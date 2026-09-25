@@ -11,3 +11,4 @@ release/
 .claude/
 .DS_Store
 *.user
+workshop/screens/

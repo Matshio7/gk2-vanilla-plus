@@ -3,6 +3,10 @@
 **Ultrawide, performance & quality of life for Graveyard Keeper 2 – the game stays vanilla.**
 by **McFly7** · [Download](https://github.com/Matshio7/gk2-vanilla-plus/releases/latest)
 
+![Ultrawide vs. vanilla](docs/screens/02_vanilla_vs_ultrawide.jpg)
+
+![Mod menu](docs/screens/03_mod_menu.jpg)
+
 **[English](#english) · [Deutsch](#deutsch)**
 
 ---

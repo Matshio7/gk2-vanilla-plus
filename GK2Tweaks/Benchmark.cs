@@ -36,6 +36,7 @@ namespace GK2Tweaks
         private float nextPoll;
         private readonly FrameStats stats = new FrameStats();
         private int shotStep;
+        private bool mainShot;
         private int gcStart;
         private readonly List<Variant> variants = new List<Variant>();
         private int variantIndex;
@@ -84,7 +85,8 @@ namespace GK2Tweaks
                     UIMainMenuWindow w = UnityEngine.Object.FindFirstObjectByType<UIMainMenuWindow>();
                     if (w == null || !w.IsShown || !w.IsContinueButtonWillBeActive()) { menuSince = -1f; return; }
                     if (menuSince < 0f) { menuSince = now; return; }
-                    if (now - menuSince < 3f) return;
+                    if (Plugin.BenchMenuShot.Value && !mainShot && now - menuSince >= 4f) { Shot("mainmenu"); mainShot = true; return; }
+                    if (now - menuSince < (Plugin.BenchMenuShot.Value ? 7f : 3f)) return;
                     Plugin.Log.LogInfo($"[BENCH] Hauptmenue nach {now:0.0}s, Fortsetzen");
                     w.OnContinueButtonClicked();
                     SetPhase(Phase.WaitLoad, now);
@@ -218,17 +220,22 @@ namespace GK2Tweaks
             if (!keepSnapshots && gs != null) SaveSystem.SaveGameSettings();
         }
 
+        // Screenshot-Tour fuer Workshop/GitHub: sauberes Bild, mit FPS-Anzeige, mit Mod-Menue
         private void MenuShot(float inPhase)
         {
-            if (shotStep == 0 && inPhase > 3f) { Plugin.Instance.Gui.SetMenu(true); shotStep = 1; }
-            else if (shotStep == 1 && inPhase > 6f)
-            {
-                string path = Path.Combine(Paths.BepInExRootPath, "gk2tweaks_menu.png");
-                ScreenCapture.CaptureScreenshot(path);
-                Plugin.Log.LogInfo("[BENCH] Screenshot: " + path);
-                shotStep = 2;
-            }
-            else if (shotStep == 2 && inPhase > 8f) { Plugin.Instance.Gui.SetMenu(false); shotStep = 3; }
+            if (shotStep == 0 && inPhase > 10f) { Shot("gameplay"); shotStep = 1; }
+            else if (shotStep == 1 && inPhase > 12f) { Plugin.ShowOverlay.Value = true; shotStep = 2; }
+            else if (shotStep == 2 && inPhase > 15f) { Shot("overlay"); shotStep = 3; }
+            else if (shotStep == 3 && inPhase > 17f) { Plugin.Instance.Gui.SetMenu(true); shotStep = 4; }
+            else if (shotStep == 4 && inPhase > 20f) { Shot("modmenu"); shotStep = 5; }
+            else if (shotStep == 5 && inPhase > 22f) { Plugin.Instance.Gui.SetMenu(false); Plugin.ShowOverlay.Value = false; shotStep = 6; }
+        }
+
+        private static void Shot(string name)
+        {
+            string path = Path.Combine(Paths.BepInExRootPath, "shot_" + name + ".png");
+            ScreenCapture.CaptureScreenshot(path);
+            Plugin.Log.LogInfo("[BENCH] Screenshot: " + path);
         }
 
         private void Report(string variant)
