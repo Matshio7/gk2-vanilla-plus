@@ -1,3 +1,5 @@
+<p align="center"><img src="docs/logo/GK2-VanillaPlus-Logo.png" alt="GK2 Vanilla+" width="600"></p>
+
 # GK2 Vanilla+
 
 **Ultrawide, performance & quality of life for Graveyard Keeper 2 – the game stays vanilla.**
