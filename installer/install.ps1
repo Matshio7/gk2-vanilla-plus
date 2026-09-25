@@ -19,6 +19,12 @@ if (-not (Test-Path (Join-Path $Payload 'winhttp.dll'))) {
 
 # --- Spielordner automatisch finden (Steam-Bibliotheken) ---
 function Find-Game {
+    # Aus dem Steam-Workshop gestartet? <Bibliothek>\steamapps\workshop\content\4358690\<id>\ -> <Bibliothek>\steamapps\common\Graveyard Keeper 2
+    $m = [regex]::Match($Root, '^(.*\\steamapps)\\workshop\\content\\4358690\\', 'IgnoreCase')
+    if ($m.Success) {
+        $g = Join-Path $m.Groups[1].Value 'common\Graveyard Keeper 2'
+        if (Test-Path (Join-Path $g $ExeName)) { return $g }
+    }
     $steamRoots = @()
     foreach ($k in 'HKCU:\Software\Valve\Steam', 'HKLM:\SOFTWARE\WOW6432Node\Valve\Steam', 'HKLM:\SOFTWARE\Valve\Steam') {
         try {

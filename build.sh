@@ -30,5 +30,11 @@ cp "$ROOT/LICENSE.md" "$ROOT/THIRD-PARTY-NOTICES.txt" "$ROOT/docs/CHANGELOG.md" 
 cp "$B/BepInEx-LICENSE.txt" "$B/UnityDoorstop-LICENSE.txt" "$S/docs/licenses/"
 mkdir -p "$R/dist"; rm -f "$R/dist/$N.zip"
 (cd "$R/stage" && zip -qrX "$R/dist/$N.zip" "$N" -x '*.DS_Store')
+# Steam-Workshop-Ordner: gleicher Inhalt wie das ZIP + Thumbnail.jpg (Vorschaubild fuer den Uploader des Spiels)
+rm -rf "$R/workshop"; mkdir -p "$R/workshop"
+cp -R "$S" "$R/workshop/GK2-VanillaPlus"
+cp "$ROOT/workshop/Thumbnail.jpg" "$R/workshop/GK2-VanillaPlus/"
+BOTTLE="$HOME/Library/Application Support/CrossOver/Bottles/Steam/drive_c"
+if [ -d "$BOTTLE" ]; then rm -rf "$BOTTLE/GK2VanillaPlus-Workshop"; cp -R "$R/workshop/GK2-VanillaPlus" "$BOTTLE/GK2VanillaPlus-Workshop"; fi
 rm -rf "$R/stage"
 echo "$R/dist/$N.zip"
