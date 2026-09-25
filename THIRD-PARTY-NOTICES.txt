@@ -1,0 +1,23 @@
+GK2 Vanilla+ – Third-party components
+======================================
+
+The release package bundles the following unmodified third-party software.
+Their license texts are included in the "licenses" folder (docs/licenses in the release package).
+
+1. BepInEx 5.4.23.5
+   https://github.com/BepInEx/BepInEx
+   License: MIT (licenses/BepInEx-LICENSE.txt)
+   Files: BepInEx/core/*, doorstop_config.ini, .doorstop_version, changelog.txt
+   BepInEx/core also contains HarmonyX (0Harmony.dll), MonoMod and Mono.Cecil,
+   all MIT licensed.
+
+2. Unity Doorstop 4.5.0
+   https://github.com/NeighTools/UnityDoorstop
+   License: GNU LGPL-2.1 (licenses/UnityDoorstop-LICENSE.txt)
+   Files: winhttp.dll
+   Source code is available at the URL above. The binary is distributed
+   unmodified as shipped in the official BepInEx 5.4.23.5 release.
+
+Graveyard Keeper 2 is (c) Lazy Bear Games / tinyBuild. No game files are
+included or modified. GK2 Vanilla+ is an unofficial fan modification and is
+not affiliated with or endorsed by Lazy Bear Games or tinyBuild.

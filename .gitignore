@@ -1,0 +1,13 @@
+# Build-Ausgaben
+bin/
+obj/
+# Privat / nicht verteilbar: Spiel-DLLs, Backups, Messdaten, Dumps, Release-Ausgaben
+_ref/
+_backup/
+_bench/
+_uidump/
+_deps/
+release/
+.claude/
+.DS_Store
+*.user
