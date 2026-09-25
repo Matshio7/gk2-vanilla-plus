@@ -32,8 +32,11 @@ mkdir -p "$R/dist"; rm -f "$R/dist/$N.zip"
 (cd "$R/stage" && zip -qrX "$R/dist/$N.zip" "$N" -x '*.DS_Store')
 # Steam-Workshop-Ordner: gleicher Inhalt wie das ZIP + Thumbnail.jpg (Vorschaubild fuer den Uploader des Spiels)
 rm -rf "$R/workshop"; mkdir -p "$R/workshop"
-cp -R "$S" "$R/workshop/GK2-VanillaPlus"
-cp "$ROOT/workshop/Thumbnail.jpg" "$R/workshop/GK2-VanillaPlus/"
+# Steam entfernt Items mit Skripten/Loader-DLLs (.bat, .ps1, winhttp.dll) -> Workshop-Item enthaelt nur die Plugins
+WS="$R/workshop/GK2-VanillaPlus"; mkdir -p "$WS/BepInEx/plugins"
+cp -R "$F/BepInEx/plugins/GK2Tweaks" "$F/BepInEx/plugins/GK2Ultrawide" "$WS/BepInEx/plugins/"
+cp "$ROOT/LICENSE.md" "$ROOT/workshop/Thumbnail.jpg" "$WS/"
+python3 -c "import sys;s=open(sys.argv[1],encoding='utf-8').read().replace('\n','\r\n');open(sys.argv[2],'w',encoding='utf-8',newline='').write(s)" "$ROOT/workshop/README.txt" "$WS/README.txt"
 BOTTLE="$HOME/Library/Application Support/CrossOver/Bottles/Steam/drive_c"
 if [ -d "$BOTTLE" ]; then rm -rf "$BOTTLE/GK2VanillaPlus-Workshop"; cp -R "$R/workshop/GK2-VanillaPlus" "$BOTTLE/GK2VanillaPlus-Workshop"; fi
 rm -rf "$R/stage"

@@ -15,19 +15,17 @@
 [*][b]One-click updates[/b] – the mod menu tells you when a new version is out.
 [/list]
 
-[h2]Install (Windows)[/h2]
-[olist]
-[*]Click [b]Subscribe[/b] and wait until Steam has downloaded the item.
-[*]Open the item folder:
-[code]<Steam library>\steamapps\workshop\content\4358690\<ID>[/code]
-<ID> is the number at the end of this page's address. Default Steam library: [i]C:\Program Files (x86)\Steam[/i].
-[*]Double-click [b]Installieren.bat[/b] (if SmartScreen warns: "More info" → "Run anyway").
-[*]The game folder is found automatically → click [b]Install[/b]. Start the game, press [b]F9[/b].
-[/olist]
-The installer also sets up BepInEx 5.4.23.5, the standard Unity mod loader.
+[h2]Install[/h2]
+[b]Easiest (Windows):[/b] download the installer from [url=https://github.com/Matshio7/gk2-vanilla-plus/releases/latest]GitHub Releases[/url], extract it, run [b]Installieren.bat[/b] → [b]Install[/b]. It sets up BepInEx and the mod in one click and can update the mod later from the in-game menu.
 
-[b]Updates:[/b] when a new version is out, the mod menu shows [i]Update available[/i] → [b]Save & update[/b]. Or run Installieren.bat again.
-[b]Uninstall:[/b] run Installieren.bat → [b]Uninstall[/b] (optionally removes BepInEx too).
+[b]Manually from this Workshop item:[/b]
+[olist]
+[*]Install [url=https://github.com/BepInEx/BepInEx/releases/tag/v5.4.23.5]BepInEx 5.4.23.5 x64[/url] in the game folder (next to GraveyardKeeper2.exe).
+[*]Subscribe, then open [i]<Steam library>\steamapps\workshop\content\4358690\<ID>[/i] (<ID> = the number at the end of this page's address).
+[*]Copy the [b]BepInEx[/b] folder from there into the game folder (merge).
+[*]Start the game and press [b]F9[/b].
+[/olist]
+[b]Uninstall:[/b] delete [i]BepInEx\plugins\GK2Tweaks[/i] and [i]BepInEx\plugins\GK2Ultrawide[/i] (or use the installer's Uninstall button).
 
 [b]macOS (CrossOver) / Linux (Proton, Steam Deck):[/b] copy the contents of [i]installer\files[/i] into the game folder and set the DLL override [i]winhttp[/i] to [i]native, builtin[/i] (Proton launch option: [code]WINEDLLOVERRIDES="winhttp=n,b" %command%[/code]). The mod menu then also offers a [b]controller fix[/b] against stutter with PlayStation controllers under Wine.
 
@@ -52,17 +50,16 @@ Problems? Please post in the comments and attach [i]<game folder>\BepInEx\LogOut
 [*][b]Updates mit einem Klick[/b] direkt aus dem Mod-Menü.
 [/list]
 
-[h2]Installation (Windows)[/h2]
+[h2]Installation[/h2]
+[b]Am einfachsten (Windows):[/b] Installer von [url=https://github.com/Matshio7/gk2-vanilla-plus/releases/latest]GitHub Releases[/url] laden, entpacken, [b]Installieren.bat[/b] → [b]Installieren[/b]. Richtet BepInEx und den Mod mit einem Klick ein, Updates dann direkt aus dem Mod-Menü.
+
+[b]Manuell aus diesem Workshop-Item:[/b]
 [olist]
-[*][b]Abonnieren[/b] klicken und warten, bis Steam das Item geladen hat.
-[*]Den Item-Ordner öffnen:
-[code]<Steam-Bibliothek>\steamapps\workshop\content\4358690\<ID>[/code]
-<ID> ist die Zahl am Ende der Adresse dieser Seite.
-[*][b]Installieren.bat[/b] doppelklicken (bei SmartScreen: „Weitere Informationen“ → „Trotzdem ausführen“).
-[*]Der Spielordner wird automatisch gefunden → [b]Installieren[/b]. Spiel starten, [b]F9[/b] drücken.
+[*][url=https://github.com/BepInEx/BepInEx/releases/tag/v5.4.23.5]BepInEx 5.4.23.5 x64[/url] in den Spielordner installieren (neben GraveyardKeeper2.exe).
+[*]Abonnieren, dann [i]<Steam-Bibliothek>\steamapps\workshop\content\4358690\<ID>[/i] öffnen (<ID> = Zahl am Ende der Adresse dieser Seite).
+[*]Den Ordner [b]BepInEx[/b] von dort in den Spielordner kopieren (zusammenführen).
+[*]Spiel starten, [b]F9[/b] drücken.
 [/olist]
-[b]Updates:[/b] Das Mod-Menü zeigt neue Versionen an → [b]Speichern & aktualisieren[/b].
-[b]Deinstallieren:[/b] Installieren.bat → [b]Deinstallieren[/b].
 
 Weitergabe in kostenlosen Modpacks ist [b]unverändert[/b] und mit Namensnennung erlaubt. Verändern, als eigenes hochladen oder Credits entfernen ist nicht erlaubt. Details: [url=https://github.com/Matshio7/gk2-vanilla-plus/blob/main/LICENSE.md]LICENSE[/url]
 
