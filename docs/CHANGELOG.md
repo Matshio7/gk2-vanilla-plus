@@ -7,8 +7,8 @@
 - New: pin **quests** and **single crafts** (e.g. clearing blockages) – pin in the header of the recipe or quest window; quest pins show the current task
 - New: pins are **kept per save**
 - New: **save overview** in the mod menu in the main menu – day, date, graveyard/church quality, "Play" button and the backups of each save
-- New: **camera** – zoom presets on F8, separate zoom indoors, smooth zoom with the mouse wheel, smooth transitions
-- New: **screenshot key** (F11) in up to 4× resolution, optionally without HUD
+- New: **camera** – zoom presets on F5, separate zoom indoors, smooth zoom with the mouse wheel, smooth transitions
+- New: **screenshot key** (F12) in up to 4× resolution, optionally without HUD
 - New: **readability** – size of the mod displays (80–200 %), high contrast mode, larger tooltips
 - New: **languages** – French, Spanish, Russian and Chinese; more languages via a simple text file (BepInEx/GK2VanillaPlus/lang/_template.txt)
 - New: **"Mods" button** in the main menu and the pause menu (Esc) – opens the mod menu, closing it returns to the game menu
@@ -24,8 +24,8 @@
 - Neu: **Quests** und **Einzel-Handwerk** (z. B. Hindernisse räumen) anpinnen – Pinnadel in der Überschrift des Rezept- oder Quest-Fensters; Quest-Pins zeigen die aktuelle Aufgabe
 - Neu: Pins werden **pro Spielstand gespeichert**
 - Neu: **Spielstand-Übersicht** im Mod-Menü im Hauptmenü – Tag, Datum, Friedhof-/Kirchen-Qualität, Button „Spielen“ und die Backups je Spielstand
-- Neu: **Kamera** – Zoom-Stufen auf F8, eigener Zoom in Innenräumen, stufenloser Zoom mit dem Mausrad, weiche Übergänge
-- Neu: **Screenshot-Taste** (F11) in bis zu 4-facher Auflösung, wahlweise ohne HUD
+- Neu: **Kamera** – Zoom-Stufen auf F5, eigener Zoom in Innenräumen, stufenloser Zoom mit dem Mausrad, weiche Übergänge
+- Neu: **Screenshot-Taste** (F12) in bis zu 4-facher Auflösung, wahlweise ohne HUD
 - Neu: **Lesbarkeit** – Größe der Mod-Anzeigen (80–200 %), Modus „Hoher Kontrast“, größere Tooltips
 - Neu: **Sprachen** – Französisch, Spanisch, Russisch und Chinesisch; weitere Sprachen über eine einfache Textdatei (BepInEx/GK2VanillaPlus/lang/_template.txt)
 - Neu: **Button „Mods“** im Hauptmenü und im Pausenmenü (Esc) – öffnet das Mod-Menü, beim Schließen geht es zurück ins Spielmenü

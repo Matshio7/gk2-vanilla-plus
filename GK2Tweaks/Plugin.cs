@@ -138,7 +138,7 @@ namespace GK2Tweaks
                 "Separate camera zoom inside buildings (church, morgue, houses ...). 0 = same as outside.",
                 new AcceptableValueList<int>(0, 80, 90, 100, 110, 125, 150, 175)));
             ZoomPresets = Config.Bind("Camera", "ZoomPresets", "80,100,125", "Zoom levels in percent the preset key cycles through, comma-separated.");
-            ZoomPresetKey = Config.Bind("Camera", "ZoomPresetKey", new KeyboardShortcut(KeyCode.F8), "Key to cycle through the zoom presets.");
+            ZoomPresetKey = Config.Bind("Camera", "ZoomPresetKey", new KeyboardShortcut(KeyCode.F5), "Key to cycle through the zoom presets.");
             MouseWheelZoom = Config.Bind("Camera", "MouseWheelZoom", true, "Zoom smoothly with the mouse wheel (only while walking around, not over menus). Resets to the camera zoom setting on the next start.");
             SmoothZoom = Config.Bind("Camera", "SmoothZoom", true, "Smooth transition when the zoom changes.");
             PauseInBackground = Config.Bind("Comfort", "PauseInBackground", true, "Pause the game while its window is in the background (saves battery and heat).");
@@ -169,7 +169,7 @@ namespace GK2Tweaks
                 "Size of the mod menu, FPS display and pinned list. 0 = automatic (follows the screen height).",
                 new AcceptableValueList<int>(0, 80, 90, 100, 110, 125, 150, 175, 200)));
             HighContrast = Config.Bind("Interface", "HighContrast", false, "Stronger contrast: dark background for the pinned list, bold and brighter have/need numbers, larger tooltips.");
-            ShotKey = Config.Bind("Screenshots", "Key", new KeyboardShortcut(KeyCode.F11), "Key for a screenshot (saved to BepInEx/GK2VanillaPlus/Screenshots).");
+            ShotKey = Config.Bind("Screenshots", "Key", new KeyboardShortcut(KeyCode.F12), "Key for a screenshot (saved to BepInEx/GK2VanillaPlus/Screenshots).");
             ShotScale = Config.Bind("Screenshots", "Scale", 2, new ConfigDescription("Resolution multiplier: 2 = twice the screen resolution in each direction (e.g. 3840x2160 from 1920x1080).",
                 new AcceptableValueList<int>(1, 2, 3, 4)));
             ShotHideHud = Config.Bind("Screenshots", "HideHud", true, "Hide the game HUD and the mod displays for the screenshot.");
