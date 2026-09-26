@@ -141,15 +141,18 @@ namespace GK2Tweaks
 
         private static void CheckGamepadCombo()
         {
-            if (!Plugin.PinsEnabled.Value || Focused == null || !LazyInput.IsGamepadActive) return;
+            if (!Plugin.PinsEnabled.Value || !LazyInput.IsGamepadActive) return;
             try
             {
                 if (!Rewired.ReInput.isReady) return;
                 Rewired.Player pl = Rewired.ReInput.players.GetPlayer(0);
                 bool l = pl.GetButton(RewiredLStick), r = pl.GetButton(RewiredRStick);
                 if (!(l && r) || !(pl.GetButtonDown(RewiredLStick) || pl.GetButtonDown(RewiredRStick))) return;
-                PinButton b = PinButton.For(Focused.transform);
+                PinButton b = Focused != null ? PinButton.For(Focused.transform) : null;
+                // Fenster mit Nadel im Kopf (Quest, Einzel-Craft): der Fokus liegt dort nicht in der Naehe der Nadel
+                if (b == null || b.Make == null) b = PinButton.HeaderPin();
                 if (b != null && b.Make != null) Toggle(b.Make());
+                else Plugin.Log.LogInfo("Pin (L3+R3): nothing to pin, focus " + (Focused != null ? Focused.name + " in " + Focused.transform.root.name : "none"));
             }
             catch { }
         }
@@ -252,6 +255,7 @@ namespace GK2Tweaks
             b.Key = key;
             b.Make = make;
             b.alwaysShow = alwaysShow;
+            b.attachedAt = Time.unscaledTime;
             b.gameObject.SetActive(Plugin.PinsEnabled.Value && key != null);
             b.UpdateLook();
         }
@@ -289,6 +293,15 @@ namespace GK2Tweaks
             return null;
         }
 
+        // Sichtbare Kopf-Nadel (immer angezeigt) im zuletzt geoeffneten Fenster
+        internal static PinButton HeaderPin()
+        {
+            PinButton best = null;
+            foreach (PinButton b in all)
+                if (b != null && b.alwaysShow && b.Key != null && b.Make != null && b.gameObject.activeInHierarchy && (best == null || b.attachedAt > best.attachedAt)) best = b;
+            return best;
+        }
+
         internal static string KeyOf(Component widget)
         {
             Transform t = widget.transform.Find("GK2VanillaPlus_Pin");
@@ -303,6 +316,7 @@ namespace GK2Tweaks
         }
 
         private bool pinned, alwaysShow;
+        private float attachedAt;
         private Canvas canvas;
 
         private void UpdateLook()
@@ -438,7 +452,7 @@ namespace GK2Tweaks
             {
                 var d = Traverse.Create(__instance).Field("data").GetValue<UICraftPreviewItemCellData>();
                 CraftDef def = d?.CraftDef;
-                if (def == null || d.IsTab || d.IsUnknown || def.isAuto || def.needItems == null || def.needItems.Count == 0) { PinButton.Attach(__instance, null, null, 16f); return; }
+                if (def == null || d.IsTab || d.IsUnknown || def.needItems == null || def.needItems.Count == 0) { PinButton.Attach(__instance, null, null, 16f); return; }
                 WgoData wgo = d.WgoData;
                 PinButton.Attach(__instance, "craft:" + def.id, () => Pins.FromCraftDef(def, wgo), 16f);
             }
@@ -511,7 +525,8 @@ namespace GK2Tweaks
                 var header = Traverse.Create(__instance).Field("headerLabel").GetValue<TMPro.TextMeshProUGUI>();
                 if (header == null) return;
                 Component host = header.transform.parent;
-                if (def == null || def.isAuto) { PinButton.Attach(host, null, null, 30f, true, 64f); return; }
+                Plugin.Log.LogInfo("Pin selection: " + __instance.GetType().Name + " " + (def != null ? def.id + (def.isAuto ? " (auto)" : "") : "-") + " cells " + (data?.CraftItemCellsData?.Count ?? -1));
+                if (def == null || (def.isAuto && (data.CraftItemCellsData == null || data.CraftItemCellsData.Count == 0))) { PinButton.Attach(host, null, null, 30f, true, 64f); return; }
                 PinButton.Attach(host, "craft:" + def.id, () =>
                 {
                     string icon = null;

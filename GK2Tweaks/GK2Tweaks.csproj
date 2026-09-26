@@ -4,7 +4,7 @@
     <AssemblyName>GK2Tweaks</AssemblyName>
     <RootNamespace>GK2Tweaks</RootNamespace>
     <LangVersion>latest</LangVersion>
-    <Version>1.4.2</Version>
+    <Version>1.4.3</Version>
     <DefineConstants Condition="'$(Configuration)' == 'Dev'">$(DefineConstants);DEV</DefineConstants>
     <DefineConstants Condition="'$(Configuration)' == 'Nexus'">$(DefineConstants);NEXUS</DefineConstants>
     <Optimize Condition="'$(Configuration)' == 'Nexus'">true</Optimize>
@@ -38,6 +38,7 @@
     <Reference Include="Rewired_Core"><HintPath>$(ManagedDir)Rewired_Core.dll</HintPath><Private>false</Private></Reference>
     <Reference Include="com.rlabrecque.steamworks.net"><HintPath>$(ManagedDir)com.rlabrecque.steamworks.net.dll</HintPath><Private>false</Private></Reference>
     <Reference Include="Unity.Postprocessing.Runtime"><HintPath>$(ManagedDir)Unity.Postprocessing.Runtime.dll</HintPath><Private>false</Private></Reference>
+    <Reference Include="UnityEngine.ParticleSystemModule"><HintPath>$(ManagedDir)UnityEngine.ParticleSystemModule.dll</HintPath><Private>false</Private></Reference>
     <Reference Include="Unity.TextMeshPro"><HintPath>$(ManagedDir)Unity.TextMeshPro.dll</HintPath><Private>false</Private></Reference>
     <Reference Include="UnityEngine.TextRenderingModule"><HintPath>$(ManagedDir)UnityEngine.TextRenderingModule.dll</HintPath><Private>false</Private></Reference>
   </ItemGroup>

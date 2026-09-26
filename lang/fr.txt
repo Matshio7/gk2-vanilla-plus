@@ -274,3 +274,5 @@ Ask how many corpses are needed this week => Demander combien de cadavres il fau
 Game's own copy => Copie du jeu
 OLED black => Noir OLED
 Pure black instead of dark gray around the map (e.g. outside the church or at the level edge). Good for OLED screens. => Noir pur au lieu de gris foncé autour de la carte (p. ex. hors de l'église ou au bord du niveau). Idéal pour les écrans OLED.
+Full-width rain => Pluie sur toute la largeur
+Rain and snow cover the whole screen on ultrawide monitors and when zoomed out (the game only fills a 16:9 area). => La pluie et la neige couvrent tout l'écran sur les moniteurs ultra-larges et en dézoomant (le jeu ne remplit qu'une zone 16:9).

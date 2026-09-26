@@ -48,6 +48,7 @@ Smooth zoom =>
 Size of mod displays => 
 High contrast => 
 OLED black => 
+Full-width rain => 
 Screenshot key => 
 Resolution => 
 Without HUD => 
@@ -161,6 +162,7 @@ Before the game overwrites a save, the previous save is backed up (BepInEx/GK2Va
 Minimum minutes between two backups of the same slot (avoids a backup on every autosave). => 
 Key for saving the game manually (empty = only the button in the mod menu). => 
 Size of the mod menu, FPS display and pinned list. 0 = automatic (follows the screen height). => 
+Rain and snow cover the whole screen on ultrawide monitors and when zoomed out (the game only fills a 16:9 area). => 
 Pure black instead of dark gray around the map (e.g. outside the church or at the level edge). Good for OLED screens. => 
 Stronger contrast: dark background for the pinned list, bold and brighter have/need numbers, larger tooltips. => 
 Key for a screenshot (saved to BepInEx/GK2VanillaPlus/Screenshots). => 

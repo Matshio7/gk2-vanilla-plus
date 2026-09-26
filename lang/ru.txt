@@ -274,3 +274,5 @@ Ask how many corpses are needed this week => Узнать, сколько тру
 Game's own copy => Копия игры
 OLED black => OLED-чёрный
 Pure black instead of dark gray around the map (e.g. outside the church or at the level edge). Good for OLED screens. => Чистый чёрный вместо тёмно-серого вокруг карты (например, за пределами церкви или на краю уровня). Подходит для OLED-экранов.
+Full-width rain => Дождь на всю ширину
+Rain and snow cover the whole screen on ultrawide monitors and when zoomed out (the game only fills a 16:9 area). => Дождь и снег покрывают весь экран на сверхшироких мониторах и при отдалении камеры (игра заполняет только область 16:9).

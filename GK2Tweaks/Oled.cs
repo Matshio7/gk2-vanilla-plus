@@ -52,7 +52,7 @@ namespace GK2Tweaks
             }
             else if (cg.lift.value != setLift) origLift = cg.lift.value; // vom Spiel geaendert
             float contrast = cg.contrast.value / 100f + 1f;
-            float black = contrast < 1f ? Mathf.Pow(0.5f, 2.2f) * (1f - contrast) * 1.1f : 0f;
+            float black = contrast < 1f ? Mathf.Pow(0.5f, 2.2f) * (1f - contrast) * 1.6f : 0f;
             float w = black > 0f ? -black / (1f - black) : 0f;
             setLift = new Vector4(origLift.x, origLift.y, origLift.z, origLift.w + w);
             if (cg.lift.value != setLift)

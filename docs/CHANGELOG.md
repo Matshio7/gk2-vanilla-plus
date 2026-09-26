@@ -1,5 +1,19 @@
 # Changelog
 
+## 1.4.3 – 2026-09-27
+
+**EN**
+- New: **full-width rain** – rain and snow now cover the whole screen on ultrawide monitors and when zoomed out (the game only fills a 16:9 area). Inspired by "GK2 Ultrawide Rain Fix" by Dry Bones (own implementation)
+- OLED black is a bit darker (near-black areas are now fully black)
+- Fix: quests can now be pinned with the controller (both sticks)
+- Fix: blockages like the tunnel breakthrough can now be pinned
+
+**DE**
+- Neu: **Regen über die ganze Breite** – Regen und Schnee füllen jetzt auf Ultrawide-Monitoren und beim Herauszoomen den ganzen Bildschirm (das Spiel füllt nur einen 16:9-Bereich). Angeregt durch „GK2 Ultrawide Rain Fix“ von Dry Bones (eigene Umsetzung)
+- OLED-Schwarz ist etwas dunkler (fast schwarze Bereiche sind jetzt ganz schwarz)
+- Fix: Quests lassen sich jetzt auch mit dem Controller anpinnen (beide Sticks)
+- Fix: Hindernisse wie der Durchbruch im Tunnel lassen sich jetzt anpinnen
+
 ## 1.4.2 – 2026-09-26
 
 **EN**
