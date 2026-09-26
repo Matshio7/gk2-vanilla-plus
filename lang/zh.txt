@@ -1,0 +1,274 @@
+# GK2 Vanilla+ – 中文
+# Format: English text => translation. Improvements welcome (GitHub / Workshop comments).
+
+Restoring only works in the main menu. => 只能在主菜单中恢复。
+Restored. Please restart the game once, then "Continue". => 已恢复。请重启一次游戏，然后点击“继续”。
+Screenshot saved: => 截图已保存：
+Screenshot failed. => 截图失败。
+Your settings => 你的设置
+Graphics benchmark => 图形基准测试
+measuring … => 测量中 …
+warming up … => 预热中 …
+cancel => 取消
+Benchmark cancelled. => 基准测试已取消。
+Your own settings hold the target too. => 你自己的设置也能达到目标。
+Recommended: => 推荐：
+(holds {0} FPS) => （可保持 {0} FPS）
+Recommended: Lowest – no tier fully holds {0} FPS. Tip: render mode "Pixel" or a lower resolution. => 推荐：最低 – 没有任何档位能完全保持 {0} FPS。提示：渲染模式选“像素”或降低分辨率。
+Unlimited => 无限制
+Default (50 Hz) => 默认（50 Hz）
+same as outside => 与室外相同
+Automatic => 自动
+Off => 关
+every => 每
+every save => 每次保存
+High => 高
+Medium => 中
+Low => 低
+Lowest => 最低
+Frame rate mode => 帧率模式
+Target FPS => 目标 FPS
+Render mode => 渲染模式
+Shadows => 阴影
+Ambient occlusion (HBAO) => 环境光遮蔽（HBAO）
+Point lights => 点光源
+Back light => 逆光
+Water => 水面
+Clouds => 云
+Physics rate => 物理频率
+Camera zoom => 镜头缩放
+Zoom indoors => 室内缩放
+Zoom presets => 缩放预设
+Zoom preset key => 缩放预设按键
+Mouse wheel zoom => 鼠标滚轮缩放
+Smooth zoom => 平滑缩放
+Size of mod displays => 模组界面大小
+High contrast => 高对比度
+Screenshot key => 截图按键
+Resolution => 分辨率
+Without HUD => 隐藏界面
+Pause in background => 后台暂停
+Autosave => 自动存档
+Widen main menu => 加宽主菜单
+Skip logos => 跳过开场标志
+"modded" note => “modded”标注
+Game log => 游戏日志
+"Mods" button in menus => 菜单中的“模组”按钮
+Show FPS display => 显示 FPS
+Stats to log => 统计写入日志
+Mod menu key => 模组菜单按键
+FPS display key => FPS 显示按键
+Save key => 存档按键
+Week plan key => 周计划按键
+Hide HUD key => 隐藏界面按键
+Daily reminder => 每日提醒
+Backups per save => 每个存档的备份数
+Minimum interval => 最小间隔
+Check for updates => 检查更新
+Language => 语言
+Position => 位置
+Pinning => 固定
+Size => 大小
+Layout => 布局
+FPS => FPS
+1% low FPS => 1% 低帧
+Frame time (ms) => 帧时间（毫秒）
+CPU load => CPU 占用
+GPU load => GPU 占用
+Memory (RAM) => 内存（RAM）
+Video memory (VRAM) => 显存（VRAM）
+Clock => 时钟
+Weekday (in game) => 星期（游戏内）
+Time of day (in game) => 时间（游戏内）
+Extra resolutions => 额外分辨率
+Main menu scaling => 主菜单缩放
+as graphics tier => 跟随画质档位
+game setting => 游戏设置
+Software limit => 软件限制
+VSync => 垂直同步
+On => 开
+PC soft (high) => PC 柔和（高）
+PC soft (medium) => PC 柔和（中）
+PC soft (low) => PC 柔和（低）
+Simple (desktop) => 简单（桌面）
+Simple (balanced) => 简单（均衡）
+Simple (performance) => 简单（性能）
+Simple (low) => 简单（低）
+Simple (minimal) => 简单（最低）
+Console (PS5/Xbox) => 主机（PS5/Xbox）
+Highest => 最高
+Real => 真实
+Simulated => 模拟
+Simple => 简单
+Normal => 普通
+Simplified => 简化
+Full (native) => 完整（原生）
+Pixel (half res) => 像素（半分辨率）
+Everything => 全部
+Warnings + errors => 警告 + 错误
+Errors only => 仅错误
+Deutsch => Deutsch
+Français => Français
+Español => Español
+English => English
+Top left => 左上
+Top right => 右上
+Bottom left => 左下
+Bottom right => 右下
+In a row => 横排
+Small => 小
+Large => 大
+Extra large => 特大
+In a column => 竖排
+Mods => 模组
+off => 关
+Lights => 光源
+on => 开
+Native = world at full resolution. Lightweight = world at half resolution (chunkier pixels), much less GPU load. Default = as the graphics tier. => 原生 = 世界以完整分辨率渲染。轻量 = 世界以一半分辨率渲染（像素更粗），显卡负载大幅降低。默认 = 跟随画质档位。
+Shadows. NGSS = soft PC shadows (expensive). Unity_* = simpler shadows as on PS5/Xbox. Default = as the graphics tier. => 阴影。NGSS = PC 柔和阴影（开销大）。Unity_* = 与 PS5/Xbox 相同的简单阴影。默认 = 跟随画质档位。
+Ambient occlusion (HBAO). Off is otherwise only used on Switch. Default = as the graphics tier. => 环境光遮蔽（HBAO）。“关”原本只在 Switch 上使用。默认 = 跟随画质档位。
+Point lights real (Realtime) or simulated (Faked, cheaper). Default = as the graphics tier. => 点光源为真实光照或模拟光照（开销更低）。默认 = 跟随画质档位。
+Back light effect. Default = as the graphics tier. => 逆光效果。默认 = 跟随画质档位。
+Water quality. Default = as the graphics tier. => 水面质量。默认 = 跟随画质档位。
+Clouds normal or simplified. May apply only after changing area. Default = as the graphics tier. => 普通或简化的云。可能在切换区域后才生效。默认 = 跟随画质档位。
+Game = setting from the game menu. Limit = software cap at TargetFps. VSync = synced to the refresh rate (60 FPS at 120 Hz = every 2nd refresh). => 游戏 = 使用游戏菜单中的设置。限制 = 用软件把帧率限制在目标 FPS。垂直同步 = 与刷新率同步（120 Hz 下 60 FPS = 每两次刷新一帧）。
+Target FPS for Limit and VSync. 0 = unlimited => 限制与垂直同步的目标 FPS。0 = 无限制
+Physics rate. 0 = game default (50 Hz). 30 = like the Switch version, saves CPU. => 物理频率。0 = 游戏默认（50 Hz）。30 = 与 Switch 版相同，节省 CPU。
+What the game writes to Player.log. Warning or Error suppresses log spam. => 游戏写入 Player.log 的内容。选“警告”或“错误”可减少日志刷屏。
+Camera zoom in percent. Below 100 = see more, above 100 = closer. => 镜头缩放百分比。低于 100 = 看得更多，高于 100 = 更近。
+Separate camera zoom inside buildings (church, morgue, houses ...). 0 = same as outside. => 建筑内部（教堂、停尸间、房屋……）单独的镜头缩放。0 = 与室外相同。
+Zoom levels in percent the preset key cycles through, comma-separated. => 预设按键循环切换的缩放百分比，用逗号分隔。
+Key to cycle through the zoom presets. => 循环切换缩放预设的按键。
+Zoom smoothly with the mouse wheel (only while walking around, not over menus). Resets to the camera zoom setting on the next start. => 用鼠标滚轮无级缩放（仅在行走时，不在菜单上）。下次启动时恢复为镜头缩放设置。
+Smooth transition when the zoom changes. => 缩放变化时平滑过渡。
+Pause the game while its window is in the background (saves battery and heat). => 游戏窗口在后台时暂停游戏（省电、降温）。
+Fill the sides of the main menu on ultrawide screens with a blurred copy of the menu image. => 在超宽屏上用模糊的菜单图像填充主菜单两侧。
+Skip the logos and intro videos when the game starts. => 启动游戏时跳过开场标志和视频。
+Show a 'modded' note next to the version number in the main menu. => 在主菜单版本号旁显示“modded”标注。
+Show a 'Mods' button in the main menu and the pause menu (opens this mod menu). => 在主菜单和暂停菜单中显示“模组”按钮（打开本菜单）。
+Extra autosave every N minutes (0 = off). Only saves while you are in free control. => 每 N 分钟额外自动存档（0 = 关）。仅在可自由操作时存档。
+Key for the mod menu. => 模组菜单按键。
+Key for the FPS display. => FPS 显示按键。
+Check GitHub once per game start for a new version of GK2 Vanilla+ (only reads the version number, nothing is sent). => 每次启动时在 GitHub 检查一次 GK2 Vanilla+ 新版本（只读取版本号，不发送任何数据）。
+Key for the week plan (what is possible on which weekday). => 周计划按键（每个星期几能做什么）。
+Key to hide/show the game's HUD, e.g. for screenshots. Esc shows it again. => 隐藏/显示游戏界面的按键，例如用于截图。Esc 重新显示。
+Show a notification each morning with what is possible today (only features you have already unlocked). => 每天早上通知今天可以做什么（仅限已解锁的内容）。
+Before the game overwrites a save, the previous save is backed up (BepInEx/GK2VanillaPlus/Backups). Number of backups kept per save slot, 0 = off. => 游戏覆盖存档前，会先备份旧存档（BepInEx/GK2VanillaPlus/Backups）。每个存档位保留的备份数，0 = 关。
+Minimum minutes between two backups of the same slot (avoids a backup on every autosave). => 同一存档位两次备份之间的最少分钟数（避免每次自动存档都备份）。
+Key for saving the game manually (empty = only the button in the mod menu). => 手动存档按键（留空 = 只用模组菜单中的按钮）。
+Size of the mod menu, FPS display and pinned list. 0 = automatic (follows the screen height). => 模组菜单、FPS 显示和固定列表的大小。0 = 自动（按屏幕高度）。
+Stronger contrast: dark background for the pinned list, bold and brighter have/need numbers, larger tooltips. => 更强对比度：固定列表使用深色背景，拥有/需要数字加粗加亮，提示文字更大。
+Key for a screenshot (saved to BepInEx/GK2VanillaPlus/Screenshots). => 截图按键（保存到 BepInEx/GK2VanillaPlus/Screenshots）。
+Resolution multiplier: 2 = twice the screen resolution in each direction (e.g. 3840x2160 from 1920x1080). => 分辨率倍数：2 = 每个方向都是屏幕分辨率的两倍（例如 1920x1080 变为 3840x2160）。
+Hide the game HUD and the mod displays for the screenshot. => 截图时隐藏游戏界面和模组显示。
+Show the FPS display (toggle with F10). Position and contents: section [Overlay]. => 显示 FPS（F10 切换）。位置和内容：见“FPS 显示”部分。
+Language of the mod menu. Auto = game language (if a translation exists, otherwise English). Translations: BepInEx/GK2VanillaPlus/lang. => 模组菜单语言。自动 = 跟随游戏语言（有翻译时使用，否则英文）。翻译文件：BepInEx/GK2VanillaPlus/lang。
+Internal: mod version whose changelog was last shown (the 'What's new' window appears once after an update). => 内部：最近一次显示更新说明的模组版本（更新后“新内容”窗口会显示一次）。
+Screen corner of the FPS display. => FPS 显示所在的屏幕角落。
+Row = all values in one line. Column = one value per line. => 横排 = 所有数值一行显示。竖排 = 每行一个数值。
+Frames per second (average over 0.5 s). => 每秒帧数（0.5 秒平均）。
+1% low FPS: how smooth it feels. Close to the FPS value = no stutter. => 1% 低帧：体感流畅度。接近 FPS 数值 = 没有卡顿。
+Frame time in ms (average and slowest frame). => 帧时间（毫秒，平均值和最慢一帧）。
+CPU load of the game (100 % = all cores busy). => 游戏的 CPU 占用（100% = 所有核心满载）。
+GPU load (3D engine, like Task Manager). Windows only. => GPU 占用（3D 引擎，与任务管理器一致）。仅限 Windows。
+RAM used by the game => 游戏占用的内存
+Video memory used by the game's textures and buffers => 游戏纹理和缓冲区占用的显存
+Current render resolution. => 当前渲染分辨率。
+Current time. => 当前时间。
+In-game weekday (Pride, Sloth, ...). => 游戏内星期（傲慢、懒惰……）。
+In-game time of day. => 游戏内时间。
+Pin recipes, blueprints and town buildings (pin icon in their top right corner). Pinned items show have/need counts from your inventory. => 固定配方、蓝图和城镇建筑（右上角的图钉）。固定的条目会按你的背包显示拥有/需要数量。
+Screen corner of the pinned list. => 固定列表所在的屏幕角落。
+Text and icon size of the pinned list. => 固定列表的文字和图标大小。
+Write frame statistics to the BepInEx log every N seconds (0 = off). => 每 N 秒把帧统计写入 BepInEx 日志（0 = 关）。
+Zoom => 缩放
+(indoors) => （室内）
+Saving only works while playing. => 只能在游戏中存档。
+Not possible right now (dialogue, work, sleep …). Try again in a moment. => 当前无法存档（对话、工作、睡觉……）。请稍后再试。
+Saving … => 存档中 …
+Saved => 已存档
+Saving failed. => 存档失败。
+ready => 就绪
+done => 已完成
+Unpin => 取消固定
+Week plan => 周计划
+What's new? => 新内容
+Active: => 当前：
+Game => 游戏
+Frame rate => 帧率
+Graphics (overrides parts of the graphics tier) => 图形（覆盖画质档位的部分设置）
+Camera => 镜头
+Comfort => 便利
+Screenshots => 截图
+Open screenshot folder => 打开截图文件夹
+Performance => 性能
+Interface => 界面
+Remove all pins => 移除全部固定
+FPS display => FPS 显示
+(applies after restart) => （重启后生效）
+Save now => 立即存档
+Reset graphics => 重置图形
+Close ( => 关闭（
+Mac / Linux (CrossOver, Wine) => Mac / Linux（CrossOver、Wine）
+Controller fix => 手柄修复
+Fixes stutter with PlayStation controllers (DualSense/DualShock) under CrossOver/Wine by reading the controller through a cheaper path. Turn it off again if the controller misbehaves. => 通过更轻量的方式读取手柄，修复 CrossOver/Wine 下 PlayStation 手柄（DualSense/DualShock）引起的卡顿。如果手柄工作异常，请关闭。
+Applies after a restart: quit the game AND Steam (or restart the CrossOver bottle). => 重启后生效：退出游戏和 Steam（或重启 CrossOver 容器）。
+Runs through all graphics tiers (about 13 s each, a bit over a minute in total) and measures FPS without a limit. You get a score and a recommendation at the end. Nothing is saved, your settings stay as they are. Best to stand still at a typical spot. Esc cancels. => 依次测试所有画质档位（每档约 13 秒，总共一分多钟），在不限帧的情况下测量 FPS，最后给出分数和推荐。不会保存任何内容，你的设置保持不变。最好站在一个常去的地方不动。按 Esc 取消。
+Start benchmark => 开始测试
+only while playing => 仅在游戏中
+Score = average FPS across the four graphics tiers × 10, higher is better – handy for comparing PCs and settings. Saved to BepInEx/GK2VanillaPlus/benchmark.txt => 分数 = 四个画质档位的平均 FPS × 10，越高越好——方便比较电脑和设置。保存在 BepInEx/GK2VanillaPlus/benchmark.txt
+GK2 Vanilla+ was updated. Here is what changed: => GK2 Vanilla+ 已更新。更新内容如下：
+Version => 版本
+All versions => 全部版本
+Close => 关闭
+what's on when? => 什么时候做什么？
+· today => · 今天
+· tomorrow => · 明天
+– nothing special (or not unlocked yet) => – 没有特别的事（或尚未解锁）
+Saves => 存档
+No saves found. => 未找到存档。
+Day => 天数
+(autosave) => （自动存档）
+Graveyard => 墓地
+Church => 教堂
+Play => 开始
+Backup => 备份
+(before restore) => （恢复前）
+Sure? => 确定？
+Restore => 恢复
+Save backups => 存档备份
+No backups yet. => 暂无备份。
+Restore backups: see "Saves" at the top. => 恢复备份：见上方“存档”。
+"Restore" replaces the save with the backup (the current save is backed up first). => “恢复”会用备份替换存档（会先备份当前存档）。
+Restoring is available in the main menu. => 可在主菜单中恢复。
+Open backup folder => 打开备份文件夹
+Update available: => 有可用更新：
+Save & update => 存档并更新
+Saves (if in game), quits the game and installs the new version. The game can be restarted right after. => 存档（如在游戏中）、退出游戏并安装新版本。之后可立即重新启动游戏。
+Download page => 下载页面
+Graphics tier => 画质档位
+The tier from the game menu. The values under 'Graphics' override parts of it. => 游戏菜单中的画质档位。“图形”下的设置会覆盖其中部分项。
+Press a key … (Esc = none) => 请按一个键 …（Esc = 无）
+– none – => – 无 –
+GK2 Vanilla+ {0} is available – press F9 to update => GK2 Vanilla+ {0} 已发布——按 F9 更新
+Could not start the updater – opening the download page. => 无法启动更新程序，正在打开下载页面。
+Today => 今天
+Pride => 傲慢
+Sloth => 懒惰
+Gluttony => 暴食
+Lust => 色欲
+Envy => 嫉妒
+Wrath => 暴怒
+Town orders can be accepted => 可以接城镇订单
+Vendor happiness limit resets => 商人满意度上限重置
+The bell calls the zombies to the town centre => 钟声把僵尸召集到镇中心
+Battle day: plan your attacks => 战斗日：规划你的进攻
+Fill the PR machine (newspapers, hypno devices) => 给宣传机补充物资（报纸、催眠装置）
+Bring green scrolls to Linda => 把绿色卷轴交给琳达
+Merchant ship in port: new goods at the Trade Master => 商船靠港：贸易大师有新货
+Looters at the port take new orders => 港口的掠夺者接受新委托
+Thunderstorm: resurrect zombies => 雷雨：复活僵尸
+Collect blue crystals at the goddess statue => 在女神像处收集蓝色水晶
+Hold a sermon in the church => 在教堂布道
+Ask how many corpses are needed this week => 询问本周需要多少具尸体
+Game's own copy => 游戏自带副本

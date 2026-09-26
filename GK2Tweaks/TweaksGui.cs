@@ -165,7 +165,8 @@ namespace GK2Tweaks
         }
 
         // oben rechts steht im Spiel der Gebietsname - im Spiel darunter anfangen
-        private static float TopFor(string corner) => corner == "TopRight" && WeekPlan.InGame ? 66f : 12f;
+        private float curScale = 1f;
+        private float TopFor(string corner) => corner == "TopRight" && WeekPlan.InGame ? 66f * Mathf.Clamp(Screen.height / 1080f, 0.75f, 2.5f) / curScale : 12f;
 
         private Rect DrawOverlay(float scale)
         {
@@ -183,40 +184,66 @@ namespace GK2Tweaks
         }
 
         // ---------- Pin-Liste ----------
-        private GUIStyle pinTitleStyle, pinRowStyle, pinBoxStyle, pinXStyle;
-        private string pinStyleSize;
+        private GUIStyle pinTitleStyle, pinRowStyle, pinBoxStyle, pinXStyle, pinNoteStyle;
+        private string pinStyleKey;
+        private Texture2D pinDarkTex;
 
         private void EnsurePinStyles()
         {
             string size = Plugin.PinsSize.Value;
-            if (pinTitleStyle != null && pinStyleSize == size) return;
-            pinStyleSize = size;
+            bool hc = Plugin.HighContrast.Value;
+            string key = size + hc;
+            if (pinTitleStyle != null && pinStyleKey == key) return;
+            pinStyleKey = key;
             int f = size == "Small" ? 15 : size == "Large" ? 22 : size == "ExtraLarge" ? 26 : 18;
             pinBoxStyle = new GUIStyle(overlayStyle) { padding = new RectOffset(12, 12, 8, 8), fixedHeight = 0, fixedWidth = 0 };
+            if (hc)
+            {
+                // Hoher Kontrast: fast schwarzer Hintergrund statt Schiefer
+                if (pinDarkTex == null) { pinDarkTex = new Texture2D(1, 1); pinDarkTex.SetPixel(0, 0, new Color(0.03f, 0.03f, 0.04f, 0.92f)); pinDarkTex.Apply(); }
+                pinBoxStyle.normal.background = pinDarkTex;
+                pinBoxStyle.border = new RectOffset(0, 0, 0, 0);
+            }
             pinTitleStyle = new GUIStyle(labelStyle) { fontSize = f + 1, fontStyle = FontStyle.Bold, fixedHeight = 0, wordWrap = false, alignment = TextAnchor.MiddleLeft, richText = true };
-            pinTitleStyle.normal.textColor = new Color(1f, 0.86f, 0.55f);
+            pinTitleStyle.normal.textColor = hc ? new Color(1f, 0.9f, 0.6f) : new Color(1f, 0.86f, 0.55f);
             pinRowStyle = new GUIStyle(labelStyle) { fontSize = f, fixedHeight = 0, wordWrap = false, alignment = TextAnchor.MiddleLeft, richText = true };
+            if (hc) pinRowStyle.normal.textColor = Color.white;
+            pinNoteStyle = new GUIStyle(pinRowStyle) { wordWrap = true, alignment = TextAnchor.UpperLeft, fontSize = Mathf.Max(12, f - 2) };
             pinXStyle = new GUIStyle(pinRowStyle) { alignment = TextAnchor.MiddleCenter, fontStyle = FontStyle.Bold };
             pinXStyle.normal.textColor = new Color(0.85f, 0.6f, 0.5f);
             pinXStyle.hover.textColor = Color.white;
+        }
+
+        private static string Count(Pins.Need n)
+        {
+            bool ok = n.Have >= n.Count;
+            string col = Plugin.HighContrast.Value ? (ok ? "#7dff5c" : "#ff4d3d") : (ok ? "#9be27f" : "#ff7a6a");
+            string t = n.Have + " / " + n.Count;
+            return Plugin.HighContrast.Value ? "<b><color=" + col + ">" + t + "</color></b>" : "<color=" + col + ">" + t + "</color>";
         }
 
         private void DrawPins(float scale, Rect ov)
         {
             EnsurePinStyles();
             float line = pinRowStyle.fontSize + 10f, icon = line - 2f, w = 0f, h = 0f;
+            float noteW = pinRowStyle.fontSize * 20f;
+            string ready = "  " + Labels.T("bereit", "ready"), done = "  " + Labels.T("erledigt", "done");
             // Breite und Hoehe vorab berechnen
             foreach (Pins.Pin p in Pins.List)
             {
-                w = Mathf.Max(w, pinTitleStyle.CalcSize(new GUIContent(p.Title + Labels.T("  bereit", "  ready"))).x + icon + 34f);
+                w = Mathf.Max(w, pinTitleStyle.CalcSize(new GUIContent(p.Title + ready)).x + icon + 34f);
                 h += line + 4f;
                 foreach (Pins.Need n in p.Needs)
                 {
                     w = Mathf.Max(w, pinRowStyle.CalcSize(new GUIContent(n.Name + "   " + n.Have + " / " + n.Count)).x + icon + 22f);
                     h += line;
                 }
+                if (!string.IsNullOrEmpty(p.Note)) w = Mathf.Max(w, Mathf.Min(noteW, pinNoteStyle.CalcSize(new GUIContent(p.Note)).x + 30f));
                 h += 6f;
             }
+            w = Mathf.Max(w, 200f);
+            foreach (Pins.Pin p in Pins.List)
+                if (!string.IsNullOrEmpty(p.Note)) h += Mathf.Min(pinNoteStyle.CalcHeight(new GUIContent(p.Note), w - 40f), pinNoteStyle.lineHeight * 4f + 4f);
             w += 24f; h += 12f;
             float sw = Screen.width / scale, sh = Screen.height / scale, m = 12f;
             string c = Plugin.PinsCorner.Value;
@@ -230,16 +257,23 @@ namespace GK2Tweaks
             foreach (Pins.Pin p in Pins.List)
             {
                 Texture2D ti = Pins.Icon(p.IconId);
-                if (ti != null) GUI.DrawTexture(new Rect(cx, cy, icon, icon), ti, ScaleMode.ScaleToFit);
-                GUI.Label(new Rect(cx + icon + 6f, cy, w - icon - 50f, line), p.Title + (p.Ready ? "  <color=#9be27f>" + Labels.T("bereit", "ready") + "</color>" : ""), pinTitleStyle);
+                float tx = cx;
+                if (ti != null) { GUI.DrawTexture(new Rect(cx, cy, icon, icon), ti, ScaleMode.ScaleToFit); tx += icon + 6f; }
+                string status = p.Ready ? "  <color=#9be27f>" + (p.QuestId != null ? done.Trim() : ready.Trim()) + "</color>" : "";
+                GUI.Label(new Rect(tx, cy, w - (tx - x) - 36f, line), p.Title + status, pinTitleStyle);
                 if (GUI.Button(new Rect(x + w - 30f, cy, 22f, line), new GUIContent("x", Labels.T("Loslösen", "Unpin")), pinXStyle)) remove = p;
                 cy += line + 4f;
+                if (!string.IsNullOrEmpty(p.Note))
+                {
+                    float nh = Mathf.Min(pinNoteStyle.CalcHeight(new GUIContent(p.Note), w - 40f), pinNoteStyle.lineHeight * 4f + 4f);
+                    GUI.Label(new Rect(cx + 10f, cy, w - 40f, nh), p.Note, pinNoteStyle);
+                    cy += nh;
+                }
                 foreach (Pins.Need n in p.Needs)
                 {
                     Texture2D ni = Pins.Icon(n.IconId);
                     if (ni != null) GUI.DrawTexture(new Rect(cx + 10f, cy + 1f, icon - 2f, icon - 2f), ni, ScaleMode.ScaleToFit);
-                    string col = n.Have >= n.Count ? "#9be27f" : "#ff7a6a";
-                    GUI.Label(new Rect(cx + icon + 14f, cy, w - icon - 30f, line), n.Name + "   <color=" + col + ">" + n.Have + " / " + n.Count + "</color>", pinRowStyle);
+                    GUI.Label(new Rect(cx + icon + 14f, cy, w - icon - 30f, line), n.Name + "   " + Count(n), pinRowStyle);
                     cy += line;
                 }
                 cy += 6f;
@@ -279,8 +313,11 @@ namespace GK2Tweaks
             if (enabled != want) enabled = want;
         }
 
+        internal bool AnyWindowOpen => menuOpen || weekOpen || newsOpen;
+
         private void OnGUI()
         {
+            if (HiResShot.Capturing) return;
             EnsureStyles();
             if (capturingKey != null && Event.current.type == EventType.KeyDown && Event.current.keyCode != KeyCode.None)
             {
@@ -294,6 +331,8 @@ namespace GK2Tweaks
             if (skinned) GUI.skin.verticalScrollbarThumb = vthumbStyle;
             Matrix4x4 old = GUI.matrix;
             float scale = Mathf.Clamp(Screen.height / 1080f, 0.75f, 2.5f);
+            if (Plugin.MenuScale.Value > 0) scale *= Plugin.MenuScale.Value / 100f;
+            curScale = scale;
             GUI.matrix = Matrix4x4.TRS(Vector3.zero, Quaternion.identity, new Vector3(scale, scale, 1f));
             Rect ov = Rect.zero;
             if (Plugin.ShowOverlay.Value) ov = DrawOverlay(scale);
@@ -336,6 +375,8 @@ namespace GK2Tweaks
 
             scroll = skinned ? GUILayout.BeginScrollView(scroll, false, true, GUIStyle.none, vbarStyle, GUIStyle.none, GUILayout.Height(560))
                              : GUILayout.BeginScrollView(scroll, GUILayout.Height(560));
+            if (MainGame.Instance != null && MainGame.Instance.gameState == MainGame.GameState.MainMenu) DrawSaves();
+
             Header(Labels.T("Spiel", "Game"));
             DrawGameTier();
 
@@ -354,8 +395,15 @@ namespace GK2Tweaks
             DrawEntry(Plugin.Water);
             DrawEntry(Plugin.Clouds);
 
-            Header(Labels.T("Komfort", "Comfort"));
+            Header(Labels.T("Kamera", "Camera"));
             DrawEntry(Plugin.Zoom);
+            DrawEntry(Plugin.InteriorZoom);
+            DrawEntry(Plugin.ZoomPresets);
+            DrawEntry(Plugin.ZoomPresetKey);
+            DrawEntry(Plugin.MouseWheelZoom);
+            DrawEntry(Plugin.SmoothZoom);
+
+            Header(Labels.T("Komfort", "Comfort"));
             DrawEntry(Plugin.PauseInBackground);
             DrawEntry(Plugin.AutoSaveMinutes);
             DrawEntry(Plugin.SkipIntro);
@@ -366,12 +414,24 @@ namespace GK2Tweaks
 
             DrawBackups();
 
+            Header(Labels.T("Screenshots", "Screenshots"));
+            DrawEntry(Plugin.ShotKey);
+            DrawEntry(Plugin.ShotScale);
+            DrawEntry(Plugin.ShotHideHud);
+            if (GUILayout.Button(Labels.T("Screenshot-Ordner öffnen", "Open screenshot folder"), buttonStyle, GUILayout.Width(260)))
+            {
+                System.IO.Directory.CreateDirectory(HiResShot.Folder);
+                Application.OpenURL("file:///" + HiResShot.Folder.Replace('\\', '/'));
+            }
+
             Header(Labels.T("Leistung", "Performance"));
             DrawEntry(Plugin.PhysicsHz);
             DrawEntry(Plugin.GameLog);
 
             Header(Labels.T("Anzeige", "Interface"));
             DrawEntry(Plugin.Language);
+            DrawEntry(Plugin.MenuScale);
+            DrawEntry(Plugin.HighContrast);
             DrawEntry(Plugin.StatsLogSeconds);
             DrawEntry(Plugin.MenuKey);
             DrawEntry(Plugin.OverlayKey);
@@ -386,7 +446,7 @@ namespace GK2Tweaks
             DrawEntry(Plugin.PinsEnabled);
             DrawEntry(Plugin.PinsCorner);
             DrawEntry(Plugin.PinsSize);
-            if (Pins.List.Count > 0 && GUILayout.Button(Labels.T("Alle Pins entfernen", "Remove all pins"), buttonStyle, GUILayout.Width(260))) { Pins.List.Clear(); PinButton.RefreshAll(); }
+            if (Pins.List.Count > 0 && GUILayout.Button(Labels.T("Alle Pins entfernen", "Remove all pins"), buttonStyle, GUILayout.Width(260))) Pins.ClearAll();
 
             Header(Labels.T("FPS-Anzeige", "FPS display"));
             foreach (ConfigEntryBase e in new ConfigEntryBase[] { Plugin.ShowOverlay, Plugin.OvCorner, Plugin.OvLayout, Plugin.OvFps, Plugin.OvLows,
@@ -415,7 +475,12 @@ namespace GK2Tweaks
             if (GUILayout.Button(Labels.T("Schließen (", "Close (") + Plugin.MenuKey.Value + ")", buttonStyle)) SetMenu(false);
             GUILayout.EndHorizontal();
             string foot = ManualSave.ShowMessage ? ManualSave.Message : GUI.tooltip;
-            GUILayout.Label(string.IsNullOrEmpty(foot) ? " " : foot, smallStyle, GUILayout.Height(36));
+            if (tipStyle == null || tipStyle.fontSize != (Plugin.HighContrast.Value ? 17 : 15))
+            {
+                tipStyle = new GUIStyle(smallStyle) { fontSize = Plugin.HighContrast.Value ? 17 : 15, wordWrap = true };
+                tipStyle.normal.textColor = Plugin.HighContrast.Value ? Color.white : new Color(0.86f, 0.82f, 0.74f);
+            }
+            GUILayout.Label(string.IsNullOrEmpty(foot) ? " " : foot, tipStyle, GUILayout.Height(Plugin.HighContrast.Value ? 60 : 48));
             if (skinned && Event.current.type == EventType.Repaint) frameStyle.Draw(new Rect(0, 0, win.width, win.height), false, false, false, false);
             GUI.DragWindow(new Rect(0, 0, 10000, 40));
         }
@@ -530,6 +595,90 @@ namespace GK2Tweaks
             GUI.DragWindow(new Rect(0, 0, 10000, 40));
         }
 
+        private GUIStyle tipStyle;
+
+        // ---------- Spielstaende (nur Hauptmenue): Uebersicht, direkt spielen, Backups je Slot ----------
+        private List<SaveSlotData> slots = new List<SaveSlotData>();
+        private float slotsAt;
+
+        private void DrawSaves()
+        {
+            Header(Labels.T("Spielstände", "Saves"));
+            if (Time.realtimeSinceStartup > slotsAt)
+            {
+                try { slots = new List<SaveSlotData>(SaveSystem.SaveSlotDataList); slots.Sort((a, b) => b.GetSaveDateTime().CompareTo(a.GetSaveDateTime())); }
+                catch (Exception e) { Plugin.Log.LogWarning("Saves: " + e.Message); slots = new List<SaveSlotData>(); }
+                if (Time.realtimeSinceStartup > backupListAt) { backupList = Backups.List(); backupListAt = Time.realtimeSinceStartup + 3f; }
+                slotsAt = Time.realtimeSinceStartup + 3f;
+            }
+            if (slots.Count == 0) { GUILayout.Label(Labels.T("Keine Spielstände gefunden.", "No saves found."), smallStyle); return; }
+            string fmt = Labels.German ? "dd.MM.yyyy HH:mm" : "yyyy-MM-dd HH:mm";
+            foreach (SaveSlotData sd in slots)
+            {
+                if (sd == null || sd.slotName == null || sd.slotName.Contains("_backup_")) continue;
+                GUILayout.BeginHorizontal();
+                GUILayout.BeginVertical(GUILayout.Width(460));
+                DateTime dt = sd.GetSaveDateTime();
+                GUILayout.Label("<b>" + sd.slotName + "</b>   " + Labels.T("Tag ", "Day ") + sd.day + (sd.isAutoSave ? Labels.T("   (Autosave)", "   (autosave)") : ""), richLabel);
+                GUILayout.Label((dt == default(DateTime) ? "" : dt.ToString(fmt) + "   ·   ") + Labels.T("Friedhof ", "Graveyard ") + sd.graveyardQuality + "   ·   " + Labels.T("Kirche ", "Church ") + sd.churchQuality, smallStyle);
+                GUILayout.EndVertical();
+                if (GUILayout.Button(Labels.T("Spielen", "Play"), buttonStyle, GUILayout.Width(110))) LoadSlot(sd);
+                GUILayout.EndHorizontal();
+                // Kopien, die das Spiel selbst anlegt (Steam_1_backup_1 ...): direkt spielbar
+                foreach (SaveSlotData gb in slots)
+                {
+                    if (gb == null || gb.slotName == null || !gb.slotName.StartsWith(sd.slotName + "_backup_")) continue;
+                    GUILayout.BeginHorizontal();
+                    GUILayout.Space(24);
+                    DateTime gdt = gb.GetSaveDateTime();
+                    GUILayout.Label(Labels.T("Kopie des Spiels ", "Game's own copy ") + gb.slotName.Substring(sd.slotName.Length + 8) + "   " + Labels.T("Tag ", "Day ") + gb.day + (gdt == default(DateTime) ? "" : "   " + gdt.ToString(fmt)), smallStyle, GUILayout.Width(436));
+                    if (GUILayout.Button(Labels.T("Spielen", "Play"), buttonStyle, GUILayout.Width(110))) LoadSlot(gb);
+                    GUILayout.EndHorizontal();
+                }
+                foreach (Backups.Item b in backupList)
+                {
+                    if (b.Slot != sd.slotName) continue;
+                    GUILayout.BeginHorizontal();
+                    GUILayout.Space(24);
+                    string when = b.Time == default(DateTime) ? System.IO.Path.GetFileName(b.Dir) : b.Time.ToString(fmt);
+                    GUILayout.Label(Labels.T("Backup ", "Backup ") + when + (b.Dir.EndsWith("_restore") ? Labels.T("  (vor Wiederherstellung)", "  (before restore)") : ""), smallStyle, GUILayout.Width(436));
+                    bool confirm = confirmRestore == b;
+                    if (GUILayout.Button(confirm ? Labels.T("Sicher?", "Sure?") : Labels.T("Laden", "Restore"), buttonStyle, GUILayout.Width(110)))
+                    {
+                        if (!confirm) confirmRestore = b;
+                        else { Backups.Restore(b, out backupMsg); confirmRestore = null; backupListAt = 0; slotsAt = 0; }
+                    }
+                    GUILayout.EndHorizontal();
+                }
+                GUILayout.Space(4);
+            }
+            if (!string.IsNullOrEmpty(backupMsg)) GUILayout.Label(backupMsg, smallStyle);
+        }
+
+        private GUIStyle richLabelStyle;
+        private GUIStyle richLabel => richLabelStyle ?? (richLabelStyle = new GUIStyle(labelStyle) { richText = true, fixedHeight = 0 });
+
+        // Wie "Fortsetzen" im Hauptmenue, nur fuer einen bestimmten Spielstand
+        private void LoadSlot(SaveSlotData sd)
+        {
+            try
+            {
+                OnMenuClosed = null;
+                SetMenu(false);
+                UIMainMenuWindow mm = LazyBearTechnology.LazyUI.GetWindow<UIMainMenuWindow>();
+                UILoadingOverlay overlay = LazyBearTechnology.LazyUI.Get<UILoadingOverlay>();
+                overlay.Draw(new LoadingWindowData(MainGame.EntrySceneToLoad, () =>
+                {
+                    SaveSystem.Load(sd, (GameSave save) =>
+                    {
+                        if (save != null) { MainGame.Instance.ContinueGame(sd, save); mm?.Close(); }
+                        else { overlay.Hide(); mm?.Open(null); }
+                    });
+                }));
+            }
+            catch (Exception e) { Plugin.Log.LogWarning("Load slot: " + e.Message); }
+        }
+
         // ---------- Spielstand-Backups ----------
         private void DrawBackups()
         {
@@ -539,7 +688,8 @@ namespace GK2Tweaks
             if (Time.realtimeSinceStartup > backupListAt) { backupList = Backups.List(); backupListAt = Time.realtimeSinceStartup + 3f; }
             bool inMenu = MainGame.Instance != null && MainGame.Instance.gameState == MainGame.GameState.MainMenu;
             if (backupList.Count == 0) GUILayout.Label(Labels.T("Noch keine Backups vorhanden.", "No backups yet."), smallStyle);
-            foreach (Backups.Item b in backupList)
+            if (inMenu) GUILayout.Label(Labels.T("Backups laden: oben unter \"Spielstände\".", "Restore backups: see \"Saves\" at the top."), smallStyle);
+            else foreach (Backups.Item b in backupList)
             {
                 GUILayout.BeginHorizontal();
                 string when = b.Time == default(System.DateTime) ? System.IO.Path.GetFileName(b.Dir) : b.Time.ToString(Labels.German ? "dd.MM.yyyy HH:mm" : "yyyy-MM-dd HH:mm");

@@ -1,0 +1,277 @@
+# GK2 Vanilla+ - translation template
+# Copy this file to <language code>.txt (e.g. it.txt, pl.txt, pt.txt), put it into
+# <game folder>/BepInEx/GK2VanillaPlus/lang/ and write the translation after " => ".
+# Keep numbers, key names and symbols as they are. \n = line break.
+# The mod uses the file when the game is set to that language. Send finished files to the author (GitHub / Workshop comments).
+
+Restoring only works in the main menu. => 
+Restored. Please restart the game once, then "Continue". => 
+Screenshot saved: => 
+Screenshot failed. => 
+Your settings => 
+Graphics benchmark => 
+measuring … => 
+warming up … => 
+cancel => 
+Benchmark cancelled. => 
+Your own settings hold the target too. => 
+Recommended: => 
+(holds {0} FPS) => 
+Recommended: Lowest – no tier fully holds {0} FPS. Tip: render mode "Pixel" or a lower resolution. => 
+Unlimited => 
+Default (50 Hz) => 
+same as outside => 
+Automatic => 
+Off => 
+every => 
+every save => 
+High => 
+Medium => 
+Low => 
+Lowest => 
+Frame rate mode => 
+Target FPS => 
+Render mode => 
+Shadows => 
+Ambient occlusion (HBAO) => 
+Point lights => 
+Back light => 
+Water => 
+Clouds => 
+Physics rate => 
+Camera zoom => 
+Zoom indoors => 
+Zoom presets => 
+Zoom preset key => 
+Mouse wheel zoom => 
+Smooth zoom => 
+Size of mod displays => 
+High contrast => 
+Screenshot key => 
+Resolution => 
+Without HUD => 
+Pause in background => 
+Autosave => 
+Widen main menu => 
+Skip logos => 
+"modded" note => 
+Game log => 
+"Mods" button in menus => 
+Show FPS display => 
+Stats to log => 
+Mod menu key => 
+FPS display key => 
+Save key => 
+Week plan key => 
+Hide HUD key => 
+Daily reminder => 
+Backups per save => 
+Minimum interval => 
+Check for updates => 
+Language => 
+Position => 
+Pinning => 
+Size => 
+Layout => 
+FPS => 
+1% low FPS => 
+Frame time (ms) => 
+CPU load => 
+GPU load => 
+Memory (RAM) => 
+Video memory (VRAM) => 
+Clock => 
+Weekday (in game) => 
+Time of day (in game) => 
+Extra resolutions => 
+Main menu scaling => 
+as graphics tier => 
+game setting => 
+Software limit => 
+VSync => 
+On => 
+PC soft (high) => 
+PC soft (medium) => 
+PC soft (low) => 
+Simple (desktop) => 
+Simple (balanced) => 
+Simple (performance) => 
+Simple (low) => 
+Simple (minimal) => 
+Console (PS5/Xbox) => 
+Highest => 
+Real => 
+Simulated => 
+Simple => 
+Normal => 
+Simplified => 
+Full (native) => 
+Pixel (half res) => 
+Everything => 
+Warnings + errors => 
+Errors only => 
+Deutsch => 
+Français => 
+Español => 
+English => 
+Top left => 
+Top right => 
+Bottom left => 
+Bottom right => 
+In a row => 
+Small => 
+Large => 
+Extra large => 
+In a column => 
+Mods => 
+off => 
+Lights => 
+on => 
+Native = world at full resolution. Lightweight = world at half resolution (chunkier pixels), much less GPU load. Default = as the graphics tier. => 
+Shadows. NGSS = soft PC shadows (expensive). Unity_* = simpler shadows as on PS5/Xbox. Default = as the graphics tier. => 
+Ambient occlusion (HBAO). Off is otherwise only used on Switch. Default = as the graphics tier. => 
+Point lights real (Realtime) or simulated (Faked, cheaper). Default = as the graphics tier. => 
+Back light effect. Default = as the graphics tier. => 
+Water quality. Default = as the graphics tier. => 
+Clouds normal or simplified. May apply only after changing area. Default = as the graphics tier. => 
+Game = setting from the game menu. Limit = software cap at TargetFps. VSync = synced to the refresh rate (60 FPS at 120 Hz = every 2nd refresh). => 
+Target FPS for Limit and VSync. 0 = unlimited => 
+Physics rate. 0 = game default (50 Hz). 30 = like the Switch version, saves CPU. => 
+What the game writes to Player.log. Warning or Error suppresses log spam. => 
+Camera zoom in percent. Below 100 = see more, above 100 = closer. => 
+Separate camera zoom inside buildings (church, morgue, houses ...). 0 = same as outside. => 
+Zoom levels in percent the preset key cycles through, comma-separated. => 
+Key to cycle through the zoom presets. => 
+Zoom smoothly with the mouse wheel (only while walking around, not over menus). Resets to the camera zoom setting on the next start. => 
+Smooth transition when the zoom changes. => 
+Pause the game while its window is in the background (saves battery and heat). => 
+Fill the sides of the main menu on ultrawide screens with a blurred copy of the menu image. => 
+Skip the logos and intro videos when the game starts. => 
+Show a 'modded' note next to the version number in the main menu. => 
+Show a 'Mods' button in the main menu and the pause menu (opens this mod menu). => 
+Extra autosave every N minutes (0 = off). Only saves while you are in free control. => 
+Key for the mod menu. => 
+Key for the FPS display. => 
+Check GitHub once per game start for a new version of GK2 Vanilla+ (only reads the version number, nothing is sent). => 
+Key for the week plan (what is possible on which weekday). => 
+Key to hide/show the game's HUD, e.g. for screenshots. Esc shows it again. => 
+Show a notification each morning with what is possible today (only features you have already unlocked). => 
+Before the game overwrites a save, the previous save is backed up (BepInEx/GK2VanillaPlus/Backups). Number of backups kept per save slot, 0 = off. => 
+Minimum minutes between two backups of the same slot (avoids a backup on every autosave). => 
+Key for saving the game manually (empty = only the button in the mod menu). => 
+Size of the mod menu, FPS display and pinned list. 0 = automatic (follows the screen height). => 
+Stronger contrast: dark background for the pinned list, bold and brighter have/need numbers, larger tooltips. => 
+Key for a screenshot (saved to BepInEx/GK2VanillaPlus/Screenshots). => 
+Resolution multiplier: 2 = twice the screen resolution in each direction (e.g. 3840x2160 from 1920x1080). => 
+Hide the game HUD and the mod displays for the screenshot. => 
+Show the FPS display (toggle with F10). Position and contents: section [Overlay]. => 
+Language of the mod menu. Auto = game language (if a translation exists, otherwise English). Translations: BepInEx/GK2VanillaPlus/lang. => 
+Internal: mod version whose changelog was last shown (the 'What's new' window appears once after an update). => 
+Screen corner of the FPS display. => 
+Row = all values in one line. Column = one value per line. => 
+Frames per second (average over 0.5 s). => 
+1% low FPS: how smooth it feels. Close to the FPS value = no stutter. => 
+Frame time in ms (average and slowest frame). => 
+CPU load of the game (100 % = all cores busy). => 
+GPU load (3D engine, like Task Manager). Windows only. => 
+RAM used by the game => 
+Video memory used by the game's textures and buffers => 
+Current render resolution. => 
+Current time. => 
+In-game weekday (Pride, Sloth, ...). => 
+In-game time of day. => 
+Pin recipes, blueprints and town buildings (pin icon in their top right corner). Pinned items show have/need counts from your inventory. => 
+Screen corner of the pinned list. => 
+Text and icon size of the pinned list. => 
+Write frame statistics to the BepInEx log every N seconds (0 = off). => 
+Zoom => 
+(indoors) => 
+Saving only works while playing. => 
+Not possible right now (dialogue, work, sleep …). Try again in a moment. => 
+Saving … => 
+Saved => 
+Saving failed. => 
+ready => 
+done => 
+Unpin => 
+Week plan => 
+What's new? => 
+Active: => 
+Game => 
+Frame rate => 
+Graphics (overrides parts of the graphics tier) => 
+Camera => 
+Comfort => 
+Screenshots => 
+Open screenshot folder => 
+Performance => 
+Interface => 
+Remove all pins => 
+FPS display => 
+(applies after restart) => 
+Save now => 
+Reset graphics => 
+Close ( => 
+Mac / Linux (CrossOver, Wine) => 
+Controller fix => 
+Fixes stutter with PlayStation controllers (DualSense/DualShock) under CrossOver/Wine by reading the controller through a cheaper path. Turn it off again if the controller misbehaves. => 
+Applies after a restart: quit the game AND Steam (or restart the CrossOver bottle). => 
+Runs through all graphics tiers (about 13 s each, a bit over a minute in total) and measures FPS without a limit. You get a score and a recommendation at the end. Nothing is saved, your settings stay as they are. Best to stand still at a typical spot. Esc cancels. => 
+Start benchmark => 
+only while playing => 
+Score = average FPS across the four graphics tiers × 10, higher is better – handy for comparing PCs and settings. Saved to BepInEx/GK2VanillaPlus/benchmark.txt => 
+GK2 Vanilla+ was updated. Here is what changed: => 
+Version => 
+All versions => 
+Close => 
+what's on when? => 
+· today => 
+· tomorrow => 
+– nothing special (or not unlocked yet) => 
+Saves => 
+No saves found. => 
+Day => 
+(autosave) => 
+Graveyard => 
+Church => 
+Play => 
+Game's own copy => 
+Backup => 
+(before restore) => 
+Sure? => 
+Restore => 
+Save backups => 
+No backups yet. => 
+Restore backups: see "Saves" at the top. => 
+"Restore" replaces the save with the backup (the current save is backed up first). => 
+Restoring is available in the main menu. => 
+Open backup folder => 
+Update available: => 
+Save & update => 
+Saves (if in game), quits the game and installs the new version. The game can be restarted right after. => 
+Download page => 
+Graphics tier => 
+The tier from the game menu. The values under 'Graphics' override parts of it. => 
+Press a key … (Esc = none) => 
+– none – => 
+GK2 Vanilla+ {0} is available – press F9 to update => 
+Could not start the updater – opening the download page. => 
+Today => 
+Pride => 
+Sloth => 
+Gluttony => 
+Lust => 
+Envy => 
+Wrath => 
+Town orders can be accepted => 
+Vendor happiness limit resets => 
+The bell calls the zombies to the town centre => 
+Battle day: plan your attacks => 
+Fill the PR machine (newspapers, hypno devices) => 
+Bring green scrolls to Linda => 
+Merchant ship in port: new goods at the Trade Master => 
+Looters at the port take new orders => 
+Thunderstorm: resurrect zombies => 
+Collect blue crystals at the goddess statue => 
+Hold a sermon in the church => 
+Ask how many corpses are needed this week => 

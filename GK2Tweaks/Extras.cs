@@ -142,4 +142,51 @@ namespace GK2Tweaks
             if (Input.GetKeyDown(KeyCode.Escape) || !WeekPlan.InGame) Show();
         }
     }
+
+    // Screenshot-Taste (Standard F11): wahlweise in 2x/3x/4x Aufloesung, ohne HUD und ohne Mod-Anzeigen.
+    internal static class HiResShot
+    {
+        internal static bool Capturing { get; private set; }
+        internal static string Folder => System.IO.Path.Combine(BepInEx.Paths.BepInExRootPath, "GK2VanillaPlus", "Screenshots");
+
+        internal static void Tick()
+        {
+            if (Capturing || Plugin.ShotKey.Value.MainKey == KeyCode.None || !Plugin.ShotKey.Value.IsDown()) return;
+            Plugin.Instance.StartCoroutine(Take());
+        }
+
+        internal static System.Collections.IEnumerator Take()
+        {
+            Capturing = true;
+            bool hid = false;
+            if (Plugin.ShotHideHud.Value && !HudToggle.Hidden && WeekPlan.InGame) { HudToggle.Toggle(); hid = HudToggle.Hidden; }
+            yield return null;
+            yield return null;
+            string path = null;
+            int scale = Mathf.Clamp(Plugin.ShotScale.Value, 1, 4);
+            // Unity begrenzt Texturen auf 16384 Pixel Kantenlaenge
+            while (scale > 1 && (Screen.width * scale > 16384 || Screen.height * scale > 16384)) scale--;
+            try
+            {
+                System.IO.Directory.CreateDirectory(Folder);
+                path = System.IO.Path.Combine(Folder, "GK2_" + DateTime.Now.ToString("yyyy-MM-dd_HH-mm-ss") + ".png");
+                ScreenCapture.CaptureScreenshot(path, scale);
+            }
+            catch (Exception e) { Plugin.Log.LogWarning("Screenshot: " + e.Message); path = null; }
+            yield return new WaitForEndOfFrame();
+            yield return null;
+            yield return null;
+            if (hid) HudToggle.Show();
+            Capturing = false;
+            // Datei wird verzoegert geschrieben - kurz warten, dann melden
+            float until = Time.realtimeSinceStartup + 5f;
+            while (path != null && !System.IO.File.Exists(path) && Time.realtimeSinceStartup < until) yield return null;
+            if (path != null && System.IO.File.Exists(path))
+            {
+                ManualSave.Toast(Labels.T("Screenshot gespeichert: ", "Screenshot saved: ") + System.IO.Path.GetFileName(path) + "  (" + Screen.width * scale + "×" + Screen.height * scale + ")", 3f);
+                Plugin.Log.LogInfo("Screenshot " + path + " x" + scale);
+            }
+            else ManualSave.Toast(Labels.T("Screenshot fehlgeschlagen.", "Screenshot failed."), 3f);
+        }
+    }
 }

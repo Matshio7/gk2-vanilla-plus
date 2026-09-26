@@ -137,9 +137,9 @@ namespace GK2Tweaks
             string mineNote = mine != null && mine.Fps >= target * 0.95 && mine.Low >= target * 0.6
                 ? Labels.T("  Deine eigenen Einstellungen halten das Ziel ebenfalls.", "  Your own settings hold the target too.") : "";
             Recommendation = (best != null
-                ? Labels.T("Empfehlung: ", "Recommended: ") + best.Name + Labels.T(" (hält " + target + " FPS)", " (holds " + target + " FPS)")
-                : Labels.T("Empfehlung: Niedrigste – " + target + " FPS werden auf keiner Stufe ganz gehalten. Tipp: Render-Modus \"Pixel\" oder eine kleinere Auflösung.",
-                           "Recommended: Lowest – no tier fully holds " + target + " FPS. Tip: render mode \"Pixel\" or a lower resolution.")) + mineNote;
+                ? Labels.T("Empfehlung: ", "Recommended: ") + best.Name + string.Format(Labels.T(" (hält {0} FPS)", " (holds {0} FPS)"), target)
+                : string.Format(Labels.T("Empfehlung: Niedrigste – {0} FPS werden auf keiner Stufe ganz gehalten. Tipp: Render-Modus \"Pixel\" oder eine kleinere Auflösung.",
+                           "Recommended: Lowest – no tier fully holds {0} FPS. Tip: render mode \"Pixel\" or a lower resolution."), target)) + mineNote;
         }
 
         internal static int TargetFps()

@@ -15,6 +15,7 @@
   </PropertyGroup>
   <ItemGroup>
     <EmbeddedResource Include="../docs/CHANGELOG.md" LogicalName="GK2Tweaks.CHANGELOG.md" />
+    <EmbeddedResource Include="../lang/??.txt" LogicalName="GK2Tweaks.lang.%(Filename).txt" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.3" PrivateAssets="all" />

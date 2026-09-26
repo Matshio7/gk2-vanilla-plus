@@ -13,6 +13,9 @@ cp -R "$B/BepInEx/." "$F/"
 cp "$ROOT/GK2Ultrawide/bin/Release/GK2Ultrawide.dll" "$F/BepInEx/plugins/GK2Ultrawide/"
 cp "$ROOT/GK2Tweaks/bin/Release/GK2Tweaks.dll" "$F/BepInEx/plugins/GK2Tweaks/"
 cp "$ROOT/LICENSE.md" "$F/BepInEx/GK2VanillaPlus/LICENSE.md"
+# Sprachen: eingebaut in der DLL; die Vorlage liegt fuer eigene Uebersetzungen bei
+python3 "$ROOT/tools/extract_strings.py" >/dev/null
+mkdir -p "$F/BepInEx/GK2VanillaPlus/lang"; cp "$ROOT/lang/_template.txt" "$F/BepInEx/GK2VanillaPlus/lang/_template.txt"
 # Textdateien fuer Windows: UTF-8 mit BOM, CRLF, Versionsnummer eintragen
 winText() { python3 - "$1" "$2" "$V" <<'PY'
 import re, sys

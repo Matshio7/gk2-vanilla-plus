@@ -48,6 +48,8 @@ namespace GK2Tweaks
         {
             phaseStart = Time.realtimeSinceStartup;
             ParseVariants(Plugin.BenchVariants.Value);
+            // Test-Pins vom letzten Lauf nicht in neue Screenshots uebernehmen
+            try { System.IO.File.Delete(Path.Combine(Paths.BepInExRootPath, "GK2VanillaPlus", "pins_bench.txt")); } catch { }
             Plugin.Log.LogInfo("[BENCH] START label=" + Plugin.BenchLabel.Value + " variants=" + variants.Count);
         }
 
@@ -91,7 +93,9 @@ namespace GK2Tweaks
                         if (Steam) Try(() => { origLang = GameSettings.Instance.language; SetGameLanguage("en"); TourSet(Plugin.Language, "English"); });
                         return;
                     }
-                    if (Plugin.BenchMenuShot.Value && !mainShot && now - menuSince >= 5f) { Shot(Steam ? "s01_mainmenu" : "mainmenu"); mainShot = true; return; }
+                    if (Plugin.BenchMenuShot.Value && !mainShot && now - menuSince >= 5f) { Shot(Steam ? "s01_mainmenu" : "mainmenu"); mainShot = true; if (Features || Steam) Plugin.Instance.Gui.SetMenu(true); return; }
+                    if ((Features || Steam) && mainShot && !savesShot && now - menuSince >= 8f) { Shot(Steam ? "s15_saves" : "f01_saves_mainmenu"); savesShot = true; return; }
+                    if ((Features || Steam) && now - menuSince < 11f) { if (now - menuSince >= 10f) Plugin.Instance.Gui.SetMenu(false); return; }
                     if (now - menuSince < (Plugin.BenchMenuShot.Value ? 7f : 3f)) return;
                     Plugin.Log.LogInfo($"[BENCH] Hauptmenue nach {now:0.0}s, Fortsetzen");
                     w.OnContinueButtonClicked();
@@ -111,7 +115,7 @@ namespace GK2Tweaks
                     break;
 
                 case Phase.Warmup:
-                    if (Plugin.BenchMenuShot.Value) { if (Steam) SteamTour(inPhase); else MenuShot(inPhase); }
+                    if (Plugin.BenchMenuShot.Value) { if (Steam) SteamTour(inPhase); else if (Features) FeatureTour(inPhase); else MenuShot(inPhase); }
                     if (inPhase >= Plugin.BenchWarmup.Value)
                     {
                         if (Plugin.Instance.Gui.MenuOpen) Plugin.Instance.Gui.SetMenu(false);
@@ -263,6 +267,97 @@ namespace GK2Tweaks
         }
 
         private static bool Steam => Plugin.BenchShotSet.Value == "steam";
+        private static bool Features => Plugin.BenchShotSet.Value == "features";
+        private bool savesShot;
+
+        // Test der 1.4-Erweiterungen: Quest-Pin, Detailfenster-Pin, Pins speichern/laden, Zoom, Screenshot, Sprachen, Kontrast
+        private void FeatureTour(float t)
+        {
+            TweaksGui gui = Plugin.Instance.Gui;
+            switch (shotStep)
+            {
+                case 0: if (t > 8f) { Try(OpenSomeQuest); shotStep++; } break;
+                case 1: if (t > 11f) { Try(() => { PinButton b = FindPin("quest:"); if (b != null) Pins.Toggle(b.Make()); Plugin.Log.LogInfo("[BENCH] quest pin button " + (b != null)); }); shotStep++; } break;
+                case 2: if (t > 13f) { Shot("f02_quest_window"); shotStep++; } break;
+                case 3: if (t > 14f) { Try(() => LazyUI.GetWindow<UIQuestInfoWindow>().Close()); Try(OpenNearestWorkbench); shotStep++; } break;
+                case 4: if (t > 17f) { Try(OpenFirstRecipeDetail); shotStep++; } break;
+                case 5: if (t > 20f) { Try(() => { PinButton b = FindPin("craft:", header: true); Plugin.Log.LogInfo("[BENCH] detail pin button " + (b != null)); if (b != null) Pins.Toggle(b.Make()); }); shotStep++; } break;
+                case 6: if (t > 22f) { Shot("f03_recipe_detail"); shotStep++; } break;
+                case 7: if (t > 23f) { Try(CloseCraftWindows); TourSet(Plugin.HighContrast, true); shotStep++; } break;
+                case 8: if (t > 26f) { Shot("f04_pins_quest_highcontrast"); shotStep++; } break;
+                case 9: if (t > 27f)
+                    {
+                        int before = Pins.List.Count;
+                        Try(() => { PinStore.Save(); PinStore.Load(); });
+                        Plugin.Log.LogInfo("[BENCH] pins save/load " + before + " -> " + Pins.List.Count + " : " + string.Join(" | ", Pins.List.ConvertAll(p => p.Title + (p.Note != null ? " [" + p.Note + "]" : "") + " " + p.Needs.Count).ToArray()));
+                        TourSet(Plugin.HighContrast, false);
+                        shotStep++;
+                    } break;
+                case 10: if (t > 28f) { Plugin.Log.LogInfo("[BENCH] zoom " + CameraZoom.Current); CameraZoom.TestSet(125f); shotStep++; } break;
+                case 11: if (t > 31f) { Plugin.Log.LogInfo("[BENCH] zoom now " + CameraZoom.Current); Shot("f05_zoom125"); shotStep++; } break;
+                case 12: if (t > 32f) { CameraZoom.TestSet(Plugin.Zoom.Value); Plugin.Instance.StartCoroutine(HiResShot.Take()); shotStep++; } break;
+                case 13: if (t > 38f) { LogNewestShot(); TourSet(Plugin.Language, "Русский"); gui.SetMenu(true); shotStep++; } break;
+                case 14: if (t > 41f) { Shot("f06_menu_ru"); shotStep++; } break;
+                case 15: if (t > 42f) { TourSet(Plugin.Language, "中文"); shotStep++; } break;
+                case 16: if (t > 44f) { Shot("f07_menu_zh"); shotStep++; } break;
+                case 17: if (t > 45f) { TourSet(Plugin.Language, "Français"); gui.SetMenu(false); gui.ToggleWeekPlan(); shotStep++; } break;
+                case 18: if (t > 48f) { Shot("f08_weekplan_fr"); shotStep++; } break;
+                case 19: if (t > 49f) { gui.ToggleWeekPlan(); TourSet(Plugin.Language, "Español"); TourSet(Plugin.MenuScale, 150); gui.SetMenu(true); shotStep++; } break;
+                case 20: if (t > 52f) { Shot("f09_menu_scale150_es"); shotStep++; } break;
+                case 21: if (t > 53f) { gui.SetMenu(false); TourRestore(); Pins.List.Clear(); shotStep++; } break;
+            }
+        }
+
+        private static PinButton FindPin(string keyPrefix, bool header = false)
+        {
+            foreach (PinButton pb in UnityEngine.Object.FindObjectsByType<PinButton>(FindObjectsSortMode.None))
+                if (pb.isActiveAndEnabled && pb.Key != null && pb.Key.StartsWith(keyPrefix) && pb.Make != null && (!header || pb.transform.parent.GetComponentInParent<UIBaseCraftSelectionWindow>() != null)) return pb;
+            return null;
+        }
+
+        private static void OpenSomeQuest()
+        {
+            foreach (QuestData q in MainGame.Instance.GameSave.questSystemData.questCollection.quests)
+            {
+                if (q.status != QuestStatus.InProgress || q.isHidden) continue;
+                Plugin.Log.LogInfo("[BENCH] quest " + q.id);
+                LazyUI.GetWindow<UIQuestInfoWindow>().Open(new UIQuestInfoWindowData(q));
+                return;
+            }
+        }
+
+        private static void OpenFirstRecipeDetail()
+        {
+            foreach (UICraftPreviewItemCell c in UnityEngine.Object.FindObjectsByType<UICraftPreviewItemCell>(FindObjectsSortMode.None))
+            {
+                var d = HarmonyLib.Traverse.Create(c).Field("data").GetValue<UICraftPreviewItemCellData>();
+                if (d?.CraftDef == null || d.IsTab || d.IsUnknown) continue;
+                HarmonyLib.AccessTools.Method(typeof(UICraftPreviewItemCell), "OpenCraftSetupWindow").Invoke(c, null);
+                Plugin.Log.LogInfo("[BENCH] detail " + d.CraftDef.id);
+                return;
+            }
+        }
+
+        private static void CloseCraftWindows()
+        {
+            foreach (UIBaseCraftSelectionWindow w in UnityEngine.Object.FindObjectsByType<UIBaseCraftSelectionWindow>(FindObjectsSortMode.None)) if (w.IsShown) w.Close();
+            LazyUI.GetWindow<UICraftWindow>().Close();
+        }
+
+        private static void LogNewestShot()
+        {
+            try
+            {
+                var files = new System.IO.DirectoryInfo(HiResShot.Folder).GetFiles("*.png");
+                Array.Sort(files, (a, b) => b.LastWriteTime.CompareTo(a.LastWriteTime));
+                if (files.Length == 0) { Plugin.Log.LogWarning("[BENCH] no hi-res shot"); return; }
+                byte[] h = new byte[24];
+                using (var fs = System.IO.File.OpenRead(files[0].FullName)) fs.Read(h, 0, 24);
+                int w = (h[16] << 24) | (h[17] << 16) | (h[18] << 8) | h[19], hh = (h[20] << 24) | (h[21] << 16) | (h[22] << 8) | h[23];
+                Plugin.Log.LogInfo("[BENCH] hires " + files[0].Name + " " + w + "x" + hh + " screen " + Screen.width + "x" + Screen.height);
+            }
+            catch (Exception e) { Plugin.Log.LogWarning("[BENCH] hires check: " + e.Message); }
+        }
         private string origLang;
 
         // Spielsprache nur fuer die Store-Bilder umstellen (nicht gespeichert)
@@ -310,15 +405,19 @@ namespace GK2Tweaks
                 case 17: if (t > 47f) { Shot("s09_pins_workbench"); shotStep++; } break;
                 case 18: if (t > 48f) { Try(() => LazyUI.GetWindow<UICraftWindow>().Close()); shotStep++; } break;
                 case 19: if (t > 51f) { Shot("s10_pins"); shotStep++; } break;
-                case 20: if (t > 52f) { Pins.List.Clear(); HudToggle.Toggle(); shotStep++; } break;
-                case 21: if (t > 55f) { Shot("s11_nohud"); shotStep++; } break;
-                case 22: if (t > 56f) { HudToggle.Show(); gui.ShowNews(true); shotStep++; } break;
-                case 23: if (t > 59f) { Shot("s12_whatsnew"); shotStep++; } break;
-                case 24: if (t > 60f) { Plugin.LastSeenVersion.Value = "1.2.0"; Try(() => AccessTools_CloseNews(gui)); GraphicsBench.Start(); shotStep++; } break;
-                case 25: if (t > 70f) { Shot("s13_benchmark_running"); shotStep++; } break;
-                case 26: if (!GraphicsBench.Running && t > 80f) { shotStep++; } break;
-                case 27: if (t > 140f) { Shot("s14_benchmark_result"); shotStep++; } break;
-                case 28: if (t > 142f) { gui.SetMenu(false); TourRestore(); Plugin.LastSeenVersion.Value = "1.2.0"; if (origLang != null) Try(() => SetGameLanguage(origLang)); shotStep++; } break;
+                case 20: if (t > 52f) { Pins.List.Clear(); Try(OpenSomeQuest); shotStep++; } break;
+                case 50: break;
+                case 21: if (t > 54f) { Try(() => { PinButton b = FindPin("quest:"); if (b != null) Pins.Toggle(b.Make()); }); shotStep = 40; } break;
+                case 40: if (t > 56f) { Shot("s16_quest_pin"); shotStep++; } break;
+                case 41: if (t > 57f) { Try(() => LazyUI.GetWindow<UIQuestInfoWindow>().Close()); Pins.List.Clear(); HudToggle.Toggle(); shotStep++; } break;
+                case 42: if (t > 59f) { Shot("s11_nohud"); shotStep = 22; } break;
+                case 22: if (t > 60f) { HudToggle.Show(); gui.ShowNews(true); shotStep++; } break;
+                case 23: if (t > 63f) { Shot("s12_whatsnew"); shotStep++; } break;
+                case 24: if (t > 64f) { Plugin.LastSeenVersion.Value = "1.2.0"; Try(() => AccessTools_CloseNews(gui)); GraphicsBench.Start(); shotStep++; } break;
+                case 25: if (t > 74f) { Shot("s13_benchmark_running"); shotStep++; } break;
+                case 26: if (!GraphicsBench.Running && t > 84f) { shotStep++; } break;
+                case 27: if (t > 145f) { Shot("s14_benchmark_result"); shotStep++; } break;
+                case 28: if (t > 147f) { gui.SetMenu(false); TourRestore(); Plugin.LastSeenVersion.Value = "1.2.0"; if (origLang != null) Try(() => SetGameLanguage(origLang)); shotStep++; } break;
             }
         }
 

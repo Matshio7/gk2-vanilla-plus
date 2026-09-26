@@ -27,3 +27,10 @@ Output: `bin/Release/GK2Tweaks.dll` / `GK2Ultrawide.dll` → `<GameFolder>/BepIn
 - **Graphics:** a postfix on `GraphicsTierConfig.ApplyTier` overrides single fields of the game's own `PlatformFeatures` (the same switches the console versions use).
 - **Main menu:** an `OnRenderImage` pass on the world camera fills the side bars with a blurred, darkened copy of the menu image.
 - Nothing is written to game files. Settings live in `BepInEx/config/mats.gk2.tweaks.cfg`.
+
+## Translations
+
+The mod menu texts are written in German and English in the code. All other languages come from `lang/<code>.txt`
+(key = English text, `English => translation`). The files are embedded into the DLL at build time.
+`python3 tools/extract_strings.py -v` rewrites `lang/_template.txt` and lists missing keys per language.
+Players can add or override a language by putting `<code>.txt` into `<game>/BepInEx/GK2VanillaPlus/lang/`.

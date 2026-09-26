@@ -25,7 +25,10 @@ namespace GK2Tweaks
         internal static ConfigEntry<string> Pacing;
         internal static ConfigEntry<int> TargetFps;
         // [Performance]
-        internal static ConfigEntry<int> PhysicsHz, Zoom, AutoSaveMinutes;
+        internal static ConfigEntry<int> PhysicsHz, Zoom, AutoSaveMinutes, InteriorZoom, MenuScale, ShotScale;
+        internal static ConfigEntry<bool> MouseWheelZoom, SmoothZoom, HighContrast, ShotHideHud;
+        internal static ConfigEntry<string> ZoomPresets;
+        internal static ConfigEntry<KeyboardShortcut> ZoomPresetKey, ShotKey;
         internal static ConfigEntry<bool> PauseInBackground, MenuExtend, MenuModdedLabel, SkipIntro, GameMenuButton;
         internal static ConfigEntry<string> GameLog;
         // [Interface]
@@ -66,7 +69,7 @@ namespace GK2Tweaks
             BindConfig();
 
             var harmony = new Harmony(Guid);
-            var patches = new System.Collections.Generic.List<Type> { typeof(TierPatch), typeof(ScreenSettingsPatch), typeof(SaveBlockPatch), typeof(ZoomPatch), typeof(ModdedLabelPatch), typeof(BackupPatch), typeof(MainMenuModsButtonPatch), typeof(PauseModsButtonPatch), typeof(CraftPinPatch), typeof(CraftCellPinPatch), typeof(BuildPinPatch), typeof(TownPinPatch) };
+            var patches = new System.Collections.Generic.List<Type> { typeof(TierPatch), typeof(ScreenSettingsPatch), typeof(SaveBlockPatch), typeof(ZoomPatch), typeof(ModdedLabelPatch), typeof(BackupPatch), typeof(MainMenuModsButtonPatch), typeof(PauseModsButtonPatch), typeof(CraftPinPatch), typeof(CraftCellPinPatch), typeof(SelectionPinPatch), typeof(QuestPinPatch), typeof(BuildPinPatch), typeof(TownPinPatch) };
 #if DEV
             if (BenchEnabled.Value) patches.Add(typeof(SystemProfiler));
 #endif
@@ -131,6 +134,13 @@ namespace GK2Tweaks
             Zoom = Config.Bind("Comfort", "Zoom", 100, new ConfigDescription(
                 "Camera zoom in percent. Below 100 = see more, above 100 = closer.",
                 new AcceptableValueList<int>(60, 70, 75, 80, 90, 100, 110, 125, 150)));
+            InteriorZoom = Config.Bind("Camera", "InteriorZoom", 0, new ConfigDescription(
+                "Separate camera zoom inside buildings (church, morgue, houses ...). 0 = same as outside.",
+                new AcceptableValueList<int>(0, 80, 90, 100, 110, 125, 150, 175)));
+            ZoomPresets = Config.Bind("Camera", "ZoomPresets", "80,100,125", "Zoom levels in percent the preset key cycles through, comma-separated.");
+            ZoomPresetKey = Config.Bind("Camera", "ZoomPresetKey", new KeyboardShortcut(KeyCode.F8), "Key to cycle through the zoom presets.");
+            MouseWheelZoom = Config.Bind("Camera", "MouseWheelZoom", true, "Zoom smoothly with the mouse wheel (only while walking around, not over menus). Resets to the camera zoom setting on the next start.");
+            SmoothZoom = Config.Bind("Camera", "SmoothZoom", true, "Smooth transition when the zoom changes.");
             PauseInBackground = Config.Bind("Comfort", "PauseInBackground", true, "Pause the game while its window is in the background (saves battery and heat).");
             MenuExtend = Config.Bind("Comfort", "MainMenuExtend", true, "Fill the sides of the main menu on ultrawide screens with a blurred copy of the menu image.");
             SkipIntro = Config.Bind("Comfort", "SkipIntro", false, "Skip the logos and intro videos when the game starts.");
@@ -155,10 +165,18 @@ namespace GK2Tweaks
                 "Minimum minutes between two backups of the same slot (avoids a backup on every autosave).",
                 new AcceptableValueList<int>(0, 5, 10, 15, 30, 60)));
             SaveKey = Config.Bind("Interface", "SaveKey", KeyboardShortcut.Empty, "Key for saving the game manually (empty = only the button in the mod menu).");
+            MenuScale = Config.Bind("Interface", "MenuScale", 0, new ConfigDescription(
+                "Size of the mod menu, FPS display and pinned list. 0 = automatic (follows the screen height).",
+                new AcceptableValueList<int>(0, 80, 90, 100, 110, 125, 150, 175, 200)));
+            HighContrast = Config.Bind("Interface", "HighContrast", false, "Stronger contrast: dark background for the pinned list, bold and brighter have/need numbers, larger tooltips.");
+            ShotKey = Config.Bind("Screenshots", "Key", new KeyboardShortcut(KeyCode.F11), "Key for a screenshot (saved to BepInEx/GK2VanillaPlus/Screenshots).");
+            ShotScale = Config.Bind("Screenshots", "Scale", 2, new ConfigDescription("Resolution multiplier: 2 = twice the screen resolution in each direction (e.g. 3840x2160 from 1920x1080).",
+                new AcceptableValueList<int>(1, 2, 3, 4)));
+            ShotHideHud = Config.Bind("Screenshots", "HideHud", true, "Hide the game HUD and the mod displays for the screenshot.");
             ShowOverlay = Config.Bind("Interface", "ShowOverlay", false, "Show the FPS display (toggle with F10). Position and contents: section [Overlay].");
             Language = Config.Bind("Interface", "Language", "Auto", new ConfigDescription(
-                "Language of the mod menu. Auto = game language (German if the game is set to German, otherwise English).",
-                new AcceptableValueList<string>("Auto", "Deutsch", "English")));
+                "Language of the mod menu. Auto = game language (if a translation exists, otherwise English). Translations: BepInEx/GK2VanillaPlus/lang.",
+                new AcceptableValueList<string>("Auto", "Deutsch", "English", "Français", "Español", "Русский", "中文")));
             LastSeenVersion = Config.Bind("Interface", "LastSeenVersion", "", "Internal: mod version whose changelog was last shown (the 'What's new' window appears once after an update).");
             OvCorner = Config.Bind("Overlay", "Corner", "BottomLeft", new ConfigDescription("Screen corner of the FPS display.",
                 new AcceptableValueList<string>("TopLeft", "TopRight", "BottomLeft", "BottomRight")));
@@ -204,7 +222,8 @@ namespace GK2Tweaks
                 case "FrameRate": ReapplyPacing(); break;
                 case "Performance": ApplyPhysics(); ApplyLogFilter(); break;
                 case "Pins": PinButton.RefreshAll(); break;
-                case "Comfort": ZoomPatch.Reapply(); Application.runInBackground = !PauseInBackground.Value; ModsButton.ApplyVisibility(); break;
+                case "Camera": CameraZoom.OnSettingsChanged(); break;
+                case "Comfort": CameraZoom.OnSettingsChanged(); Application.runInBackground = !PauseInBackground.Value; ModsButton.ApplyVisibility(); break;
             }
         }
 
@@ -238,6 +257,8 @@ namespace GK2Tweaks
 #endif
             AutoSave.Tick();
             ZoomPatch.Tick();
+            CameraZoom.Tick(dt);
+            HiResShot.Tick();
             MenuSideFill.Tick();
             SkipLogosPatch.Tick();
 #if DEV

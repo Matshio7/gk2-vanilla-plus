@@ -26,6 +26,8 @@ namespace GK2Tweaks
         internal sealed class Pin
         {
             public string Key, Title, IconId;
+            public string TitleKey, Suffix = "";   // Lokalisierungs-Schluessel des Titels (zum Neuladen in anderer Sprache)
+            public string QuestId, Note;           // Quest-Pins: Aufgabentext statt Zutaten
             public List<Need> Needs = new List<Need>();
             public bool Ready;
         }
@@ -42,14 +44,22 @@ namespace GK2Tweaks
         {
             if (p == null) return;
             int i = List.FindIndex(x => x.Key == p.Key);
-            if (i >= 0) { List.RemoveAt(i); PinButton.RefreshAll(); return; }
+            if (i >= 0) { List.RemoveAt(i); Changed(); return; }
             if (List.Count >= Max) List.RemoveAt(0);
             List.Add(p);
             Refresh();
-            PinButton.RefreshAll();
+            Changed();
         }
 
-        internal static void Unpin(Pin p) { List.Remove(p); PinButton.RefreshAll(); }
+        internal static void Unpin(Pin p) { List.Remove(p); Changed(); }
+
+        internal static void ClearAll() { List.Clear(); Changed(); }
+
+        private static void Changed()
+        {
+            PinButton.RefreshAll();
+            PinStore.Save();
+        }
 
         internal static string Clean(string s) => string.IsNullOrEmpty(s) ? "" : Tags.Replace(s, "").Trim();
 
@@ -63,7 +73,7 @@ namespace GK2Tweaks
         {
             string icon = null;
             try { icon = def.GetOutputPreview(wgo).IconId; } catch { }
-            var p = new Pin { Key = "craft:" + def.id, Title = Loc(def.id), IconId = icon };
+            var p = new Pin { Key = "craft:" + def.id, Title = Loc(def.id), TitleKey = def.id, IconId = icon };
             foreach (NeedItemData n in def.needItems)
             {
                 if (n == null || string.IsNullOrEmpty(n.Id)) continue;
@@ -83,9 +93,9 @@ namespace GK2Tweaks
             return p;
         }
 
-        internal static Pin Build(string key, string title, string iconId, List<UICraftItemCellData> cells, WgoData wgo, int multiplier)
+        internal static Pin Build(string key, string titleKey, string suffix, string iconId, List<UICraftItemCellData> cells, WgoData wgo, int multiplier)
         {
-            var p = new Pin { Key = key, Title = Clean(title), IconId = iconId };
+            var p = new Pin { Key = key, Title = Loc(titleKey) + suffix, TitleKey = titleKey, Suffix = suffix, IconId = iconId };
             if (cells == null) return p;
             foreach (UICraftItemCellData c in cells)
             {
@@ -104,6 +114,16 @@ namespace GK2Tweaks
                 if (same != null) same.Count += need.Count; else p.Needs.Add(need);
             }
             return p;
+        }
+
+        internal static Pin FromQuest(QuestData q)
+        {
+            string icon = null;
+            return new Pin
+            {
+                Key = "quest:" + q.id, QuestId = q.id, TitleKey = q.id, Title = Loc(q.id), IconId = icon,
+                Note = Clean(q.Description),
+            };
         }
 
         // ---------- Controller: beide Sticks druecken (L3 + R3) pinnt das fokussierte Rezept ----------
@@ -142,8 +162,9 @@ namespace GK2Tweaks
             int s = mg == null ? -1 : (int)mg.gameState;
             if (s != lastState)
             {
-                // Spielstand verlassen: Pins gehoeren zum laufenden Spiel
-                if (lastState == (int)MainGame.GameState.InGame) List.Clear();
+                // Pins gehoeren zum Spielstand: beim Verlassen leeren, beim Laden die des Slots wiederherstellen
+                if (lastState == (int)MainGame.GameState.InGame) { List.Clear(); PinButton.RefreshAll(); }
+                if (s == (int)MainGame.GameState.InGame) { PinStore.Load(); Refresh(); PinButton.RefreshAll(); }
                 lastState = s;
             }
             if (List.Count == 0 || Time.realtimeSinceStartup < refreshAt) return;
@@ -158,6 +179,16 @@ namespace GK2Tweaks
             try { inv = MainGame.PlayerController.WorkerMultiInventory; } catch { return; }
             foreach (Pin p in List)
             {
+                if (p.QuestId != null)
+                {
+                    try
+                    {
+                        var q = MainGame.Instance.GameSave.questSystemData;
+                        p.Ready = q.IsQuestInStatus(p.QuestId, QuestStatus.Completed);
+                    }
+                    catch { }
+                    continue;
+                }
                 bool ready = true;
                 foreach (Need n in p.Needs)
                 {
@@ -206,7 +237,7 @@ namespace GK2Tweaks
         internal string Key;
         private Image image;
 
-        internal static void Attach(Component widget, string key, Func<Pins.Pin> make, float size = 22f)
+        internal static void Attach(Component widget, string key, Func<Pins.Pin> make, float size = 22f, bool alwaysShow = false, float shiftLeft = 0f)
         {
             if (widget == null) return;
             PinButton b = null;
@@ -216,10 +247,11 @@ namespace GK2Tweaks
             if (b == null) return;
             var rt = (RectTransform)b.transform;
             rt.sizeDelta = new Vector2(size, size);
-            rt.anchoredPosition = new Vector2(-size * 0.6f, -size * 0.6f);
+            rt.anchoredPosition = new Vector2(-size * 0.6f - shiftLeft, -size * 0.6f);
             b.transform.SetAsLastSibling();
             b.Key = key;
             b.Make = make;
+            b.alwaysShow = alwaysShow;
             b.gameObject.SetActive(Plugin.PinsEnabled.Value && key != null);
             b.UpdateLook();
         }
@@ -263,7 +295,7 @@ namespace GK2Tweaks
             foreach (PinButton b in all) { b.gameObject.SetActive(Plugin.PinsEnabled.Value && b.Key != null); b.UpdateLook(); }
         }
 
-        private bool pinned;
+        private bool pinned, alwaysShow;
         private Canvas canvas;
 
         private void UpdateLook()
@@ -272,7 +304,7 @@ namespace GK2Tweaks
             pinned = Key != null && Pins.IsPinned(Key);
             image.color = pinned ? Color.white : new Color(0.85f, 0.8f, 0.72f, 0.8f);
             transform.localRotation = Quaternion.Euler(0, 0, pinned ? 0f : 30f);
-            image.enabled = pinned || Hovered();
+            image.enabled = pinned || alwaysShow || Hovered();
         }
 
         // Nicht angepinnt: Nadel nur zeigen, solange die Maus ueber dem Rezept ist (sonst wird das Raster unruhig)
@@ -290,7 +322,7 @@ namespace GK2Tweaks
         private void Update()
         {
             if (image == null) return;
-            bool show = pinned || Hovered();
+            bool show = pinned || alwaysShow || Hovered();
             if (image.enabled != show) image.enabled = show;
         }
 
@@ -356,8 +388,7 @@ namespace GK2Tweaks
                 {
                     string icon = null;
                     try { icon = def.GetOutputPreview(d.WgoData).IconId; } catch { }
-                    string title = Pins.Loc(def.id) + (d.CraftsCount > 1 ? " ×" + d.CraftsCount : "");
-                    return Pins.Build("craft:" + def.id, title, icon, d.CraftItemCellsData, d.WgoData, d.CraftsCount);
+                    return Pins.Build("craft:" + def.id, def.id, d.CraftsCount > 1 ? " ×" + d.CraftsCount : "", icon, d.CraftItemCellsData, d.WgoData, d.CraftsCount);
                 });
             }
             catch (Exception e) { Plugin.Log.LogWarning("Pin craft: " + e.Message); }
@@ -392,7 +423,7 @@ namespace GK2Tweaks
                 var d = Traverse.Create(__instance).Field("data").GetValue<UIBuildingWidgetData>();
                 if (d?.BuildData?.Definition == null || d.CraftItemCellsData == null || d.CraftItemCellsData.Count == 0) { PinButton.Attach(__instance, null, null); return; }
                 string key = "build:" + d.BuildData.Definition.id;
-                PinButton.Attach(__instance, key, () => Pins.Build(key, Pins.Loc(d.Name), d.BuildData.IconId, d.CraftItemCellsData, null, 1));
+                PinButton.Attach(__instance, key, () => Pins.Build(key, d.Name, "", d.BuildData.IconId, d.CraftItemCellsData, null, 1));
             }
             catch (Exception e) { Plugin.Log.LogWarning("Pin build: " + e.Message); }
         }
@@ -408,9 +439,134 @@ namespace GK2Tweaks
                 var d = Traverse.Create(__instance).Field("data").GetValue<UITownBuildingWidgetData>();
                 if (d?.TownBuildingDef == null || d.CraftItemCellsData == null || d.CraftItemCellsData.Count == 0) { PinButton.Attach(__instance, null, null); return; }
                 string key = "town:" + d.TownBuildingDef.id;
-                PinButton.Attach(__instance, key, () => Pins.Build(key, d.Name, d.TownBuildingDef.iconId, d.CraftItemCellsData, null, 1));
+                PinButton.Attach(__instance, key, () => Pins.Build(key, d.TownBuildingDef.id, "", d.TownBuildingDef.iconId, d.CraftItemCellsData, null, 1));
             }
             catch (Exception e) { Plugin.Log.LogWarning("Pin town: " + e.Message); }
         }
+    }
+}
+
+namespace GK2Tweaks
+{
+    // Rezept-Detailfenster (Klick auf ein Rezept) und Einzel-Handwerk, z. B. Hindernisse wegraeumen:
+    // Pinnadel oben rechts neben der Ueberschrift, immer sichtbar.
+    [HarmonyPatch(typeof(UIBaseCraftSelectionWindow), nameof(UIBaseCraftSelectionWindow.Open))]
+    internal static class SelectionPinPatch
+    {
+        private static void Postfix(UIBaseCraftSelectionWindow __instance, UIBaseCraftSelectionWindowData data)
+        {
+            try
+            {
+                CraftDef def = data?.CraftDefinition;
+                var header = Traverse.Create(__instance).Field("headerLabel").GetValue<TMPro.TextMeshProUGUI>();
+                if (header == null) return;
+                Component host = header.transform.parent;
+                if (def == null || def.isAuto) { PinButton.Attach(host, null, null, 30f, true, 64f); return; }
+                PinButton.Attach(host, "craft:" + def.id, () =>
+                {
+                    string icon = null;
+                    try { icon = def.GetOutputPreview(data.WgoData).IconId; } catch { }
+                    int n = Math.Max(1, data.CraftsCount);
+                    return Pins.Build("craft:" + def.id, def.id, n > 1 ? " ×" + n : "", icon, data.CraftItemCellsData, data.WgoData, n);
+                }, 30f, true, 64f);
+            }
+            catch (Exception e) { Plugin.Log.LogWarning("Pin selection: " + e.Message); }
+        }
+    }
+
+    // Quest-Info (Questbaum -> Quest anklicken): Quest anpinnen, die Liste zeigt dann die aktuelle Aufgabe
+    [HarmonyPatch(typeof(UIQuestInfoWindow), nameof(UIQuestInfoWindow.Redraw))]
+    internal static class QuestPinPatch
+    {
+        private static void Postfix(UIQuestInfoWindow __instance)
+        {
+            try
+            {
+                var d = Traverse.Create(__instance).Field("data").GetValue<UIQuestInfoWindowData>();
+                var header = Traverse.Create(__instance).Field("header").GetValue<TMPro.TMP_Text>();
+                QuestData q = d?.QuestData;
+                if (header == null) return;
+                Component host = header.transform.parent;
+                if (q == null || q.status == QuestStatus.Completed) { PinButton.Attach(host, null, null, 30f, true, 64f); return; }
+                PinButton.Attach(host, "quest:" + q.id, () => Pins.FromQuest(q), 30f, true, 64f);
+            }
+            catch (Exception e) { Plugin.Log.LogWarning("Pin quest: " + e.Message); }
+        }
+    }
+
+    // Pins pro Spielstand merken (BepInEx/GK2VanillaPlus/pins.txt, eine Zeile pro Pin)
+    internal static class PinStore
+    {
+        private static string FilePath => System.IO.Path.Combine(BepInEx.Paths.BepInExRootPath, "GK2VanillaPlus", Plugin.BenchOn ? "pins_bench.txt" : "pins.txt");
+        private static bool loading;
+
+        private static string Slot()
+        {
+            try { return MainGame.Instance?.SaveSlotData?.slotName; } catch { return null; }
+        }
+
+        private static string Esc(string v) => (v ?? "").Replace("\t", " ").Replace("|", "/").Replace(";", ",").Replace("\n", " ");
+
+        internal static void Save()
+        {
+            if (loading) return;
+            string slot = Slot();
+            if (string.IsNullOrEmpty(slot)) return;
+            try
+            {
+                var lines = new List<string>();
+                if (System.IO.File.Exists(FilePath))
+                    foreach (string l in System.IO.File.ReadAllLines(FilePath))
+                        if (!l.StartsWith(slot + "\t")) lines.Add(l);
+                foreach (Pins.Pin p in Pins.List)
+                {
+                    var needs = new List<string>();
+                    foreach (Pins.Need n in p.Needs) needs.Add(Esc(n.Id) + "|" + (n.Group ? 1 : 0) + "|" + n.Count + "|" + Esc(n.IconId));
+                    lines.Add(string.Join("\t", new[] { Esc(slot), Esc(p.Key), Esc(p.TitleKey), Esc(p.Suffix), Esc(p.IconId), Esc(p.QuestId), string.Join(";", needs.ToArray()) }));
+                }
+                System.IO.Directory.CreateDirectory(System.IO.Path.GetDirectoryName(FilePath));
+                System.IO.File.WriteAllLines(FilePath, lines.ToArray());
+            }
+            catch (Exception e) { Plugin.Log.LogWarning("Pins save: " + e.Message); }
+        }
+
+        internal static void Load()
+        {
+            string slot = Slot();
+            Pins.List.Clear();
+            if (string.IsNullOrEmpty(slot) || !System.IO.File.Exists(FilePath)) return;
+            loading = true;
+            try
+            {
+                foreach (string l in System.IO.File.ReadAllLines(FilePath))
+                {
+                    string[] f = l.Split('\t');
+                    if (f.Length < 7 || f[0] != slot) continue;
+                    var p = new Pins.Pin { Key = f[1], TitleKey = f[2], Suffix = f[3], IconId = N(f[4]), QuestId = N(f[5]) };
+                    p.Title = Pins.Loc(p.TitleKey) + p.Suffix;
+                    if (p.QuestId != null)
+                    {
+                        try
+                        {
+                            QuestData q = MainGame.Instance.GameSave.questSystemData.questCollection.questsCache[p.QuestId];
+                            p.Note = Pins.Clean(q.Description);
+                        }
+                        catch { }
+                    }
+                    foreach (string ns in f[6].Split(new[] { ';' }, StringSplitOptions.RemoveEmptyEntries))
+                    {
+                        string[] nf = ns.Split('|');
+                        if (nf.Length < 4) continue;
+                        int.TryParse(nf[2], out int cnt);
+                        p.Needs.Add(new Pins.Need { Id = nf[0], Group = nf[1] == "1", Count = cnt, IconId = N(nf[3]), Name = Pins.Loc(nf[0]) });
+                    }
+                    if (Pins.List.Count < Pins.Max) Pins.List.Add(p);
+                }
+            }
+            catch (Exception e) { Plugin.Log.LogWarning("Pins load: " + e.Message); }
+            finally { loading = false; }
+        }
+
+        private static string N(string v) => string.IsNullOrEmpty(v) ? null : v;
     }
 }

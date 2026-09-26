@@ -32,6 +32,12 @@ GK2 Vanilla+ improves the PC version of Graveyard Keeper 2 without changing the 
 - Mod menu in the game's own look (F9 or the **Mods** button in the main and pause menu), German and English
 - **Pin recipes**, blueprints and town buildings: have/need list at the screen edge (controller: press both sticks)
 - **What's new** window after each update
+- Pin **quests** and single crafts too; pins are kept per save
+- **Save overview** in the main menu with "Play" and backups per save
+- **Camera**: zoom presets (F8), separate zoom indoors, mouse-wheel zoom
+- **Screenshot key** (F11) in up to 4× resolution without HUD
+- **Readability**: size of the mod displays, high contrast
+- Languages: English, German, French, Spanish, Russian, Chinese – more via a text file
 - **Graphics benchmark**: runs through all tiers, score and recommendation
 - FPS display (F10): pick the corner and what to show – FPS, 1% low, frame time, CPU, GPU, RAM, VRAM, resolution, clock, in-game weekday and time
 - "Save now" button and optional save key, extra autosave timer
@@ -84,6 +90,12 @@ GK2 Vanilla+ verbessert die PC-Version von Graveyard Keeper 2, ohne das Spiel se
 - Mod-Menü in der Optik des Spiels (F9 oder Button **Mods** im Haupt- und Pausenmenü), Deutsch und Englisch
 - **Rezepte anpinnen**, auch Baupläne und Stadtgebäude: Haben/Brauchen-Liste am Bildschirmrand (Controller: beide Sticks drücken)
 - **„Was ist neu?“** nach jedem Update
+- Auch **Quests** und Einzel-Handwerk anpinnen; Pins bleiben pro Spielstand gespeichert
+- **Spielstand-Übersicht** im Hauptmenü mit „Spielen“ und Backups je Spielstand
+- **Kamera**: Zoom-Stufen (F8), eigener Zoom in Innenräumen, Zoom mit dem Mausrad
+- **Screenshot-Taste** (F11) in bis zu 4-facher Auflösung ohne HUD
+- **Lesbarkeit**: Größe der Mod-Anzeigen, hoher Kontrast
+- Sprachen: Deutsch, Englisch, Französisch, Spanisch, Russisch, Chinesisch – weitere per Textdatei
 - **Grafik-Benchmark**: geht alle Stufen durch, Score und Empfehlung
 - FPS-Anzeige (F10): Ecke und Inhalt wählbar – FPS, 1%-Low, Frametime, CPU, GPU, RAM, VRAM, Auflösung, Uhrzeit, Wochentag und Uhrzeit im Spiel
 - Button „Jetzt speichern“ und optionale Speichern-Taste, zusätzlicher Autosave

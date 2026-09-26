@@ -52,7 +52,7 @@ namespace GK2Tweaks
                         Available = true;
                         Plugin.Log.LogInfo("Update available: " + Latest);
                         if (MainGame.Instance == null || MainGame.Instance.gameState != MainGame.GameState.InGame)
-                            ManualSave.Toast(Labels.T("GK2 Vanilla+ " + Latest + " ist verfügbar – F9 zum Aktualisieren", "GK2 Vanilla+ " + Latest + " is available – press F9 to update"), 8f);
+                            ManualSave.Toast(string.Format(Labels.T("GK2 Vanilla+ {0} ist verfügbar – F9 zum Aktualisieren", "GK2 Vanilla+ {0} is available – press F9 to update"), Latest), 8f);
                     }
                     else Plugin.Log.LogInfo("Update check: up to date (" + m.Groups[1].Value + ")");
                 }

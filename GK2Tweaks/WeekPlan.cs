@@ -50,7 +50,7 @@ namespace GK2Tweaks
         private static Dictionary<string, Texture2D> icons;
         private static bool subscribed;
 
-        internal static string DayName(string id) => DayNames.TryGetValue(id, out string[] n) ? n[Labels.German ? 0 : 1] : id;
+        internal static string DayName(string id) => DayNames.TryGetValue(id, out string[] n) ? Labels.T(n[0], n[1]) : id;
 
         internal static bool InGame => MainGame.Instance != null && MainGame.Instance.gameState == MainGame.GameState.InGame && MainGame.Instance.GameSave != null;
 
@@ -100,7 +100,7 @@ namespace GK2Tweaks
             var list = new List<string>();
             if (!InGame) return list;
             foreach (Entry e in Entries)
-                if (e.Day == dayId && Unlocked(e)) list.Add(Labels.German ? e.De : e.En);
+                if (e.Day == dayId && Unlocked(e)) list.Add(Labels.T(e.De, e.En));
             return list;
         }
 

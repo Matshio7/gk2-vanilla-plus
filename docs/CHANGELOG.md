@@ -4,6 +4,13 @@
 
 **EN**
 - New: **pin recipes** – a small pin in the top right corner of recipes (workbenches), blueprints (build menu) and town buildings. Pinned items are listed at the screen edge with have/need per ingredient (your inventory, not chests), green when you have enough. Corner and size selectable. With a controller: press both sticks (L3 + R3) on a recipe.
+- New: pin **quests** and **single crafts** (e.g. clearing blockages) – pin in the header of the recipe or quest window; quest pins show the current task
+- New: pins are **kept per save**
+- New: **save overview** in the mod menu in the main menu – day, date, graveyard/church quality, "Play" button and the backups of each save
+- New: **camera** – zoom presets on F8, separate zoom indoors, smooth zoom with the mouse wheel, smooth transitions
+- New: **screenshot key** (F11) in up to 4× resolution, optionally without HUD
+- New: **readability** – size of the mod displays (80–200 %), high contrast mode, larger tooltips
+- New: **languages** – French, Spanish, Russian and Chinese; more languages via a simple text file (BepInEx/GK2VanillaPlus/lang/_template.txt)
 - New: **"Mods" button** in the main menu and the pause menu (Esc) – opens the mod menu, closing it returns to the game menu
 - New: **graphics benchmark** in the mod menu – runs through all graphics tiers (plus your own settings), measures FPS without a limit and shows a score and a recommendation. Nothing is changed, results are also saved to BepInEx/GK2VanillaPlus/benchmark.txt
 - New: **What's new** window – shown once after an update, and anytime via the button in the mod menu
@@ -14,6 +21,13 @@
 
 **DE**
 - Neu: **Rezepte anpinnen** – eine kleine Pinnadel oben rechts an Rezepten (Werkbänke), Bauplänen (Baumenü) und Stadtgebäuden. Angepinntes steht als Liste am Bildschirmrand mit Haben/Brauchen je Zutat (dein Inventar, ohne Truhen), grün sobald genug da ist. Ecke und Größe einstellbar. Mit Controller: auf dem Rezept beide Sticks drücken (L3 + R3).
+- Neu: **Quests** und **Einzel-Handwerk** (z. B. Hindernisse räumen) anpinnen – Pinnadel in der Überschrift des Rezept- oder Quest-Fensters; Quest-Pins zeigen die aktuelle Aufgabe
+- Neu: Pins werden **pro Spielstand gespeichert**
+- Neu: **Spielstand-Übersicht** im Mod-Menü im Hauptmenü – Tag, Datum, Friedhof-/Kirchen-Qualität, Button „Spielen“ und die Backups je Spielstand
+- Neu: **Kamera** – Zoom-Stufen auf F8, eigener Zoom in Innenräumen, stufenloser Zoom mit dem Mausrad, weiche Übergänge
+- Neu: **Screenshot-Taste** (F11) in bis zu 4-facher Auflösung, wahlweise ohne HUD
+- Neu: **Lesbarkeit** – Größe der Mod-Anzeigen (80–200 %), Modus „Hoher Kontrast“, größere Tooltips
+- Neu: **Sprachen** – Französisch, Spanisch, Russisch und Chinesisch; weitere Sprachen über eine einfache Textdatei (BepInEx/GK2VanillaPlus/lang/_template.txt)
 - Neu: **Button „Mods“** im Hauptmenü und im Pausenmenü (Esc) – öffnet das Mod-Menü, beim Schließen geht es zurück ins Spielmenü
 - Neu: **Grafik-Benchmark** im Mod-Menü – geht alle Grafikstufen durch (plus deine eigenen Einstellungen), misst die FPS ohne Limit und zeigt Score und Empfehlung. Es wird nichts verändert, das Ergebnis steht zusätzlich in BepInEx/GK2VanillaPlus/benchmark.txt
 - Neu: Fenster **„Was ist neu?“** – erscheint einmal nach einem Update und jederzeit über den Button im Mod-Menü

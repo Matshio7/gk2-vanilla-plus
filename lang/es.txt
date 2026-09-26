@@ -1,0 +1,274 @@
+# GK2 Vanilla+ – Español
+# Format: English text => translation. Improvements welcome (GitHub / Workshop comments).
+
+Restoring only works in the main menu. => Solo se puede restaurar en el menú principal.
+Restored. Please restart the game once, then "Continue". => Restaurado. Reinicia el juego una vez y luego pulsa «Continuar».
+Screenshot saved: => Captura guardada:
+Screenshot failed. => Error al hacer la captura.
+Your settings => Tus ajustes
+Graphics benchmark => Prueba de rendimiento gráfico
+measuring … => midiendo …
+warming up … => calentando …
+cancel => cancelar
+Benchmark cancelled. => Prueba cancelada.
+Your own settings hold the target too. => Tus propios ajustes también mantienen el objetivo.
+Recommended: => Recomendado:
+(holds {0} FPS) => (mantiene {0} FPS)
+Recommended: Lowest – no tier fully holds {0} FPS. Tip: render mode "Pixel" or a lower resolution. => Recomendado: Mínimo – ningún nivel mantiene del todo {0} FPS. Consejo: modo de renderizado «Píxel» o una resolución menor.
+Unlimited => Ilimitado
+Default (50 Hz) => Predeterminado (50 Hz)
+same as outside => igual que fuera
+Automatic => Automático
+Off => Desactivado
+every => cada
+every save => cada guardado
+High => Alto
+Medium => Medio
+Low => Bajo
+Lowest => Mínimo
+Frame rate mode => Modo de tasa de fotogramas
+Target FPS => FPS objetivo
+Render mode => Modo de renderizado
+Shadows => Sombras
+Ambient occlusion (HBAO) => Oclusión ambiental (HBAO)
+Point lights => Luces puntuales
+Back light => Contraluz
+Water => Agua
+Clouds => Nubes
+Physics rate => Frecuencia de física
+Camera zoom => Zoom de cámara
+Zoom indoors => Zoom en interiores
+Zoom presets => Niveles de zoom
+Zoom preset key => Tecla de nivel de zoom
+Mouse wheel zoom => Zoom con la rueda del ratón
+Smooth zoom => Zoom suave
+Size of mod displays => Tamaño de los elementos del mod
+High contrast => Alto contraste
+Screenshot key => Tecla de captura
+Resolution => Resolución
+Without HUD => Sin HUD
+Pause in background => Pausa en segundo plano
+Autosave => Autoguardado
+Widen main menu => Ampliar el menú principal
+Skip logos => Saltar logotipos
+"modded" note => Nota «modded»
+Game log => Registro del juego
+"Mods" button in menus => Botón «Mods» en los menús
+Show FPS display => Mostrar FPS
+Stats to log => Estadísticas al registro
+Mod menu key => Tecla del menú del mod
+FPS display key => Tecla de FPS
+Save key => Tecla de guardado
+Week plan key => Tecla del plan semanal
+Hide HUD key => Tecla ocultar HUD
+Daily reminder => Recordatorio diario
+Backups per save => Copias por partida
+Minimum interval => Intervalo mínimo
+Check for updates => Buscar actualizaciones
+Language => Idioma
+Position => Posición
+Pinning => Fijar
+Size => Tamaño
+Layout => Disposición
+FPS => FPS
+1% low FPS => FPS del 1 % inferior
+Frame time (ms) => Tiempo de fotograma (ms)
+CPU load => Carga de CPU
+GPU load => Carga de GPU
+Memory (RAM) => Memoria (RAM)
+Video memory (VRAM) => Memoria de vídeo (VRAM)
+Clock => Reloj
+Weekday (in game) => Día de la semana (en el juego)
+Time of day (in game) => Hora (en el juego)
+Extra resolutions => Resoluciones adicionales
+Main menu scaling => Escala del menú principal
+as graphics tier => según el nivel gráfico
+game setting => ajuste del juego
+Software limit => Límite por software
+VSync => VSync
+On => Activado
+PC soft (high) => PC suaves (alto)
+PC soft (medium) => PC suaves (medio)
+PC soft (low) => PC suaves (bajo)
+Simple (desktop) => Simples (escritorio)
+Simple (balanced) => Simples (equilibrado)
+Simple (performance) => Simples (rendimiento)
+Simple (low) => Simples (bajo)
+Simple (minimal) => Simples (mínimo)
+Console (PS5/Xbox) => Consola (PS5/Xbox)
+Highest => Máximo
+Real => Reales
+Simulated => Simuladas
+Simple => Simple
+Normal => Normal
+Simplified => Simplificadas
+Full (native) => Completo (nativo)
+Pixel (half res) => Píxel (media resolución)
+Everything => Todo
+Warnings + errors => Avisos + errores
+Errors only => Solo errores
+Deutsch => Deutsch
+Français => Français
+Español => Español
+English => English
+Top left => Arriba a la izquierda
+Top right => Arriba a la derecha
+Bottom left => Abajo a la izquierda
+Bottom right => Abajo a la derecha
+In a row => En fila
+Small => Pequeño
+Large => Grande
+Extra large => Muy grande
+In a column => En columna
+Mods => Mods
+off => desactivado
+Lights => Luces
+on => activado
+Native = world at full resolution. Lightweight = world at half resolution (chunkier pixels), much less GPU load. Default = as the graphics tier. => Nativo = mundo a resolución completa. Ligero = mundo a media resolución (píxeles más gruesos), mucha menos carga de GPU. Predeterminado = según el nivel gráfico.
+Shadows. NGSS = soft PC shadows (expensive). Unity_* = simpler shadows as on PS5/Xbox. Default = as the graphics tier. => Sombras. NGSS = sombras suaves de PC (costosas). Unity_* = sombras más simples como en PS5/Xbox. Predeterminado = según el nivel gráfico.
+Ambient occlusion (HBAO). Off is otherwise only used on Switch. Default = as the graphics tier. => Oclusión ambiental (HBAO). «Desactivado» solo se usa normalmente en Switch. Predeterminado = según el nivel gráfico.
+Point lights real (Realtime) or simulated (Faked, cheaper). Default = as the graphics tier. => Luces puntuales reales o simuladas (más baratas). Predeterminado = según el nivel gráfico.
+Back light effect. Default = as the graphics tier. => Efecto de contraluz. Predeterminado = según el nivel gráfico.
+Water quality. Default = as the graphics tier. => Calidad del agua. Predeterminado = según el nivel gráfico.
+Clouds normal or simplified. May apply only after changing area. Default = as the graphics tier. => Nubes normales o simplificadas. Puede aplicarse solo al cambiar de zona. Predeterminado = según el nivel gráfico.
+Game = setting from the game menu. Limit = software cap at TargetFps. VSync = synced to the refresh rate (60 FPS at 120 Hz = every 2nd refresh). => Juego = ajuste del menú del juego. Límite = tope por software en los FPS objetivo. VSync = sincronizado con la frecuencia de refresco (60 FPS a 120 Hz = cada 2.º refresco).
+Target FPS for Limit and VSync. 0 = unlimited => FPS objetivo para Límite y VSync. 0 = ilimitado
+Physics rate. 0 = game default (50 Hz). 30 = like the Switch version, saves CPU. => Frecuencia de física. 0 = valor del juego (50 Hz). 30 = como en la versión de Switch, ahorra CPU.
+What the game writes to Player.log. Warning or Error suppresses log spam. => Lo que el juego escribe en Player.log. Avisos o Errores evitan el spam del registro.
+Camera zoom in percent. Below 100 = see more, above 100 = closer. => Zoom de cámara en porcentaje. Menos de 100 = ver más, más de 100 = más cerca.
+Separate camera zoom inside buildings (church, morgue, houses ...). 0 = same as outside. => Zoom propio dentro de edificios (iglesia, morgue, casas …). 0 = igual que fuera.
+Zoom levels in percent the preset key cycles through, comma-separated. => Niveles de zoom en porcentaje que recorre la tecla, separados por comas.
+Key to cycle through the zoom presets. => Tecla para recorrer los niveles de zoom.
+Zoom smoothly with the mouse wheel (only while walking around, not over menus). Resets to the camera zoom setting on the next start. => Zoom continuo con la rueda del ratón (solo al moverte, no sobre menús). Vuelve al zoom de cámara en el próximo inicio.
+Smooth transition when the zoom changes. => Transición suave cuando cambia el zoom.
+Pause the game while its window is in the background (saves battery and heat). => Pausa el juego cuando su ventana está en segundo plano (ahorra batería y calor).
+Fill the sides of the main menu on ultrawide screens with a blurred copy of the menu image. => Rellena los laterales del menú principal en pantallas ultrapanorámicas con una copia desenfocada de la imagen del menú.
+Skip the logos and intro videos when the game starts. => Salta los logotipos y vídeos de introducción al iniciar el juego.
+Show a 'modded' note next to the version number in the main menu. => Muestra una nota «modded» junto al número de versión en el menú principal.
+Show a 'Mods' button in the main menu and the pause menu (opens this mod menu). => Muestra un botón «Mods» en el menú principal y en el de pausa (abre este menú).
+Extra autosave every N minutes (0 = off). Only saves while you are in free control. => Autoguardado adicional cada N minutos (0 = desactivado). Solo guarda cuando controlas libremente al personaje.
+Key for the mod menu. => Tecla del menú del mod.
+Key for the FPS display. => Tecla para mostrar los FPS.
+Check GitHub once per game start for a new version of GK2 Vanilla+ (only reads the version number, nothing is sent). => Comprueba en GitHub una vez por inicio si hay una versión nueva de GK2 Vanilla+ (solo lee el número de versión, no se envía nada).
+Key for the week plan (what is possible on which weekday). => Tecla del plan semanal (qué se puede hacer cada día).
+Key to hide/show the game's HUD, e.g. for screenshots. Esc shows it again. => Tecla para ocultar/mostrar el HUD del juego, p. ej. para capturas. Esc lo vuelve a mostrar.
+Show a notification each morning with what is possible today (only features you have already unlocked). => Muestra cada mañana un aviso de lo que se puede hacer hoy (solo lo que ya has desbloqueado).
+Before the game overwrites a save, the previous save is backed up (BepInEx/GK2VanillaPlus/Backups). Number of backups kept per save slot, 0 = off. => Antes de que el juego sobrescriba una partida, se copia la anterior (BepInEx/GK2VanillaPlus/Backups). Número de copias por ranura, 0 = desactivado.
+Minimum minutes between two backups of the same slot (avoids a backup on every autosave). => Minutos mínimos entre dos copias de la misma ranura (evita una copia en cada autoguardado).
+Key for saving the game manually (empty = only the button in the mod menu). => Tecla para guardar manualmente (vacío = solo el botón del menú del mod).
+Size of the mod menu, FPS display and pinned list. 0 = automatic (follows the screen height). => Tamaño del menú del mod, los FPS y la lista fijada. 0 = automático (según la altura de la pantalla).
+Stronger contrast: dark background for the pinned list, bold and brighter have/need numbers, larger tooltips. => Más contraste: fondo oscuro para la lista fijada, cifras de tienes/necesitas en negrita y más brillantes, descripciones más grandes.
+Key for a screenshot (saved to BepInEx/GK2VanillaPlus/Screenshots). => Tecla de captura (se guarda en BepInEx/GK2VanillaPlus/Screenshots).
+Resolution multiplier: 2 = twice the screen resolution in each direction (e.g. 3840x2160 from 1920x1080). => Multiplicador de resolución: 2 = el doble de la resolución de pantalla en cada dirección (p. ej. 3840x2160 desde 1920x1080).
+Hide the game HUD and the mod displays for the screenshot. => Oculta el HUD del juego y los elementos del mod en la captura.
+Show the FPS display (toggle with F10). Position and contents: section [Overlay]. => Muestra los FPS (alternar con F10). Posición y contenido: sección «FPS».
+Language of the mod menu. Auto = game language (if a translation exists, otherwise English). Translations: BepInEx/GK2VanillaPlus/lang. => Idioma del menú del mod. Auto = idioma del juego (si hay traducción; si no, inglés). Traducciones: BepInEx/GK2VanillaPlus/lang.
+Internal: mod version whose changelog was last shown (the 'What's new' window appears once after an update). => Interno: versión del mod cuyas novedades se mostraron por última vez (la ventana «Novedades» aparece una vez tras actualizar).
+Screen corner of the FPS display. => Esquina de la pantalla para los FPS.
+Row = all values in one line. Column = one value per line. => Fila = todos los valores en una línea. Columna = un valor por línea.
+Frames per second (average over 0.5 s). => Fotogramas por segundo (media de 0,5 s).
+1% low FPS: how smooth it feels. Close to the FPS value = no stutter. => FPS del 1 % inferior: lo fluido que se siente. Cerca del valor de FPS = sin tirones.
+Frame time in ms (average and slowest frame). => Tiempo de fotograma en ms (media y fotograma más lento).
+CPU load of the game (100 % = all cores busy). => Carga de CPU del juego (100 % = todos los núcleos ocupados).
+GPU load (3D engine, like Task Manager). Windows only. => Carga de GPU (motor 3D, como el Administrador de tareas). Solo Windows.
+RAM used by the game => RAM usada por el juego
+Video memory used by the game's textures and buffers => Memoria de vídeo usada por las texturas y búferes del juego
+Current render resolution. => Resolución de renderizado actual.
+Current time. => Hora actual.
+In-game weekday (Pride, Sloth, ...). => Día de la semana en el juego (Soberbia, Pereza, …).
+In-game time of day. => Hora del día en el juego.
+Pin recipes, blueprints and town buildings (pin icon in their top right corner). Pinned items show have/need counts from your inventory. => Fija recetas, planos y edificios de la ciudad (chincheta arriba a la derecha). Lo fijado muestra tienes/necesitas según tu inventario.
+Screen corner of the pinned list. => Esquina de la pantalla para la lista fijada.
+Text and icon size of the pinned list. => Tamaño del texto y los iconos de la lista fijada.
+Write frame statistics to the BepInEx log every N seconds (0 = off). => Escribe estadísticas de fotogramas en el registro de BepInEx cada N segundos (0 = desactivado).
+Zoom => Zoom
+(indoors) => (interior)
+Saving only works while playing. => Solo se puede guardar mientras juegas.
+Not possible right now (dialogue, work, sleep …). Try again in a moment. => No es posible ahora (diálogo, trabajo, sueño …). Inténtalo de nuevo en un momento.
+Saving … => Guardando …
+Saved => Guardado
+Saving failed. => Error al guardar.
+ready => listo
+done => hecho
+Unpin => Quitar
+Week plan => Plan semanal
+What's new? => Novedades
+Active: => Activo:
+Game => Juego
+Frame rate => Tasa de fotogramas
+Graphics (overrides parts of the graphics tier) => Gráficos (sustituyen partes del nivel gráfico)
+Camera => Cámara
+Comfort => Comodidad
+Screenshots => Capturas
+Open screenshot folder => Abrir carpeta de capturas
+Performance => Rendimiento
+Interface => Interfaz
+Remove all pins => Quitar todo lo fijado
+FPS display => FPS en pantalla
+(applies after restart) => (tras reiniciar)
+Save now => Guardar ahora
+Reset graphics => Restablecer gráficos
+Close ( => Cerrar (
+Mac / Linux (CrossOver, Wine) => Mac / Linux (CrossOver, Wine)
+Controller fix => Arreglo de mando
+Fixes stutter with PlayStation controllers (DualSense/DualShock) under CrossOver/Wine by reading the controller through a cheaper path. Turn it off again if the controller misbehaves. => Corrige los tirones con mandos de PlayStation (DualSense/DualShock) en CrossOver/Wine leyendo el mando por una vía más ligera. Desactívalo si el mando falla.
+Applies after a restart: quit the game AND Steam (or restart the CrossOver bottle). => Se aplica tras reiniciar: cierra el juego Y Steam (o reinicia la botella de CrossOver).
+Runs through all graphics tiers (about 13 s each, a bit over a minute in total) and measures FPS without a limit. You get a score and a recommendation at the end. Nothing is saved, your settings stay as they are. Best to stand still at a typical spot. Esc cancels. => Recorre todos los niveles gráficos (unos 13 s cada uno, algo más de un minuto en total) y mide los FPS sin límite. Al final obtienes una puntuación y una recomendación. No se guarda nada, tus ajustes no cambian. Mejor quedarse quieto en un lugar típico. Esc cancela.
+Start benchmark => Iniciar prueba
+only while playing => solo mientras juegas
+Score = average FPS across the four graphics tiers × 10, higher is better – handy for comparing PCs and settings. Saved to BepInEx/GK2VanillaPlus/benchmark.txt => Puntuación = FPS medios en los cuatro niveles gráficos × 10, cuanto más alta mejor – útil para comparar PC y ajustes. Guardado en BepInEx/GK2VanillaPlus/benchmark.txt
+GK2 Vanilla+ was updated. Here is what changed: => GK2 Vanilla+ se ha actualizado. Estos son los cambios:
+Version => Versión
+All versions => Todas las versiones
+Close => Cerrar
+what's on when? => ¿qué toca cuándo?
+· today => · hoy
+· tomorrow => · mañana
+– nothing special (or not unlocked yet) => – nada especial (o aún no desbloqueado)
+Saves => Partidas
+No saves found. => No se encontraron partidas.
+Day => Día
+(autosave) => (autoguardado)
+Graveyard => Cementerio
+Church => Iglesia
+Play => Jugar
+Backup => Copia
+(before restore) => (antes de restaurar)
+Sure? => ¿Seguro?
+Restore => Restaurar
+Save backups => Copias de seguridad
+No backups yet. => Aún no hay copias.
+Restore backups: see "Saves" at the top. => Restaurar copias: ver «Partidas» arriba.
+"Restore" replaces the save with the backup (the current save is backed up first). => «Restaurar» sustituye la partida por la copia (antes se copia la partida actual).
+Restoring is available in the main menu. => Puedes restaurar desde el menú principal.
+Open backup folder => Abrir carpeta de copias
+Update available: => Actualización disponible:
+Save & update => Guardar y actualizar
+Saves (if in game), quits the game and installs the new version. The game can be restarted right after. => Guarda (si estás jugando), cierra el juego e instala la nueva versión. Puedes volver a iniciarlo enseguida.
+Download page => Página de descarga
+Graphics tier => Nivel gráfico
+The tier from the game menu. The values under 'Graphics' override parts of it. => El nivel del menú del juego. Los valores de «Gráficos» sustituyen partes de él.
+Press a key … (Esc = none) => Pulsa una tecla … (Esc = ninguna)
+– none – => – ninguna –
+GK2 Vanilla+ {0} is available – press F9 to update => GK2 Vanilla+ {0} está disponible – pulsa F9 para actualizar
+Could not start the updater – opening the download page. => No se pudo iniciar el actualizador; se abre la página de descarga.
+Today => Hoy
+Pride => Soberbia
+Sloth => Pereza
+Gluttony => Gula
+Lust => Lujuria
+Envy => Envidia
+Wrath => Ira
+Town orders can be accepted => Se pueden aceptar encargos de la ciudad
+Vendor happiness limit resets => Se reinicia el límite de satisfacción de los comerciantes
+The bell calls the zombies to the town centre => La campana llama a los zombis al centro de la ciudad
+Battle day: plan your attacks => Día de batalla: planifica tus ataques
+Fill the PR machine (newspapers, hypno devices) => Rellenar la máquina de propaganda (periódicos, aparatos de hipnosis)
+Bring green scrolls to Linda => Llevar los pergaminos verdes a Linda
+Merchant ship in port: new goods at the Trade Master => Barco mercante en el puerto: nuevos artículos en el maestro comerciante
+Looters at the port take new orders => Los saqueadores del puerto aceptan nuevos encargos
+Thunderstorm: resurrect zombies => Tormenta: resucitar zombis
+Collect blue crystals at the goddess statue => Recoger cristales azules en la estatua de la diosa
+Hold a sermon in the church => Dar un sermón en la iglesia
+Ask how many corpses are needed this week => Preguntar cuántos cadáveres hacen falta esta semana
+Game's own copy => Copia del juego
