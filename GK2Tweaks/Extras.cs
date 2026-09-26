@@ -152,6 +152,7 @@ namespace GK2Tweaks
         internal static void Tick()
         {
             if (Capturing || Plugin.ShotKey.Value.MainKey == KeyCode.None || !Plugin.ShotKey.Value.IsDown()) return;
+            Oled.diagPending = true;
             Plugin.Instance.StartCoroutine(Take());
         }
 
