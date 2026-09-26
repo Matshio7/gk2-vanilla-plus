@@ -272,3 +272,5 @@ Collect blue crystals at the goddess statue => 在女神像处收集蓝色水晶
 Hold a sermon in the church => 在教堂布道
 Ask how many corpses are needed this week => 询问本周需要多少具尸体
 Game's own copy => 游戏自带副本
+OLED black => OLED 纯黑
+Pure black instead of dark gray around the map (e.g. outside the church or at the level edge). Good for OLED screens. => 地图周围使用纯黑而不是深灰（例如教堂外或关卡边缘）。适合 OLED 屏幕。

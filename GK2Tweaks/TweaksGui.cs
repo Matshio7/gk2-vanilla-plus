@@ -394,6 +394,7 @@ namespace GK2Tweaks
             DrawEntry(Plugin.BackLight);
             DrawEntry(Plugin.Water);
             DrawEntry(Plugin.Clouds);
+            DrawEntry(Plugin.OledBlack);
 
             Header(Labels.T("Kamera", "Camera"));
             DrawEntry(Plugin.Zoom);

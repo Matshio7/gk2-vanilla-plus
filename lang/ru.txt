@@ -272,3 +272,5 @@ Collect blue crystals at the goddess statue => Собрать синие кри�
 Hold a sermon in the church => Прочитать проповедь в церкви
 Ask how many corpses are needed this week => Узнать, сколько трупов нужно на этой неделе
 Game's own copy => Копия игры
+OLED black => OLED-чёрный
+Pure black instead of dark gray around the map (e.g. outside the church or at the level edge). Good for OLED screens. => Чистый чёрный вместо тёмно-серого вокруг карты (например, за пределами церкви или на краю уровня). Подходит для OLED-экранов.

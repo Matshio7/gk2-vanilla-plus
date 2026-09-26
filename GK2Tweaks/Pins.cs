@@ -331,13 +331,39 @@ namespace GK2Tweaks
             if (image == null) return;
             bool show = pinned || alwaysShow || Hovered();
             if (image.enabled != show) image.enabled = show;
+            // Baumenues (Hof, Stadt) fangen Mausklicks selbst ab, bevor die Nadel sie bekommt:
+            // deshalb den Linksklick direkt abfragen, wenn die Maus ueber der sichtbaren Nadel ist.
+            if (show && Input.GetMouseButtonDown(0) && Time.frameCount != lastToggleFrame && OverSelf())
+            {
+                lastToggleFrame = Time.frameCount;
+                lastPollToggle = Time.unscaledTime;
+                DoToggle();
+            }
+        }
+
+        private static int lastToggleFrame = -1;
+        private static float lastPollToggle = -10f;
+
+        private bool OverSelf()
+        {
+            if (canvas == null) canvas = GetComponentInParent<Canvas>();
+            Camera cam = canvas != null && canvas.rootCanvas.renderMode != RenderMode.ScreenSpaceOverlay ? canvas.rootCanvas.worldCamera : null;
+            return RectTransformUtility.RectangleContainsScreenPoint((RectTransform)transform, Input.mousePosition, cam);
+        }
+
+        private void DoToggle()
+        {
+            try { Pins.Toggle(Make?.Invoke()); } catch (Exception ex) { Plugin.Log.LogWarning("Pin: " + ex.Message); }
         }
 
         public void OnPointerClick(PointerEventData e)
         {
             if (e.button != PointerEventData.InputButton.Left) return;
-            try { Pins.Toggle(Make?.Invoke()); } catch (Exception ex) { Plugin.Log.LogWarning("Pin: " + ex.Message); }
             e.Use();
+            // schon beim Druecken ueber die Abfrage oben umgeschaltet: nicht doppelt umschalten
+            if (Time.unscaledTime - lastPollToggle < 1.5f) return;
+            lastToggleFrame = Time.frameCount;
+            DoToggle();
         }
 
         // Pixel-Pinnadel (12x12): roter Kopf, heller Glanzpunkt, graue Nadel

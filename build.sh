@@ -38,6 +38,8 @@ rm -rf "$R/workshop"; mkdir -p "$R/workshop"
 cp -R "$S" "$R/workshop/GK2-VanillaPlus"
 cp "$ROOT/workshop/Thumbnail.jpg" "$R/workshop/GK2-VanillaPlus/"
 BOTTLE="$HOME/Library/Application Support/CrossOver/Bottles/Steam/drive_c"
+GAME="$BOTTLE/Program Files (x86)/Steam/steamapps/common/Graveyard Keeper 2"
+if [ -d "$GAME/BepInEx" ]; then mkdir -p "$GAME/BepInEx/GK2VanillaPlus"; cp "$ROOT/workshop/description.bbcode" "$GAME/BepInEx/GK2VanillaPlus/workshop_description.bbcode"; fi
 if [ -d "$BOTTLE" ]; then rm -rf "$BOTTLE/GK2VanillaPlus-Workshop"; cp -R "$R/workshop/GK2-VanillaPlus" "$BOTTLE/GK2VanillaPlus-Workshop"; fi
 # Nexus-Ausgabe: ohne Update-Pruefung und Online-Updater (Nexus erlaubt keine Selbst-Updates)
 (cd "$ROOT/GK2Tweaks" && dotnet build -c Nexus -v q -nologo | grep -E "error|Build succeeded")

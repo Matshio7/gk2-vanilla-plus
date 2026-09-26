@@ -1,5 +1,15 @@
 # Changelog
 
+## 1.4.2 – 2026-09-26
+
+**EN**
+- Fix: pins in the build menu (e.g. blueprints in the yard like the workbench) and for town buildings can now be clicked with the mouse
+- New: **OLED black** (Graphics) – pure black instead of dark gray around the map, e.g. outside the church or at the level edge
+
+**DE**
+- Fix: Pins im Baumenü (z. B. Baupläne im Hof wie die Werkbank) und bei Stadtgebäuden lassen sich jetzt auch mit der Maus anklicken
+- Neu: **OLED-Schwarz** (Grafik) – reines Schwarz statt Dunkelgrau um die Karte herum, z. B. außerhalb der Kirche oder am Levelrand
+
 ## 1.4.1 – 2026-09-26
 
 **EN**

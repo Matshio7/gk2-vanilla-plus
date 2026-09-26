@@ -13,7 +13,7 @@ namespace GK2Tweaks
     {
         public const string Guid = "mats.gk2.tweaks";
         public const string PluginName = "GK2 Tweaks";
-        public const string PluginVersion = "1.4.1";
+        public const string PluginVersion = "1.4.2";
         internal const string Keep = "Default";
 
         internal static Plugin Instance;
@@ -26,7 +26,7 @@ namespace GK2Tweaks
         internal static ConfigEntry<int> TargetFps;
         // [Performance]
         internal static ConfigEntry<int> PhysicsHz, Zoom, AutoSaveMinutes, InteriorZoom, MenuScale, ShotScale;
-        internal static ConfigEntry<bool> MouseWheelZoom, SmoothZoom, HighContrast, ShotHideHud;
+        internal static ConfigEntry<bool> MouseWheelZoom, SmoothZoom, HighContrast, ShotHideHud, OledBlack;
         internal static ConfigEntry<string> ZoomPresets;
         internal static ConfigEntry<KeyboardShortcut> ZoomPresetKey, ShotKey;
         internal static ConfigEntry<bool> PauseInBackground, MenuExtend, MenuModdedLabel, SkipIntro, GameMenuButton;
@@ -79,6 +79,7 @@ namespace GK2Tweaks
                 catch (Exception e) { Log.LogError("Patch " + t.Name + " fehlgeschlagen: " + e.Message); }
             }
 
+            WorkshopUpload.Apply(harmony);
             ApplyPhysics();
             ApplyLogFilter();
             Application.runInBackground = !PauseInBackground.Value;
@@ -168,6 +169,7 @@ namespace GK2Tweaks
             MenuScale = Config.Bind("Interface", "MenuScale", 0, new ConfigDescription(
                 "Size of the mod menu, FPS display and pinned list. 0 = automatic (follows the screen height).",
                 new AcceptableValueList<int>(0, 80, 90, 100, 110, 125, 150, 175, 200)));
+            OledBlack = Config.Bind("Interface", "OledBlack", false, "Pure black instead of dark gray around the map (e.g. outside the church or at the level edge). Good for OLED screens.");
             HighContrast = Config.Bind("Interface", "HighContrast", false, "Stronger contrast: dark background for the pinned list, bold and brighter have/need numbers, larger tooltips.");
             ShotKey = Config.Bind("Screenshots", "Key", new KeyboardShortcut(KeyCode.F12), "Key for a screenshot (saved to BepInEx/GK2VanillaPlus/Screenshots).");
             ShotScale = Config.Bind("Screenshots", "Scale", 2, new ConfigDescription("Resolution multiplier: 2 = twice the screen resolution in each direction (e.g. 3840x2160 from 1920x1080).",
@@ -239,6 +241,7 @@ namespace GK2Tweaks
             GraphicsBench.Tick(dt);
             Pins.Tick();
             BuildPinScan.Tick();
+            Oled.Tick();
             NewsTick();
             Gui.Tick(dt);
 

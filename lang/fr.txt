@@ -272,3 +272,5 @@ Collect blue crystals at the goddess statue => Récolter des cristaux bleus à l
 Hold a sermon in the church => Faire un sermon à l'église
 Ask how many corpses are needed this week => Demander combien de cadavres il faut cette semaine
 Game's own copy => Copie du jeu
+OLED black => Noir OLED
+Pure black instead of dark gray around the map (e.g. outside the church or at the level edge). Good for OLED screens. => Noir pur au lieu de gris foncé autour de la carte (p. ex. hors de l'église ou au bord du niveau). Idéal pour les écrans OLED.
