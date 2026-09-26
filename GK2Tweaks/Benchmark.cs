@@ -229,6 +229,13 @@ namespace GK2Tweaks
             else if (shotStep == 3 && inPhase > 17f) { Plugin.Instance.Gui.SetMenu(true); shotStep = 4; }
             else if (shotStep == 4 && inPhase > 20f) { Shot("modmenu"); shotStep = 5; }
             else if (shotStep == 5 && inPhase > 22f) { Plugin.Instance.Gui.SetMenu(false); Plugin.ShowOverlay.Value = false; shotStep = 6; }
+            else if (shotStep == 6 && inPhase > 24f) { WeekPlan.DebugDump(); Plugin.Instance.Gui.ToggleWeekPlan(); shotStep = 7; }
+            else if (shotStep == 7 && inPhase > 27f) { Shot("weekplan"); shotStep = 8; }
+            else if (shotStep == 8 && inPhase > 29f) { Plugin.Instance.Gui.ToggleWeekPlan(); WeekPlan.OnNewDay(WeekPlan.TodayNumber); shotStep = 9; }
+            else if (shotStep == 9 && inPhase > 31f) { Shot("notify"); shotStep = 10; }
+            else if (shotStep == 10 && inPhase > 33f) { HudToggle.Toggle(); shotStep = 11; }
+            else if (shotStep == 11 && inPhase > 35f) { Shot("nohud"); shotStep = 12; }
+            else if (shotStep == 12 && inPhase > 37f) { HudToggle.Show(); Backups.BeforeSave(MainGame.Instance.SaveSlotData); Plugin.Log.LogInfo("[BENCH] backups: " + Backups.List().Count); shotStep = 13; }
         }
 
         private static void Shot(string name)

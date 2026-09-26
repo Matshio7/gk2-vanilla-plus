@@ -11,8 +11,19 @@ namespace GK2Tweaks
     // Mod-Menue (F9) und FPS-Anzeige (F10). Zeigt alle Einstellungen dieses Mods und aller anderen BepInEx-Mods.
     internal sealed class TweaksGui : MonoBehaviour
     {
-        private const int WindowId = 0x6B2D;
-        private bool menuOpen;
+        private const int WindowId = 0x6B2D, WeekWindowId = 0x6B2E;
+        private bool menuOpen, weekOpen;
+        private Rect weekWin = new Rect(0, 0, 0, 0);
+        private string backupMsg = "";
+        private Backups.Item confirmRestore;
+        private float backupListAt;
+        private System.Collections.Generic.List<Backups.Item> backupList = new System.Collections.Generic.List<Backups.Item>();
+
+        internal void ToggleWeekPlan()
+        {
+            weekOpen = !weekOpen && WeekPlan.InGame;
+            UpdateEnabled();
+        }
         private Rect win = new Rect(40, 60, 700, 760);
         private Vector2 scroll;
         private readonly FrameStats stats = new FrameStats();
@@ -92,7 +103,7 @@ namespace GK2Tweaks
 
         private void DrawOverlay(float scale)
         {
-            if (string.IsNullOrEmpty(overlayText)) return;
+            if (string.IsNullOrEmpty(overlayText) || HudToggle.Hidden) return;
             var content = new GUIContent(overlayText);
             Vector2 size = overlayStyle.CalcSize(content);
             size.x += 4;
@@ -105,7 +116,8 @@ namespace GK2Tweaks
 
         private void UpdateEnabled()
         {
-            bool want = menuOpen || Plugin.ShowOverlay.Value || ManualSave.ShowMessage;
+            if (weekOpen && !WeekPlan.InGame) weekOpen = false;
+            bool want = menuOpen || weekOpen || Plugin.ShowOverlay.Value || ManualSave.ShowMessage;
             if (enabled != want) enabled = want;
         }
 
@@ -133,6 +145,11 @@ namespace GK2Tweaks
                 GUI.Label(new Rect((Screen.width / scale - sz.x) / 2f, 24, sz.x + 4, sz.y), msg, overlayStyle);
             }
             if (menuOpen) win = GUILayout.Window(WindowId, win, DrawWindow, skinned ? "" : "GK2 Vanilla+ · by McFly7", windowStyle);
+            if (weekOpen)
+            {
+                if (weekWin.width <= 0) weekWin = new Rect(Screen.width / scale / 2f - 330, 80, 660, 10);
+                weekWin = GUILayout.Window(WeekWindowId, weekWin, DrawWeekWindow, skinned ? "" : Labels.T("Wochenplan", "Week plan"), windowStyle);
+            }
             GUI.matrix = old;
             GUI.skin.verticalScrollbarThumb = oldThumb;
         }
@@ -170,6 +187,9 @@ namespace GK2Tweaks
             DrawEntry(Plugin.SkipIntro);
             DrawEntry(Plugin.MenuExtend);
             DrawEntry(Plugin.MenuModdedLabel);
+            DrawEntry(Plugin.WeekPlanNotify);
+
+            DrawBackups();
 
             Header(Labels.T("Leistung", "Performance"));
             DrawEntry(Plugin.PhysicsHz);
@@ -181,6 +201,8 @@ namespace GK2Tweaks
             DrawEntry(Plugin.MenuKey);
             DrawEntry(Plugin.OverlayKey);
             DrawEntry(Plugin.SaveKey);
+            DrawEntry(Plugin.WeekPlanKey);
+            DrawEntry(Plugin.HudKey);
 #if !NEXUS
             DrawEntry(Plugin.CheckUpdates);
 #endif
@@ -229,6 +251,69 @@ namespace GK2Tweaks
             if (WineFix.Pending)
                 GUILayout.Label(Labels.T("Wirkt nach Neustart: Spiel UND Steam beenden (bzw. die CrossOver-Flasche neu starten).",
                     "Applies after a restart: quit the game AND Steam (or restart the CrossOver bottle)."), smallStyle);
+        }
+
+        // ---------- Wochenplan (F6) ----------
+        private void DrawWeekWindow(int id)
+        {
+            if (skinned) GUILayout.Label(Labels.T("Wochenplan", "Week plan") + "  ·  " + Labels.T("was geht wann?", "what's on when?"), titleStyle);
+            int today = WeekPlan.TodayNumber;
+            for (int k = 0; k < 6; k++)
+            {
+                int num = (today - 1 + k) % 6 + 1;
+                string dayId = WeekPlan.IdForNumber(num);
+                if (dayId == null) continue;
+                var items = WeekPlan.ItemsFor(dayId);
+                GUILayout.BeginHorizontal();
+                Texture2D icon = WeekPlan.Icon(dayId);
+                Rect ir = GUILayoutUtility.GetRect(44, 44, GUILayout.Width(44), GUILayout.Height(44));
+                if (icon != null) { icon.filterMode = FilterMode.Point; GUI.DrawTexture(ir, icon, ScaleMode.ScaleToFit); }
+                string head = WeekPlan.DayName(dayId) + (k == 0 ? Labels.T("  · heute", "  · today") : k == 1 ? Labels.T("  · morgen", "  · tomorrow") : "");
+                GUILayout.BeginVertical();
+                GUILayout.Label(head, k == 0 ? headerStyle : labelStyle);
+                GUILayout.Label(items.Count == 0 ? Labels.T("– nichts Besonderes (oder noch nicht freigeschaltet)", "– nothing special (or not unlocked yet)") : "• " + string.Join("\n• ", items.ToArray()), smallStyle);
+                GUILayout.EndVertical();
+                GUILayout.EndHorizontal();
+                GUILayout.Space(4);
+            }
+            GUILayout.Space(4);
+            if (GUILayout.Button(Labels.T("Schließen (", "Close (") + Plugin.WeekPlanKey.Value + ")", buttonStyle)) { weekOpen = false; UpdateEnabled(); }
+            if (skinned && Event.current.type == EventType.Repaint) frameStyle.Draw(new Rect(0, 0, weekWin.width, weekWin.height), false, false, false, false);
+            GUI.DragWindow(new Rect(0, 0, 10000, 40));
+        }
+
+        // ---------- Spielstand-Backups ----------
+        private void DrawBackups()
+        {
+            Header(Labels.T("Spielstand-Backups", "Save backups"));
+            DrawEntry(Plugin.BackupCount);
+            DrawEntry(Plugin.BackupMinutes);
+            if (Time.realtimeSinceStartup > backupListAt) { backupList = Backups.List(); backupListAt = Time.realtimeSinceStartup + 3f; }
+            bool inMenu = MainGame.Instance != null && MainGame.Instance.gameState == MainGame.GameState.MainMenu;
+            if (backupList.Count == 0) GUILayout.Label(Labels.T("Noch keine Backups vorhanden.", "No backups yet."), smallStyle);
+            foreach (Backups.Item b in backupList)
+            {
+                GUILayout.BeginHorizontal();
+                string when = b.Time == default(System.DateTime) ? System.IO.Path.GetFileName(b.Dir) : b.Time.ToString(Labels.German ? "dd.MM.yyyy HH:mm" : "yyyy-MM-dd HH:mm");
+                GUILayout.Label(when + "   " + b.Slot + "   " + (b.Bytes / 1048576f).ToString("0.0") + " MB" + (b.Dir.EndsWith("_restore") ? Labels.T("  (vor Wiederherstellung)", "  (before restore)") : ""), labelStyle, GUILayout.Width(460));
+                if (inMenu)
+                {
+                    bool confirm = confirmRestore == b;
+                    if (GUILayout.Button(confirm ? Labels.T("Sicher?", "Sure?") : Labels.T("Laden", "Restore"), buttonStyle, GUILayout.Width(110)))
+                    {
+                        if (!confirm) confirmRestore = b;
+                        else { Backups.Restore(b, out backupMsg); confirmRestore = null; backupListAt = 0; }
+                    }
+                }
+                GUILayout.EndHorizontal();
+            }
+            GUILayout.Label(!string.IsNullOrEmpty(backupMsg) ? backupMsg : (inMenu ? Labels.T("\"Laden\" ersetzt den Spielstand durch das Backup (der aktuelle Stand wird vorher gesichert).", "\"Restore\" replaces the save with the backup (the current save is backed up first).")
+                : Labels.T("Wiederherstellen ist im Hauptmenü möglich.", "Restoring is available in the main menu.")), smallStyle);
+            if (GUILayout.Button(Labels.T("Backup-Ordner öffnen", "Open backup folder"), buttonStyle, GUILayout.Width(260)))
+            {
+                System.IO.Directory.CreateDirectory(Backups.Root);
+                Application.OpenURL("file:///" + Backups.Root.Replace('\\', '/'));
+            }
         }
 
         private void DrawUpdate()

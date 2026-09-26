@@ -26,6 +26,7 @@ INSTALLATION (Windows)
 
 IM SPIEL
 - F9  = Mod-Menü        - F10 = FPS-Anzeige
+- F6  = Wochenplan      - F7  = HUD ausblenden (Screenshots)
 - Im Mod-Menü: "Jetzt speichern" speichert sofort (optional auch per Taste).
 - Im Mod-Menü unter "FPS-Anzeige": Ecke und Inhalt wählen
   (FPS, 1%-Low, Frametime, CPU, GPU, RAM, VRAM, Auflösung, Uhrzeit).
@@ -72,7 +73,7 @@ INSTALL (Windows)
 4. Click "Install", then start the game normally via Steam.
 
 IN GAME
-- F9 = mod menu, F10 = FPS display
+- F9 = mod menu, F10 = FPS display, F6 = week plan, F7 = hide HUD
 - Mod menu: "Save now" saves immediately (optionally via a key).
 - Mod menu > "FPS display": choose the corner and what to show
   (FPS, 1% low, frame time, CPU, GPU, RAM, VRAM, resolution, clock).

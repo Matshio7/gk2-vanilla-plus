@@ -13,7 +13,7 @@ namespace GK2Tweaks
     {
         public const string Guid = "mats.gk2.tweaks";
         public const string PluginName = "GK2 Tweaks";
-        public const string PluginVersion = "1.2.0";
+        public const string PluginVersion = "1.3.0";
         internal const string Keep = "Default";
 
         internal static Plugin Instance;
@@ -29,7 +29,9 @@ namespace GK2Tweaks
         internal static ConfigEntry<bool> PauseInBackground, MenuExtend, MenuModdedLabel, SkipIntro;
         internal static ConfigEntry<string> GameLog;
         // [Interface]
-        internal static ConfigEntry<KeyboardShortcut> MenuKey, OverlayKey, SaveKey;
+        internal static ConfigEntry<KeyboardShortcut> MenuKey, OverlayKey, SaveKey, WeekPlanKey, HudKey;
+        internal static ConfigEntry<bool> WeekPlanNotify;
+        internal static ConfigEntry<int> BackupCount, BackupMinutes;
         internal static ConfigEntry<bool> ShowOverlay, CheckUpdates;
         internal static ConfigEntry<int> StatsLogSeconds;
         internal static ConfigEntry<string> Language;
@@ -62,7 +64,7 @@ namespace GK2Tweaks
             BindConfig();
 
             var harmony = new Harmony(Guid);
-            var patches = new System.Collections.Generic.List<Type> { typeof(TierPatch), typeof(ScreenSettingsPatch), typeof(SaveBlockPatch), typeof(ZoomPatch), typeof(ModdedLabelPatch) };
+            var patches = new System.Collections.Generic.List<Type> { typeof(TierPatch), typeof(ScreenSettingsPatch), typeof(SaveBlockPatch), typeof(ZoomPatch), typeof(ModdedLabelPatch), typeof(BackupPatch) };
 #if DEV
             if (BenchEnabled.Value) patches.Add(typeof(SystemProfiler));
 #endif
@@ -79,6 +81,7 @@ namespace GK2Tweaks
 
             Gui = gameObject.AddComponent<TweaksGui>();
             StartCoroutine(UpdateCheck.Run());
+            WeekPlan.Init();
 #if DEV
             if (BenchEnabled.Value) bench = new Benchmark();
 #endif
@@ -139,6 +142,15 @@ namespace GK2Tweaks
 #if !NEXUS
             CheckUpdates = Config.Bind("Interface", "CheckForUpdates", true, "Check GitHub once per game start for a new version of GK2 Vanilla+ (only reads the version number, nothing is sent).");
 #endif
+            WeekPlanKey = Config.Bind("Interface", "WeekPlanKey", new KeyboardShortcut(KeyCode.F6), "Key for the week plan (what is possible on which weekday).");
+            HudKey = Config.Bind("Interface", "HideHudKey", new KeyboardShortcut(KeyCode.F7), "Key to hide/show the game's HUD, e.g. for screenshots. Esc shows it again.");
+            WeekPlanNotify = Config.Bind("Comfort", "DailyReminder", true, "Show a notification each morning with what is possible today (only features you have already unlocked).");
+            BackupCount = Config.Bind("Backups", "KeepBackups", 5, new ConfigDescription(
+                "Before the game overwrites a save, the previous save is backed up (BepInEx/GK2VanillaPlus/Backups). Number of backups kept per save slot, 0 = off.",
+                new AcceptableValueList<int>(0, 3, 5, 10, 20)));
+            BackupMinutes = Config.Bind("Backups", "MinMinutesBetween", 10, new ConfigDescription(
+                "Minimum minutes between two backups of the same slot (avoids a backup on every autosave).",
+                new AcceptableValueList<int>(0, 5, 10, 15, 30, 60)));
             SaveKey = Config.Bind("Interface", "SaveKey", KeyboardShortcut.Empty, "Key for saving the game manually (empty = only the button in the mod menu).");
             ShowOverlay = Config.Bind("Interface", "ShowOverlay", false, "Show the FPS display (toggle with F10). Position and contents: section [Overlay].");
             Language = Config.Bind("Interface", "Language", "Auto", new ConfigDescription(
@@ -188,6 +200,9 @@ namespace GK2Tweaks
             if (MenuKey.Value.IsDown()) Gui.ToggleMenu();
             if (OverlayKey.Value.IsDown()) ShowOverlay.Value = !ShowOverlay.Value;
             if (SaveKey.Value.MainKey != KeyCode.None && SaveKey.Value.IsDown()) ManualSave.Save(Gui.MenuOpen);
+            if (WeekPlanKey.Value.MainKey != KeyCode.None && WeekPlanKey.Value.IsDown()) Gui.ToggleWeekPlan();
+            if (HudKey.Value.MainKey != KeyCode.None && HudKey.Value.IsDown()) HudToggle.Toggle();
+            HudToggle.Tick();
             Gui.Tick(dt);
 
             if (StatsLogSeconds.Value > 0)

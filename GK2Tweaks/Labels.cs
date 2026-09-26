@@ -51,6 +51,11 @@ namespace GK2Tweaks
             { "MenuKey", new[] { "Taste Mod-Menü", "Mod menu key" } },
             { "OverlayKey", new[] { "Taste FPS-Anzeige", "FPS display key" } },
             { "SaveKey", new[] { "Taste Speichern", "Save key" } },
+            { "WeekPlanKey", new[] { "Taste Wochenplan", "Week plan key" } },
+            { "HideHudKey", new[] { "Taste HUD ausblenden", "Hide HUD key" } },
+            { "DailyReminder", new[] { "Tagesübersicht am Morgen", "Daily reminder" } },
+            { "KeepBackups", new[] { "Backups pro Spielstand", "Backups per save" } },
+            { "MinMinutesBetween", new[] { "Mindestabstand", "Minimum interval" } },
             { "CheckForUpdates", new[] { "Nach Updates suchen", "Check for updates" } },
             { "Language", new[] { "Sprache", "Language" } },
             { "Corner", new[] { "Position", "Position" } },
@@ -89,6 +94,11 @@ namespace GK2Tweaks
             { "SkipIntro", "Logos und Intro-Videos beim Spielstart überspringen." },
             { "MainMenuModdedLabel", "Hinweis \"modded\" neben der Versionsnummer im Hauptmenü." },
             { "CheckForUpdates", "Prüft bei jedem Spielstart einmal auf GitHub, ob es eine neue Version gibt. Es wird nur die Versionsnummer gelesen, nichts gesendet." },
+            { "WeekPlanKey", "Öffnet den Wochenplan: was an welchem Wochentag möglich ist (nur bereits Freigeschaltetes)." },
+            { "HideHudKey", "Blendet die komplette Spiel-Oberfläche aus, z. B. für Screenshots. Esc blendet sie wieder ein." },
+            { "DailyReminder", "Jeden Morgen eine Benachrichtigung, was heute möglich ist – nur bereits freigeschaltete Dinge, keine Spoiler." },
+            { "KeepBackups", "Bevor das Spiel einen Spielstand überschreibt, wird der alte gesichert (BepInEx/GK2VanillaPlus/Backups). 0 = aus." },
+            { "MinMinutesBetween", "Mindestabstand zwischen zwei Backups desselben Spielstands, damit nicht jeder Autosave eins erzeugt." },
             { "SaveKey", "Taste zum manuellen Speichern (Esc beim Zuweisen = keine Taste). Ohne Taste nur über den Button im Mod-Menü." },
             { "ShowOverlay", "FPS-Anzeige ein- oder ausblenden (auch mit F10)." },
             { "StatsLogSeconds", "Frame-Statistik regelmäßig ins BepInEx-Log schreiben." },
@@ -174,6 +184,8 @@ namespace GK2Tweaks
                 if (key == "PhysicsHz") return i == 0 ? T("Standard (50 Hz)", "Default (50 Hz)") : i + " Hz";
                 if (key == "Zoom") return i + " %";
                 if (key == "AutoSaveMinutes") return i == 0 ? T("Aus", "Off") : T("alle ", "every ") + i + " min";
+                if (key == "KeepBackups") return i == 0 ? T("Aus", "Off") : i.ToString();
+                if (key == "MinMinutesBetween") return i == 0 ? T("jedes Speichern", "every save") : i + " min";
                 if (key == "StatsLogSeconds") return i == 0 ? T("Aus", "Off") : T("alle ", "every ") + i + " s";
                 return i.ToString();
             }

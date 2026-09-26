@@ -32,6 +32,9 @@ GK2 Vanilla+ improves the PC version of Graveyard Keeper 2 without changing the 
 - Mod menu in the game's own look (F9), German and English
 - FPS display (F10): pick the corner and what to show – FPS, 1% low, frame time, CPU, GPU, RAM, VRAM, resolution, clock
 - "Save now" button and optional save key, extra autosave timer
+- **Save backups** with restore from the mod menu
+- **Week plan** (F6) and a spoiler-free daily reminder: what is possible on which weekday
+- **Hide HUD** (F7) for clean screenshots
 - Camera zoom, pause when the window is in the background, skip intro logos
 - Update check with one-click update (Windows)
 
@@ -78,6 +81,9 @@ GK2 Vanilla+ verbessert die PC-Version von Graveyard Keeper 2, ohne das Spiel se
 - Mod-Menü in der Optik des Spiels (F9), Deutsch und Englisch
 - FPS-Anzeige (F10): Ecke und Inhalt wählbar – FPS, 1%-Low, Frametime, CPU, GPU, RAM, VRAM, Auflösung, Uhrzeit
 - Button „Jetzt speichern“ und optionale Speichern-Taste, zusätzlicher Autosave
+- **Spielstand-Backups** mit Wiederherstellen im Mod-Menü
+- **Wochenplan** (F6) und spoilerfreie Tagesübersicht: was an welchem Wochentag geht
+- **HUD ausblenden** (F7) für saubere Screenshots
 - Kamera-Zoom, Pause im Hintergrund, Intro-Logos überspringen
 - Update-Prüfung mit Ein-Klick-Update (Windows)
 
