@@ -12,3 +12,4 @@ release/
 .DS_Store
 *.user
 workshop/screens/
+dashboard/data/

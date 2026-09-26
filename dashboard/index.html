@@ -1,0 +1,220 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>GK2 Vanilla+ · Workshop</title>
+<style>
+:root{--bg:#15171c;--panel:#1f232b;--line:#2c313b;--text:#e9e2d4;--muted:#9a9384;--gold:#e8be78;--green:#8fd18f;--red:#e8806a;--blue:#7fb3e8}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font:14px/1.45 -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+.wrap{max-width:1180px;margin:0 auto;padding:24px 20px 40px}
+header{display:flex;gap:16px;align-items:center;margin-bottom:20px}
+header img{width:64px;height:64px;border-radius:8px;border:1px solid var(--line);image-rendering:pixelated}
+header h1{font-size:20px;margin:0;color:var(--gold)}
+header .sub{color:var(--muted);font-size:13px}
+header .right{margin-left:auto;text-align:right;color:var(--muted);font-size:12px}
+button{background:#3a2a22;color:var(--text);border:1px solid #6b3b2c;border-radius:6px;padding:6px 12px;cursor:pointer;font:inherit}
+button:hover{background:#4d3328}
+button.on{background:#6b3b2c;border-color:var(--gold)}
+.tiles{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:12px;margin-bottom:18px}
+.tile{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:14px 16px}
+.tile .k{color:var(--muted);font-size:12px;text-transform:uppercase;letter-spacing:.04em}
+.tile .v{font-size:30px;font-weight:650;margin:4px 0 2px;font-variant-numeric:tabular-nums}
+.tile .d{font-size:12px;color:var(--muted);font-variant-numeric:tabular-nums}
+.up{color:var(--green)!important}.down{color:var(--red)!important}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:16px;margin-bottom:16px}
+.panel h2{font-size:14px;margin:0 0 10px;color:var(--gold);display:flex;align-items:center;gap:10px}
+.panel h2 .sp{margin-left:auto;display:flex;gap:6px}
+.legend{display:flex;gap:16px;font-size:12px;color:var(--muted);margin:-4px 0 6px}
+.legend i{display:inline-block;width:10px;height:3px;border-radius:2px;margin-right:6px;vertical-align:middle}
+svg{width:100%;display:block}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+@media(max-width:800px){.grid2{grid-template-columns:1fr}}
+table{width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums;font-size:13px}
+td,th{padding:6px 8px;border-bottom:1px solid var(--line);text-align:right}
+td:first-child,th:first-child{text-align:left}
+th{color:var(--muted);font-weight:500}
+.tip{position:fixed;pointer-events:none;background:#0e1014;border:1px solid var(--line);border-radius:6px;padding:6px 9px;font-size:12px;display:none;white-space:nowrap}
+.err{color:var(--red);font-size:12px}
+a{color:var(--gold)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <img id="prev" alt="">
+    <div>
+      <h1 id="title">GK2 Vanilla+</h1>
+      <div class="sub" id="meta">lädt …</div>
+    </div>
+    <div class="right">
+      <div id="status">–</div>
+      <div style="margin-top:6px"><button id="refresh">Jetzt abfragen</button></div>
+    </div>
+  </header>
+
+  <div class="tiles" id="tiles"></div>
+
+  <div class="panel">
+    <h2>Abonnenten <span class="sp" id="ranges"></span></h2>
+    <div class="legend"><span><i style="background:var(--gold)"></i>aktuell</span><span><i style="background:var(--blue)"></i>insgesamt (Lifetime)</span></div>
+    <svg id="c1" viewBox="0 0 1000 260" height="260"></svg>
+  </div>
+
+  <div class="grid2">
+    <div class="panel">
+      <h2>Aufrufe</h2>
+      <svg id="c2" viewBox="0 0 1000 200" height="200"></svg>
+    </div>
+    <div class="panel">
+      <h2>Neue Abos pro Tag</h2>
+      <svg id="c3" viewBox="0 0 1000 200" height="200"></svg>
+    </div>
+  </div>
+
+  <div class="panel">
+    <h2>Tagesübersicht</h2>
+    <table id="days"></table>
+  </div>
+  <div class="err" id="err"></div>
+</div>
+<div class="tip" id="tip"></div>
+
+<script>
+const $ = id => document.getElementById(id);
+const fmt = n => n == null ? '–' : n.toLocaleString('de-DE');
+const RANGES = [['24 h', 86400], ['7 Tage', 7*86400], ['30 Tage', 30*86400], ['Alles', 0]];
+let range = 7*86400, data = null;
+try { range = +localStorage.getItem('range') || range; } catch(e) {}
+
+$('ranges').innerHTML = RANGES.map(([l, s]) => `<button data-s="${s}">${l}</button>`).join('');
+$('ranges').onclick = e => { const b = e.target.closest('button'); if (!b) return; range = +b.dataset.s; try { localStorage.setItem('range', range); } catch(e) {} render(); };
+$('refresh').onclick = async () => { $('refresh').disabled = true; await fetch('/api/refresh'); await load(); $('refresh').disabled = false; };
+
+function at(hist, t) {            // letzter Messpunkt vor/zu Zeitpunkt t
+  let r = null; for (const h of hist) { if (h.t <= t) r = h; else break; } return r;
+}
+function delta(hist, key, secs) {
+  hist = hist.filter(h => h[key] != null);
+  if (!hist.length) return null; const last = hist[hist.length-1]; const base = at(hist, last.t - secs) || hist[0];
+  return last[key] - base[key];
+}
+function dtxt(v, label) {
+  if (v == null) return ''; const cls = v > 0 ? 'up' : v < 0 ? 'down' : '';
+  return `<span class="${cls}">${v > 0 ? '+' : ''}${fmt(v)}</span> ${label}`;
+}
+function ago(t) {
+  const s = Math.max(0, Math.round(Date.now()/1000 - t));
+  if (s < 60) return 'vor ' + s + ' s'; if (s < 3600) return 'vor ' + Math.round(s/60) + ' min';
+  if (s < 86400) return 'vor ' + Math.round(s/3600) + ' h'; return 'vor ' + Math.round(s/86400) + ' Tagen';
+}
+const dstr = t => new Date(t*1000).toLocaleString('de-DE', {day:'2-digit', month:'2-digit', hour:'2-digit', minute:'2-digit'});
+
+function tiles(h, m) {
+  const L = h[h.length-1] || {};
+  const churn = L.subs_total != null ? L.subs_total - L.subs : null;
+  const conv = L.views ? (100 * L.subs_total / L.views) : null;
+  const stars = L.stars == null ? (L.ratings ? '–' : 'noch keine') : '★'.repeat(L.stars) + '☆'.repeat(5 - L.stars);
+  const T = [
+    ['Abonnenten', fmt(L.subs), dtxt(delta(h,'subs',86400),'in 24 h') + ' · ' + dtxt(delta(h,'subs',7*86400),'7 T')],
+    ['Abos insgesamt', fmt(L.subs_total), dtxt(delta(h,'subs_total',86400),'in 24 h')],
+    ['Aufrufe', fmt(L.views), dtxt(delta(h,'views',86400),'in 24 h')],
+    ['Favoriten', fmt(L.favs), dtxt(delta(h,'favs',86400),'in 24 h')],
+    ['Kommentare', fmt(L.comments), dtxt(delta(h,'comments',86400),'in 24 h') + (L.discussions ? ` · ${L.discussions} Diskussionen` : '')],
+    ['Bewertung', `<span style="font-size:22px;color:var(--gold)">${stars}</span>`, L.ratings ? fmt(L.ratings) + ' Bewertungen' : 'ab ca. 25 Stimmen sichtbar'],
+    ['Abo-Quote', conv == null ? '–' : conv.toFixed(1).replace('.', ',') + ' %', 'Abos insgesamt / Aufrufe'],
+    ['Abbestellt', fmt(churn), churn != null && L.subs_total ? (100*churn/L.subs_total).toFixed(0) + ' % der Abos' : ''],
+  ];
+  $('tiles').innerHTML = T.map(([k, v, d]) => `<div class="tile"><div class="k">${k}</div><div class="v">${v}</div><div class="d">${d || '&nbsp;'}</div></div>`).join('');
+}
+
+// Liniendiagramm als SVG, mit Hover-Tooltip
+function line(svg, rows, series, H) {
+  const W = svg.clientWidth || 1000; svg.setAttribute('viewBox', `0 0 ${W} ${H}`); const P = {l: 44, r: 12, t: 10, b: 24};
+  if (rows.length < 2) { svg.innerHTML = `<text x="${W/2}" y="${H/2}" fill="#9a9384" text-anchor="middle" font-size="14">Noch zu wenige Messpunkte – das Dashboard sammelt alle 5 Minuten.</text>`; return; }
+  const t0 = rows[0].t, t1 = rows[rows.length-1].t;
+  let lo = Infinity, hi = -Infinity;
+  for (const r of rows) for (const s of series) { const v = r[s.key]; if (v != null) { lo = Math.min(lo, v); hi = Math.max(hi, v); } }
+  if (lo === hi) { lo -= 1; hi += 1; }
+  const pad = (hi - lo) * 0.08; lo = Math.max(0, lo - pad); hi += pad;
+  const X = t => P.l + (W - P.l - P.r) * (t - t0) / Math.max(1, t1 - t0);
+  const Y = v => P.t + (H - P.t - P.b) * (1 - (v - lo) / (hi - lo));
+  let g = '';
+  for (let i = 0; i <= 4; i++) {
+    const v = lo + (hi - lo) * i / 4, y = Y(v);
+    g += `<line x1="${P.l}" x2="${W-P.r}" y1="${y}" y2="${y}" stroke="#2c313b" vector-effect="non-scaling-stroke"/>`;
+    g += `<text x="${P.l-6}" y="${y+4}" fill="#9a9384" font-size="11" text-anchor="end">${hi - lo < 8 ? v.toFixed(1).replace('.', ',') : Math.round(v)}</text>`;
+  }
+  for (let i = 0; i <= 4; i++) {
+    const t = t0 + (t1 - t0) * i / 4;
+    g += `<text x="${X(t)}" y="${H-6}" fill="#9a9384" font-size="11" text-anchor="${i==0?'start':i==4?'end':'middle'}">${dstr(t)}</text>`;
+  }
+  for (const s of series) {
+    const pts = rows.filter(r => r[s.key] != null).map(r => `${X(r.t).toFixed(1)},${Y(r[s.key]).toFixed(1)}`).join(' ');
+    g += `<polyline points="${pts}" fill="none" stroke="${s.color}" stroke-width="2.2" vector-effect="non-scaling-stroke" stroke-linejoin="round"/>`;
+  }
+  g += `<line id="${svg.id}h" y1="${P.t}" y2="${H-P.b}" stroke="#9a9384" stroke-dasharray="3 3" vector-effect="non-scaling-stroke" style="display:none"/>`;
+  svg.innerHTML = g;
+  svg.onmousemove = e => {
+    const b = svg.getBoundingClientRect(), x = (e.clientX - b.left) / b.width * W;
+    const t = t0 + (x - P.l) / (W - P.l - P.r) * (t1 - t0);
+    let best = rows[0]; for (const r of rows) if (Math.abs(r.t - t) < Math.abs(best.t - t)) best = r;
+    const hl = $(svg.id + 'h'); hl.style.display = ''; hl.setAttribute('x1', X(best.t)); hl.setAttribute('x2', X(best.t));
+    const tip = $('tip'); tip.style.display = 'block'; tip.style.left = (e.clientX + 14) + 'px'; tip.style.top = (e.clientY + 10) + 'px';
+    tip.innerHTML = `<b>${dstr(best.t)}</b><br>` + series.map(s => `<span style="color:${s.color}">■</span> ${s.label}: ${fmt(best[s.key])}`).join('<br>');
+  };
+  svg.onmouseleave = () => { $('tip').style.display = 'none'; const hl = $(svg.id + 'h'); if (hl) hl.style.display = 'none'; };
+}
+
+// Neue Abos pro Tag (Balken), aus der Lifetime-Zahl
+function perDay(h) {
+  const days = new Map();
+  for (const r of h) { const d = new Date(r.t*1000); const k = d.toLocaleDateString('de-DE'); days.set(k, {first: days.get(k)?.first || r, last: r}); }
+  const out = []; let prev = null;
+  for (const [k, v] of days) { const base = prev ? prev.last : v.first; out.push({day: k, subs: v.last.subs_total - base.subs_total, views: v.last.views - base.views, favs: v.last.favs - base.favs, cur: v.last.subs}); prev = v; }
+  return out;
+}
+function bars(svg, rows, H) {
+  const W = svg.clientWidth || 1000; svg.setAttribute('viewBox', `0 0 ${W} ${H}`); const P = {l: 44, r: 12, t: 10, b: 24};
+  rows = rows.slice(-30);
+  if (!rows.length) { svg.innerHTML = ''; return; }
+  const hi = Math.max(1, ...rows.map(r => r.subs));
+  const bw = (W - P.l - P.r) / rows.length;
+  let g = '';
+  rows.forEach((r, i) => {
+    const h = (H - P.t - P.b) * r.subs / hi, x = P.l + i * bw + bw * 0.15, y = H - P.b - h;
+    g += `<rect x="${x}" y="${y}" width="${bw*0.7}" height="${h}" rx="3" fill="#e8be78"><title>${r.day}: +${r.subs}</title></rect>`;
+    if (rows.length <= 14) g += `<text x="${x + bw*0.35}" y="${H-6}" fill="#9a9384" font-size="11" text-anchor="middle">${r.day.slice(0,5)}</text>`;
+    if (h > 16) g += `<text x="${x + bw*0.35}" y="${y+14}" fill="#15171c" font-size="11" text-anchor="middle" font-weight="700">${r.subs}</text>`;
+  });
+  svg.innerHTML = g;
+}
+
+function render() {
+  if (!data) return;
+  const h = data.history, m = data.meta || {};
+  document.querySelectorAll('#ranges button').forEach(b => b.classList.toggle('on', +b.dataset.s === range));
+  if (m.title) { $('title').textContent = m.title; document.title = 'GK2 Vanilla+ · ' + fmt((h[h.length-1]||{}).subs) + ' Abos'; }
+  if (m.preview) $('prev').src = m.preview;
+  if (m.updated) $('meta').innerHTML = `Letztes Mod-Update ${dstr(m.updated)} · Tags: ${(m.tags||[]).join(', ') || '–'} · <a href="${m.url}" target="_blank">Workshop-Seite</a>` + (m.banned ? ' · <span class="down">GESPERRT</span>' : '') + (m.visibility ? ' · <span class="down">nicht öffentlich</span>' : '');
+  $('status').innerHTML = data.last_ok ? `Abgefragt ${ago(data.last_ok)} · nächste ${data.next_poll ? 'in ' + Math.max(0, Math.round((data.next_poll - Date.now()/1000)/60)) + ' min' : '–'} · ${h.length} Messpunkte` : 'Noch keine Daten';
+  $('err').textContent = data.last_error ? 'Fehler: ' + data.last_error : '';
+  tiles(h, m);
+  const cut = range ? h[h.length-1].t - range : 0, rows = h.filter(r => r.t >= cut);
+  line($('c1'), rows, [{key:'subs', color:'#e8be78', label:'aktuell'}, {key:'subs_total', color:'#7fb3e8', label:'insgesamt'}], 260);
+  line($('c2'), rows, [{key:'views', color:'#8fd18f', label:'Aufrufe'}], 200);
+  const pd = perDay(h);
+  bars($('c3'), pd, 200);
+  $('days').innerHTML = '<tr><th>Tag</th><th>Neue Abos</th><th>Aufrufe</th><th>Favoriten</th><th>Abonnenten (Tagesende)</th></tr>' +
+    pd.slice().reverse().slice(0, 14).map(r => `<tr><td>${r.day}</td><td>+${fmt(r.subs)}</td><td>+${fmt(r.views)}</td><td>${r.favs>=0?'+':''}${fmt(r.favs)}</td><td>${fmt(r.cur)}</td></tr>`).join('');
+}
+
+async function load() {
+  try { data = await (await fetch('/api/data', {cache: 'no-store'})).json(); render(); }
+  catch (e) { $('status').textContent = 'Server nicht erreichbar – läuft server.py?'; }
+}
+load(); setInterval(load, 30000); window.addEventListener('resize', render);
+</script>
+</body>
+</html>
