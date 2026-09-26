@@ -4,7 +4,7 @@
     <AssemblyName>GK2Tweaks</AssemblyName>
     <RootNamespace>GK2Tweaks</RootNamespace>
     <LangVersion>latest</LangVersion>
-    <Version>1.4.0</Version>
+    <Version>1.4.1</Version>
     <DefineConstants Condition="'$(Configuration)' == 'Dev'">$(DefineConstants);DEV</DefineConstants>
     <DefineConstants Condition="'$(Configuration)' == 'Nexus'">$(DefineConstants);NEXUS</DefineConstants>
     <Optimize Condition="'$(Configuration)' == 'Nexus'">true</Optimize>

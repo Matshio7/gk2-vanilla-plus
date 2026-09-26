@@ -289,6 +289,13 @@ namespace GK2Tweaks
             return null;
         }
 
+        internal static string KeyOf(Component widget)
+        {
+            Transform t = widget.transform.Find("GK2VanillaPlus_Pin");
+            PinButton b = t != null ? t.GetComponent<PinButton>() : null;
+            return b != null && b.gameObject.activeSelf ? b.Key : null;
+        }
+
         internal static void RefreshAll()
         {
             all.RemoveAll(b => b == null);
@@ -413,35 +420,52 @@ namespace GK2Tweaks
         }
     }
 
-    [HarmonyPatch(typeof(UIBuildingWidget), nameof(UIBuildingWidget.Redraw))]
-    internal static class BuildPinPatch
+    // Baumenue und Stadtgebaeude: KEIN Harmony-Patch auf deren Redraw (Mono meldet "Method has zero rva"
+    // und das Fenster bricht ab). Stattdessen werden die sichtbaren Eintraege regelmaessig abgefragt.
+    internal static class BuildPinScan
     {
-        private static void Postfix(UIBuildingWidget __instance)
-        {
-            try
-            {
-                var d = Traverse.Create(__instance).Field("data").GetValue<UIBuildingWidgetData>();
-                if (d?.BuildData?.Definition == null || d.CraftItemCellsData == null || d.CraftItemCellsData.Count == 0) { PinButton.Attach(__instance, null, null); return; }
-                string key = "build:" + d.BuildData.Definition.id;
-                PinButton.Attach(__instance, key, () => Pins.Build(key, d.Name, "", d.BuildData.IconId, d.CraftItemCellsData, null, 1));
-            }
-            catch (Exception e) { Plugin.Log.LogWarning("Pin build: " + e.Message); }
-        }
-    }
+        private static float next;
 
-    [HarmonyPatch(typeof(UITownBuildingWidget), nameof(UITownBuildingWidget.Redraw))]
-    internal static class TownPinPatch
-    {
-        private static void Postfix(UITownBuildingWidget __instance)
+        internal static void Tick()
         {
-            try
+            if (!Plugin.PinsEnabled.Value || Time.unscaledTime < next) return;
+            next = Time.unscaledTime + 0.25f;
+            try { ScanBuild(); } catch (Exception e) { Plugin.Log.LogWarning("Pin build: " + e.Message); next = Time.unscaledTime + 5f; }
+            try { ScanTown(); } catch (Exception e) { Plugin.Log.LogWarning("Pin town: " + e.Message); next = Time.unscaledTime + 5f; }
+        }
+
+        private static void ScanBuild()
+        {
+            UIBuildingWindow w = LazyUI.GetWindow<UIBuildingWindow>();
+            if (w == null || !w.IsShown) return;
+            var list = Traverse.Create(w).Field("displayedBuildItemGUIs").GetValue<List<UIBuildingWidget>>();
+            if (list == null) return;
+            foreach (UIBuildingWidget wd in list)
             {
-                var d = Traverse.Create(__instance).Field("data").GetValue<UITownBuildingWidgetData>();
-                if (d?.TownBuildingDef == null || d.CraftItemCellsData == null || d.CraftItemCellsData.Count == 0) { PinButton.Attach(__instance, null, null); return; }
-                string key = "town:" + d.TownBuildingDef.id;
-                PinButton.Attach(__instance, key, () => Pins.Build(key, d.TownBuildingDef.id, "", d.TownBuildingDef.iconId, d.CraftItemCellsData, null, 1));
+                if (wd == null || !wd.isActiveAndEnabled) continue;
+                var d = Traverse.Create(wd).Field("data").GetValue<UIBuildingWidgetData>();
+                if (d?.BuildData?.Definition == null || d.CraftItemCellsData == null || d.CraftItemCellsData.Count == 0) { PinButton.Attach(wd, null, null); continue; }
+                string key = "build:" + d.BuildData.Definition.id;
+                if (PinButton.KeyOf(wd) == key) continue;
+                PinButton.Attach(wd, key, () => Pins.Build(key, d.Name, "", d.BuildData.IconId, d.CraftItemCellsData, null, 1));
             }
-            catch (Exception e) { Plugin.Log.LogWarning("Pin town: " + e.Message); }
+        }
+
+        private static void ScanTown()
+        {
+            UITownBuildingWindow w = LazyUI.GetWindow<UITownBuildingWindow>();
+            if (w == null || !w.IsShown) return;
+            var list = Traverse.Create(w).Field("displayedBuildItemGUIs").GetValue<List<UITownBuildingWidget>>();
+            if (list == null) return;
+            foreach (UITownBuildingWidget wd in list)
+            {
+                if (wd == null || !wd.isActiveAndEnabled) continue;
+                var d = Traverse.Create(wd).Field("data").GetValue<UITownBuildingWidgetData>();
+                if (d?.TownBuildingDef == null || d.CraftItemCellsData == null || d.CraftItemCellsData.Count == 0) { PinButton.Attach(wd, null, null); continue; }
+                string key = "town:" + d.TownBuildingDef.id;
+                if (PinButton.KeyOf(wd) == key) continue;
+                PinButton.Attach(wd, key, () => Pins.Build(key, d.TownBuildingDef.id, "", d.TownBuildingDef.iconId, d.CraftItemCellsData, null, 1));
+            }
         }
     }
 }

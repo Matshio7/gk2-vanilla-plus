@@ -269,14 +269,19 @@ namespace GK2Tweaks
         private static bool Steam => Plugin.BenchShotSet.Value == "steam";
         private static bool Features => Plugin.BenchShotSet.Value == "features";
         private bool savesShot;
+        private bool featStarted;
 
         // Test der 1.4-Erweiterungen: Quest-Pin, Detailfenster-Pin, Pins speichern/laden, Zoom, Screenshot, Sprachen, Kontrast
         private void FeatureTour(float t)
         {
             TweaksGui gui = Plugin.Instance.Gui;
+            if (!featStarted) { featStarted = true; shotStep = 100; }
             switch (shotStep)
             {
-                case 0: if (t > 8f) { Try(OpenSomeQuest); shotStep++; } break;
+                case 0: if (t > 14f) { Try(OpenSomeQuest); shotStep++; } break;
+                case 100: if (t > 4f) { Try(OpenBuilder); shotStep++; } break;
+                case 101: if (t > 8f) { Try(() => { PinButton b = FindPin("build:"); Plugin.Log.LogInfo("[BENCH] build pin " + (b != null)); if (b != null) Pins.Toggle(b.Make()); }); shotStep++; } break;
+                case 102: if (t > 10f) { Shot("f00_build"); Plugin.Log.LogInfo("[BENCH] build window shown " + LazyUI.GetWindow<UIBuildingWindow>().IsShown + " pins " + Pins.List.Count); Try(() => LazyUI.GetWindow<UIBuildingWindow>().Close()); Pins.List.Clear(); shotStep = 0; } break;
                 case 1: if (t > 11f) { Try(() => { PinButton b = FindPin("quest:"); if (b != null) Pins.Toggle(b.Make()); Plugin.Log.LogInfo("[BENCH] quest pin button " + (b != null)); }); shotStep++; } break;
                 case 2: if (t > 13f) { Shot("f02_quest_window"); shotStep++; } break;
                 case 3: if (t > 14f) { Try(() => LazyUI.GetWindow<UIQuestInfoWindow>().Close()); Try(OpenNearestWorkbench); shotStep++; } break;
@@ -306,6 +311,20 @@ namespace GK2Tweaks
                 case 20: if (t > 52f) { Shot("f09_menu_scale150_es"); shotStep++; } break;
                 case 21: if (t > 53f) { gui.SetMenu(false); TourRestore(); Pins.List.Clear(); shotStep++; } break;
             }
+        }
+
+        private static void OpenBuilder()
+        {
+            Vector3 pos = MainGame.PlayerController.transform.position;
+            Wgo best = null; float bd = float.MaxValue;
+            foreach (Wgo w in UnityEngine.Object.FindObjectsByType<Wgo>(FindObjectsSortMode.None))
+            {
+                if (w.GetComponentInChildren<BuildInteractionHandler>(true) == null) continue;
+                float d = Vector3.Distance(pos, w.transform.position);
+                if (d < bd) { bd = d; best = w; }
+            }
+            Plugin.Log.LogInfo("[BENCH] builder " + (best != null ? best.Data?.Definition?.id : "none"));
+            if (best != null) BuildManager.Instance.TryEnable(best);
         }
 
         private static PinButton FindPin(string keyPrefix, bool header = false)

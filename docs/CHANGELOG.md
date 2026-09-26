@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.4.1 – 2026-09-26
+
+**EN**
+- Fix: the build menu (builder desk) threw an error and did not open correctly. Pins in the build menu and for town buildings now work without patching those windows.
+
+**DE**
+- Fix: Das Baumenü (Bauplan-Tisch) warf einen Fehler und öffnete nicht richtig. Pins im Baumenü und bei Stadtgebäuden funktionieren jetzt, ohne diese Fenster zu patchen.
+
 ## 1.4.0 – 2026-09-26
 
 **EN**
