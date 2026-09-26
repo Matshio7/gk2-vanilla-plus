@@ -35,6 +35,9 @@ def fetch_api():
         "https://api.steampowered.com/ISteamRemoteStorage/GetPublishedFileDetails/v1/", data=body, headers=UA)
     with urllib.request.urlopen(req, timeout=20) as r:
         d = json.load(r)["response"]["publishedfiledetails"][0]
+    # Steam liefert bei Stoerungen gelegentlich einen leeren Datensatz (alles 0) - nicht speichern
+    if d.get("result") != 1 or not d.get("lifetime_subscriptions"):
+        raise RuntimeError("Steam-API: leere Antwort (result %s)" % d.get("result"))
     return d
 
 
@@ -118,7 +121,9 @@ def read_history():
         with lock, open(HISTORY, encoding="utf-8") as f:
             for line in f:
                 try:
-                    rows.append(json.loads(line))
+                    row = json.loads(line)
+                    if row.get("subs_total"):  # leere Stoer-Antworten ausblenden
+                        rows.append(row)
                 except ValueError:
                     pass
     return rows
