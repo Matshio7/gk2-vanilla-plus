@@ -3,19 +3,23 @@
 ## 1.4.0 – 2026-09-26
 
 **EN**
-- New: **pin recipes** – a small pin in the top right corner of recipes (workbenches), blueprints (build menu) and town buildings. Pinned items are listed at the screen edge with have/need per ingredient (your inventory, not chests), green when you have enough. Corner and size selectable.
+- New: **pin recipes** – a small pin in the top right corner of recipes (workbenches), blueprints (build menu) and town buildings. Pinned items are listed at the screen edge with have/need per ingredient (your inventory, not chests), green when you have enough. Corner and size selectable. With a controller: press both sticks (L3 + R3) on a recipe.
 - New: **"Mods" button** in the main menu and the pause menu (Esc) – opens the mod menu, closing it returns to the game menu
 - New: **graphics benchmark** in the mod menu – runs through all graphics tiers (plus your own settings), measures FPS without a limit and shows a score and a recommendation. Nothing is changed, results are also saved to BepInEx/GK2VanillaPlus/benchmark.txt
+- New: **What's new** window – shown once after an update, and anytime via the button in the mod menu
 - New: FPS display can show the **in-game weekday** and the **in-game time**
 - Fix: the camera zoom no longer affects the main menu (always 100 % there)
+- Fix: clicks in mod windows no longer reach game buttons underneath
 - Pinning inspired by "Recipe Pin" by farfars (own implementation)
 
 **DE**
-- Neu: **Rezepte anpinnen** – eine kleine Pinnadel oben rechts an Rezepten (Werkbänke), Bauplänen (Baumenü) und Stadtgebäuden. Angepinntes steht als Liste am Bildschirmrand mit Haben/Brauchen je Zutat (dein Inventar, ohne Truhen), grün sobald genug da ist. Ecke und Größe einstellbar.
+- Neu: **Rezepte anpinnen** – eine kleine Pinnadel oben rechts an Rezepten (Werkbänke), Bauplänen (Baumenü) und Stadtgebäuden. Angepinntes steht als Liste am Bildschirmrand mit Haben/Brauchen je Zutat (dein Inventar, ohne Truhen), grün sobald genug da ist. Ecke und Größe einstellbar. Mit Controller: auf dem Rezept beide Sticks drücken (L3 + R3).
 - Neu: **Button „Mods“** im Hauptmenü und im Pausenmenü (Esc) – öffnet das Mod-Menü, beim Schließen geht es zurück ins Spielmenü
 - Neu: **Grafik-Benchmark** im Mod-Menü – geht alle Grafikstufen durch (plus deine eigenen Einstellungen), misst die FPS ohne Limit und zeigt Score und Empfehlung. Es wird nichts verändert, das Ergebnis steht zusätzlich in BepInEx/GK2VanillaPlus/benchmark.txt
+- Neu: Fenster **„Was ist neu?“** – erscheint einmal nach einem Update und jederzeit über den Button im Mod-Menü
 - Neu: FPS-Anzeige kann den **Wochentag** und die **Uhrzeit im Spiel** zeigen
 - Fix: Der Kamera-Zoom wirkt nicht mehr im Hauptmenü (dort immer 100 %)
+- Fix: Klicks in Mod-Fenstern lösen keine Spiel-Buttons darunter mehr aus
 - Anpinnen angeregt durch „Recipe Pin“ von farfars (eigene Umsetzung)
 
 ## 1.3.0 – 2026-09-26

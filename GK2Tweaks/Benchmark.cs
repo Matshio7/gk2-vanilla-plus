@@ -84,8 +84,14 @@ namespace GK2Tweaks
                     if (mg == null || mg.gameState != MainGame.GameState.MainMenu) return;
                     UIMainMenuWindow w = UnityEngine.Object.FindFirstObjectByType<UIMainMenuWindow>();
                     if (w == null || !w.IsShown || !w.IsContinueButtonWillBeActive()) { menuSince = -1f; return; }
-                    if (menuSince < 0f) { menuSince = now; return; }
-                    if (Plugin.BenchMenuShot.Value && !mainShot && now - menuSince >= 4f) { Shot("mainmenu"); mainShot = true; return; }
+                    if (menuSince < 0f)
+                    {
+                        menuSince = now;
+                        if (!string.IsNullOrEmpty(Plugin.BenchShotRes.Value)) { try { SetResolution(Plugin.BenchShotRes.Value); } catch (Exception e) { Plugin.Log.LogWarning("[BENCH] res: " + e.Message); } }
+                        if (Steam) Try(() => { origLang = GameSettings.Instance.language; SetGameLanguage("en"); TourSet(Plugin.Language, "English"); });
+                        return;
+                    }
+                    if (Plugin.BenchMenuShot.Value && !mainShot && now - menuSince >= 5f) { Shot(Steam ? "s01_mainmenu" : "mainmenu"); mainShot = true; return; }
                     if (now - menuSince < (Plugin.BenchMenuShot.Value ? 7f : 3f)) return;
                     Plugin.Log.LogInfo($"[BENCH] Hauptmenue nach {now:0.0}s, Fortsetzen");
                     w.OnContinueButtonClicked();
@@ -105,7 +111,7 @@ namespace GK2Tweaks
                     break;
 
                 case Phase.Warmup:
-                    if (Plugin.BenchMenuShot.Value) MenuShot(inPhase);
+                    if (Plugin.BenchMenuShot.Value) { if (Steam) SteamTour(inPhase); else MenuShot(inPhase); }
                     if (inPhase >= Plugin.BenchWarmup.Value)
                     {
                         if (Plugin.Instance.Gui.MenuOpen) Plugin.Instance.Gui.SetMenu(false);
@@ -256,6 +262,95 @@ namespace GK2Tweaks
             else if (shotStep == 29 && inPhase > 142f) { Plugin.Instance.Gui.SetMenu(false); shotStep = 30; }
         }
 
+        private static bool Steam => Plugin.BenchShotSet.Value == "steam";
+        private string origLang;
+
+        // Spielsprache nur fuer die Store-Bilder umstellen (nicht gespeichert)
+        private static void SetGameLanguage(string lang)
+        {
+            GameSettings gs = GameSettings.Instance;
+            gs.language = lang;
+            gs.ApplyLanguageSettings(applySave: false);
+            try { GUIElements.Instance?.UpdateLocalizedLabels(); } catch { }
+        }
+
+        // Store-Screenshots, ein Bild je Feature. Zeiten in Sekunden nach dem Laden.
+        private readonly Dictionary<ConfigEntryBase, object> tourSaved = new Dictionary<ConfigEntryBase, object>();
+        private void TourSet(ConfigEntryBase e, object v) { if (!tourSaved.ContainsKey(e)) tourSaved[e] = e.BoxedValue; e.BoxedValue = v; }
+        private void TourRestore() { foreach (var kv in tourSaved) kv.Key.BoxedValue = kv.Value; tourSaved.Clear(); }
+
+        private void SteamTour(float t)
+        {
+            TweaksGui gui = Plugin.Instance.Gui;
+            switch (shotStep)
+            {
+                case 0: if (t > 10f) { Shot("s02_gameplay"); shotStep++; } break;
+                case 1: if (t > 11f)
+                    {
+                        TourSet(Plugin.ShowOverlay, true); TourSet(Plugin.OvCorner, "TopRight"); TourSet(Plugin.OvLayout, "Row");
+                        foreach (var e in new ConfigEntryBase[] { Plugin.OvFps, Plugin.OvLows, Plugin.OvCpu, Plugin.OvRam, Plugin.OvVram, Plugin.OvWeekday, Plugin.OvGameTime }) TourSet(e, true);
+                        TourSet(Plugin.OvFrameTime, false); TourSet(Plugin.OvGpu, false); TourSet(Plugin.OvResolution, false); TourSet(Plugin.OvClock, false);
+                        shotStep++;
+                    } break;
+                case 2: if (t > 14f) { Shot("s03_overlay"); shotStep++; } break;
+                case 3: if (t > 15f) { TourSet(Plugin.ShowOverlay, false); gui.SetMenu(true); shotStep++; } break;
+                case 4: if (t > 18f) { Shot("s04_modmenu"); shotStep++; } break;
+                case 5: if (t > 19f) { gui.ScrollToHeader(Labels.T("Spielstand-Backups", "Save backups")); shotStep++; } break;
+                case 6: if (t > 21f) { Shot("s05_backups"); shotStep++; } break;
+                case 7: if (t > 22f) { gui.SetMenu(false); shotStep++; } break;
+                case 8: if (t > 24f) { Try(() => LazyUI.GetWindow<UIGamePauseWindow>().Open(null)); shotStep++; } break;
+                case 9: if (t > 27f) { Shot("s06_pausemenu"); shotStep++; } break;
+                case 10: if (t > 28f) { Try(() => LazyUI.GetWindow<UIGamePauseWindow>().Close()); shotStep++; } break;
+                case 11: if (t > 30f) { gui.ToggleWeekPlan(); shotStep++; } break;
+                case 12: if (t > 33f) { Shot("s07_weekplan"); shotStep++; } break;
+                case 13: if (t > 34f) { gui.ToggleWeekPlan(); WeekPlan.OnNewDay(WeekPlan.TodayNumber); shotStep++; } break;
+                case 14: if (t > 36f) { Shot("s08_reminder"); shotStep++; } break;
+                case 15: if (t > 42f) { Try(OpenNearestWorkbench); shotStep++; } break;
+                case 16: if (t > 45f) { Try(PinFirstRecipes); Try(PinOtherWorkbenches); shotStep++; } break;
+                case 17: if (t > 47f) { Shot("s09_pins_workbench"); shotStep++; } break;
+                case 18: if (t > 48f) { Try(() => LazyUI.GetWindow<UICraftWindow>().Close()); shotStep++; } break;
+                case 19: if (t > 51f) { Shot("s10_pins"); shotStep++; } break;
+                case 20: if (t > 52f) { Pins.List.Clear(); HudToggle.Toggle(); shotStep++; } break;
+                case 21: if (t > 55f) { Shot("s11_nohud"); shotStep++; } break;
+                case 22: if (t > 56f) { HudToggle.Show(); gui.ShowNews(true); shotStep++; } break;
+                case 23: if (t > 59f) { Shot("s12_whatsnew"); shotStep++; } break;
+                case 24: if (t > 60f) { Plugin.LastSeenVersion.Value = "1.2.0"; Try(() => AccessTools_CloseNews(gui)); GraphicsBench.Start(); shotStep++; } break;
+                case 25: if (t > 70f) { Shot("s13_benchmark_running"); shotStep++; } break;
+                case 26: if (!GraphicsBench.Running && t > 80f) { shotStep++; } break;
+                case 27: if (t > 140f) { Shot("s14_benchmark_result"); shotStep++; } break;
+                case 28: if (t > 142f) { gui.SetMenu(false); TourRestore(); Plugin.LastSeenVersion.Value = "1.2.0"; if (origLang != null) Try(() => SetGameLanguage(origLang)); shotStep++; } break;
+            }
+        }
+
+        private static void AccessTools_CloseNews(TweaksGui gui) => HarmonyLib.AccessTools.Method(typeof(TweaksGui), "CloseNews").Invoke(gui, null);
+
+        // Rezepte anderer Werkbaenke in der Naehe anpinnen, bevorzugt solche mit fehlenden Zutaten (rot/gruen im Bild)
+        private static void PinOtherWorkbenches()
+        {
+            Vector3 pos = MainGame.PlayerController.transform.position;
+            var wgos = new List<Wgo>(UnityEngine.Object.FindObjectsByType<Wgo>(FindObjectsSortMode.None));
+            wgos.Sort((a, b) => Vector3.Distance(pos, a.transform.position).CompareTo(Vector3.Distance(pos, b.transform.position)));
+            var seen = new HashSet<string>();
+            foreach (Wgo w in wgos)
+            {
+                CraftComponent cc = w.Data?.CraftComponent;
+                if (cc == null || cc.CraftsIn == null || w.Data.Definition == null || !seen.Add(w.Data.Definition.id)) continue;
+                if (w.Data.Definition.id == "circular_saw") continue;
+                foreach (CraftDefBase cb in cc.CraftsIn)
+                {
+                    CraftDef def = cb as CraftDef;
+                    if (def == null || def.isAuto || def.needItems == null || def.needItems.Count < 2) continue;
+                    if (def.isNeedsUnlock && !MainGame.Instance.GameSave.knowledgeSystem.unlockedCrafts.Contains(def.id)) continue;
+                    Pins.Pin p = Pins.FromCraftDef(def, w.Data);
+                    Pins.Toggle(p);
+                    if (p.Ready) { Pins.Unpin(p); continue; } // fuers Bild: Rezepte, fuer die noch etwas fehlt
+                    Plugin.Log.LogInfo("[BENCH] pinned other " + w.Data.Definition.id + "/" + def.id);
+                    break;
+                }
+                if (Pins.List.Count >= 3) break;
+            }
+        }
+
         private static void Try(Action a)
         {
             try { a(); } catch (Exception e) { Plugin.Log.LogWarning("[BENCH] tour: " + e); }
@@ -292,7 +387,7 @@ namespace GK2Tweaks
             {
                 if (!pb.gameObject.activeInHierarchy || pb.Make == null) continue;
                 Pins.Toggle(pb.Make());
-                if (++n >= 2) break;
+                if (++n >= (Steam ? 1 : 2)) break;
             }
             Plugin.Log.LogInfo("[BENCH] pinned " + n);
             foreach (Pins.Pin p in Pins.List)

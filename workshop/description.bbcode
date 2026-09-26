@@ -1,22 +1,47 @@
 [img]https://raw.githubusercontent.com/Matshio7/gk2-vanilla-plus/main/docs/logo/GK2-VanillaPlus-Banner.png[/img]
 
-[h1]GK2 Vanilla+ – Ultrawide, Performance & QoL[/h1]
-[i]The game stays vanilla: no gameplay changes, no game files touched, save games stay compatible. Uninstall it and the game is exactly as before.[/i]
+[h1]GK2 Vanilla+ – Ultrawide, Performance & Quality of Life[/h1]
+[i]The game stays vanilla: no gameplay changes, no game files touched, saves stay compatible. Uninstall it and everything is exactly as before.[/i]
 
 [b]English[/b] · [b]Deutsch weiter unten[/b]
 
-[h2]Features[/h2]
+[h2]New in 1.4[/h2]
 [list]
-[*][b]Ultrawide 21:9 / 32:9[/b] – unlocks 2560×1080, 3440×1440, 3840×1080, 5120×1440 and more. The main menu fills the whole screen.
-[*][b]Performance[/b] – the mod menu ([b]F9[/b]) exposes graphics switches the game has internally but hides: shadows (soft PC or cheaper console shadows), ambient occlusion, point lights, back light, water, clouds, render mode. Frame rate cap or VSync with target FPS (e.g. a locked 60), physics rate, log spam filter. Great for laptops, handhelds and Macs.
-[*][b]FPS display[/b] ([b]F10[/b]) – choose the corner and what to show: FPS, 1% low, frame time, CPU, GPU, RAM, VRAM, resolution, clock, in-game weekday and time.
-[*][b]Quality of life[/b] – "Save now" button and optional save key, extra autosave, [b]save backups[/b] with restore, camera zoom, pause in background, skip intro logos.
-[*][b]Week plan[/b] ([b]F6[/b]) and a spoiler-free daily reminder – what is possible on which weekday.
-[*][b]Pin recipes[/b] – a pin on recipes, blueprints and town buildings; pinned items show have/need per ingredient at the screen edge.
-[*][b]Graphics benchmark[/b] – runs through all graphics tiers and gives a score and a recommendation.
-[*][b]Hide HUD[/b] ([b]F7[/b]) for clean screenshots.
-[*][b]Mod menu in the game's own look[/b] (F9 or the [b]Mods[/b] button in the main and pause menu), English and German.
-[*][b]One-click updates[/b] – the mod menu tells you when a new version is out.
+[*][b]Pin recipes[/b] – mouse or controller (press both sticks)
+[*][b]Mods button[/b] in the main and pause menu
+[*][b]Graphics benchmark[/b] with score and recommendation
+[*][b]What's new[/b] window after every update
+[*]Week plan, daily reminder, save backups, hide HUD, in-game weekday and time in the FPS display
+[/list]
+
+[h2]Highlights[/h2]
+[h3]Ultrawide 21:9 / 32:9[/h3]
+Unlocks 2560×1080, 3440×1440, 3840×1080, 5120×1440 and more. The main menu fills the whole screen.
+
+[h3]More FPS on any PC[/h3]
+The game has more graphics switches than its menu shows. The mod menu ([b]F9[/b] or the [b]Mods[/b] button) exposes them: shadows (soft PC or cheaper console shadows), ambient occlusion, point lights, back light, water, clouds, render mode. Plus frame rate cap or VSync with target FPS, physics rate and a log spam filter. Great for laptops, handhelds and Macs.
+
+[h3]Graphics benchmark[/h3]
+One click runs through all graphics tiers, measures your FPS and gives you a score and a recommendation. Your settings stay untouched.
+
+[h3]Pin recipes[/h3]
+Pin recipes, blueprints and town buildings. A list at the screen edge shows have / need for every ingredient, green as soon as you have enough. With a controller: press both sticks on a recipe.
+
+[h3]Week plan & daily reminder[/h3]
+[b]F6[/b] shows what is possible on which weekday, with the game's day icons. Each morning a notification tells you what's on today. Spoiler-free: only things you have already unlocked.
+
+[h3]FPS display[/h3]
+[b]F10[/b] – pick the corner and what to show: FPS, 1% low, frame time, CPU, GPU, RAM, VRAM, resolution, clock, in-game weekday and time.
+
+[h3]Save backups[/h3]
+Before the game overwrites a save, the old one is backed up (outside Steam Cloud). Restore with one click from the main menu. Also: "Save now" button, optional save key, extra autosave.
+
+[h3]And more[/h3]
+[list]
+[*][b]Hide HUD[/b] ([b]F7[/b]) for clean screenshots
+[*]Camera zoom, pause in background, skip intro logos
+[*]Mod menu in the game's own look, English and German, all keys freely assignable
+[*]One-click updates from the mod menu, "What's new" after each update
 [/list]
 
 [h2]Install (Windows)[/h2]
@@ -26,38 +51,44 @@
 [code]<Steam library>\steamapps\workshop\content\4358690\<ID>[/code]
 <ID> is the number at the end of this page's address. Default Steam library: [i]C:\Program Files (x86)\Steam[/i].
 [*]Double-click [b]Installieren.bat[/b] (if SmartScreen warns: "More info" → "Run anyway").
-[*]The game folder is found automatically → click [b]Install[/b]. Start the game, press [b]F9[/b].
+[*]The game folder is found automatically → [b]Install[/b]. Start the game, press [b]F9[/b] or click [b]Mods[/b].
 [/olist]
 The installer also sets up BepInEx 5.4.23.5, the standard Unity mod loader.
+[b]Updates:[/b] the mod menu shows [i]Update available[/i] → [b]Save & update[/b]. [b]Uninstall:[/b] Installieren.bat → [b]Uninstall[/b].
 
-[b]Updates:[/b] when a new version is out, the mod menu shows [i]Update available[/i] → [b]Save & update[/b]. Or run Installieren.bat again.
-[b]Uninstall:[/b] run Installieren.bat → [b]Uninstall[/b] (optionally removes BepInEx too).
-
-[b]macOS (CrossOver) / Linux (Proton, Steam Deck):[/b] copy the contents of [i]installer\files[/i] into the game folder and set the DLL override [i]winhttp[/i] to [i]native, builtin[/i] (Proton launch option: [code]WINEDLLOVERRIDES="winhttp=n,b" %command%[/code]). The mod menu then also offers a [b]controller fix[/b] against stutter with PlayStation controllers under Wine.
+[b]macOS (CrossOver) / Linux (Proton, Steam Deck):[/b] copy the contents of [i]installer\files[/i] into the game folder and set the DLL override [i]winhttp[/i] to [i]native, builtin[/i] (Proton: [code]WINEDLLOVERRIDES="winhttp=n,b" %command%[/code]). The mod menu then also offers a [b]controller fix[/b] against stutter with PlayStation controllers under Wine.
 
 [h2]Mod packs & license[/h2]
 You may include GK2 Vanilla+ [b]unmodified[/b] in free mod packs, with credit ("GK2 Vanilla+ by McFly7") and the license file. Modifying it, re-uploading it as your own or removing the credits is not allowed.
-Source code, license and all releases: [url=https://github.com/Matshio7/gk2-vanilla-plus]github.com/Matshio7/gk2-vanilla-plus[/url]
-
-Problems? Please post in the comments and attach [i]<game folder>\BepInEx\LogOutput.log[/i].
+Source, license and releases: [url=https://github.com/Matshio7/gk2-vanilla-plus]github.com/Matshio7/gk2-vanilla-plus[/url]
+Problems? Post in the comments and attach [i]<game folder>\BepInEx\LogOutput.log[/i].
+Ideas for pinning and the daily reminder inspired by "Recipe Pin" (farfars) and "Daily Reminder" (MrsKiraSayers) – own implementation.
 
 [hr][/hr]
 
 [h1]Deutsch[/h1]
 [i]Das Spiel bleibt Vanilla: kein anderes Gameplay, keine Spieldateien verändert, Spielstände bleiben kompatibel. Nach dem Deinstallieren ist alles wie vorher.[/i]
 
-[h2]Funktionen[/h2]
+[h2]Neu in 1.4[/h2]
 [list]
-[*][b]Ultrawide 21:9 / 32:9[/b] – schaltet 2560×1080, 3440×1440, 3840×1080, 5120×1440 und mehr frei. Das Hauptmenü füllt den ganzen Bildschirm.
-[*][b]Leistung[/b] – das Mod-Menü ([b]F9[/b]) macht versteckte Grafik-Schalter des Spiels zugänglich: Schatten (weich oder sparsame Konsolen-Schatten), Umgebungsverdeckung, Punktlichter, Gegenlicht, Wasser, Wolken, Render-Modus. Bildraten-Limit oder VSync mit Ziel-FPS (z. B. stabile 60), Physik-Takt, Filter gegen Log-Spam.
-[*][b]FPS-Anzeige[/b] ([b]F10[/b]) – Ecke und Inhalt wählbar: FPS, 1%-Low, Frametime, CPU, GPU, RAM, VRAM, Auflösung, Uhrzeit, Wochentag und Uhrzeit im Spiel.
-[*][b]Komfort[/b] – Button „Jetzt speichern“ und optionale Speichern-Taste, zusätzlicher Autosave, [b]Spielstand-Backups[/b] mit Wiederherstellen, Kamera-Zoom, Pause im Hintergrund, Intro-Logos überspringen.
-[*][b]Wochenplan[/b] ([b]F6[/b]) und spoilerfreie Tagesübersicht – was an welchem Wochentag geht.
-[*][b]Rezepte anpinnen[/b] – eine Pinnadel an Rezepten, Bauplänen und Stadtgebäuden; Angepinntes steht mit Haben/Brauchen je Zutat am Bildschirmrand.
-[*][b]Grafik-Benchmark[/b] – geht alle Grafikstufen durch, mit Score und Empfehlung.
-[*][b]HUD ausblenden[/b] ([b]F7[/b]) für saubere Screenshots.
-[*][b]Mod-Menü in der Optik des Spiels[/b] (F9 oder Button [b]Mods[/b] im Haupt- und Pausenmenü), Deutsch und Englisch.
-[*][b]Updates mit einem Klick[/b] direkt aus dem Mod-Menü.
+[*][b]Rezepte anpinnen[/b] – mit Maus oder Controller (beide Sticks drücken)
+[*][b]Button „Mods“[/b] im Haupt- und Pausenmenü
+[*][b]Grafik-Benchmark[/b] mit Score und Empfehlung
+[*][b]„Was ist neu?“[/b] nach jedem Update
+[*]Wochenplan, Tagesübersicht, Spielstand-Backups, HUD ausblenden, Wochentag und Uhrzeit im Spiel in der FPS-Anzeige
+[/list]
+
+[h2]Highlights[/h2]
+[list]
+[*][b]Ultrawide 21:9 / 32:9[/b] – 2560×1080, 3440×1440, 3840×1080, 5120×1440 und mehr, Hauptmenü füllt den ganzen Bildschirm.
+[*][b]Mehr FPS auf jedem PC[/b] – das Mod-Menü ([b]F9[/b] oder Button [b]Mods[/b]) macht versteckte Grafik-Schalter zugänglich: Schatten, Umgebungsverdeckung, Punktlichter, Gegenlicht, Wasser, Wolken, Render-Modus. Dazu Bildraten-Limit oder VSync, Physik-Takt, Filter gegen Log-Spam.
+[*][b]Grafik-Benchmark[/b] – ein Klick, alle Grafikstufen gemessen, Score und Empfehlung. Deine Einstellungen bleiben unverändert.
+[*][b]Rezepte anpinnen[/b] – Rezepte, Baupläne und Stadtgebäude; die Liste am Bildschirmrand zeigt Haben/Brauchen je Zutat. Controller: beide Sticks drücken.
+[*][b]Wochenplan[/b] ([b]F6[/b]) und [b]Tagesübersicht[/b] am Morgen – spoilerfrei, nur bereits Freigeschaltetes.
+[*][b]FPS-Anzeige[/b] ([b]F10[/b]) – Ecke und Inhalt wählbar, auch Wochentag und Uhrzeit im Spiel.
+[*][b]Spielstand-Backups[/b] mit Wiederherstellen per Klick, „Jetzt speichern“, Speichern-Taste, zusätzlicher Autosave.
+[*][b]HUD ausblenden[/b] ([b]F7[/b]), Kamera-Zoom, Pause im Hintergrund, Intro-Logos überspringen.
+[*]Mod-Menü in der Optik des Spiels, Deutsch und Englisch, Updates mit einem Klick, „Was ist neu?“ nach jedem Update.
 [/list]
 
 [h2]Installation (Windows)[/h2]
@@ -67,10 +98,9 @@ Problems? Please post in the comments and attach [i]<game folder>\BepInEx\LogOut
 [code]<Steam-Bibliothek>\steamapps\workshop\content\4358690\<ID>[/code]
 <ID> ist die Zahl am Ende der Adresse dieser Seite.
 [*][b]Installieren.bat[/b] doppelklicken (bei SmartScreen: „Weitere Informationen“ → „Trotzdem ausführen“).
-[*]Der Spielordner wird automatisch gefunden → [b]Installieren[/b]. Spiel starten, [b]F9[/b] drücken.
+[*]Der Spielordner wird automatisch gefunden → [b]Installieren[/b]. Spiel starten, [b]F9[/b] drücken oder [b]Mods[/b] klicken.
 [/olist]
-[b]Updates:[/b] Das Mod-Menü zeigt neue Versionen an → [b]Speichern & aktualisieren[/b].
-[b]Deinstallieren:[/b] Installieren.bat → [b]Deinstallieren[/b].
+[b]Updates:[/b] Das Mod-Menü zeigt neue Versionen an → [b]Speichern & aktualisieren[/b]. [b]Deinstallieren:[/b] Installieren.bat → [b]Deinstallieren[/b].
 
 Weitergabe in kostenlosen Modpacks ist [b]unverändert[/b] und mit Namensnennung erlaubt. Verändern, als eigenes hochladen oder Credits entfernen ist nicht erlaubt. Details: [url=https://github.com/Matshio7/gk2-vanilla-plus/blob/main/LICENSE.md]LICENSE[/url]
 

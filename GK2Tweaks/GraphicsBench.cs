@@ -81,6 +81,7 @@ namespace GK2Tweaks
         {
             if (!Running) return;
             if (Input.GetKeyDown(KeyCode.Escape) || !CanRun) { Finish(true); return; }
+            if (QualitySettings.vSyncCount != 0 || Application.targetFrameRate != -1) Unlock();
             float now = Time.realtimeSinceStartup;
             Step s = steps[cur];
             if (measuring) stats.Add(dt);

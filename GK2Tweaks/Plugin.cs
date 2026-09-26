@@ -34,7 +34,7 @@ namespace GK2Tweaks
         internal static ConfigEntry<int> BackupCount, BackupMinutes;
         internal static ConfigEntry<bool> ShowOverlay, CheckUpdates;
         internal static ConfigEntry<int> StatsLogSeconds;
-        internal static ConfigEntry<string> Language;
+        internal static ConfigEntry<string> Language, LastSeenVersion;
         // [Overlay] – FPS-Anzeige
         internal static ConfigEntry<string> OvCorner, OvLayout, PinsCorner, PinsSize;
         internal static ConfigEntry<bool> PinsEnabled;
@@ -42,7 +42,7 @@ namespace GK2Tweaks
 #if DEV
         // [Benchmark] – nur fuer Messlaeufe (Dev-Build)
         internal static ConfigEntry<bool> BenchEnabled, BenchMenuShot;
-        internal static ConfigEntry<string> BenchLabel, BenchVariants;
+        internal static ConfigEntry<string> BenchLabel, BenchVariants, BenchShotSet, BenchShotRes;
         internal static ConfigEntry<int> BenchWarmup, BenchMeasure;
         internal static bool BenchOn => BenchEnabled.Value;
 #else
@@ -62,6 +62,7 @@ namespace GK2Tweaks
             Instance = this;
             Log = Logger;
             defaultFixedDeltaTime = Time.fixedDeltaTime;
+            Changelog.FreshInstall = !System.IO.File.Exists(Config.ConfigFilePath);
             BindConfig();
 
             var harmony = new Harmony(Guid);
@@ -158,6 +159,7 @@ namespace GK2Tweaks
             Language = Config.Bind("Interface", "Language", "Auto", new ConfigDescription(
                 "Language of the mod menu. Auto = game language (German if the game is set to German, otherwise English).",
                 new AcceptableValueList<string>("Auto", "Deutsch", "English")));
+            LastSeenVersion = Config.Bind("Interface", "LastSeenVersion", "", "Internal: mod version whose changelog was last shown (the 'What's new' window appears once after an update).");
             OvCorner = Config.Bind("Overlay", "Corner", "BottomLeft", new ConfigDescription("Screen corner of the FPS display.",
                 new AcceptableValueList<string>("TopLeft", "TopRight", "BottomLeft", "BottomRight")));
             OvLayout = Config.Bind("Overlay", "Layout", "Row", new ConfigDescription("Row = all values in one line. Column = one value per line.",
@@ -189,6 +191,8 @@ namespace GK2Tweaks
             BenchWarmup = Config.Bind("Benchmark", "WarmupSeconds", 20, "Wartezeit nach dem Laden.");
             BenchMeasure = Config.Bind("Benchmark", "MeasureSeconds", 45, "Messdauer in Sekunden.");
             BenchMenuShot = Config.Bind("Benchmark", "MenuScreenshot", false, "Menue kurz oeffnen und Screenshot speichern (Test).");
+            BenchShotSet = Config.Bind("Benchmark", "ShotSet", "", "steam = Screenshot-Tour fuer die Store-Seite (ein Bild je Feature).");
+            BenchShotRes = Config.Bind("Benchmark", "ShotResolution", "", "Aufloesung fuer die Screenshot-Tour, z. B. 1920x1080 (leer = unveraendert).");
 #endif
         }
 
@@ -215,6 +219,7 @@ namespace GK2Tweaks
             HudToggle.Tick();
             GraphicsBench.Tick(dt);
             Pins.Tick();
+            NewsTick();
             Gui.Tick(dt);
 
             if (StatsLogSeconds.Value > 0)
@@ -238,6 +243,21 @@ namespace GK2Tweaks
 #if DEV
             UiDump.Tick();
 #endif
+        }
+
+        private bool newsChecked;
+        private float menuSince = -1f;
+
+        // "Was ist neu?" einmal nach einem Update, sobald das Hauptmenue ein paar Sekunden steht
+        private void NewsTick()
+        {
+            if (newsChecked || BenchOn) return;
+            MainGame mg = MainGame.Instance;
+            if (mg == null || mg.gameState != MainGame.GameState.MainMenu) { menuSince = -1f; return; }
+            if (menuSince < 0f) { menuSince = Time.realtimeSinceStartup; return; }
+            if (Time.realtimeSinceStartup - menuSince < 3f) return;
+            newsChecked = true;
+            if (Changelog.ShouldAutoShow()) Gui.ShowNews(true);
         }
 
         internal static void ReapplyGraphics()

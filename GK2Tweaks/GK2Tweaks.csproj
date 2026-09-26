@@ -14,6 +14,9 @@
     <BepInExDir Condition="'$(BepInExDir)' == ''">$(MSBuildThisFileDirectory)../_deps/BepInEx/BepInEx/core/</BepInExDir>
   </PropertyGroup>
   <ItemGroup>
+    <EmbeddedResource Include="../docs/CHANGELOG.md" LogicalName="GK2Tweaks.CHANGELOG.md" />
+  </ItemGroup>
+  <ItemGroup>
     <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.3" PrivateAssets="all" />
   </ItemGroup>
   <ItemGroup>
@@ -31,6 +34,7 @@
     <Reference Include="UnityEngine.InputLegacyModule"><HintPath>$(ManagedDir)UnityEngine.InputLegacyModule.dll</HintPath><Private>false</Private></Reference>
     <Reference Include="UnityEngine.ImageConversionModule"><HintPath>$(ManagedDir)UnityEngine.ImageConversionModule.dll</HintPath><Private>false</Private></Reference>
     <Reference Include="UnityEngine.UI"><HintPath>$(ManagedDir)UnityEngine.UI.dll</HintPath><Private>false</Private></Reference>
+    <Reference Include="Rewired_Core"><HintPath>$(ManagedDir)Rewired_Core.dll</HintPath><Private>false</Private></Reference>
     <Reference Include="Unity.TextMeshPro"><HintPath>$(ManagedDir)Unity.TextMeshPro.dll</HintPath><Private>false</Private></Reference>
     <Reference Include="UnityEngine.TextRenderingModule"><HintPath>$(ManagedDir)UnityEngine.TextRenderingModule.dll</HintPath><Private>false</Private></Reference>
   </ItemGroup>

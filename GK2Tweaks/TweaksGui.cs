@@ -11,7 +11,27 @@ namespace GK2Tweaks
     // Mod-Menue (F9) und FPS-Anzeige (F10). Zeigt alle Einstellungen dieses Mods und aller anderen BepInEx-Mods.
     internal sealed class TweaksGui : MonoBehaviour
     {
-        private const int WindowId = 0x6B2D, WeekWindowId = 0x6B2E;
+        private const int WindowId = 0x6B2D, WeekWindowId = 0x6B2E, NewsWindowId = 0x6B2F;
+        private bool newsOpen, newsSinceUpdate;
+        private Rect newsWin;
+        private Vector2 newsScroll;
+        private GUIStyle newsStyle;
+
+        internal void ShowNews(bool sinceUpdate)
+        {
+            newsOpen = true;
+            newsSinceUpdate = sinceUpdate;
+            newsScroll = Vector2.zero;
+            newsWin = new Rect(0, 0, 0, 0);
+            UpdateEnabled();
+        }
+
+        private void CloseNews()
+        {
+            newsOpen = false;
+            Changelog.MarkSeen();
+            UpdateEnabled();
+        }
         private bool menuOpen, weekOpen;
         private Rect weekWin = new Rect(0, 0, 0, 0);
         private string backupMsg = "";
@@ -78,6 +98,7 @@ namespace GK2Tweaks
         {
             RunPendingReopen();
             if (menuOpen && capturingKey == null && Input.GetKeyDown(KeyCode.Escape)) SetMenu(false);
+            else if (newsOpen && Input.GetKeyDown(KeyCode.Escape)) CloseNews();
             UpdateEnabled();
             OverlayStats.Configure(Plugin.ShowOverlay.Value, Plugin.OvCpu.Value, Plugin.OvGpu.Value, Plugin.OvRam.Value, Plugin.OvVram.Value, Plugin.OvFrameTime.Value);
             if (!enabled) return;
@@ -143,18 +164,22 @@ namespace GK2Tweaks
             return string.Join(Plugin.OvLayout.Value == "Column" ? "\n" : "   ", parts.ToArray());
         }
 
-        private float DrawOverlay(float scale)
+        // oben rechts steht im Spiel der Gebietsname - im Spiel darunter anfangen
+        private static float TopFor(string corner) => corner == "TopRight" && WeekPlan.InGame ? 66f : 12f;
+
+        private Rect DrawOverlay(float scale)
         {
-            if (string.IsNullOrEmpty(overlayText) || HudToggle.Hidden) return 0f;
+            if (string.IsNullOrEmpty(overlayText) || HudToggle.Hidden) return Rect.zero;
             var content = new GUIContent(overlayText);
             Vector2 size = overlayStyle.CalcSize(content);
             size.x += 4;
             float w = Screen.width / scale, h = Screen.height / scale, m = 12f;
             string c = Plugin.OvCorner.Value;
             float x = c.EndsWith("Right") ? w - size.x - m : m;
-            float y = c.StartsWith("Top") ? m : h - size.y - m;
-            GUI.Label(new Rect(x, y, size.x, size.y), content, overlayStyle);
-            return size.y + 6f;
+            float y = c.StartsWith("Top") ? TopFor(c) : h - size.y - m;
+            var r = new Rect(x, y, size.x, size.y);
+            GUI.Label(r, content, overlayStyle);
+            return r;
         }
 
         // ---------- Pin-Liste ----------
@@ -176,7 +201,7 @@ namespace GK2Tweaks
             pinXStyle.hover.textColor = Color.white;
         }
 
-        private void DrawPins(float scale, float skipY)
+        private void DrawPins(float scale, Rect ov)
         {
             EnsurePinStyles();
             float line = pinRowStyle.fontSize + 10f, icon = line - 2f, w = 0f, h = 0f;
@@ -195,11 +220,10 @@ namespace GK2Tweaks
             w += 24f; h += 12f;
             float sw = Screen.width / scale, sh = Screen.height / scale, m = 12f;
             string c = Plugin.PinsCorner.Value;
-            // oben rechts steht im Spiel der Gebietsname - darunter anfangen
-            float top = c == "TopRight" ? 70f : m;
             float x = c.EndsWith("Right") ? sw - w - m : m;
-            float y = c.StartsWith("Top") ? top + skipY : sh - h - m - skipY;
-            if (c.StartsWith("Top") == false && c.EndsWith("Left")) y -= 110f; // unten links: Platz fuer die Schnellleiste
+            float y;
+            if (c.StartsWith("Top")) y = ov.height > 0 ? ov.yMax + 6f : TopFor(c);
+            else y = ov.height > 0 ? ov.y - 6f - h : sh - h - m;
             GUI.Box(new Rect(x, y, w, h), GUIContent.none, pinBoxStyle);
             float cy = y + 6f, cx = x + 12f;
             Pins.Pin remove = null;
@@ -223,10 +247,35 @@ namespace GK2Tweaks
             if (remove != null) Pins.Unpin(remove);
         }
 
+        // Unsichtbare Flaeche ueber der Spiel-Oberflaeche, solange ein Mod-Fenster offen ist:
+        // IMGUI-Klicks sollen nicht zusaetzlich Buttons des Spiels darunter ausloesen.
+        private GameObject blocker;
+
+        private void SetBlocker(bool on)
+        {
+            if (blocker == null)
+            {
+                if (!on) return;
+                blocker = new GameObject("GK2VanillaPlus_ClickBlocker");
+                DontDestroyOnLoad(blocker);
+                var c = blocker.AddComponent<Canvas>();
+                c.renderMode = RenderMode.ScreenSpaceOverlay;
+                c.sortingOrder = 32000;
+                blocker.AddComponent<UnityEngine.UI.GraphicRaycaster>();
+                var img = new GameObject("Area", typeof(RectTransform)).AddComponent<UnityEngine.UI.Image>();
+                img.transform.SetParent(blocker.transform, false);
+                var rt = (RectTransform)img.transform;
+                rt.anchorMin = Vector2.zero; rt.anchorMax = Vector2.one; rt.offsetMin = rt.offsetMax = Vector2.zero;
+                img.color = new Color(0, 0, 0, 0);
+            }
+            if (blocker.activeSelf != on) blocker.SetActive(on);
+        }
+
         private void UpdateEnabled()
         {
+            SetBlocker(menuOpen || newsOpen);
             if (weekOpen && !WeekPlan.InGame) weekOpen = false;
-            bool want = menuOpen || weekOpen || Plugin.ShowOverlay.Value || ManualSave.ShowMessage || GraphicsBench.Running || (Pins.List.Count > 0 && Plugin.PinsEnabled.Value);
+            bool want = menuOpen || weekOpen || newsOpen || Plugin.ShowOverlay.Value || ManualSave.ShowMessage || GraphicsBench.Running || (Pins.List.Count > 0 && Plugin.PinsEnabled.Value);
             if (enabled != want) enabled = want;
         }
 
@@ -246,10 +295,10 @@ namespace GK2Tweaks
             Matrix4x4 old = GUI.matrix;
             float scale = Mathf.Clamp(Screen.height / 1080f, 0.75f, 2.5f);
             GUI.matrix = Matrix4x4.TRS(Vector3.zero, Quaternion.identity, new Vector3(scale, scale, 1f));
-            float overlayH = 0f;
-            if (Plugin.ShowOverlay.Value) overlayH = DrawOverlay(scale);
+            Rect ov = Rect.zero;
+            if (Plugin.ShowOverlay.Value) ov = DrawOverlay(scale);
             if (Pins.List.Count > 0 && Plugin.PinsEnabled.Value && WeekPlan.InGame && !HudToggle.Hidden)
-                DrawPins(scale, Plugin.PinsCorner.Value == Plugin.OvCorner.Value && Plugin.ShowOverlay.Value ? overlayH : 0f);
+                DrawPins(scale, Plugin.PinsCorner.Value == Plugin.OvCorner.Value ? ov : Rect.zero);
             if (GraphicsBench.Running)
             {
                 var bm = new GUIContent(GraphicsBench.Status);
@@ -267,6 +316,11 @@ namespace GK2Tweaks
             {
                 if (weekWin.width <= 0) weekWin = new Rect(Screen.width / scale / 2f - 330, 80, 660, 10);
                 weekWin = GUILayout.Window(WeekWindowId, weekWin, DrawWeekWindow, skinned ? "" : Labels.T("Wochenplan", "Week plan"), windowStyle);
+            }
+            if (newsOpen)
+            {
+                if (newsWin.width <= 0) newsWin = new Rect(Screen.width / scale / 2f - 380, 70, 760, 10);
+                newsWin = GUILayout.Window(NewsWindowId, newsWin, DrawNewsWindow, skinned ? "" : Labels.T("Was ist neu?", "What's new?"), windowStyle);
             }
             GUI.matrix = old;
             GUI.skin.verticalScrollbarThumb = oldThumb;
@@ -351,10 +405,12 @@ namespace GK2Tweaks
             }
             GUILayout.EndScrollView();
             if (scrollToBench && Event.current.type == EventType.Repaint) { scroll.y = Mathf.Max(0, benchY - 10); scrollToBench = false; }
+            if (pendingScrollHeader != null && Event.current.type == EventType.Repaint && headerY.TryGetValue(pendingScrollHeader, out float hy)) { scroll.y = Mathf.Max(0, hy - 10); pendingScrollHeader = null; }
 
             GUILayout.Space(4);
             GUILayout.BeginHorizontal();
             if (GUILayout.Button(Labels.T("Jetzt speichern", "Save now"), buttonStyle)) ManualSave.Save(true);
+            if (GUILayout.Button(Labels.T("Was ist neu?", "What's new?"), buttonStyle)) ShowNews(false);
             if (GUILayout.Button(Labels.T("Grafik zurücksetzen", "Reset graphics"), buttonStyle)) ResetTweaks();
             if (GUILayout.Button(Labels.T("Schließen (", "Close (") + Plugin.MenuKey.Value + ")", buttonStyle)) SetMenu(false);
             GUILayout.EndHorizontal();
@@ -414,6 +470,35 @@ namespace GK2Tweaks
             GUILayout.Label(GraphicsBench.Recommendation, new GUIStyle(labelStyle) { wordWrap = true, fixedHeight = 0 });
             GUILayout.Label(Labels.T("Score = mittlere FPS über die vier Grafikstufen × 10, höher ist besser – gut zum Vergleichen von PCs und Einstellungen. Gespeichert in BepInEx/GK2VanillaPlus/benchmark.txt",
                 "Score = average FPS across the four graphics tiers × 10, higher is better – handy for comparing PCs and settings. Saved to BepInEx/GK2VanillaPlus/benchmark.txt"), smallStyle);
+        }
+
+        // ---------- Was ist neu? ----------
+        private void DrawNewsWindow(int id)
+        {
+            if (newsStyle == null)
+            {
+                newsStyle = new GUIStyle(labelStyle) { fixedHeight = 0, wordWrap = true, richText = true, alignment = TextAnchor.UpperLeft, fontSize = 15 };
+            }
+            if (skinned) GUILayout.Label(Labels.T("Was ist neu?", "What's new?") + "  ·  GK2 Vanilla+ " + Plugin.PluginVersion, titleStyle);
+            if (newsSinceUpdate) GUILayout.Label(Labels.T("GK2 Vanilla+ wurde aktualisiert. Das hat sich geändert:", "GK2 Vanilla+ was updated. Here is what changed:"), smallStyle);
+            newsScroll = skinned ? GUILayout.BeginScrollView(newsScroll, false, true, GUIStyle.none, vbarStyle, GUIStyle.none, GUILayout.Height(460))
+                                 : GUILayout.BeginScrollView(newsScroll, GUILayout.Height(460));
+            var list = newsSinceUpdate ? Changelog.Since(Plugin.LastSeenVersion.Value) : Changelog.Entries;
+            foreach (Changelog.Entry e in list)
+            {
+                GUILayout.Label(Labels.T("Version ", "Version ") + e.Version + "   ·   " + e.Date, headerStyle);
+                GUILayout.Label(e.Text, newsStyle);
+                GUILayout.Space(6);
+            }
+            if (list.Count == 0) GUILayout.Label("–", newsStyle);
+            GUILayout.EndScrollView();
+            GUILayout.Space(4);
+            GUILayout.BeginHorizontal();
+            if (newsSinceUpdate && GUILayout.Button(Labels.T("Alle Versionen", "All versions"), buttonStyle)) { newsSinceUpdate = false; newsScroll = Vector2.zero; }
+            if (GUILayout.Button(Labels.T("Schließen", "Close"), buttonStyle)) CloseNews();
+            GUILayout.EndHorizontal();
+            if (skinned && Event.current.type == EventType.Repaint) frameStyle.Draw(new Rect(0, 0, newsWin.width, newsWin.height), false, false, false, false);
+            GUI.DragWindow(new Rect(0, 0, 10000, 40));
         }
 
         // ---------- Wochenplan (F6) ----------
@@ -494,10 +579,16 @@ namespace GK2Tweaks
             GUILayout.EndHorizontal();
         }
 
+        private readonly Dictionary<string, float> headerY = new Dictionary<string, float>();
+        private string pendingScrollHeader;
+
+        internal void ScrollToHeader(string text) => pendingScrollHeader = text;
+
         private void Header(string text)
         {
             GUILayout.Space(8);
             GUILayout.Label(text, headerStyle);
+            if (Event.current.type == EventType.Repaint) headerY[text] = GUILayoutUtility.GetLastRect().y;
         }
 
         private void DrawGameTier()

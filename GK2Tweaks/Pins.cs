@@ -106,8 +106,38 @@ namespace GK2Tweaks
             return p;
         }
 
+        // ---------- Controller: beide Sticks druecken (L3 + R3) pinnt das fokussierte Rezept ----------
+        internal static GamepadNavigationItem Focused;
+        private static bool gamepadHooked;
+        private const int RewiredRStick = 19, RewiredLStick = 20; // Aktions-IDs wie im GamepadController des Spiels
+
+        private static void HookGamepad()
+        {
+            if (gamepadHooked) return;
+            gamepadHooked = true;
+            GamepadNavigationItem.OnFocusStatic += i => Focused = i;
+            GamepadNavigationItem.OnUnfocusStatic += i => { if (Focused == i) Focused = null; };
+        }
+
+        private static void CheckGamepadCombo()
+        {
+            if (!Plugin.PinsEnabled.Value || Focused == null || !LazyInput.IsGamepadActive) return;
+            try
+            {
+                if (!Rewired.ReInput.isReady) return;
+                Rewired.Player pl = Rewired.ReInput.players.GetPlayer(0);
+                bool l = pl.GetButton(RewiredLStick), r = pl.GetButton(RewiredRStick);
+                if (!(l && r) || !(pl.GetButtonDown(RewiredLStick) || pl.GetButtonDown(RewiredRStick))) return;
+                PinButton b = PinButton.For(Focused.transform);
+                if (b != null && b.Make != null) Toggle(b.Make());
+            }
+            catch { }
+        }
+
         internal static void Tick()
         {
+            HookGamepad();
+            CheckGamepadCombo();
             MainGame mg = MainGame.Instance;
             int s = mg == null ? -1 : (int)mg.gameState;
             if (s != lastState)
@@ -216,6 +246,17 @@ namespace GK2Tweaks
             return b;
         }
 
+        // Pinnadel zum fokussierten Element suchen (das Element selbst oder eines seiner Eltern traegt die Nadel)
+        internal static PinButton For(Transform t)
+        {
+            for (int i = 0; t != null && i < 8; i++, t = t.parent)
+            {
+                Transform p = t.Find("GK2VanillaPlus_Pin");
+                if (p != null && p.gameObject.activeInHierarchy) return p.GetComponent<PinButton>();
+            }
+            return null;
+        }
+
         internal static void RefreshAll()
         {
             all.RemoveAll(b => b == null);
@@ -239,6 +280,8 @@ namespace GK2Tweaks
         {
             var parent = transform.parent as RectTransform;
             if (parent == null) return false;
+            GamepadNavigationItem f = Pins.Focused;
+            if (f != null && LazyInput.IsGamepadActive && f.isActiveAndEnabled && f.transform.IsChildOf(parent)) return true;
             if (canvas == null) canvas = GetComponentInParent<Canvas>();
             Camera cam = canvas != null && canvas.rootCanvas.renderMode != RenderMode.ScreenSpaceOverlay ? canvas.rootCanvas.worldCamera : null;
             return RectTransformUtility.RectangleContainsScreenPoint(parent, Input.mousePosition, cam);
