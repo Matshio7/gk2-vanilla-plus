@@ -6,6 +6,7 @@ Add-Type -AssemblyName System.Drawing
 [System.Windows.Forms.Application]::EnableVisualStyles()
 
 $Version = '1.2.0'
+$OnlineUpdate = $true   # Nexus-Ausgabe: $false (keine Internetverbindung)
 $ExeName = 'GraveyardKeeper2.exe'
 $Root    = Split-Path -Parent (Split-Path -Parent $MyInvocation.MyCommand.Path)
 $Payload = Join-Path $Root 'installer\files'
@@ -164,7 +165,8 @@ $credit.LinkColor = [System.Drawing.Color]::FromArgb(150, 200, 255)
 $credit.SetBounds(400, 281, 200, 22)
 $credit.TextAlign = 'MiddleRight'
 $credit.Add_LinkClicked({ Start-Process 'https://github.com/Matshio7/gk2-vanilla-plus' })
-$form.Controls.AddRange(@($install, $uninstall, $close, $online, $credit))
+$form.Controls.AddRange(@($install, $uninstall, $close, $credit))
+if ($OnlineUpdate) { $form.Controls.Add($online) }
 $online.Add_Click({
     $dir = $box.Text
     if (-not (Test-GameDir $dir)) { Set-Status; return }

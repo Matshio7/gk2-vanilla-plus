@@ -181,7 +181,9 @@ namespace GK2Tweaks
             DrawEntry(Plugin.MenuKey);
             DrawEntry(Plugin.OverlayKey);
             DrawEntry(Plugin.SaveKey);
+#if !NEXUS
             DrawEntry(Plugin.CheckUpdates);
+#endif
 
             Header(Labels.T("FPS-Anzeige", "FPS display"));
             foreach (ConfigEntryBase e in new ConfigEntryBase[] { Plugin.ShowOverlay, Plugin.OvCorner, Plugin.OvLayout, Plugin.OvFps, Plugin.OvLows,

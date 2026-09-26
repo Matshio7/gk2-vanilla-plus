@@ -136,7 +136,9 @@ namespace GK2Tweaks
 
             MenuKey = Config.Bind("Interface", "MenuKey", new KeyboardShortcut(KeyCode.F9), "Key for the mod menu.");
             OverlayKey = Config.Bind("Interface", "OverlayKey", new KeyboardShortcut(KeyCode.F10), "Key for the FPS display.");
+#if !NEXUS
             CheckUpdates = Config.Bind("Interface", "CheckForUpdates", true, "Check GitHub once per game start for a new version of GK2 Vanilla+ (only reads the version number, nothing is sent).");
+#endif
             SaveKey = Config.Bind("Interface", "SaveKey", KeyboardShortcut.Empty, "Key for saving the game manually (empty = only the button in the mod menu).");
             ShowOverlay = Config.Bind("Interface", "ShowOverlay", false, "Show the FPS display (toggle with F10). Position and contents: section [Overlay].");
             Language = Config.Bind("Interface", "Language", "Auto", new ConfigDescription(

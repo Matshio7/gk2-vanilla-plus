@@ -6,6 +6,8 @@
     <LangVersion>latest</LangVersion>
     <Version>1.2.0</Version>
     <DefineConstants Condition="'$(Configuration)' == 'Dev'">$(DefineConstants);DEV</DefineConstants>
+    <DefineConstants Condition="'$(Configuration)' == 'Nexus'">$(DefineConstants);NEXUS</DefineConstants>
+    <Optimize Condition="'$(Configuration)' == 'Nexus'">true</Optimize>
     <Optimize Condition="'$(Configuration)' == 'Dev'">true</Optimize>
     <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
     <ManagedDir Condition="'$(ManagedDir)' == ''">$(MSBuildThisFileDirectory)../_ref/Managed/</ManagedDir>

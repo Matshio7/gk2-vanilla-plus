@@ -1,3 +1,4 @@
+#if !NEXUS
 using System;
 using System.Collections;
 using System.Diagnostics;
@@ -89,3 +90,20 @@ namespace GK2Tweaks
         }
     }
 }
+#else
+using System.Collections;
+
+namespace GK2Tweaks
+{
+    // Nexus-Ausgabe: keine Update-Pruefung, keine Internetverbindung, kein Updater. Updates kommen ueber Nexus Mods.
+    internal static class UpdateCheck
+    {
+        internal const string ReleasePage = "";
+        internal static bool Available => false;
+        internal static string Latest => "";
+        internal static bool CanAutoUpdate => false;
+        internal static IEnumerator Run() { yield break; }
+        internal static void SaveAndUpdate(bool menuOpen) { }
+    }
+}
+#endif

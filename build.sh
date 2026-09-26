@@ -36,5 +36,29 @@ cp -R "$S" "$R/workshop/GK2-VanillaPlus"
 cp "$ROOT/workshop/Thumbnail.jpg" "$R/workshop/GK2-VanillaPlus/"
 BOTTLE="$HOME/Library/Application Support/CrossOver/Bottles/Steam/drive_c"
 if [ -d "$BOTTLE" ]; then rm -rf "$BOTTLE/GK2VanillaPlus-Workshop"; cp -R "$R/workshop/GK2-VanillaPlus" "$BOTTLE/GK2VanillaPlus-Workshop"; fi
+# Nexus-Ausgabe: ohne Update-Pruefung und Online-Updater (Nexus erlaubt keine Selbst-Updates)
+(cd "$ROOT/GK2Tweaks" && dotnet build -c Nexus -v q -nologo | grep -E "error|Build succeeded")
+NX="$R/stage/nexus/$N"; rm -rf "$R/stage/nexus"; mkdir -p "$R/stage/nexus"; cp -R "$S" "$NX"
+cp "$ROOT/GK2Tweaks/bin/Nexus/GK2Tweaks.dll" "$NX/installer/files/BepInEx/plugins/GK2Tweaks/"
+rm -f "$NX/installer/files/BepInEx/GK2VanillaPlus/update.ps1"
+python3 - "$NX" <<'PY'
+import re, sys
+nx = sys.argv[1]
+p = nx + '/installer/install.ps1'
+s = open(p, encoding='utf-8-sig').read().replace('$OnlineUpdate = $true', '$OnlineUpdate = $false', 1)
+s = re.sub(r'\$online    = New-Btn[^\n]*\n\$online\.SetBounds[^\n]*\n', '', s)
+s = re.sub(r'\$online\.Add_Click\(\{.*?\n\}\)\r?\n', '', s, count=1, flags=re.S)
+s = re.sub(r'if \(\$OnlineUpdate\)[^\n]*\n', '', s)
+open(p, 'w', encoding='utf-8-sig', newline='').write(s)
+p = nx + '/LIESMICH - README.txt'
+s = open(p, encoding='utf-8-sig', newline='').read()
+s = re.sub(r'AKTUALISIEREN\r\n.*?\r\n\r\n', 'AKTUALISIEREN\r\nNeue Version auf Nexus Mods laden, entpacken und "Installieren.bat" > "Aktualisieren".\r\nDeine Einstellungen bleiben dabei erhalten.\r\n\r\n', s, count=1, flags=re.S)
+s = re.sub(r'UPDATE\r\n.*?\r\n\r\n', 'UPDATE\r\nDownload the new version from Nexus Mods, extract it and run "Installieren.bat" > "Update".\r\nYour settings are kept.\r\n\r\n', s, count=1, flags=re.S)
+open(p, 'w', encoding='utf-8-sig', newline='').write(s)
+PY
+mkdir -p "$R/nexus"; rm -f "$R/nexus/"*.zip
+(cd "$R/stage/nexus" && zip -qrX "$R/nexus/$N-Nexus.zip" "$N" -x '*.DS_Store')
+(cd "$NX/installer/files" && zip -qrX "$R/nexus/$N-Nexus-Manual.zip" . -x '*.DS_Store')
 rm -rf "$R/stage"
 echo "$R/dist/$N.zip"
+ls -la "$R/nexus"
