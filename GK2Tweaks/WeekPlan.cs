@@ -142,6 +142,8 @@ namespace GK2Tweaks
             UISimpleTextNotification note = LazyPooler.GetObject<UISimpleTextNotification>();
             note.LocalizationKey = "";
             note.Text = text;
+            // 3x so lang wie normale Meldungen des Spiels; beim Zuruecklegen in den Pool wieder zuruecksetzen
+            LongNotes.Set(note, note.displayingTime * 3f);
             AccessTools.Method(typeof(UINotificator), "ShowNotification").Invoke(n, new object[] { note });
         }
 
@@ -163,6 +165,24 @@ namespace GK2Tweaks
                 catch { return null; }
             }
             return icons.TryGetValue(dayId, out Texture2D t) ? t : null;
+        }
+    }
+
+    // Laengere Anzeigedauer nur fuer unsere Tagesmeldung (die Meldungs-Objekte werden vom Spiel wiederverwendet)
+    [HarmonyPatch(typeof(UISimpleTextNotification), nameof(UISimpleTextNotification.ReleaseToPool))]
+    internal static class LongNotes
+    {
+        private static readonly Dictionary<UIBaseNotification, float> original = new Dictionary<UIBaseNotification, float>();
+
+        internal static void Set(UIBaseNotification n, float seconds)
+        {
+            if (!original.ContainsKey(n)) original[n] = n.displayingTime;
+            n.displayingTime = seconds;
+        }
+
+        private static void Prefix(UISimpleTextNotification __instance)
+        {
+            if (original.TryGetValue(__instance, out float t)) { __instance.displayingTime = t; original.Remove(__instance); }
         }
     }
 }

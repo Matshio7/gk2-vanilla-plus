@@ -69,7 +69,7 @@ namespace GK2Tweaks
             BindConfig();
 
             var harmony = new Harmony(Guid);
-            var patches = new System.Collections.Generic.List<Type> { typeof(TierPatch), typeof(ScreenSettingsPatch), typeof(SaveBlockPatch), typeof(ZoomPatch), typeof(ModdedLabelPatch), typeof(BackupPatch), typeof(MainMenuModsButtonPatch), typeof(PauseModsButtonPatch), typeof(CraftPinPatch), typeof(CraftCellPinPatch), typeof(SelectionPinPatch), typeof(QuestPinPatch), typeof(BuildPinPatch), typeof(TownPinPatch) };
+            var patches = new System.Collections.Generic.List<Type> { typeof(TierPatch), typeof(ScreenSettingsPatch), typeof(SaveBlockPatch), typeof(ZoomPatch), typeof(ModdedLabelPatch), typeof(BackupPatch), typeof(MainMenuModsButtonPatch), typeof(PauseModsButtonPatch), typeof(CraftPinPatch), typeof(CraftCellPinPatch), typeof(SelectionPinPatch), typeof(QuestPinPatch), typeof(BuildPinPatch), typeof(TownPinPatch), typeof(LongNotes) };
 #if DEV
             if (BenchEnabled.Value) patches.Add(typeof(SystemProfiler));
 #endif

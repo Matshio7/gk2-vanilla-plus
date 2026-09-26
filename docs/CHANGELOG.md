@@ -40,14 +40,14 @@
 
 **EN**
 - New: **week plan** (F6, key configurable) – what is possible on which weekday, today and tomorrow highlighted, with the game's day icons. Spoiler-free: only features you have already unlocked.
-- New: **daily reminder** – each morning a game notification shows what is possible today (can be turned off)
+- New: **daily reminder** – each morning a game notification shows what is possible today (shown three times as long as normal notifications) (can be turned off)
 - New: **save backups** – before the game overwrites a save, the previous one is backed up (default: keep 5 per slot, at most every 10 min). Restore from the mod menu in the main menu. Stored in the game folder, not in Steam Cloud.
 - New: **hide HUD** (F7) for clean screenshots, Esc shows it again
 - Idea for the daily reminder inspired by "Daily Reminder" by MrsKiraSayers (own implementation)
 
 **DE**
 - Neu: **Wochenplan** (F6, Taste frei wählbar) – was an welchem Wochentag möglich ist, heute und morgen hervorgehoben, mit den Tagessymbolen des Spiels. Spoilerfrei: nur bereits Freigeschaltetes.
-- Neu: **Tagesübersicht am Morgen** – jeden Morgen eine Spiel-Benachrichtigung, was heute geht (abschaltbar)
+- Neu: **Tagesübersicht am Morgen** – jeden Morgen eine Spiel-Benachrichtigung, was heute geht (dreimal so lange sichtbar wie normale Meldungen) (abschaltbar)
 - Neu: **Spielstand-Backups** – bevor das Spiel einen Stand überschreibt, wird der alte gesichert (Standard: 5 pro Spielstand, höchstens alle 10 min). Wiederherstellen im Mod-Menü im Hauptmenü. Liegen im Spielordner, nicht in der Steam Cloud.
 - Neu: **HUD ausblenden** (F7) für saubere Screenshots, Esc blendet es wieder ein
 - Idee zur Tagesübersicht angeregt durch „Daily Reminder“ von MrsKiraSayers (eigene Umsetzung)
