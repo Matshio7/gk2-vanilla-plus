@@ -4,7 +4,7 @@
     <AssemblyName>GK2Tweaks</AssemblyName>
     <RootNamespace>GK2Tweaks</RootNamespace>
     <LangVersion>latest</LangVersion>
-    <Version>1.3.0</Version>
+    <Version>1.4.0</Version>
     <DefineConstants Condition="'$(Configuration)' == 'Dev'">$(DefineConstants);DEV</DefineConstants>
     <DefineConstants Condition="'$(Configuration)' == 'Nexus'">$(DefineConstants);NEXUS</DefineConstants>
     <Optimize Condition="'$(Configuration)' == 'Nexus'">true</Optimize>
@@ -30,6 +30,8 @@
     <Reference Include="UnityEngine.UIModule"><HintPath>$(ManagedDir)UnityEngine.UIModule.dll</HintPath><Private>false</Private></Reference>
     <Reference Include="UnityEngine.InputLegacyModule"><HintPath>$(ManagedDir)UnityEngine.InputLegacyModule.dll</HintPath><Private>false</Private></Reference>
     <Reference Include="UnityEngine.ImageConversionModule"><HintPath>$(ManagedDir)UnityEngine.ImageConversionModule.dll</HintPath><Private>false</Private></Reference>
+    <Reference Include="UnityEngine.UI"><HintPath>$(ManagedDir)UnityEngine.UI.dll</HintPath><Private>false</Private></Reference>
+    <Reference Include="Unity.TextMeshPro"><HintPath>$(ManagedDir)Unity.TextMeshPro.dll</HintPath><Private>false</Private></Reference>
     <Reference Include="UnityEngine.TextRenderingModule"><HintPath>$(ManagedDir)UnityEngine.TextRenderingModule.dll</HintPath><Private>false</Private></Reference>
   </ItemGroup>
 </Project>

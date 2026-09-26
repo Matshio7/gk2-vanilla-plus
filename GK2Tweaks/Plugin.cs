@@ -13,7 +13,7 @@ namespace GK2Tweaks
     {
         public const string Guid = "mats.gk2.tweaks";
         public const string PluginName = "GK2 Tweaks";
-        public const string PluginVersion = "1.3.0";
+        public const string PluginVersion = "1.4.0";
         internal const string Keep = "Default";
 
         internal static Plugin Instance;
@@ -26,7 +26,7 @@ namespace GK2Tweaks
         internal static ConfigEntry<int> TargetFps;
         // [Performance]
         internal static ConfigEntry<int> PhysicsHz, Zoom, AutoSaveMinutes;
-        internal static ConfigEntry<bool> PauseInBackground, MenuExtend, MenuModdedLabel, SkipIntro;
+        internal static ConfigEntry<bool> PauseInBackground, MenuExtend, MenuModdedLabel, SkipIntro, GameMenuButton;
         internal static ConfigEntry<string> GameLog;
         // [Interface]
         internal static ConfigEntry<KeyboardShortcut> MenuKey, OverlayKey, SaveKey, WeekPlanKey, HudKey;
@@ -36,8 +36,9 @@ namespace GK2Tweaks
         internal static ConfigEntry<int> StatsLogSeconds;
         internal static ConfigEntry<string> Language;
         // [Overlay] – FPS-Anzeige
-        internal static ConfigEntry<string> OvCorner, OvLayout;
-        internal static ConfigEntry<bool> OvFps, OvLows, OvFrameTime, OvCpu, OvGpu, OvRam, OvVram, OvResolution, OvClock;
+        internal static ConfigEntry<string> OvCorner, OvLayout, PinsCorner, PinsSize;
+        internal static ConfigEntry<bool> PinsEnabled;
+        internal static ConfigEntry<bool> OvFps, OvLows, OvFrameTime, OvCpu, OvGpu, OvRam, OvVram, OvResolution, OvClock, OvWeekday, OvGameTime;
 #if DEV
         // [Benchmark] – nur fuer Messlaeufe (Dev-Build)
         internal static ConfigEntry<bool> BenchEnabled, BenchMenuShot;
@@ -64,7 +65,7 @@ namespace GK2Tweaks
             BindConfig();
 
             var harmony = new Harmony(Guid);
-            var patches = new System.Collections.Generic.List<Type> { typeof(TierPatch), typeof(ScreenSettingsPatch), typeof(SaveBlockPatch), typeof(ZoomPatch), typeof(ModdedLabelPatch), typeof(BackupPatch) };
+            var patches = new System.Collections.Generic.List<Type> { typeof(TierPatch), typeof(ScreenSettingsPatch), typeof(SaveBlockPatch), typeof(ZoomPatch), typeof(ModdedLabelPatch), typeof(BackupPatch), typeof(MainMenuModsButtonPatch), typeof(PauseModsButtonPatch), typeof(CraftPinPatch), typeof(CraftCellPinPatch), typeof(BuildPinPatch), typeof(TownPinPatch) };
 #if DEV
             if (BenchEnabled.Value) patches.Add(typeof(SystemProfiler));
 #endif
@@ -133,6 +134,7 @@ namespace GK2Tweaks
             MenuExtend = Config.Bind("Comfort", "MainMenuExtend", true, "Fill the sides of the main menu on ultrawide screens with a blurred copy of the menu image.");
             SkipIntro = Config.Bind("Comfort", "SkipIntro", false, "Skip the logos and intro videos when the game starts.");
             MenuModdedLabel = Config.Bind("Comfort", "MainMenuModdedLabel", true, "Show a 'modded' note next to the version number in the main menu.");
+            GameMenuButton = Config.Bind("Comfort", "GameMenuButton", true, "Show a 'Mods' button in the main menu and the pause menu (opens this mod menu).");
             AutoSaveMinutes = Config.Bind("Comfort", "AutoSaveMinutes", 0, new ConfigDescription(
                 "Extra autosave every N minutes (0 = off). Only saves while you are in free control.",
                 new AcceptableValueList<int>(0, 5, 10, 15, 20, 30)));
@@ -169,6 +171,13 @@ namespace GK2Tweaks
             OvVram = Config.Bind("Overlay", "Vram", false, "Video memory used by the game's textures and buffers / GPU memory.");
             OvResolution = Config.Bind("Overlay", "Resolution", false, "Current render resolution.");
             OvClock = Config.Bind("Overlay", "Clock", false, "Current time.");
+            OvWeekday = Config.Bind("Overlay", "Weekday", false, "In-game weekday (Pride, Sloth, ...).");
+            OvGameTime = Config.Bind("Overlay", "GameTime", false, "In-game time of day.");
+            PinsEnabled = Config.Bind("Pins", "Enabled", true, "Pin recipes, blueprints and town buildings (pin icon in their top right corner). Pinned items show have/need counts from your inventory.");
+            PinsCorner = Config.Bind("Pins", "Corner", "TopRight", new ConfigDescription("Screen corner of the pinned list.",
+                new AcceptableValueList<string>("TopLeft", "TopRight", "BottomLeft", "BottomRight")));
+            PinsSize = Config.Bind("Pins", "Size", "Medium", new ConfigDescription("Text and icon size of the pinned list.",
+                new AcceptableValueList<string>("Small", "Medium", "Large", "ExtraLarge")));
             StatsLogSeconds = Config.Bind("Interface", "StatsLogSeconds", 0, new ConfigDescription(
                 "Write frame statistics to the BepInEx log every N seconds (0 = off).",
                 new AcceptableValueList<int>(0, 5, 10, 30, 60)));
@@ -190,7 +199,8 @@ namespace GK2Tweaks
                 case "Graphics": ReapplyGraphics(); break;
                 case "FrameRate": ReapplyPacing(); break;
                 case "Performance": ApplyPhysics(); ApplyLogFilter(); break;
-                case "Comfort": ZoomPatch.Reapply(); Application.runInBackground = !PauseInBackground.Value; break;
+                case "Pins": PinButton.RefreshAll(); break;
+                case "Comfort": ZoomPatch.Reapply(); Application.runInBackground = !PauseInBackground.Value; ModsButton.ApplyVisibility(); break;
             }
         }
 
@@ -203,6 +213,8 @@ namespace GK2Tweaks
             if (WeekPlanKey.Value.MainKey != KeyCode.None && WeekPlanKey.Value.IsDown()) Gui.ToggleWeekPlan();
             if (HudKey.Value.MainKey != KeyCode.None && HudKey.Value.IsDown()) HudToggle.Toggle();
             HudToggle.Tick();
+            GraphicsBench.Tick(dt);
+            Pins.Tick();
             Gui.Tick(dt);
 
             if (StatsLogSeconds.Value > 0)
@@ -220,6 +232,7 @@ namespace GK2Tweaks
             bench?.Update(dt);
 #endif
             AutoSave.Tick();
+            ZoomPatch.Tick();
             MenuSideFill.Tick();
             SkipLogosPatch.Tick();
 #if DEV

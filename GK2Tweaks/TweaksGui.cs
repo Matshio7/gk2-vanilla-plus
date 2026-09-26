@@ -37,9 +37,31 @@ namespace GK2Tweaks
         private ConfigEntry<KeyboardShortcut> capturingKey;
 
         internal bool MenuOpen => menuOpen;
+        internal bool CapturingKey => capturingKey != null;
         internal void ScrollToEnd() => scroll.y = 100000f;
 
         internal void ToggleMenu() => SetMenu(!menuOpen);
+
+        // Wird beim Schliessen einmal aufgerufen (z. B. um das Haupt- oder Pausenmenue des Spiels wieder zu oeffnen)
+        internal Action OnMenuClosed;
+
+        private Action pendingReopen;
+        private int reopenFrame;
+
+        // erst im naechsten Frame, damit ein Esc-Druck nicht gleich das wieder geoeffnete Spielmenue schliesst
+        private void RunPendingReopen()
+        {
+            if (pendingReopen == null || Time.frameCount < reopenFrame) return;
+            Action a = pendingReopen;
+            pendingReopen = null;
+            try { a(); } catch (Exception e) { Plugin.Log.LogWarning("Menu reopen: " + e.Message); }
+        }
+
+        internal void OpenFromGameMenu(Action reopen)
+        {
+            SetMenu(true);
+            OnMenuClosed = reopen;
+        }
 
         internal void SetMenu(bool open)
         {
@@ -49,10 +71,13 @@ namespace GK2Tweaks
             // Spielersteuerung sperren, damit Klicks im Menue nicht im Spiel landen
             try { MainGame.PlayerController?.SetControlTakenType(TakenControlType.ByTeleport, !open); } catch { }
             UpdateEnabled();
+            if (!open && OnMenuClosed != null) { pendingReopen = OnMenuClosed; reopenFrame = Time.frameCount + 1; OnMenuClosed = null; }
         }
 
         internal void Tick(float dt)
         {
+            RunPendingReopen();
+            if (menuOpen && capturingKey == null && Input.GetKeyDown(KeyCode.Escape)) SetMenu(false);
             UpdateEnabled();
             OverlayStats.Configure(Plugin.ShowOverlay.Value, Plugin.OvCpu.Value, Plugin.OvGpu.Value, Plugin.OvRam.Value, Plugin.OvVram.Value, Plugin.OvFrameTime.Value);
             if (!enabled) return;
@@ -97,13 +122,30 @@ namespace GK2Tweaks
             }
             if (Plugin.OvResolution.Value) parts.Add($"{Screen.width}x{Screen.height}");
             if (Plugin.OvClock.Value) parts.Add(DateTime.Now.ToString("HH:mm"));
+            if ((Plugin.OvWeekday.Value || Plugin.OvGameTime.Value) && WeekPlan.InGame)
+            {
+                try
+                {
+                    var env = MainGame.Instance.GameSave.environmentData;
+                    string g = "";
+                    if (Plugin.OvWeekday.Value) { string id = WeekPlan.IdForNumber(env.CurrentDayNumber); if (id != null) g = WeekPlan.DayName(id); }
+                    if (Plugin.OvGameTime.Value)
+                    {
+                        // Tageszeit 0..1 = 0..24 Uhr (0,25 Sonnenaufgang, 0,5 Mittag); auf 10 Minuten gerundet wie eine Spieluhr
+                        int min = Mathf.FloorToInt(Mathf.Repeat(env.TimeOfDay, 1f) * 1440f) / 10 * 10;
+                        g += (g.Length > 0 ? " " : "") + (min / 60).ToString("00") + ":" + (min % 60).ToString("00");
+                    }
+                    if (g.Length > 0) parts.Add(g);
+                }
+                catch { }
+            }
             if (parts.Count == 0) return "";
             return string.Join(Plugin.OvLayout.Value == "Column" ? "\n" : "   ", parts.ToArray());
         }
 
-        private void DrawOverlay(float scale)
+        private float DrawOverlay(float scale)
         {
-            if (string.IsNullOrEmpty(overlayText) || HudToggle.Hidden) return;
+            if (string.IsNullOrEmpty(overlayText) || HudToggle.Hidden) return 0f;
             var content = new GUIContent(overlayText);
             Vector2 size = overlayStyle.CalcSize(content);
             size.x += 4;
@@ -112,12 +154,79 @@ namespace GK2Tweaks
             float x = c.EndsWith("Right") ? w - size.x - m : m;
             float y = c.StartsWith("Top") ? m : h - size.y - m;
             GUI.Label(new Rect(x, y, size.x, size.y), content, overlayStyle);
+            return size.y + 6f;
+        }
+
+        // ---------- Pin-Liste ----------
+        private GUIStyle pinTitleStyle, pinRowStyle, pinBoxStyle, pinXStyle;
+        private string pinStyleSize;
+
+        private void EnsurePinStyles()
+        {
+            string size = Plugin.PinsSize.Value;
+            if (pinTitleStyle != null && pinStyleSize == size) return;
+            pinStyleSize = size;
+            int f = size == "Small" ? 15 : size == "Large" ? 22 : size == "ExtraLarge" ? 26 : 18;
+            pinBoxStyle = new GUIStyle(overlayStyle) { padding = new RectOffset(12, 12, 8, 8), fixedHeight = 0, fixedWidth = 0 };
+            pinTitleStyle = new GUIStyle(labelStyle) { fontSize = f + 1, fontStyle = FontStyle.Bold, fixedHeight = 0, wordWrap = false, alignment = TextAnchor.MiddleLeft, richText = true };
+            pinTitleStyle.normal.textColor = new Color(1f, 0.86f, 0.55f);
+            pinRowStyle = new GUIStyle(labelStyle) { fontSize = f, fixedHeight = 0, wordWrap = false, alignment = TextAnchor.MiddleLeft, richText = true };
+            pinXStyle = new GUIStyle(pinRowStyle) { alignment = TextAnchor.MiddleCenter, fontStyle = FontStyle.Bold };
+            pinXStyle.normal.textColor = new Color(0.85f, 0.6f, 0.5f);
+            pinXStyle.hover.textColor = Color.white;
+        }
+
+        private void DrawPins(float scale, float skipY)
+        {
+            EnsurePinStyles();
+            float line = pinRowStyle.fontSize + 10f, icon = line - 2f, w = 0f, h = 0f;
+            // Breite und Hoehe vorab berechnen
+            foreach (Pins.Pin p in Pins.List)
+            {
+                w = Mathf.Max(w, pinTitleStyle.CalcSize(new GUIContent(p.Title + Labels.T("  bereit", "  ready"))).x + icon + 34f);
+                h += line + 4f;
+                foreach (Pins.Need n in p.Needs)
+                {
+                    w = Mathf.Max(w, pinRowStyle.CalcSize(new GUIContent(n.Name + "   " + n.Have + " / " + n.Count)).x + icon + 22f);
+                    h += line;
+                }
+                h += 6f;
+            }
+            w += 24f; h += 12f;
+            float sw = Screen.width / scale, sh = Screen.height / scale, m = 12f;
+            string c = Plugin.PinsCorner.Value;
+            // oben rechts steht im Spiel der Gebietsname - darunter anfangen
+            float top = c == "TopRight" ? 70f : m;
+            float x = c.EndsWith("Right") ? sw - w - m : m;
+            float y = c.StartsWith("Top") ? top + skipY : sh - h - m - skipY;
+            if (c.StartsWith("Top") == false && c.EndsWith("Left")) y -= 110f; // unten links: Platz fuer die Schnellleiste
+            GUI.Box(new Rect(x, y, w, h), GUIContent.none, pinBoxStyle);
+            float cy = y + 6f, cx = x + 12f;
+            Pins.Pin remove = null;
+            foreach (Pins.Pin p in Pins.List)
+            {
+                Texture2D ti = Pins.Icon(p.IconId);
+                if (ti != null) GUI.DrawTexture(new Rect(cx, cy, icon, icon), ti, ScaleMode.ScaleToFit);
+                GUI.Label(new Rect(cx + icon + 6f, cy, w - icon - 50f, line), p.Title + (p.Ready ? "  <color=#9be27f>" + Labels.T("bereit", "ready") + "</color>" : ""), pinTitleStyle);
+                if (GUI.Button(new Rect(x + w - 30f, cy, 22f, line), new GUIContent("x", Labels.T("Loslösen", "Unpin")), pinXStyle)) remove = p;
+                cy += line + 4f;
+                foreach (Pins.Need n in p.Needs)
+                {
+                    Texture2D ni = Pins.Icon(n.IconId);
+                    if (ni != null) GUI.DrawTexture(new Rect(cx + 10f, cy + 1f, icon - 2f, icon - 2f), ni, ScaleMode.ScaleToFit);
+                    string col = n.Have >= n.Count ? "#9be27f" : "#ff7a6a";
+                    GUI.Label(new Rect(cx + icon + 14f, cy, w - icon - 30f, line), n.Name + "   <color=" + col + ">" + n.Have + " / " + n.Count + "</color>", pinRowStyle);
+                    cy += line;
+                }
+                cy += 6f;
+            }
+            if (remove != null) Pins.Unpin(remove);
         }
 
         private void UpdateEnabled()
         {
             if (weekOpen && !WeekPlan.InGame) weekOpen = false;
-            bool want = menuOpen || weekOpen || Plugin.ShowOverlay.Value || ManualSave.ShowMessage;
+            bool want = menuOpen || weekOpen || Plugin.ShowOverlay.Value || ManualSave.ShowMessage || GraphicsBench.Running || (Pins.List.Count > 0 && Plugin.PinsEnabled.Value);
             if (enabled != want) enabled = want;
         }
 
@@ -137,8 +246,17 @@ namespace GK2Tweaks
             Matrix4x4 old = GUI.matrix;
             float scale = Mathf.Clamp(Screen.height / 1080f, 0.75f, 2.5f);
             GUI.matrix = Matrix4x4.TRS(Vector3.zero, Quaternion.identity, new Vector3(scale, scale, 1f));
-            if (Plugin.ShowOverlay.Value) DrawOverlay(scale);
-            if (ManualSave.ShowMessage && !menuOpen)
+            float overlayH = 0f;
+            if (Plugin.ShowOverlay.Value) overlayH = DrawOverlay(scale);
+            if (Pins.List.Count > 0 && Plugin.PinsEnabled.Value && WeekPlan.InGame && !HudToggle.Hidden)
+                DrawPins(scale, Plugin.PinsCorner.Value == Plugin.OvCorner.Value && Plugin.ShowOverlay.Value ? overlayH : 0f);
+            if (GraphicsBench.Running)
+            {
+                var bm = new GUIContent(GraphicsBench.Status);
+                Vector2 bsz = overlayStyle.CalcSize(bm);
+                GUI.Label(new Rect((Screen.width / scale - bsz.x) / 2f, 24, bsz.x + 4, bsz.y), bm, overlayStyle);
+            }
+            else if (ManualSave.ShowMessage && !menuOpen)
             {
                 var msg = new GUIContent(ManualSave.Message);
                 Vector2 sz = overlayStyle.CalcSize(msg);
@@ -167,6 +285,8 @@ namespace GK2Tweaks
             Header(Labels.T("Spiel", "Game"));
             DrawGameTier();
 
+            DrawGfxBench();
+
             Header(Labels.T("Bildrate", "Frame rate"));
             DrawEntry(Plugin.Pacing);
             DrawEntry(Plugin.TargetFps);
@@ -187,6 +307,7 @@ namespace GK2Tweaks
             DrawEntry(Plugin.SkipIntro);
             DrawEntry(Plugin.MenuExtend);
             DrawEntry(Plugin.MenuModdedLabel);
+            DrawEntry(Plugin.GameMenuButton);
             DrawEntry(Plugin.WeekPlanNotify);
 
             DrawBackups();
@@ -207,9 +328,15 @@ namespace GK2Tweaks
             DrawEntry(Plugin.CheckUpdates);
 #endif
 
+            Header(Labels.T("Anpinnen", "Pinning"));
+            DrawEntry(Plugin.PinsEnabled);
+            DrawEntry(Plugin.PinsCorner);
+            DrawEntry(Plugin.PinsSize);
+            if (Pins.List.Count > 0 && GUILayout.Button(Labels.T("Alle Pins entfernen", "Remove all pins"), buttonStyle, GUILayout.Width(260))) { Pins.List.Clear(); PinButton.RefreshAll(); }
+
             Header(Labels.T("FPS-Anzeige", "FPS display"));
             foreach (ConfigEntryBase e in new ConfigEntryBase[] { Plugin.ShowOverlay, Plugin.OvCorner, Plugin.OvLayout, Plugin.OvFps, Plugin.OvLows,
-                         Plugin.OvFrameTime, Plugin.OvCpu, Plugin.OvGpu, Plugin.OvRam, Plugin.OvVram, Plugin.OvResolution, Plugin.OvClock })
+                         Plugin.OvFrameTime, Plugin.OvCpu, Plugin.OvGpu, Plugin.OvRam, Plugin.OvVram, Plugin.OvResolution, Plugin.OvClock, Plugin.OvWeekday, Plugin.OvGameTime })
                 DrawEntry(e);
 
             if (WineFix.IsWine) DrawWineFix();
@@ -223,6 +350,7 @@ namespace GK2Tweaks
                 foreach (KeyValuePair<ConfigDefinition, ConfigEntryBase> kv in cfg) DrawEntry(kv.Value);
             }
             GUILayout.EndScrollView();
+            if (scrollToBench && Event.current.type == EventType.Repaint) { scroll.y = Mathf.Max(0, benchY - 10); scrollToBench = false; }
 
             GUILayout.Space(4);
             GUILayout.BeginHorizontal();
@@ -251,6 +379,41 @@ namespace GK2Tweaks
             if (WineFix.Pending)
                 GUILayout.Label(Labels.T("Wirkt nach Neustart: Spiel UND Steam beenden (bzw. die CrossOver-Flasche neu starten).",
                     "Applies after a restart: quit the game AND Steam (or restart the CrossOver bottle)."), smallStyle);
+        }
+
+        // ---------- Grafik-Benchmark ----------
+        private bool scrollToBench;
+        private float benchY;
+
+        internal void ShowBenchResults() => scrollToBench = true;
+
+        private void DrawGfxBench()
+        {
+            GUILayout.Space(4);
+            GUILayout.BeginHorizontal();
+            GUILayout.Label(new GUIContent(Labels.T("Grafik-Benchmark", "Graphics benchmark"), Labels.T(
+                "Geht alle Grafikstufen nacheinander durch (je ca. 13 s, insgesamt gut 1 Minute) und misst die FPS ohne Limit. Am Ende gibt es einen Score und eine Empfehlung. Nichts wird gespeichert, deine Einstellungen bleiben wie sie sind. Am besten an einer typischen Stelle stehen bleiben. Esc bricht ab.",
+                "Runs through all graphics tiers (about 13 s each, a bit over a minute in total) and measures FPS without a limit. You get a score and a recommendation at the end. Nothing is saved, your settings stay as they are. Best to stand still at a typical spot. Esc cancels.")),
+                labelStyle, GUILayout.Width(268));
+            GUI.enabled = GraphicsBench.CanRun;
+            if (GUILayout.Button(GraphicsBench.CanRun ? Labels.T("Benchmark starten", "Start benchmark") : Labels.T("nur im laufenden Spiel", "only while playing"), buttonStyle, GUILayout.Width(310)))
+                GraphicsBench.Start();
+            GUI.enabled = true;
+            GUILayout.EndHorizontal();
+            if (Event.current.type == EventType.Repaint) benchY = GUILayoutUtility.GetLastRect().y;
+            if (GraphicsBench.Results.Count == 0) return;
+            foreach (GraphicsBench.Step st in GraphicsBench.Results)
+            {
+                GUILayout.BeginHorizontal();
+                GUILayout.Label(st.Name, labelStyle, GUILayout.Width(360));
+                GUILayout.Label(st.Fps.ToString("0") + " FPS", labelStyle, GUILayout.Width(110));
+                GUILayout.Label("1%: " + st.Low.ToString("0"), labelStyle, GUILayout.Width(110));
+                GUILayout.EndHorizontal();
+            }
+            GUILayout.Label("Score: " + GraphicsBench.Score, headerStyle);
+            GUILayout.Label(GraphicsBench.Recommendation, new GUIStyle(labelStyle) { wordWrap = true, fixedHeight = 0 });
+            GUILayout.Label(Labels.T("Score = mittlere FPS über die vier Grafikstufen × 10, höher ist besser – gut zum Vergleichen von PCs und Einstellungen. Gespeichert in BepInEx/GK2VanillaPlus/benchmark.txt",
+                "Score = average FPS across the four graphics tiers × 10, higher is better – handy for comparing PCs and settings. Saved to BepInEx/GK2VanillaPlus/benchmark.txt"), smallStyle);
         }
 
         // ---------- Wochenplan (F6) ----------

@@ -9,7 +9,7 @@ namespace GK2Tweaks
     {
         private static void Postfix(ref PlatformFeatureEntry __result)
         {
-            if (__result == null || !Overrides.Any()) return;
+            if (__result == null || !Overrides.Any() || GraphicsBench.SuppressOverrides) return;
             PlatformFeatureEntry e = __result.Clone();
             Overrides.Apply(e);
             __result = e;
@@ -20,7 +20,7 @@ namespace GK2Tweaks
     [HarmonyPatch(typeof(GameSettings), nameof(GameSettings.ApplyScreenSettings))]
     internal static class ScreenSettingsPatch
     {
-        private static void Postfix() => Plugin.ApplyPacing();
+        private static void Postfix() { if (GraphicsBench.Running) GraphicsBench.Unlock(); else Plugin.ApplyPacing(); }
     }
 
     // Nur im Messmodus: Spielstand wird nie geschrieben.

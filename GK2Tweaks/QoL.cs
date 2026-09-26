@@ -13,9 +13,23 @@ namespace GK2Tweaks
         {
             float zoom = Plugin.Zoom.Value / 100f;
             if (Mathf.Approximately(zoom, 1f)) return;
+            // Hauptmenue, Ladebildschirm usw. immer mit 100 % - das Menuebild ist auf diese Groesse gebaut
+            if (MainGame.Instance == null || MainGame.Instance.gameState != MainGame.GameState.InGame) return;
             float size = CameraSystem.CalculateOrthographicSize(res.y, ResolutionConfig.PixelSize) / zoom;
             __instance.SetOrthographicSize(size);
             if (__instance.WorldCamera != null) __instance.WorldCamera.orthographicSize = size;
+        }
+
+        private static int lastState = -1;
+
+        // Beim Wechsel Hauptmenue <-> Spiel die Kamera neu berechnen lassen
+        internal static void Tick()
+        {
+            MainGame mg = MainGame.Instance;
+            int s = mg == null ? -1 : (int)mg.gameState;
+            if (s == lastState) return;
+            lastState = s;
+            if (Plugin.Zoom.Value != 100) Reapply();
         }
 
         internal static void Reapply()

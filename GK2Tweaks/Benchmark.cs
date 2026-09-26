@@ -236,6 +236,67 @@ namespace GK2Tweaks
             else if (shotStep == 10 && inPhase > 33f) { HudToggle.Toggle(); shotStep = 11; }
             else if (shotStep == 11 && inPhase > 35f) { Shot("nohud"); shotStep = 12; }
             else if (shotStep == 12 && inPhase > 37f) { HudToggle.Show(); Backups.BeforeSave(MainGame.Instance.SaveSlotData); Plugin.Log.LogInfo("[BENCH] backups: " + Backups.List().Count); shotStep = 13; }
+            // 1.4.0: Pausenmenue mit Mods-Button, Rueckweg, Werkbank mit Pinnadel, Pin-Liste, Overlay mit Spielzeit
+            else if (shotStep == 13 && inPhase > 39f) { Try(() => LazyUI.GetWindow<UIGamePauseWindow>().Open(null)); shotStep = 14; }
+            else if (shotStep == 14 && inPhase > 42f) { Shot("pause"); shotStep = 15; }
+            else if (shotStep == 15 && inPhase > 43f) { Try(() => ClickNamed("GK2VanillaPlus_Mods")); shotStep = 16; }
+            else if (shotStep == 16 && inPhase > 46f) { Plugin.Log.LogInfo("[BENCH] menuOpen after Mods click: " + Plugin.Instance.Gui.MenuOpen); Shot("pause_mods"); shotStep = 17; }
+            else if (shotStep == 17 && inPhase > 47f) { Plugin.Instance.Gui.SetMenu(false); shotStep = 18; }
+            else if (shotStep == 18 && inPhase > 50f) { Plugin.Log.LogInfo("[BENCH] pause shown again: " + LazyUI.GetWindow<UIGamePauseWindow>().IsShown); Shot("pause_back"); Try(() => LazyUI.GetWindow<UIGamePauseWindow>().Close()); shotStep = 19; }
+            else if (shotStep == 19 && inPhase > 52f) { Try(OpenNearestWorkbench); shotStep = 20; }
+            else if (shotStep == 20 && inPhase > 55f) { Try(PinFirstRecipes); shotStep = 21; }
+            else if (shotStep == 21 && inPhase > 57f) { Shot("craft_pin"); shotStep = 22; }
+            else if (shotStep == 22 && inPhase > 58f) { Try(() => LazyUI.GetWindow<UICraftWindow>().Close()); Plugin.ShowOverlay.Value = true; Plugin.OvWeekday.Value = true; Plugin.OvGameTime.Value = true; shotStep = 23; }
+            else if (shotStep == 23 && inPhase > 62f) { Plugin.Log.LogInfo("[BENCH] pins: " + Pins.List.Count); Shot("pins"); shotStep = 24; }
+            else if (shotStep == 24 && inPhase > 63f) { Plugin.ShowOverlay.Value = false; Plugin.OvWeekday.Value = false; Plugin.OvGameTime.Value = false; Pins.List.Clear(); shotStep = 25; }
+            else if (shotStep == 25 && inPhase > 65f) { GraphicsBench.Start(); shotStep = 26; }
+            else if (shotStep == 26 && inPhase > 72f) { Shot("gfxbench_run"); shotStep = 27; }
+            else if (shotStep == 27 && !GraphicsBench.Running && inPhase > 80f) { shotStep = 28; }
+            else if (shotStep == 28 && inPhase > 140f) { Shot("gfxbench_result"); shotStep = 29; }
+            else if (shotStep == 29 && inPhase > 142f) { Plugin.Instance.Gui.SetMenu(false); shotStep = 30; }
+        }
+
+        private static void Try(Action a)
+        {
+            try { a(); } catch (Exception e) { Plugin.Log.LogWarning("[BENCH] tour: " + e); }
+        }
+
+        private static void ClickNamed(string name)
+        {
+            foreach (LazyButton b in Resources.FindObjectsOfTypeAll<LazyButton>())
+                if (b != null && b.name == name && b.gameObject.activeInHierarchy) { Plugin.Log.LogInfo("[BENCH] click " + name); b.onClick.Invoke(); return; }
+            Plugin.Log.LogWarning("[BENCH] button not found: " + name);
+        }
+
+        private static void OpenNearestWorkbench()
+        {
+            Vector3 pos = MainGame.PlayerController.transform.position;
+            Wgo best = null; float bestD = float.MaxValue;
+            foreach (Wgo w in UnityEngine.Object.FindObjectsByType<Wgo>(FindObjectsSortMode.None))
+            {
+                CraftComponent cc = w.Data?.CraftComponent;
+                if (cc == null || cc.CraftsIn == null || cc.CraftsIn.Count < 2) continue;
+                if (w.Data.CraftableType != CraftableType.Regular) continue;
+                float d = Vector3.Distance(pos, w.transform.position);
+                if (d < bestD) { bestD = d; best = w; }
+            }
+            if (best == null) { Plugin.Log.LogWarning("[BENCH] no workbench"); return; }
+            Plugin.Log.LogInfo("[BENCH] workbench " + best.Data.Definition?.id + " d=" + bestD.ToString("0.0"));
+            LazyUI.GetWindow<UICraftWindow>().Open(new UIBaseCraftWindowData(best, ce => { }, ce => { }), null);
+        }
+
+        private static void PinFirstRecipes()
+        {
+            int n = 0;
+            foreach (PinButton pb in UnityEngine.Object.FindObjectsByType<PinButton>(FindObjectsSortMode.None))
+            {
+                if (!pb.gameObject.activeInHierarchy || pb.Make == null) continue;
+                Pins.Toggle(pb.Make());
+                if (++n >= 2) break;
+            }
+            Plugin.Log.LogInfo("[BENCH] pinned " + n);
+            foreach (Pins.Pin p in Pins.List)
+                Plugin.Log.LogInfo("[BENCH] pin " + p.Key + " '" + p.Title + "' " + string.Join(", ", p.Needs.ConvertAll(x => x.Name + " " + x.Have + "/" + x.Count).ToArray()));
         }
 
         private static void Shot(string name)

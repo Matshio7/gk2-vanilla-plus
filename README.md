@@ -29,8 +29,10 @@ GK2 Vanilla+ improves the PC version of Graveyard Keeper 2 without changing the 
 - Useful on any monitor, especially on laptops, handhelds and Macs
 
 **Quality of life**
-- Mod menu in the game's own look (F9), German and English
-- FPS display (F10): pick the corner and what to show – FPS, 1% low, frame time, CPU, GPU, RAM, VRAM, resolution, clock
+- Mod menu in the game's own look (F9 or the **Mods** button in the main and pause menu), German and English
+- **Pin recipes**, blueprints and town buildings: have/need list at the screen edge
+- **Graphics benchmark**: runs through all tiers, score and recommendation
+- FPS display (F10): pick the corner and what to show – FPS, 1% low, frame time, CPU, GPU, RAM, VRAM, resolution, clock, in-game weekday and time
 - "Save now" button and optional save key, extra autosave timer
 - **Save backups** with restore from the mod menu
 - **Week plan** (F6) and a spoiler-free daily reminder: what is possible on which weekday
@@ -78,8 +80,10 @@ GK2 Vanilla+ verbessert die PC-Version von Graveyard Keeper 2, ohne das Spiel se
 - Hilft auf jedem Monitor, besonders auf Laptops, Handhelds und Macs
 
 **Komfort**
-- Mod-Menü in der Optik des Spiels (F9), Deutsch und Englisch
-- FPS-Anzeige (F10): Ecke und Inhalt wählbar – FPS, 1%-Low, Frametime, CPU, GPU, RAM, VRAM, Auflösung, Uhrzeit
+- Mod-Menü in der Optik des Spiels (F9 oder Button **Mods** im Haupt- und Pausenmenü), Deutsch und Englisch
+- **Rezepte anpinnen**, auch Baupläne und Stadtgebäude: Haben/Brauchen-Liste am Bildschirmrand
+- **Grafik-Benchmark**: geht alle Stufen durch, Score und Empfehlung
+- FPS-Anzeige (F10): Ecke und Inhalt wählbar – FPS, 1%-Low, Frametime, CPU, GPU, RAM, VRAM, Auflösung, Uhrzeit, Wochentag und Uhrzeit im Spiel
 - Button „Jetzt speichern“ und optionale Speichern-Taste, zusätzlicher Autosave
 - **Spielstand-Backups** mit Wiederherstellen im Mod-Menü
 - **Wochenplan** (F6) und spoilerfreie Tagesübersicht: was an welchem Wochentag geht
