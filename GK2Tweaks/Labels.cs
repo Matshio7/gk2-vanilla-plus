@@ -99,7 +99,9 @@ namespace GK2Tweaks
             { "SkipIntro", "Logos und Intro-Videos beim Spielstart überspringen." },
             { "GameMenuButton", "Zeigt im Hauptmenü und im Pausenmenü (Esc) einen Button \"Mods\", der dieses Menü öffnet." },
             { "MainMenuModdedLabel", "Hinweis \"modded\" neben der Versionsnummer im Hauptmenü." },
+#if !NEXUS
             { "CheckForUpdates", "Prüft bei jedem Spielstart einmal auf GitHub, ob es eine neue Version gibt. Es wird nur die Versionsnummer gelesen, nichts gesendet." },
+#endif
             { "WeekPlanKey", "Öffnet den Wochenplan: was an welchem Wochentag möglich ist (nur bereits Freigeschaltetes)." },
             { "HideHudKey", "Blendet die komplette Spiel-Oberfläche aus, z. B. für Screenshots. Esc blendet sie wieder ein." },
             { "DailyReminder", "Jeden Morgen eine Benachrichtigung, was heute möglich ist – nur bereits freigeschaltete Dinge, keine Spoiler." },
