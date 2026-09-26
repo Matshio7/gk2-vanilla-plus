@@ -19,42 +19,71 @@ namespace GK2Tweaks
 
         internal static bool Active => title != null && title.StartsWith("GK2 Vanilla+") && File.Exists(DescriptionFile);
 
+        // Die kleinen Steamworks-Methoden werden vom Mono-JIT inline eingebaut, Patches darauf greifen nicht.
+        // Deshalb im Uploader des Spiels (SubmitContent) die Aufrufe per Transpiler auf eigene Wrapper umleiten.
         internal static void Apply(Harmony h)
         {
             try
             {
-                h.Patch(AccessTools.Method(typeof(SteamUGC), nameof(SteamUGC.SetItemTitle)), prefix: new HarmonyMethod(typeof(WorkshopUpload), nameof(TitlePrefix)));
-                h.Patch(AccessTools.Method(typeof(SteamUGC), nameof(SteamUGC.SetItemContent)), prefix: new HarmonyMethod(typeof(WorkshopUpload), nameof(ContentPrefix)));
-                h.Patch(AccessTools.Method(typeof(SteamUGC), nameof(SteamUGC.SetItemVisibility)), prefix: new HarmonyMethod(typeof(WorkshopUpload), nameof(VisibilityPrefix)));
-                h.Patch(AccessTools.Method(typeof(SteamUGC), nameof(SteamUGC.SubmitItemUpdate)), prefix: new HarmonyMethod(typeof(WorkshopUpload), nameof(SubmitPrefix)));
+                var target = AccessTools.Method(typeof(SteamWorkshopCreatorService), "SubmitContent");
+                if (target == null) { Plugin.Log.LogWarning("Workshop upload: SubmitContent not found"); return; }
+                h.Patch(target, transpiler: new HarmonyMethod(typeof(WorkshopUpload), nameof(Transpiler)));
             }
             catch (Exception e) { Plugin.Log.LogWarning("Workshop upload patch: " + e.Message); }
         }
 
-        private static void TitlePrefix(string pchTitle) { title = pchTitle; contentFolder = null; }
-
-        private static void ContentPrefix(string pszContentFolder) { contentFolder = pszContentFolder; }
-
-        private static bool VisibilityPrefix(ref bool __result)
+        private static System.Collections.Generic.IEnumerable<CodeInstruction> Transpiler(System.Collections.Generic.IEnumerable<CodeInstruction> code)
         {
-            if (!Active) return true;
-            Plugin.Log.LogInfo("Workshop upload: visibility left unchanged");
-            __result = true;
-            return false;
+            int n = 0;
+            foreach (CodeInstruction ci in code)
+            {
+                if ((ci.opcode == System.Reflection.Emit.OpCodes.Call) && ci.operand is System.Reflection.MethodInfo m && m.DeclaringType == typeof(SteamUGC))
+                {
+                    var w = AccessTools.Method(typeof(WorkshopUpload), "W" + m.Name);
+                    if (w != null) { ci.operand = w; n++; }
+                }
+                yield return ci;
+            }
+            Plugin.Log.LogInfo("Workshop upload: " + n + " calls redirected");
         }
 
-        private static void SubmitPrefix(UGCUpdateHandle_t handle, ref string pchChangeNote)
+        private static bool WSetItemTitle(UGCUpdateHandle_t h, string t) { title = t; contentFolder = null; return SteamUGC.SetItemTitle(h, t); }
+
+        private static bool WSetItemDescription(UGCUpdateHandle_t h, string d)
         {
-            try
+            if (Active)
             {
-                if (!Active) return;
-                string desc = File.ReadAllText(DescriptionFile, Encoding.UTF8).Replace("\r\n", "\n");
-                bool ok = SteamUGC.SetItemDescription(handle, desc);
-                Plugin.Log.LogInfo("Workshop upload: description from file (" + desc.Length + " chars) " + (ok ? "set" : "FAILED"));
-                string note = ChangeNote(contentFolder);
-                if (!string.IsNullOrEmpty(note)) { pchChangeNote = note; Plugin.Log.LogInfo("Workshop upload: change note set"); }
+                try
+                {
+                    string desc = File.ReadAllText(DescriptionFile, Encoding.UTF8).Replace("\r\n", "\n");
+                    Plugin.Log.LogInfo("Workshop upload: description from file (" + desc.Length + " chars)");
+                    return SteamUGC.SetItemDescription(h, desc);
+                }
+                catch (Exception e) { Plugin.Log.LogWarning("Workshop upload: " + e.Message); }
             }
-            catch (Exception e) { Plugin.Log.LogWarning("Workshop upload: " + e.Message); }
+            return SteamUGC.SetItemDescription(h, d);
+        }
+
+        private static bool WSetItemVisibility(UGCUpdateHandle_t h, ERemoteStoragePublishedFileVisibility v)
+        {
+            if (Active) { Plugin.Log.LogInfo("Workshop upload: visibility left unchanged"); return true; }
+            return SteamUGC.SetItemVisibility(h, v);
+        }
+
+        private static bool WSetItemContent(UGCUpdateHandle_t h, string folder) { contentFolder = folder; return SteamUGC.SetItemContent(h, folder); }
+
+        private static SteamAPICall_t WSubmitItemUpdate(UGCUpdateHandle_t h, string note)
+        {
+            if (Active)
+            {
+                try
+                {
+                    string cl = ChangeNote(contentFolder);
+                    if (!string.IsNullOrEmpty(cl)) { note = cl; Plugin.Log.LogInfo("Workshop upload: change note from changelog"); }
+                }
+                catch (Exception e) { Plugin.Log.LogWarning("Workshop upload: " + e.Message); }
+            }
+            return SteamUGC.SubmitItemUpdate(h, note);
         }
 
         // Neuester Eintrag aus docs/CHANGELOG.md im hochgeladenen Ordner, als Steam-BBCode
