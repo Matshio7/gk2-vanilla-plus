@@ -1,0 +1,63 @@
+[h1]Installation guide – Windows, Linux / Steam Deck, Mac[/h1]
+[b]Important:[/b] Clicking [i]Subscribe[/i] only downloads the mod. You still have to install it once (takes 1 minute). This is because GK2 has no built-in mod loader – the mod runs through BepInEx, which has to sit in the game folder.
+
+Mod workshop ID: [b]3808053878[/b] · Game ID: [b]4358690[/b]
+
+[h2]Windows[/h2]
+[olist]
+[*]Click [b]Subscribe[/b] and wait until Steam has finished downloading.
+[*]Open the mod folder: [i]<Steam library>\steamapps\workshop\content\4358690\3808053878[/i]
+Default: [i]C:\Program Files (x86)\Steam\steamapps\workshop\content\4358690\3808053878[/i]
+[*]Double-click [b]Installieren.bat[/b].
+If Windows shows "Windows protected your PC": click [b]More info[/b] → [b]Run anyway[/b] (the script is not signed, that's all).
+[*]The game folder is found automatically. If not: [b]Browse[/b] and pick the folder with [i]GraveyardKeeper2.exe[/i] (Steam: right-click the game → Manage → Browse local files).
+[*]Click [b]Install[/b] and start the game normally through Steam.
+[*]In the main menu you'll see a [b]Mods[/b] button – or press [b]F9[/b]. Done!
+[/olist]
+
+[h2]Linux (Proton) / Steam Deck[/h2]
+Steam Deck: do everything in [b]Desktop Mode[/b].
+[olist]
+[*]Subscribe and let Steam download the mod.
+[*]Open the mod files:
+[i]~/.local/share/Steam/steamapps/workshop/content/4358690/3808053878/installer/files[/i]
+Flatpak Steam: [i]~/.var/app/com.valvesoftware.Steam/.local/share/Steam/steamapps/workshop/content/4358690/3808053878/installer/files[/i]
+Hidden folders (like .local): press [b]Ctrl+H[/b] in the file manager.
+[*]Open the game folder: in Steam right-click [b]Graveyard Keeper 2 → Manage → Browse local files[/b] (the folder with [i]GraveyardKeeper2.exe[/i]).
+[*]Copy [b]everything inside[/b] "files" into the game folder, right next to the .exe:
+[i]BepInEx[/i] (folder), [i]winhttp.dll[/i], [i]doorstop_config.ini[/i], [i]changelog.txt[/i]
+Copy the contents, [b]not[/b] the "files" folder itself.
+[*]Right-click the game → [b]Properties → General → Launch Options[/b] and paste:
+[code]WINEDLLOVERRIDES="winhttp=n,b" %command%[/code]
+[*]Start the game. [b]Mods[/b] button in the main menu or [b]F9[/b] = it works.
+[/olist]
+
+[h2]Mac (CrossOver)[/h2]
+Tested with Steam for Windows running in a CrossOver bottle.
+[olist]
+[*]Subscribe in the Steam client inside your bottle and let it download.
+[*]In CrossOver select the bottle → [b]Open C: Drive[/b].
+[*]Mod files: [i]Program Files (x86)/Steam/steamapps/workshop/content/4358690/3808053878/installer/files[/i]
+[*]Game folder: [i]Program Files (x86)/Steam/steamapps/common/Graveyard Keeper 2[/i]
+[*]Copy [b]everything inside[/b] "files" into the game folder (next to [i]GraveyardKeeper2.exe[/i]).
+[*]Once per bottle: select the bottle → [b]Wine Configuration[/b] → tab [b]Libraries[/b] → type [i]winhttp[/i] → [b]Add[/b] → select it → [b]Edit[/b] → [b]Native then Builtin[/b] → OK.
+[*]Start the game. [b]Mods[/b] button or [b]F9[/b] = it works.
+[/olist]
+
+[h2]Updating[/h2]
+[list]
+[*][b]Windows:[/b] when a new version is out, the mod menu (F9) shows [b]Save & update[/b] – one click, settings are kept. Or run [b]Installieren.bat[/b] again, it offers the update.
+[*][b]Linux / Mac:[/b] the mod menu tells you when a new version is out. After Steam has updated the Workshop item, copy the files from "installer/files" into the game folder again and overwrite everything – your settings stay.
+[/list]
+Steam updating the Workshop item alone does [b]not[/b] update the installed mod.
+
+[h2]Uninstalling[/h2]
+[list]
+[*][b]Windows:[/b] [b]Installieren.bat[/b] → [b]Uninstall[/b]. Optionally also removes BepInEx, then the game is exactly as before.
+[*][b]Linux / Mac:[/b] delete [i]BepInEx[/i], [i]winhttp.dll[/i], [i]doorstop_config.ini[/i] and [i]changelog.txt[/i] from the game folder (and remove the launch option / DLL override).
+[/list]
+Your saves are never touched, uninstalling is always safe.
+
+[h2]Still not working?[/h2]
+Post here with your platform and attach [i]<game folder>/BepInEx/LogOutput.log[/i] (e.g. via pastebin). No LogOutput.log at all = the mod isn't loading: on Linux/Mac check the launch option / DLL override and that the files are next to the .exe.
+Questions about features? See the FAQ below.

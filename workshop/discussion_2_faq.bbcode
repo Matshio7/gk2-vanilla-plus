@@ -1,0 +1,82 @@
+[h1]FAQ[/h1]
+
+[h2]General[/h2]
+[b]I subscribed but nothing changed?[/b]
+Subscribing only downloads the files. Install it once – see the guide in the first post.
+
+[b]Does the mod change gameplay, balance or my saves?[/b]
+No. GK2 Vanilla+ only adds display, comfort and performance options. No game files are modified, saves stay 100 % compatible and you can remove the mod at any time.
+
+[b]Can I start a new game or continue my old save?[/b]
+Both. The mod works with existing saves.
+
+[b]Do achievements still work?[/b]
+The mod doesn't touch achievements or gameplay, so they unlock as usual.
+
+[b]Workshop, Nexus or GitHub – what's the difference?[/b]
+Same mod. The Nexus version has no online update check (Nexus rules), so you update it manually there.
+
+[b]Is it safe? My antivirus / SmartScreen complains.[/b]
+[i]Installieren.bat[/i] is a plain script and not signed, that's why Windows asks. [i]winhttp.dll[/i] is Unity Doorstop, the standard loader of BepInEx (open source). The full mod source is on GitHub.
+
+[h2]Controls & features[/h2]
+[b]Keys[/b]
+[list]
+[*][b]F9[/b] – mod menu (or the [b]Mods[/b] button in the main and pause menu)
+[*][b]F10[/b] – FPS display (corner and content selectable)
+[*][b]F6[/b] – week plan
+[*][b]F7[/b] – hide HUD
+[*][b]F5[/b] – cycle zoom presets
+[*][b]F12[/b] – screenshot
+[/list]
+All keys can be changed in the mod menu. Hover over any option to see what it does.
+
+[b]How do I get ultrawide?[/b]
+Game settings → Graphics → Resolution. 21:9 and 32:9 (e.g. 2560×1080, 3440×1440, 3840×1080, 5120×1440) are unlocked there. The main menu fills the whole screen, rain and snow cover the full width.
+
+[b]How do I pin recipes, blueprints and quests?[/b]
+Mouse: hover a recipe, blueprint, town building, blockage or quest and click the small pin in the corner. Controller: press both sticks ([b]L3 + R3[/b]). Pinned items appear at the screen edge with have / need per ingredient (your inventory, not chests) – green when you have enough. Pins are saved per save. Corner and size can be changed in the mod menu.
+
+[b]Where are my screenshots?[/b]
+[i]<game folder>/BepInEx/GK2VanillaPlus/Screenshots[/i]. Up to 4× your screen resolution, optionally without HUD.
+
+[b]How does the zoom work?[/b]
+F5 cycles through presets (default 80 / 100 / 125 %). You can set a separate zoom for indoors and turn on smooth mouse-wheel zoom in the mod menu.
+
+[b]What are backups?[/b]
+Before the game overwrites a save, the mod keeps a copy with a timestamp in [i]<game folder>/BepInEx/GK2VanillaPlus/Backups[/i] – outside Steam Cloud. Restore with one click in the save overview (mod menu in the main menu).
+
+[b]What is OLED black?[/b]
+Makes the area around the map pure black instead of dark gray. Good for OLED screens.
+
+[h2]Performance[/h2]
+[b]How do I get more FPS?[/b]
+Run the [b]graphics benchmark[/b] in the mod menu – it tests all graphics tiers and recommends one, nothing is changed. The biggest savings are usually: Shadows → Simple, Ambient occlusion → Off, Render mode → Pixel. You can also set an FPS limit or VSync.
+
+[b]Steam Deck / laptop / Mac tips?[/b]
+Use the benchmark recommendation and an FPS limit (e.g. 40 or 45 on the Deck) – smoother and saves battery.
+
+[b]Stutter with a PlayStation controller on Linux / Mac?[/b]
+The mod menu shows a [b]Controller fix[/b] there. It applies after restarting the game [b]and[/b] Steam.
+
+[h2]Problems[/h2]
+[b]The Mods button / F9 does nothing[/b]
+The mod isn't loaded. Check if [i]<game folder>/BepInEx/LogOutput.log[/i] exists. If not: on Linux check the launch option, on Mac the winhttp override, and that all files are right next to [i]GraveyardKeeper2.exe[/i].
+
+[b]The game was updated and something broke[/b]
+Game updates can break mods until the mod is updated – usually quickly. Until then you can uninstall it, your saves are safe.
+
+[b]Can I use other mods with it?[/b]
+Other BepInEx mods usually work. Don't combine it with another ultrawide mod. If you use "GK2 Ultrawide Rain Fix", turn off [b]Full-width rain[/b] in the mod menu (or remove the other mod) – they do the same.
+
+[b]How do I reset all settings?[/b]
+Delete [i]<game folder>/BepInEx/config/mats.gk2.tweaks.cfg[/i] while the game is closed.
+
+[b]My language is missing / a translation is wrong[/b]
+Included: English, German, French, Spanish, Russian, Chinese. You can add or fix a language with [i]BepInEx/GK2VanillaPlus/lang/_template.txt[/i] – send it to me and I'll include it.
+
+[b]How do I report a bug?[/b]
+Post here: platform, what you did, what happened – and attach [i]BepInEx/LogOutput.log[/i] (e.g. via pastebin). Screenshots help a lot.
+
+[h2]Mod packs[/h2]
+You may include GK2 Vanilla+ [b]unmodified[/b] in free mod packs, with credit ("GK2 Vanilla+ by McFly7"). Modifying it or removing credits is not allowed.
