@@ -13,7 +13,7 @@ namespace GK2Tweaks
     {
         public const string Guid = "mats.gk2.tweaks";
         public const string PluginName = "GK2 Tweaks";
-        public const string PluginVersion = "1.4.4";
+        public const string PluginVersion = "1.5.0";
         internal const string Keep = "Default";
 
         internal static Plugin Instance;
@@ -26,7 +26,7 @@ namespace GK2Tweaks
         internal static ConfigEntry<int> TargetFps;
         // [Performance]
         internal static ConfigEntry<int> PhysicsHz, Zoom, AutoSaveMinutes, InteriorZoom, MenuScale, ShotScale;
-        internal static ConfigEntry<bool> MouseWheelZoom, SmoothZoom, HighContrast, ShotHideHud, OledBlack, WideRain;
+        internal static ConfigEntry<bool> MouseWheelZoom, SmoothZoom, HighContrast, ShotHideHud, OledBlack, WideRain, HudCenter;
         internal static ConfigEntry<string> ZoomPresets;
         internal static ConfigEntry<KeyboardShortcut> ZoomPresetKey, ShotKey;
         internal static ConfigEntry<bool> PauseInBackground, MenuExtend, MenuModdedLabel, SkipIntro, GameMenuButton;
@@ -47,7 +47,8 @@ namespace GK2Tweaks
 #endif
         // [Overlay] – FPS-Anzeige
         internal static ConfigEntry<string> OvCorner, OvLayout, PinsCorner, PinsSize, OvOrder, OvSeparator;
-        internal static ConfigEntry<bool> PinsEnabled;
+        internal static ConfigEntry<bool> PinsEnabled, PinsNotify, PinsAutoUnpin;
+        internal static ConfigEntry<string> PinsChests;
         internal static ConfigEntry<bool> OvFps, OvLows, OvFrameTime, OvCpu, OvGpu, OvRam, OvVram, OvResolution, OvClock, OvWeekday, OvGameTime;
 #if DEV
         // [Benchmark] – nur fuer Messlaeufe (Dev-Build)
@@ -180,6 +181,7 @@ namespace GK2Tweaks
                 "Size of the mod menu, FPS display and pinned list. 0 = automatic (follows the screen height).",
                 new AcceptableValueList<int>(0, 80, 90, 100, 110, 125, 150, 175, 200)));
             WideRain = Config.Bind("Interface", "WideRain", true, "Rain and snow cover the whole screen on ultrawide monitors and when zoomed out (the game only fills a 16:9 area).");
+            HudCenter = Config.Bind("Interface", "HudCenter", false, "Ultrawide: move the HUD, area name, NPC window and the mod displays into the 16:9 area in the middle instead of the outer screen edges. The world stays ultrawide.");
             OledBlack = Config.Bind("Interface", "OledBlack", false, "Pure black instead of dark gray around the map (e.g. outside the church or at the level edge). Good for OLED screens.");
             HighContrast = Config.Bind("Interface", "HighContrast", false, "Stronger contrast: dark background for the pinned list, bold and brighter have/need numbers, larger tooltips.");
             ShotKey = Config.Bind("Screenshots", "Key", new KeyboardShortcut(KeyCode.F12), "Key for a screenshot (saved to BepInEx/GK2VanillaPlus/Screenshots).");
@@ -209,7 +211,11 @@ namespace GK2Tweaks
             OvClock = Config.Bind("Overlay", "Clock", false, "Current time.");
             OvWeekday = Config.Bind("Overlay", "Weekday", false, "In-game weekday (Pride, Sloth, ...).");
             OvGameTime = Config.Bind("Overlay", "GameTime", false, "In-game time of day.");
-            PinsEnabled = Config.Bind("Pins", "Enabled", true, "Pin recipes, blueprints and town buildings (pin icon in their top right corner). Pinned items show have/need counts from your inventory.");
+            PinsEnabled = Config.Bind("Pins", "Enabled", true, "Pin recipes, blueprints and town buildings (pin icon in their top right corner). Pinned items show have/need counts.");
+            PinsChests = Config.Bind("Pins", "Chests", "Area", new ConfigDescription("Which items count as 'have': your inventory and the chests in the area you are in (like the game's crafting), or additionally all chests on the map.",
+                new AcceptableValueList<string>("Area", "Everywhere")));
+            PinsNotify = Config.Bind("Pins", "NotifyReady", true, "Short message with a sound when a pinned item becomes ready (you have everything) or a pinned quest is done.");
+            PinsAutoUnpin = Config.Bind("Pins", "AutoUnpin", true, "Unpin a recipe automatically when you start crafting it.");
             PinsCorner = Config.Bind("Pins", "Corner", "TopRight", new ConfigDescription("Screen corner of the pinned list.",
                 new AcceptableValueList<string>("TopLeft", "TopRight", "BottomLeft", "BottomRight")));
             PinsSize = Config.Bind("Pins", "Size", "Medium", new ConfigDescription("Text and icon size of the pinned list.",
@@ -271,6 +277,7 @@ namespace GK2Tweaks
             SafeMode.Run("Pins", BuildPinScan.Tick);
             SafeMode.Run("Oled", Oled.Tick);
             SafeMode.Run("Rain", Rain.Tick);
+            SafeMode.Run("HudCenter", GK2Tweaks.HudCenter.Tick);
 #if MINIMAP
             SafeMode.Run("Minimap", Minimap.Tick);
 #endif

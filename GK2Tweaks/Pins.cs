@@ -29,7 +29,7 @@ namespace GK2Tweaks
             public string TitleKey, Suffix = "";   // Lokalisierungs-Schluessel des Titels (zum Neuladen in anderer Sprache)
             public string QuestId, Note;           // Quest-Pins: Aufgabentext statt Zutaten
             public List<Need> Needs = new List<Need>();
-            public bool Ready;
+            public bool Ready, Checked;
         }
 
         internal static readonly List<Pin> List = new List<Pin>();
@@ -52,6 +52,7 @@ namespace GK2Tweaks
         }
 
         internal static void Unpin(Pin p) { List.Remove(p); Changed(); }
+        internal static void Unpin(string key) { if (List.RemoveAll(p => p.Key == key) > 0) Changed(); }
 
         internal static void ClearAll() { List.Clear(); Changed(); }
 
@@ -179,9 +180,10 @@ namespace GK2Tweaks
             refreshAt = Time.realtimeSinceStartup + 0.5f;
             if (!WeekPlan.InGame) return;
             MultiInventory inv;
-            try { inv = MainGame.PlayerController.WorkerMultiInventory; } catch { return; }
+            try { inv = Plugin.PinsChests.Value == "Everywhere" ? AllChests() : MainGame.PlayerController.WorkerMultiInventory; } catch { return; }
             foreach (Pin p in List)
             {
+                bool wasReady = p.Ready;
                 if (p.QuestId != null)
                 {
                     try
@@ -190,6 +192,8 @@ namespace GK2Tweaks
                         p.Ready = q.IsQuestInStatus(p.QuestId, QuestStatus.Completed);
                     }
                     catch { }
+                    if (p.Ready && !wasReady && p.Checked) NotifyReady(p);
+                    p.Checked = true;
                     continue;
                 }
                 bool ready = true;
@@ -211,7 +215,39 @@ namespace GK2Tweaks
                     if (have < n.Count) ready = false;
                 }
                 p.Ready = ready;
+                if (ready && !wasReady && p.Checked) NotifyReady(p);
+                p.Checked = true;
             }
+        }
+
+        // Kurze Meldung mit Ton, wenn ein Pin fertig wird (alle Zutaten da / Quest erledigt)
+        private static void NotifyReady(Pin p)
+        {
+            if (!Plugin.PinsNotify.Value) return;
+            ManualSave.Toast(string.Format(p.QuestId != null ? Labels.T("Erledigt: {0}", "Done: {0}") : Labels.T("Alles da für: {0}", "Everything ready for: {0}"), p.Title), 4f);
+            try { LazyAudio.PlayAndForget("unlock"); } catch { }
+        }
+
+        // Spielerinventar + alle Truhen auf der ganzen Karte (alle 3 s neu zusammengestellt)
+        private static MultiInventory allChests;
+        private static float allChestsAt;
+        private static MultiInventory AllChests()
+        {
+            if (allChests != null && Time.realtimeSinceStartup < allChestsAt) return allChests;
+            var m = new MultiInventory(MainGame.PlayerData, false);
+            foreach (GameSceneData sc in MainGame.Instance.GameSave.worldData.gameSceneDataList)
+                foreach (WorldZoneData wz in sc.worldZones)
+                    m.Add(new MultiInventory(wz));
+            allChests = m;
+            allChestsAt = Time.realtimeSinceStartup + 3f;
+            return m;
+        }
+
+        // nach dem Herstellen automatisch abpinnen
+        internal static void OnCrafted(string key)
+        {
+            if (!Plugin.PinsAutoUnpin.Value || key == null || !IsPinned(key)) return;
+            Unpin(key);
         }
 
         internal static Texture2D Icon(string iconId)
@@ -537,6 +573,11 @@ namespace GK2Tweaks
                     int n = Math.Max(1, data.CraftsCount);
                     return Pins.Build("craft:" + def.id, def.id, n > 1 ? " ×" + n : "", icon, data.CraftItemCellsData, data.WgoData, n);
                 }, 30f, true, 64f);
+                // Herstellen gestartet -> Pin automatisch loesen (Option)
+                var f = Traverse.Create(__instance).Field("onStartCraftPressed");
+                Action orig = f.GetValue<Action>();
+                if (orig != null && !(orig.Target is CraftedHook))
+                    f.SetValue((Action)new CraftedHook(orig, "craft:" + def.id).Invoke);
             }
             catch (Exception e) { SafeMode.Fail("Pins", e); }
         }
@@ -637,5 +678,18 @@ namespace GK2Tweaks
         }
 
         private static string N(string v) => string.IsNullOrEmpty(v) ? null : v;
+    }
+
+    // Haengt sich an den "Herstellen"-Knopf eines Rezeptfensters, ruft zuerst das Original auf
+    internal sealed class CraftedHook
+    {
+        private readonly Action orig;
+        private readonly string key;
+        internal CraftedHook(Action orig, string key) { this.orig = orig; this.key = key; }
+        internal void Invoke()
+        {
+            orig();
+            try { Pins.OnCrafted(key); } catch (Exception e) { SafeMode.Fail("Pins", e); }
+        }
     }
 }

@@ -9,7 +9,7 @@ using UnityEngine;
 namespace GK2Tweaks
 {
     // Mod-Menue (F9) und FPS-Anzeige (F10). Zeigt alle Einstellungen dieses Mods und aller anderen BepInEx-Mods.
-    internal sealed class TweaksGui : MonoBehaviour
+    internal sealed partial class TweaksGui : MonoBehaviour
     {
         private const int WindowId = 0x6B2D, WeekWindowId = 0x6B2E, NewsWindowId = 0x6B2F;
         private bool newsOpen, newsSinceUpdate;
@@ -96,6 +96,7 @@ namespace GK2Tweaks
 
         internal void Tick(float dt)
         {
+            PadTick();
             RunPendingReopen();
             if (menuOpen && capturingKey == null && Input.GetKeyDown(KeyCode.Escape)) SetMenu(false);
             else if (newsOpen && Input.GetKeyDown(KeyCode.Escape)) CloseNews();
@@ -185,7 +186,8 @@ namespace GK2Tweaks
             size.x += 4;
             float w = Screen.width / scale, h = Screen.height / scale, m = 12f;
             string c = Plugin.OvCorner.Value;
-            float x = c.EndsWith("Right") ? w - size.x - m : m;
+            float ins = GK2Tweaks.HudCenter.Inset(scale);
+            float x = c.EndsWith("Right") ? w - size.x - m - ins : m + ins;
             float y = c.StartsWith("Top") ? TopFor(c) : h - size.y - m;
             var r = new Rect(x, y, size.x, size.y);
             GUI.Label(r, content, overlayStyle);
@@ -278,7 +280,8 @@ namespace GK2Tweaks
             w += 24f; h += 12f;
             float sw = Screen.width / scale, sh = Screen.height / scale, m = 12f;
             string c = Plugin.PinsCorner.Value;
-            float x = c.EndsWith("Right") ? sw - w - m : m;
+            float ins = GK2Tweaks.HudCenter.Inset(scale);
+            float x = c.EndsWith("Right") ? sw - w - m - ins : m + ins;
             float y;
             if (c.StartsWith("Top")) y = ov.height > 0 ? ov.yMax + 6f : TopFor(c);
             else y = ov.height > 0 ? ov.y - 6f - h : sh - h - m;
@@ -362,6 +365,7 @@ namespace GK2Tweaks
                 Event.current.Use();
             }
 
+            PadBeginGUI();
             GUIStyle oldThumb = GUI.skin.verticalScrollbarThumb;
             if (skinned) GUI.skin.verticalScrollbarThumb = vthumbStyle;
             Matrix4x4 old = GUI.matrix;
@@ -404,6 +408,7 @@ namespace GK2Tweaks
 
         private void DrawWindow(int id)
         {
+            PadWindowBegin(WindowId);
             if (skinned) GUILayout.Label("GK2 Vanilla+  ·  by McFly7", titleStyle);
             if (UpdateCheck.Available) DrawUpdate();
             GUILayout.Label(fpsText + "     " + SystemInfo.graphicsDeviceVersion, labelStyle);
@@ -418,10 +423,12 @@ namespace GK2Tweaks
 
             scroll = skinned ? GUILayout.BeginScrollView(scroll, false, true, GUIStyle.none, vbarStyle, GUIStyle.none, GUILayout.Height(560))
                              : GUILayout.BeginScrollView(scroll, GUILayout.Height(560));
+            inScroll = true;
             if (MainGame.Instance != null && MainGame.Instance.gameState == MainGame.GameState.MainMenu) DrawSaves();
 
             Header(Labels.T("Spiel", "Game"));
             DrawGameTier();
+            DrawProfiles();
 
             DrawGfxBench();
 
@@ -463,7 +470,7 @@ namespace GK2Tweaks
             DrawEntry(Plugin.ShotKey);
             DrawEntry(Plugin.ShotScale);
             DrawEntry(Plugin.ShotHideHud);
-            if (GUILayout.Button(Labels.T("Screenshot-Ordner öffnen", "Open screenshot folder"), buttonStyle, GUILayout.Width(260)))
+            if (Btn(Labels.T("Screenshot-Ordner öffnen", "Open screenshot folder"), buttonStyle, GUILayout.Width(260)))
             {
                 System.IO.Directory.CreateDirectory(HiResShot.Folder);
                 Application.OpenURL("file:///" + HiResShot.Folder.Replace('\\', '/'));
@@ -476,6 +483,7 @@ namespace GK2Tweaks
             Header(Labels.T("Anzeige", "Interface"));
             DrawEntry(Plugin.Language);
             DrawEntry(Plugin.MenuScale);
+            DrawEntry(Plugin.HudCenter);
             DrawEntry(Plugin.HighContrast);
             DrawEntry(Plugin.StatsLogSeconds);
             DrawEntry(Plugin.MenuKey);
@@ -489,9 +497,12 @@ namespace GK2Tweaks
 
             Header(Labels.T("Anpinnen", "Pinning"));
             DrawEntry(Plugin.PinsEnabled);
+            DrawEntry(Plugin.PinsChests);
+            DrawEntry(Plugin.PinsNotify);
+            DrawEntry(Plugin.PinsAutoUnpin);
             DrawEntry(Plugin.PinsCorner);
             DrawEntry(Plugin.PinsSize);
-            if (Pins.List.Count > 0 && GUILayout.Button(Labels.T("Alle Pins entfernen", "Remove all pins"), buttonStyle, GUILayout.Width(260))) Pins.ClearAll();
+            if (Pins.List.Count > 0 && Btn(Labels.T("Alle Pins entfernen", "Remove all pins"), buttonStyle, GUILayout.Width(260))) Pins.ClearAll();
 
             Header(Labels.T("FPS-Anzeige", "FPS display"));
             foreach (ConfigEntryBase e in new ConfigEntryBase[] { Plugin.ShowOverlay, Plugin.OvCorner, Plugin.OvLayout, Plugin.OvSeparator })
@@ -509,23 +520,26 @@ namespace GK2Tweaks
                 foreach (KeyValuePair<ConfigDefinition, ConfigEntryBase> kv in cfg) DrawEntry(kv.Value);
             }
             GUILayout.EndScrollView();
+            inScroll = false;
+            PadScrollInto(ref scroll, 560f);
             if (scrollToBench && Event.current.type == EventType.Repaint) { scroll.y = Mathf.Max(0, benchY - 10); scrollToBench = false; }
             if (pendingScrollHeader != null && Event.current.type == EventType.Repaint && headerY.TryGetValue(pendingScrollHeader, out float hy)) { scroll.y = Mathf.Max(0, hy - 10); pendingScrollHeader = null; }
 
             GUILayout.Space(4);
             GUILayout.BeginHorizontal();
-            if (GUILayout.Button(Labels.T("Jetzt speichern", "Save now"), buttonStyle)) ManualSave.Save(true);
-            if (GUILayout.Button(Labels.T("Was ist neu?", "What's new?"), buttonStyle)) ShowNews(false);
-            if (GUILayout.Button(Labels.T("Grafik zurücksetzen", "Reset graphics"), buttonStyle)) ResetTweaks();
-            if (GUILayout.Button(Labels.T("Schließen (", "Close (") + Plugin.MenuKey.Value + ")", buttonStyle)) SetMenu(false);
+            if (Btn(Labels.T("Jetzt speichern", "Save now"), buttonStyle)) ManualSave.Save(true);
+            if (Btn(Labels.T("Was ist neu?", "What's new?"), buttonStyle)) ShowNews(false);
+            if (Btn(Labels.T("Grafik zurücksetzen", "Reset graphics"), buttonStyle)) ResetTweaks();
+            if (Btn(Labels.T("Schließen (", "Close (") + Plugin.MenuKey.Value + ")", buttonStyle)) SetMenu(false);
             GUILayout.EndHorizontal();
-            string foot = ManualSave.ShowMessage ? ManualSave.Message : GUI.tooltip;
+            string foot = ManualSave.ShowMessage ? ManualSave.Message : (PadFooter() ?? GUI.tooltip);
             if (tipStyle == null || tipStyle.fontSize != (Plugin.HighContrast.Value ? 17 : 15))
             {
                 tipStyle = new GUIStyle(smallStyle) { fontSize = Plugin.HighContrast.Value ? 17 : 15, wordWrap = true };
                 tipStyle.normal.textColor = Plugin.HighContrast.Value ? Color.white : new Color(0.86f, 0.82f, 0.74f);
             }
             GUILayout.Label(string.IsNullOrEmpty(foot) ? " " : foot, tipStyle, GUILayout.Height(Plugin.HighContrast.Value ? 60 : 48));
+            PadWindowEnd();
             if (skinned && Event.current.type == EventType.Repaint) frameStyle.Draw(new Rect(0, 0, win.width, win.height), false, false, false, false);
             GUI.DragWindow(new Rect(0, 0, 10000, 40));
         }
@@ -540,7 +554,7 @@ namespace GK2Tweaks
                 "Fixes stutter with PlayStation controllers (DualSense/DualShock) under CrossOver/Wine by reading the controller through a cheaper path. Turn it off again if the controller misbehaves.")),
                 labelStyle, GUILayout.Width(268));
             bool on = WineFix.Enabled;
-            if (GUILayout.Button(on ? Labels.T("An", "On") : Labels.T("Aus", "Off"), buttonStyle, GUILayout.Width(310))) WineFix.Enabled = !on;
+            if (Btn(on ? Labels.T("An", "On") : Labels.T("Aus", "Off"), buttonStyle, GUILayout.Width(310))) WineFix.Enabled = !on;
             GUILayout.EndHorizontal();
             if (WineFix.Pending)
                 GUILayout.Label(Labels.T("Wirkt nach Neustart: Spiel UND Steam beenden (bzw. die CrossOver-Flasche neu starten).",
@@ -562,7 +576,7 @@ namespace GK2Tweaks
                 "Runs through all graphics tiers (about 13 s each, a bit over a minute in total) and measures FPS without a limit. You get a score and a recommendation at the end. Nothing is saved, your settings stay as they are. Best to stand still at a typical spot. Esc cancels.")),
                 labelStyle, GUILayout.Width(268));
             GUI.enabled = GraphicsBench.CanRun;
-            if (GUILayout.Button(GraphicsBench.CanRun ? Labels.T("Benchmark starten", "Start benchmark") : Labels.T("nur im laufenden Spiel", "only while playing"), buttonStyle, GUILayout.Width(310)))
+            if (Btn(GraphicsBench.CanRun ? Labels.T("Benchmark starten", "Start benchmark") : Labels.T("nur im laufenden Spiel", "only while playing"), buttonStyle, GUILayout.Width(310)))
                 GraphicsBench.Start();
             GUI.enabled = true;
             GUILayout.EndHorizontal();
@@ -585,6 +599,7 @@ namespace GK2Tweaks
         // ---------- Was ist neu? ----------
         private void DrawNewsWindow(int id)
         {
+            PadWindowBegin(NewsWindowId);
             if (newsStyle == null)
             {
                 newsStyle = new GUIStyle(labelStyle) { fixedHeight = 0, wordWrap = true, richText = true, alignment = TextAnchor.UpperLeft, fontSize = 15 };
@@ -602,11 +617,18 @@ namespace GK2Tweaks
             }
             if (list.Count == 0) GUILayout.Label("–", newsStyle);
             GUILayout.EndScrollView();
+            if (padMode && curWin == padWin && Event.current.type == EventType.Layout)
+            {
+                // Controller: hoch/runter scrollt den Text, die Buttons erreicht man mit links/rechts
+                if (Take(ref padUp)) newsScroll.y = Mathf.Max(0, newsScroll.y - 120f);
+                if (Take(ref padDown)) newsScroll.y += 120f;
+            }
             GUILayout.Space(4);
             GUILayout.BeginHorizontal();
-            if (newsSinceUpdate && GUILayout.Button(Labels.T("Alle Versionen", "All versions"), buttonStyle)) { newsSinceUpdate = false; newsScroll = Vector2.zero; }
-            if (GUILayout.Button(Labels.T("Schließen", "Close"), buttonStyle)) CloseNews();
+            if (newsSinceUpdate && Btn(Labels.T("Alle Versionen", "All versions"), buttonStyle)) { newsSinceUpdate = false; newsScroll = Vector2.zero; }
+            if (Btn(Labels.T("Schließen", "Close"), buttonStyle)) CloseNews();
             GUILayout.EndHorizontal();
+            PadWindowEnd();
             if (skinned && Event.current.type == EventType.Repaint) frameStyle.Draw(new Rect(0, 0, newsWin.width, newsWin.height), false, false, false, false);
             GUI.DragWindow(new Rect(0, 0, 10000, 40));
         }
@@ -614,6 +636,7 @@ namespace GK2Tweaks
         // ---------- Wochenplan (F6) ----------
         private void DrawWeekWindow(int id)
         {
+            PadWindowBegin(WeekWindowId);
             if (skinned) GUILayout.Label(Labels.T("Wochenplan", "Week plan") + "  ·  " + Labels.T("was geht wann?", "what's on when?"), titleStyle);
             int today = WeekPlan.TodayNumber;
             for (int k = 0; k < 6; k++)
@@ -635,7 +658,8 @@ namespace GK2Tweaks
                 GUILayout.Space(4);
             }
             GUILayout.Space(4);
-            if (GUILayout.Button(Labels.T("Schließen (", "Close (") + Plugin.WeekPlanKey.Value + ")", buttonStyle)) { weekOpen = false; UpdateEnabled(); }
+            if (Btn(Labels.T("Schließen (", "Close (") + Plugin.WeekPlanKey.Value + ")", buttonStyle)) { weekOpen = false; UpdateEnabled(); }
+            PadWindowEnd();
             if (skinned && Event.current.type == EventType.Repaint) frameStyle.Draw(new Rect(0, 0, weekWin.width, weekWin.height), false, false, false, false);
             GUI.DragWindow(new Rect(0, 0, 10000, 40));
         }
@@ -667,7 +691,7 @@ namespace GK2Tweaks
                 GUILayout.Label("<b>" + sd.slotName + "</b>   " + Labels.T("Tag ", "Day ") + sd.day + (sd.isAutoSave ? Labels.T("   (Autosave)", "   (autosave)") : ""), richLabel);
                 GUILayout.Label((dt == default(DateTime) ? "" : dt.ToString(fmt) + "   ·   ") + Labels.T("Friedhof ", "Graveyard ") + sd.graveyardQuality + "   ·   " + Labels.T("Kirche ", "Church ") + sd.churchQuality, smallStyle);
                 GUILayout.EndVertical();
-                if (GUILayout.Button(Labels.T("Spielen", "Play"), buttonStyle, GUILayout.Width(110))) LoadSlot(sd);
+                if (Btn(Labels.T("Spielen", "Play"), buttonStyle, GUILayout.Width(110))) LoadSlot(sd);
                 GUILayout.EndHorizontal();
                 // Kopien, die das Spiel selbst anlegt (Steam_1_backup_1 ...): direkt spielbar
                 foreach (SaveSlotData gb in slots)
@@ -677,7 +701,7 @@ namespace GK2Tweaks
                     GUILayout.Space(24);
                     DateTime gdt = gb.GetSaveDateTime();
                     GUILayout.Label(Labels.T("Kopie des Spiels ", "Game's own copy ") + gb.slotName.Substring(sd.slotName.Length + 8) + "   " + Labels.T("Tag ", "Day ") + gb.day + (gdt == default(DateTime) ? "" : "   " + gdt.ToString(fmt)), smallStyle, GUILayout.Width(436));
-                    if (GUILayout.Button(Labels.T("Spielen", "Play"), buttonStyle, GUILayout.Width(110))) LoadSlot(gb);
+                    if (Btn(Labels.T("Spielen", "Play"), buttonStyle, GUILayout.Width(110))) LoadSlot(gb);
                     GUILayout.EndHorizontal();
                 }
                 foreach (Backups.Item b in backupList)
@@ -688,7 +712,7 @@ namespace GK2Tweaks
                     string when = b.Time == default(DateTime) ? System.IO.Path.GetFileName(b.Dir) : b.Time.ToString(fmt);
                     GUILayout.Label(Labels.T("Backup ", "Backup ") + when + (b.Dir.EndsWith("_restore") ? Labels.T("  (vor Wiederherstellung)", "  (before restore)") : ""), smallStyle, GUILayout.Width(436));
                     bool confirm = confirmRestore == b;
-                    if (GUILayout.Button(confirm ? Labels.T("Sicher?", "Sure?") : Labels.T("Laden", "Restore"), buttonStyle, GUILayout.Width(110)))
+                    if (Btn(confirm ? Labels.T("Sicher?", "Sure?") : Labels.T("Laden", "Restore"), buttonStyle, GUILayout.Width(110)))
                     {
                         if (!confirm) confirmRestore = b;
                         else { Backups.Restore(b, out backupMsg); confirmRestore = null; backupListAt = 0; slotsAt = 0; }
@@ -742,7 +766,7 @@ namespace GK2Tweaks
                 if (inMenu)
                 {
                     bool confirm = confirmRestore == b;
-                    if (GUILayout.Button(confirm ? Labels.T("Sicher?", "Sure?") : Labels.T("Laden", "Restore"), buttonStyle, GUILayout.Width(110)))
+                    if (Btn(confirm ? Labels.T("Sicher?", "Sure?") : Labels.T("Laden", "Restore"), buttonStyle, GUILayout.Width(110)))
                     {
                         if (!confirm) confirmRestore = b;
                         else { Backups.Restore(b, out backupMsg); confirmRestore = null; backupListAt = 0; }
@@ -752,7 +776,7 @@ namespace GK2Tweaks
             }
             GUILayout.Label(!string.IsNullOrEmpty(backupMsg) ? backupMsg : (inMenu ? Labels.T("\"Laden\" ersetzt den Spielstand durch das Backup (der aktuelle Stand wird vorher gesichert).", "\"Restore\" replaces the save with the backup (the current save is backed up first).")
                 : Labels.T("Wiederherstellen ist im Hauptmenü möglich.", "Restoring is available in the main menu.")), smallStyle);
-            if (GUILayout.Button(Labels.T("Backup-Ordner öffnen", "Open backup folder"), buttonStyle, GUILayout.Width(260)))
+            if (Btn(Labels.T("Backup-Ordner öffnen", "Open backup folder"), buttonStyle, GUILayout.Width(260)))
             {
                 System.IO.Directory.CreateDirectory(Backups.Root);
                 Application.OpenURL("file:///" + Backups.Root.Replace('\\', '/'));
@@ -765,12 +789,12 @@ namespace GK2Tweaks
             GUILayout.Label(Labels.T("Update verfügbar: ", "Update available: ") + Plugin.PluginVersion + " → " + UpdateCheck.Latest, headerStyle, GUILayout.Width(300));
             if (UpdateCheck.CanAutoUpdate)
             {
-                if (GUILayout.Button(new GUIContent(Labels.T("Speichern & aktualisieren", "Save & update"),
+                if (Btn(new GUIContent(Labels.T("Speichern & aktualisieren", "Save & update"),
                         Labels.T("Speichert (falls im Spiel), beendet das Spiel und installiert die neue Version. Danach kann das Spiel direkt neu gestartet werden.",
                                  "Saves (if in game), quits the game and installs the new version. The game can be restarted right after.")), buttonStyle))
                     UpdateCheck.SaveAndUpdate(true);
             }
-            if (GUILayout.Button(Labels.T("Download-Seite", "Download page"), buttonStyle, GUILayout.Width(150))) Application.OpenURL(UpdateCheck.ReleasePage);
+            if (Btn(Labels.T("Download-Seite", "Download page"), buttonStyle, GUILayout.Width(150))) Application.OpenURL(UpdateCheck.ReleasePage);
             GUILayout.EndHorizontal();
         }
 
@@ -786,6 +810,26 @@ namespace GK2Tweaks
             if (Event.current.type == EventType.Repaint) headerY[text] = GUILayoutUtility.GetLastRect().y;
         }
 
+        // Ein-Klick-Profile (Grafik + Bildrate)
+        private void DrawProfiles()
+        {
+            GUILayout.BeginHorizontal();
+            GUILayout.Label(new GUIContent(Labels.T("Profil", "Profile"), Labels.T("Setzt mehrere Einstellungen auf einmal. Danach bleibt alles einzeln änderbar.", "Sets several options at once. Everything stays adjustable afterwards.")), labelStyle, GUILayout.Width(268));
+            GUILayout.BeginVertical();
+            for (int r = 0; r < 2; r++)
+            {
+                GUILayout.BeginHorizontal();
+                for (int c = 0; c < 2; c++)
+                {
+                    string id = Profiles.Ids[r * 2 + c];
+                    if (Btn(new GUIContent(Profiles.Name(id), Profiles.Tip(id)), buttonStyle, GUILayout.Width(153))) Profiles.Apply(id);
+                }
+                GUILayout.EndHorizontal();
+            }
+            GUILayout.EndVertical();
+            GUILayout.EndHorizontal();
+        }
+
         private void DrawGameTier()
         {
             GameSettings gs = GameSettings.Instance;
@@ -794,10 +838,18 @@ namespace GK2Tweaks
             GUILayout.Label(new GUIContent(Labels.T("Grafikstufe", "Graphics tier"), Labels.T("Die Stufe aus dem Spielmenü. Die Werte unter 'Grafik' überschreiben einzelne Teile davon.", "The tier from the game menu. The values under 'Graphics' override parts of it.")), labelStyle, GUILayout.Width(268));
             var tiers = (GraphicsTier[])Enum.GetValues(typeof(GraphicsTier));
             int i = Math.Max(0, Array.IndexOf(tiers, gs.graphicsTier));
+            bool pf = PadFocused();
             if (GUILayout.Button("<", arrowStyle, GUILayout.Width(36))) SetTier(tiers[(i - 1 + tiers.Length) % tiers.Length]);
             GUILayout.Label(Labels.Tier(gs.graphicsTier), valueStyle, GUILayout.Width(230));
             if (GUILayout.Button(">", arrowStyle, GUILayout.Width(36))) SetTier(tiers[(i + 1) % tiers.Length]);
             GUILayout.EndHorizontal();
+            PadMark(pf);
+            if (pf)
+            {
+                padTip = Labels.T("Die Stufe aus dem Spielmenü.", "The tier from the game menu.");
+                if (Take(ref padLeft)) SetTier(tiers[(i - 1 + tiers.Length) % tiers.Length]);
+                else if (Take(ref padRight) || Take(ref padA)) SetTier(tiers[(i + 1) % tiers.Length]);
+            }
         }
 
         private static void SetTier(GraphicsTier tier)
@@ -816,6 +868,7 @@ namespace GK2Tweaks
             {
                 ConfigEntry<bool> e = OverlayOrder.Entry(order[i]);
                 if (e == null) continue;
+                bool pf = PadFocused();
                 GUILayout.BeginHorizontal();
                 GUILayout.Label(new GUIContent(Labels.Name(e), Labels.Tip(e)), labelStyle, GUILayout.Width(268));
                 if (GUILayout.Button(e.Value ? Labels.T("An", "On") : Labels.T("Aus", "Off"), buttonStyle, GUILayout.Width(226))) e.Value = !e.Value;
@@ -825,11 +878,20 @@ namespace GK2Tweaks
                 if (GUILayout.Button(new GUIContent("v", Labels.T("Nach hinten", "Move down")), arrowStyle, GUILayout.Width(40))) OverlayOrder.Move(i, 1);
                 GUI.enabled = true;
                 GUILayout.EndHorizontal();
+                PadMark(pf);
+                if (pf)
+                {
+                    padTip = Labels.Tip(e) + "  " + Labels.T("(LB/RB: verschieben)", "(LB/RB: move)");
+                    if (Take(ref padA) || Take(ref padLeft) || Take(ref padRight)) e.Value = !e.Value;
+                    if (Take(ref padLB) && i > 0) { OverlayOrder.Move(i, -1); padFocus--; }
+                    if (Take(ref padRB) && i < order.Count - 1) { OverlayOrder.Move(i, 1); padFocus++; }
+                }
             }
         }
 
         private void DrawEntry(ConfigEntryBase e)
         {
+            bool pf = PadFocused();
             GUILayout.BeginHorizontal();
             GUILayout.Label(new GUIContent(Labels.Name(e), Labels.Tip(e)), labelStyle, GUILayout.Width(268));
             AcceptableValueBase acc = e.Description?.AcceptableValues;
@@ -843,6 +905,10 @@ namespace GK2Tweaks
             else if (e.SettingType == typeof(KeyboardShortcut)) KeyField((ConfigEntry<KeyboardShortcut>)e);
             else TextField(e);
             GUILayout.EndHorizontal();
+            PadMark(pf);
+            object[] vals = acc is AcceptableValueList<string> ls2 ? ls2.AcceptableValues.Cast<object>().ToArray()
+                : acc is AcceptableValueList<int> li2 ? li2.AcceptableValues.Cast<object>().ToArray() : null;
+            PadEntry(pf, e, vals);
         }
 
         private void Cycle(ConfigEntryBase e, object[] values)

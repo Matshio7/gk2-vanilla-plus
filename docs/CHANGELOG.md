@@ -1,16 +1,24 @@
 # Changelog
 
-## 1.4.4 – 2026-09-27
+## 1.5.0 – 2026-09-27
 
 **EN**
 - New: **safe mode** – after a game update the mod checks everything it relies on. If something changed, only the affected feature is turned off (with a note in the mod menu) instead of causing errors – the rest keeps working. Features that keep throwing errors are turned off automatically too.
 - Fix: the pinned list no longer covers the reputation window of the main NPCs (it moves below it)
 - New: FPS display – **order of the values** can be changed with arrows in the mod menu, optional **separator** between the values (long dash, bar or dot)
+- New: **controller support for the mod menu** – D-pad / left stick to select and change, A to confirm, B or Start to close, LB/RB to reorder the FPS display. While a mod window is open, the game ignores the controller.
+- New: **one-click profiles** in the mod menu – "Steam Deck / battery", "Performance", "Quality" and "Game default"
+- New: **HUD to the center** (ultrawide, optional) – HUD, area name, NPC window and the mod displays move into the 16:9 area in the middle
+- New: pins – optional counting of **all chests on the map**, a **short message with sound** when a pinned item is ready, and **automatic unpinning** when you start crafting it
 
 **DE**
 - Neu: **Sicherer Modus** – nach einem Spiel-Update prüft der Mod alles, worauf er zugreift. Hat sich etwas geändert, wird nur die betroffene Funktion abgeschaltet (mit Hinweis im Mod-Menü), statt Fehler zu verursachen – der Rest läuft weiter. Funktionen, die wiederholt Fehler werfen, werden ebenfalls automatisch abgeschaltet.
 - Fix: Die Pin-Liste verdeckt nicht mehr das Ansehen-Fenster der Haupt-NPCs (sie rückt darunter)
 - Neu: FPS-Anzeige – **Reihenfolge der Werte** im Mod-Menü per Pfeil einstellbar, optional **Trennzeichen** zwischen den Werten (langer Strich, senkrechter Strich oder Punkt)
+- Neu: **Controller-Bedienung des Mod-Menüs** – Steuerkreuz / linker Stick zum Auswählen und Ändern, A bestätigt, B oder Start schließt, LB/RB verschiebt die Werte der FPS-Anzeige. Solange ein Mod-Fenster offen ist, ignoriert das Spiel den Controller.
+- Neu: **Ein-Klick-Profile** im Mod-Menü – „Steam Deck / Akku“, „Leistung“, „Qualität“ und „Spiel-Standard“
+- Neu: **HUD zur Mitte** (Ultrawide, optional) – HUD, Gebietsname, NPC-Fenster und die Mod-Anzeigen rücken in den 16:9-Bereich in der Mitte
+- Neu: Pins – optional **alle Truhen auf der Karte** mitzählen, **kurze Meldung mit Ton**, wenn ein Pin fertig ist, und **automatisch lösen**, sobald du das Rezept herstellst
 
 ## 1.4.3 – 2026-09-27
 

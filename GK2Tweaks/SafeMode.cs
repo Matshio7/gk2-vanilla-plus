@@ -35,6 +35,7 @@ namespace GK2Tweaks
             { "Saves", new[] { "Speichern & Backups", "Saving & backups" } },
             { "Zoom", new[] { "Kamera-Zoom", "Camera zoom" } },
             { "Oled", new[] { "OLED-Schwarz", "OLED black" } },
+            { "HudCenter", new[] { "HUD zur Mitte", "HUD to the center" } },
             { "Screenshots", new[] { "Screenshots", "Screenshots" } },
             { "Ultrawide", new[] { "Ultrawide-Hauptmenü", "Ultrawide main menu" } },
             { "Hud", new[] { "HUD ausblenden", "Hide HUD" } },
