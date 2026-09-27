@@ -1,1 +1,1 @@
-Ultrawide 21:9/32:9, hidden graphics settings & benchmark, FPS display, pinning with have/need list, week plan, save backups, zoom, full-width rain - in-game mod menu (F9) and a one-click installer. The game stays vanilla.
+Ultrawide 21:9/32:9, hidden graphics settings & benchmark, FPS display, pinning with have/need list, week plan, save backups, zoom, full-width rain, controller support - in-game mod menu (F9). The game stays vanilla.
