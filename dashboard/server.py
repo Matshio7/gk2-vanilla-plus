@@ -28,6 +28,74 @@ PAGE_SECONDS = 1800         # Workshop-Seite (Kommentare, Bewertung) nur alle 30
 lock = threading.Lock()
 state = {"last_ok": None, "last_error": None, "next_poll": None, "meta": {}, "page": {}, "page_at": 0}
 
+# ---------- Live-Status: Pruefung durch Steam / Sichtbarkeit ----------
+# Solange Steam ein Item nach einem Update prueft ("awaiting analysis"), ist es fuer alle anderen versteckt:
+# die oeffentliche API liefert dann result 9 (nicht gefunden). Sobald wieder result 1 kommt, ist die Pruefung
+# durch und man kann die Sichtbarkeit wieder auf "Oeffentlich" stellen.
+STATUS_SECONDS = 30
+VIS = {0: "public", 1: "friends", 2: "private", 3: "unlisted"}
+status = {"state": "unknown", "since": None, "checked": None, "error": None, "misses": 0, "events": []}
+
+
+def notify(title, msg):
+    """macOS-Mitteilung mit Ton (Mitteilungszentrale)."""
+    try:
+        import subprocess
+        esc = lambda x: x.replace("\\", "\\\\").replace('"', '\\"')
+        subprocess.run(["osascript", "-e", 'display notification "%s" with title "%s" sound name "Glass"' % (esc(msg), esc(title))],
+                       timeout=10, check=False)
+    except Exception:
+        pass
+
+
+def check_status():
+    body = urllib.parse.urlencode({"itemcount": 1, "publishedfileids[0]": ITEM_ID}).encode()
+    req = urllib.request.Request(
+        "https://api.steampowered.com/ISteamRemoteStorage/GetPublishedFileDetails/v1/", data=body, headers=UA)
+    with urllib.request.urlopen(req, timeout=20) as r:
+        d = json.load(r)["response"]["publishedfiledetails"][0]
+    res = d.get("result")
+    if res == 1 and d.get("title"):
+        return "banned" if d.get("banned") else VIS.get(d.get("visibility"), "visible")
+    if res == 9:
+        return "review"
+    return None  # unklare Antwort, ignorieren
+
+
+def set_status(new):
+    now = int(time.time())
+    old = status["state"]
+    if new == "review" and old not in ("unknown", "review"):
+        status["misses"] += 1          # einzelne Aussetzer der API nicht gleich als Pruefung werten
+        if status["misses"] < 2:
+            return
+    status["misses"] = 0
+    if new == old:
+        return
+    status["state"], status["since"] = new, now
+    status["events"] = (status["events"] + [{"t": now, "from": old, "to": new}])[-20:]
+    if old == "review" and new in ("unlisted", "friends", "private", "visible"):
+        notify("GK2 Vanilla+: Prüfung fertig", "Der Mod ist wieder sichtbar – jetzt im Workshop auf „Öffentlich“ stellen.")
+    elif new == "public" and old != "unknown":
+        notify("GK2 Vanilla+ ist öffentlich", "Der Mod erscheint wieder in der Workshop-Suche.")
+    elif new == "review" and old != "unknown":
+        notify("GK2 Vanilla+: wird geprüft", "Steam prüft das Item gerade – es ist vorübergehend versteckt.")
+    elif new == "banned":
+        notify("GK2 Vanilla+: gesperrt", "Steam meldet das Item als gesperrt – bitte Workshop-Seite prüfen.")
+
+
+def status_poller():
+    while True:
+        try:
+            s = check_status()
+            status["error"] = None
+            if s:
+                set_status(s)
+            status["checked"] = int(time.time())
+        except Exception as e:
+            status["error"] = str(e)
+        time.sleep(STATUS_SECONDS)
+
 
 def fetch_api():
     body = urllib.parse.urlencode({"itemcount": 1, "publishedfileids[0]": ITEM_ID}).encode()
@@ -148,6 +216,11 @@ class Handler(BaseHTTPRequestHandler):
                                "last_error": state["last_error"] or state.get("page_error"), "next_poll": state["next_poll"],
                                "poll_seconds": POLL_SECONDS, "now": int(time.time())}).encode()
             return self.send(200, body, "application/json")
+        if path == "/api/status":
+            body = json.dumps({k: status[k] for k in ("state", "since", "checked", "error", "events")}
+                              | {"now": int(time.time()), "every": STATUS_SECONDS,
+                                 "url": "https://steamcommunity.com/sharedfiles/filedetails/?id=" + ITEM_ID}).encode()
+            return self.send(200, body, "application/json")
         if path == "/api/refresh":
             try:
                 poll_once()
@@ -172,6 +245,7 @@ def restore_page_values():
 if __name__ == "__main__":
     restore_page_values()
     threading.Thread(target=poller, daemon=True).start()
+    threading.Thread(target=status_poller, daemon=True).start()
     srv = ThreadingHTTPServer(("127.0.0.1", PORT), Handler)
     print("GK2 Vanilla+ Dashboard: http://localhost:%d  (Strg+C zum Beenden)" % PORT)
     try:

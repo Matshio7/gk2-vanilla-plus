@@ -38,6 +38,17 @@ th{color:var(--muted);font-weight:500}
 .tip{position:fixed;pointer-events:none;background:#0e1014;border:1px solid var(--line);border-radius:6px;padding:6px 9px;font-size:12px;display:none;white-space:nowrap}
 .err{color:var(--red);font-size:12px}
 a{color:var(--gold)}
+.vis{display:flex;align-items:center;gap:16px;border-radius:10px;padding:14px 18px;margin-bottom:18px;border:1px solid var(--line);background:var(--panel)}
+.vis .dot{width:14px;height:14px;border-radius:50%;flex:none;background:var(--muted)}
+.vis .big{font-size:18px;font-weight:650}
+.vis .small{color:var(--muted);font-size:12px;margin-top:2px}
+.vis .act{margin-left:auto;display:flex;gap:8px;align-items:center}
+.vis a.btn{background:#6b3b2c;border:1px solid var(--gold);color:var(--text);border-radius:6px;padding:7px 14px;text-decoration:none;font-weight:600}
+.vis.review{border-color:#b8923f;background:#2b2415}.vis.review .dot{background:#e8be78;animation:pulse 1.4s infinite}
+.vis.todo{border-color:var(--green);background:#1c2a1c}.vis.todo .dot{background:var(--green);animation:pulse .8s infinite}
+.vis.ok .dot{background:var(--green)}
+.vis.bad{border-color:var(--red);background:#2e1b17}.vis.bad .dot{background:var(--red)}
+@keyframes pulse{50%{opacity:.25}}
 </style>
 </head>
 <body>
@@ -53,6 +64,8 @@ a{color:var(--gold)}
       <div style="margin-top:6px"><button id="refresh">Jetzt abfragen</button></div>
     </div>
   </header>
+
+  <div class="vis" id="vis"><div class="dot"></div><div><div class="big" id="visBig">Status wird geprüft …</div><div class="small" id="visSmall">&nbsp;</div></div><div class="act" id="visAct"></div></div>
 
   <div class="tiles" id="tiles"></div>
 
@@ -215,6 +228,43 @@ async function load() {
   catch (e) { $('status').textContent = 'Server nicht erreichbar – läuft server.py?'; }
 }
 load(); setInterval(load, 30000); window.addEventListener('resize', render);
+
+// ---------- Live-Status: Steam-Pruefung & Sichtbarkeit (alle 5 s vom lokalen Server, der alle 30 s bei Steam fragt) ----------
+const VIS = {
+  review:   ['review', 'Steam prüft das Item gerade', 'Vorübergehend für alle anderen versteckt. Du bekommst eine Mitteilung, sobald es durch ist.', false],
+  unlisted: ['todo',   'Prüfung fertig – jetzt auf „Öffentlich“ stellen', 'Sichtbarkeit ist „Nicht gelistet“: taucht nicht in der Suche auf.', true],
+  friends:  ['todo',   'Sichtbar nur für Freunde – auf „Öffentlich“ stellen', '', true],
+  private:  ['todo',   'Privat – auf „Öffentlich“ stellen', '', true],
+  visible:  ['todo',   'Sichtbar – Sichtbarkeit prüfen', '', true],
+  public:   ['ok',     'Öffentlich – alles in Ordnung', 'Der Mod erscheint in der Workshop-Suche.', false],
+  banned:   ['bad',    'Von Steam gesperrt', 'Bitte die Workshop-Seite prüfen.', true],
+  unknown:  ['',       'Status wird geprüft …', '', false],
+};
+let lastVis = null;
+function beep() {
+  try { const c = new AudioContext(), o = c.createOscillator(), g = c.createGain(); o.connect(g); g.connect(c.destination);
+    o.frequency.value = 880; g.gain.setValueAtTime(.15, c.currentTime); g.gain.exponentialRampToValueAtTime(.001, c.currentTime + .6);
+    o.start(); o.stop(c.currentTime + .6); } catch (e) {}
+}
+const dur = s => s < 60 ? s + ' s' : s < 3600 ? Math.round(s/60) + ' min' : Math.floor(s/3600) + ' h ' + Math.round(s%3600/60) + ' min';
+async function loadStatus() {
+  let st; try { st = await (await fetch('/api/status', {cache: 'no-store'})).json(); } catch (e) { return; }
+  const [cls, big, small, act] = VIS[st.state] || VIS.unknown;
+  $('vis').className = 'vis ' + cls;
+  $('visBig').textContent = big;
+  const bits = [];
+  if (small) bits.push(small);
+  const firstSeen = (st.events || []).length && st.events[st.events.length-1].from === 'unknown';
+  if (st.since) bits.push((firstSeen ? 'beobachtet seit ' : 'seit ') + dstr(st.since) + ' (' + dur(st.now - st.since) + ')');
+  if (st.checked) bits.push('zuletzt geprüft vor ' + Math.max(0, st.now - st.checked) + ' s');
+  if (st.error) bits.push('Fehler: ' + st.error);
+  $('visSmall').textContent = bits.join(' · ');
+  $('visAct').innerHTML = act || st.state === 'review' ? `<a class="btn" href="${st.url}" target="_blank">Workshop-Seite öffnen</a>` : '';
+  if (lastVis && lastVis !== st.state && st.state !== 'unknown') { beep(); if (cls === 'todo') document.title = '✅ Prüfung fertig – GK2 Vanilla+'; }
+  if (cls === 'ok' && document.title.startsWith('✅')) document.title = 'GK2 Vanilla+';
+  lastVis = st.state;
+}
+loadStatus(); setInterval(loadStatus, 5000);
 </script>
 </body>
 </html>
