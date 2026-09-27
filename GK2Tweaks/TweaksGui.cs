@@ -572,7 +572,7 @@ namespace GK2Tweaks
             GUILayout.Space(4);
             GUILayout.BeginHorizontal();
             if (Btn(Labels.T("Jetzt speichern", "Save now"), buttonStyle)) ManualSave.Save(true);
-            if (Btn(Labels.T("Was ist neu?", "What's new?"), buttonStyle)) ShowNews(false);
+            if (Btn(Labels.T("Was ist neu?", "What's new?"), buttonStyle)) { ShowNews(false); GUIUtility.ExitGUI(); }
             if (Btn(Labels.T("Grafik zurücksetzen", "Reset graphics"), buttonStyle)) ResetTweaks();
             if (Btn(Labels.T("Schließen (", "Close (") + Plugin.MenuKey.Value + ")", buttonStyle)) SetMenu(false);
             GUILayout.EndHorizontal();
@@ -684,7 +684,7 @@ namespace GK2Tweaks
             GUILayout.Space(4);
             GUILayout.BeginHorizontal();
             if (newsSinceUpdate && Btn(Labels.T("Alle Versionen", "All versions"), buttonStyle)) { newsSinceUpdate = false; newsScroll = Vector2.zero; }
-            if (Btn(Labels.T("Schließen", "Close"), buttonStyle)) CloseNews();
+            if (Btn(Labels.T("Schließen", "Close"), buttonStyle)) { CloseNews(); GUIUtility.ExitGUI(); }
             GUILayout.EndHorizontal();
             PadWindowEnd();
             if (skinned && Event.current.type == EventType.Repaint) frameStyle.Draw(new Rect(0, 0, newsWin.width, newsWin.height), false, false, false, false);
@@ -710,9 +710,10 @@ namespace GK2Tweaks
             {
                 Application.OpenURL(Plugin.WorkshopUrl);
                 CloseRate(0);
+                GUIUtility.ExitGUI();
             }
-            if (Btn(Labels.T("Später erinnern", "Remind me later"), buttonStyle)) CloseRate(6);
-            if (Btn(Labels.T("Nicht mehr fragen", "Don't ask again"), buttonStyle)) CloseRate(0);
+            if (Btn(Labels.T("Später erinnern", "Remind me later"), buttonStyle)) { CloseRate(6); GUIUtility.ExitGUI(); }
+            if (Btn(Labels.T("Nicht mehr fragen", "Don't ask again"), buttonStyle)) { CloseRate(0); GUIUtility.ExitGUI(); }
             GUILayout.EndHorizontal();
             PadWindowEnd();
             if (skinned && Event.current.type == EventType.Repaint) frameStyle.Draw(new Rect(0, 0, rateWin.width, rateWin.height), false, false, false, false);
