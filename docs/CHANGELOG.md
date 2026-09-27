@@ -5,10 +5,12 @@
 **EN**
 - Small fixes: more robust after game updates, controller fixes in the mod menu (removing pins, restoring backups, B cancels a key assignment), Esc always closes the topmost mod window, quickly toggling the FPS display no longer starts extra background threads, auto-unpin after crafting picks the right recipe
 - Uninstall now keeps the mod's save backups and screenshots (moved to Documents\GK2 Vanilla+)
+- Known issue: switching between controller and mouse/keyboard while a menu is open can show an error message – just close it, everything keeps working normally
 
 **DE**
 - Kleine Korrekturen: robuster nach Spiel-Updates, Controller-Fixes im Mod-Menü (Pins entfernen, Backups wiederherstellen, B bricht eine Tastenbelegung ab), Esc schließt immer das oberste Mod-Fenster, schnelles An/Aus der FPS-Anzeige startet keine zusätzlichen Hintergrund-Threads mehr, automatisches Lösen nach dem Herstellen erwischt das richtige Rezept
 - Deinstallieren behält jetzt die Spielstand-Backups und Screenshots des Mods (werden nach Dokumente\GK2 Vanilla+ verschoben)
+- Bekannter Fehler: Wechselt man bei offenem Menü zwischen Controller und Maus/Tastatur, kann eine Fehlermeldung erscheinen – einfach wegklicken, danach läuft alles normal weiter
 
 ## 1.5.1 – 2026-09-27
 
