@@ -438,8 +438,8 @@ namespace GK2Tweaks
 #if !NEXUS
             if (rateOpen)
             {
-                // bewusst nicht zentriert: sitzt oben links, damit das GK2-Logo und die Menu-Buttons frei bleiben
-                if (rateWin.width <= 0) rateWin = new Rect(24, 24, 460, 10);
+                // bewusst nicht zentriert: oben rechts, damit weder Logo/Menu-Buttons (Mitte) noch das große Mod-Fenster (oben links, 40/60) verdeckt werden
+                if (rateWin.width <= 0) rateWin = new Rect(Screen.width / scale - 484, 24, 460, 10);
                 rateWin = GUILayout.Window(RateWindowId, rateWin, DrawRateWindow, skinned ? "" : Labels.T("Gefällt dir der Mod?", "Enjoying the mod?"), windowStyle);
             }
 #endif
