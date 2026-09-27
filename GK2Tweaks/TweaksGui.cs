@@ -87,6 +87,14 @@ namespace GK2Tweaks
         private Action pendingReopen;
         private int reopenFrame;
 
+        // Klicks, die Fenster oeffnen/schliessen oder die Anzahl an GUILayout-Controls in einem Fenster
+        // aendern, duerfen den Zustand NICHT sofort mitten in OnGUI aendern (Layout- und Repaint-Durchlauf
+        // koennten dann unterschiedlich viele Controls sehen -> Unity-Fehler "controls when doing repaint").
+        // Stattdessen wird die eigentliche Aenderung hier gesammelt und einmal pro Frame in Tick() (also
+        // ausserhalb von OnGUI) ausgefuehrt.
+        private Action pendingWindowAction;
+        private void Defer(Action a) => pendingWindowAction = a;
+
         // erst im naechsten Frame, damit ein Esc-Druck nicht gleich das wieder geoeffnete Spielmenue schliesst
         private void RunPendingReopen()
         {
@@ -115,6 +123,12 @@ namespace GK2Tweaks
 
         internal void Tick(float dt)
         {
+            if (pendingWindowAction != null)
+            {
+                Action a = pendingWindowAction;
+                pendingWindowAction = null;
+                try { a(); } catch (Exception e) { Plugin.Log.LogWarning("Window action: " + e.Message); }
+            }
             updateAvailableSnap = UpdateCheck.Available;
             safeNoticeSnap = SafeMode.MenuNotice();
             PadTick();
@@ -579,9 +593,9 @@ namespace GK2Tweaks
             GUILayout.Space(4);
             GUILayout.BeginHorizontal();
             if (Btn(Labels.T("Jetzt speichern", "Save now"), buttonStyle)) ManualSave.Save(true);
-            if (Btn(Labels.T("Was ist neu?", "What's new?"), buttonStyle)) { ShowNews(false); GUIUtility.ExitGUI(); }
+            if (Btn(Labels.T("Was ist neu?", "What's new?"), buttonStyle)) Defer(() => ShowNews(false));
             if (Btn(Labels.T("Grafik zurücksetzen", "Reset graphics"), buttonStyle)) ResetTweaks();
-            if (Btn(Labels.T("Schließen (", "Close (") + Plugin.MenuKey.Value + ")", buttonStyle)) SetMenu(false);
+            if (Btn(Labels.T("Schließen (", "Close (") + Plugin.MenuKey.Value + ")", buttonStyle)) Defer(() => SetMenu(false));
             GUILayout.EndHorizontal();
             string foot = ManualSave.ShowMessage ? ManualSave.Message : (PadFooter() ?? GUI.tooltip);
             if (tipStyle == null || tipStyle.fontSize != (Plugin.HighContrast.Value ? 17 : 15))
@@ -690,8 +704,8 @@ namespace GK2Tweaks
             }
             GUILayout.Space(4);
             GUILayout.BeginHorizontal();
-            if (newsSinceUpdate && Btn(Labels.T("Alle Versionen", "All versions"), buttonStyle)) { newsSinceUpdate = false; newsScroll = Vector2.zero; }
-            if (Btn(Labels.T("Schließen", "Close"), buttonStyle)) { CloseNews(); GUIUtility.ExitGUI(); }
+            if (newsSinceUpdate && Btn(Labels.T("Alle Versionen", "All versions"), buttonStyle)) Defer(() => { newsSinceUpdate = false; newsScroll = Vector2.zero; });
+            if (Btn(Labels.T("Schließen", "Close"), buttonStyle)) Defer(CloseNews);
             GUILayout.EndHorizontal();
             PadWindowEnd();
             if (skinned && Event.current.type == EventType.Repaint) frameStyle.Draw(new Rect(0, 0, newsWin.width, newsWin.height), false, false, false, false);
@@ -714,13 +728,9 @@ namespace GK2Tweaks
             GUILayout.Space(8);
             GUILayout.BeginHorizontal();
             if (Btn(Labels.T("👍 Jetzt bewerten", "👍 Rate it now"), buttonStyle))
-            {
-                Application.OpenURL(Plugin.WorkshopUrl);
-                CloseRate(0);
-                GUIUtility.ExitGUI();
-            }
-            if (Btn(Labels.T("Später erinnern", "Remind me later"), buttonStyle)) { CloseRate(6); GUIUtility.ExitGUI(); }
-            if (Btn(Labels.T("Nicht mehr fragen", "Don't ask again"), buttonStyle)) { CloseRate(0); GUIUtility.ExitGUI(); }
+                Defer(() => { Application.OpenURL(Plugin.WorkshopUrl); CloseRate(0); });
+            if (Btn(Labels.T("Später erinnern", "Remind me later"), buttonStyle)) Defer(() => CloseRate(6));
+            if (Btn(Labels.T("Nicht mehr fragen", "Don't ask again"), buttonStyle)) Defer(() => CloseRate(0));
             GUILayout.EndHorizontal();
             PadWindowEnd();
             if (skinned && Event.current.type == EventType.Repaint) frameStyle.Draw(new Rect(0, 0, rateWin.width, rateWin.height), false, false, false, false);
@@ -753,7 +763,7 @@ namespace GK2Tweaks
                 GUILayout.Space(4);
             }
             GUILayout.Space(4);
-            if (Btn(Labels.T("Schließen (", "Close (") + Plugin.WeekPlanKey.Value + ")", buttonStyle)) { weekOpen = false; UpdateEnabled(); }
+            if (Btn(Labels.T("Schließen (", "Close (") + Plugin.WeekPlanKey.Value + ")", buttonStyle)) Defer(() => { weekOpen = false; UpdateEnabled(); });
             PadWindowEnd();
             if (skinned && Event.current.type == EventType.Repaint) frameStyle.Draw(new Rect(0, 0, weekWin.width, weekWin.height), false, false, false, false);
             GUI.DragWindow(new Rect(0, 0, 10000, 40));
@@ -786,7 +796,7 @@ namespace GK2Tweaks
                 GUILayout.Label("<b>" + sd.slotName + "</b>   " + Labels.T("Tag ", "Day ") + sd.day + (sd.isAutoSave ? Labels.T("   (Autosave)", "   (autosave)") : ""), richLabel);
                 GUILayout.Label((dt == default(DateTime) ? "" : dt.ToString(fmt) + "   ·   ") + Labels.T("Friedhof ", "Graveyard ") + sd.graveyardQuality + "   ·   " + Labels.T("Kirche ", "Church ") + sd.churchQuality, smallStyle);
                 GUILayout.EndVertical();
-                if (Btn(Labels.T("Spielen", "Play"), buttonStyle, GUILayout.Width(110))) LoadSlot(sd);
+                if (Btn(Labels.T("Spielen", "Play"), buttonStyle, GUILayout.Width(110))) Defer(() => LoadSlot(sd));
                 GUILayout.EndHorizontal();
                 // Kopien, die das Spiel selbst anlegt (Steam_1_backup_1 ...): direkt spielbar
                 foreach (SaveSlotData gb in slots)
@@ -796,7 +806,7 @@ namespace GK2Tweaks
                     GUILayout.Space(24);
                     DateTime gdt = gb.GetSaveDateTime();
                     GUILayout.Label(Labels.T("Kopie des Spiels ", "Game's own copy ") + gb.slotName.Substring(sd.slotName.Length + 8) + "   " + Labels.T("Tag ", "Day ") + gb.day + (gdt == default(DateTime) ? "" : "   " + gdt.ToString(fmt)), smallStyle, GUILayout.Width(436));
-                    if (Btn(Labels.T("Spielen", "Play"), buttonStyle, GUILayout.Width(110))) LoadSlot(gb);
+                    if (Btn(Labels.T("Spielen", "Play"), buttonStyle, GUILayout.Width(110))) Defer(() => LoadSlot(gb));
                     GUILayout.EndHorizontal();
                 }
                 foreach (Backups.Item b in backupList)
