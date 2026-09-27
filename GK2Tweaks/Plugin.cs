@@ -13,7 +13,7 @@ namespace GK2Tweaks
     {
         public const string Guid = "mats.gk2.tweaks";
         public const string PluginName = "GK2 Tweaks";
-        public const string PluginVersion = "1.5.0";
+        public const string PluginVersion = "1.4.4";
         internal const string Keep = "Default";
 
         internal static Plugin Instance;
@@ -38,11 +38,13 @@ namespace GK2Tweaks
         internal static ConfigEntry<bool> ShowOverlay, CheckUpdates;
         internal static ConfigEntry<int> StatsLogSeconds;
         internal static ConfigEntry<string> Language, LastSeenVersion, LastGameVersion;
+#if MINIMAP
         // [Minimap]
         internal static ConfigEntry<bool> MinimapEnabled;
         internal static ConfigEntry<string> MinimapCorner;
         internal static ConfigEntry<int> MinimapSize, MinimapZoom;
         internal static ConfigEntry<KeyboardShortcut> MinimapKey;
+#endif
         // [Overlay] – FPS-Anzeige
         internal static ConfigEntry<string> OvCorner, OvLayout, PinsCorner, PinsSize;
         internal static ConfigEntry<bool> PinsEnabled;
@@ -209,6 +211,7 @@ namespace GK2Tweaks
                 new AcceptableValueList<string>("TopLeft", "TopRight", "BottomLeft", "BottomRight")));
             PinsSize = Config.Bind("Pins", "Size", "Medium", new ConfigDescription("Text and icon size of the pinned list.",
                 new AcceptableValueList<string>("Small", "Medium", "Large", "ExtraLarge")));
+#if MINIMAP
             MinimapEnabled = Config.Bind("Minimap", "Enabled", false, "Small map in a screen corner: a section of the game's own world map around you (outdoors; indoors your location on the map).");
             MinimapCorner = Config.Bind("Minimap", "Corner", "BottomRight", new ConfigDescription("Screen corner of the minimap.",
                 new AcceptableValueList<string>("TopLeft", "TopRight", "BottomLeft", "BottomRight")));
@@ -217,6 +220,7 @@ namespace GK2Tweaks
             MinimapZoom = Config.Bind("Minimap", "Zoom", 100, new ConfigDescription("Zoom of the minimap in percent (higher = closer).",
                 new AcceptableValueList<int>(50, 75, 100, 150, 200, 300)));
             MinimapKey = Config.Bind("Minimap", "Key", KeyboardShortcut.Empty, "Key to show or hide the minimap (empty = only in the mod menu).");
+#endif
             LastGameVersion = Config.Bind("Interface", "LastGameVersion", "", "Internal: game version at the last start (safe mode shows a note after game updates).");
             StatsLogSeconds = Config.Bind("Interface", "StatsLogSeconds", 0, new ConfigDescription(
                 "Write frame statistics to the BepInEx log every N seconds (0 = off).",
@@ -255,14 +259,18 @@ namespace GK2Tweaks
             if (SaveKey.Value.MainKey != KeyCode.None && SaveKey.Value.IsDown()) ManualSave.Save(Gui.MenuOpen);
             if (WeekPlanKey.Value.MainKey != KeyCode.None && WeekPlanKey.Value.IsDown()) Gui.ToggleWeekPlan();
             if (HudKey.Value.MainKey != KeyCode.None && HudKey.Value.IsDown()) HudToggle.Toggle();
+#if MINIMAP
             if (MinimapKey.Value.MainKey != KeyCode.None && MinimapKey.Value.IsDown()) MinimapEnabled.Value = !MinimapEnabled.Value;
+#endif
             SafeMode.Run("Hud", HudToggle.Tick);
             GraphicsBench.Tick(dt);
             SafeMode.Run("Pins", Pins.Tick);
             SafeMode.Run("Pins", BuildPinScan.Tick);
             SafeMode.Run("Oled", Oled.Tick);
             SafeMode.Run("Rain", Rain.Tick);
+#if MINIMAP
             SafeMode.Run("Minimap", Minimap.Tick);
+#endif
             NewsTick();
             Gui.Tick(dt);
 

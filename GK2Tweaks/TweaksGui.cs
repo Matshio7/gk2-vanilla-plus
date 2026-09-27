@@ -309,7 +309,7 @@ namespace GK2Tweaks
         {
             SetBlocker(menuOpen || newsOpen);
             if (weekOpen && !WeekPlan.InGame) weekOpen = false;
-            bool want = menuOpen || weekOpen || newsOpen || Plugin.ShowOverlay.Value || ManualSave.ShowMessage || GraphicsBench.Running || (Pins.List.Count > 0 && Plugin.PinsEnabled.Value) || Minimap.Visible;
+            bool want = menuOpen || weekOpen || newsOpen || Plugin.ShowOverlay.Value || ManualSave.ShowMessage || GraphicsBench.Running || (Pins.List.Count > 0 && Plugin.PinsEnabled.Value);
             if (enabled != want) enabled = want;
         }
 
@@ -336,9 +336,8 @@ namespace GK2Tweaks
             GUI.matrix = Matrix4x4.TRS(Vector3.zero, Quaternion.identity, new Vector3(scale, scale, 1f));
             Rect ov = Rect.zero;
             if (Plugin.ShowOverlay.Value) ov = DrawOverlay(scale);
-            Rect mm = Minimap.Visible ? Minimap.Draw(scale, Plugin.MinimapCorner.Value == Plugin.OvCorner.Value ? ov : Rect.zero, TopFor(Plugin.MinimapCorner.Value)) : Rect.zero;
             if (Pins.List.Count > 0 && Plugin.PinsEnabled.Value && WeekPlan.InGame && !HudToggle.Hidden)
-                DrawPins(scale, Plugin.PinsCorner.Value == Plugin.MinimapCorner.Value && mm.height > 0 ? mm : (Plugin.PinsCorner.Value == Plugin.OvCorner.Value ? ov : Rect.zero));
+                DrawPins(scale, Plugin.PinsCorner.Value == Plugin.OvCorner.Value ? ov : Rect.zero);
             if (GraphicsBench.Running)
             {
                 var bm = new GUIContent(GraphicsBench.Status);
@@ -413,13 +412,6 @@ namespace GK2Tweaks
             DrawEntry(Plugin.ZoomPresetKey);
             DrawEntry(Plugin.MouseWheelZoom);
             DrawEntry(Plugin.SmoothZoom);
-
-            Header(Labels.T("Minimap", "Minimap"));
-            DrawEntry(Plugin.MinimapEnabled);
-            DrawEntry(Plugin.MinimapCorner);
-            DrawEntry(Plugin.MinimapSize);
-            DrawEntry(Plugin.MinimapZoom);
-            DrawEntry(Plugin.MinimapKey);
 
             Header(Labels.T("Komfort", "Comfort"));
             DrawEntry(Plugin.PauseInBackground);

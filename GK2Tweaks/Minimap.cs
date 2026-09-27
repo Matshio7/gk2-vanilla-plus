@@ -1,3 +1,5 @@
+#if MINIMAP
+// Minimap: vorerst deaktiviert (nicht im Build), siehe CHANGELOG
 using System.Collections;
 using System.Collections.Generic;
 using HarmonyLib;
@@ -255,3 +257,5 @@ namespace GK2Tweaks
         }
     }
 }
+
+#endif

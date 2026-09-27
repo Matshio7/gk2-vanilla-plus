@@ -72,11 +72,8 @@ Minimum interval =>
 Check for updates => 
 Language => 
 Position => 
-Show minimap => 
-Size => 
-Zoom => 
-Minimap key => 
 Pinning => 
+Size => 
 Layout => 
 FPS => 
 1% low FPS => 
@@ -197,6 +194,7 @@ Zoom of the minimap in percent (higher = closer). =>
 Key to show or hide the minimap (empty = only in the mod menu). => 
 Internal: game version at the last start (safe mode shows a note after game updates). => 
 Write frame statistics to the BepInEx log every N seconds (0 = off). => 
+Zoom => 
 (indoors) => 
 Saving only works while playing. => 
 Not possible right now (dialogue, work, sleep …). Try again in a moment. => 

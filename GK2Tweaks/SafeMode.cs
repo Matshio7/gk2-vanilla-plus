@@ -104,12 +104,6 @@ namespace GK2Tweaks
             F("Pins", typeof(UIQuestInfoWindow), "header");
             F("Rain", typeof(WeatherComponent), "parameters");
             F("Rain", typeof(CPParticleEmission), "defaultValue");
-            F("Minimap", typeof(MapPageWidget), "scrollRect");
-            F("Minimap", typeof(MapPageWidget), "mapRect");
-            F("Minimap", typeof(MapPageWidget), "playerIcon");
-            F("Minimap", typeof(MapPageWidget), "worldZonePoints");
-            M("Minimap", typeof(MapPageWidget), "UpdateZones");
-            M("Minimap", typeof(MapPageWidget), "UpdateFightIcons");
             M("WeekPlan", typeof(UINotificator), "ShowNotification");
             F("WeekPlan", typeof(UIHUDWheel), "dayIcons");
             F("ModsButton", typeof(UIMainMenuWindow), "gameSettingsButton");
