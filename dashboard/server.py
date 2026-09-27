@@ -58,6 +58,18 @@ def check_status():
     if res == 1 and d.get("title"):
         return "banned" if d.get("banned") else VIS.get(d.get("visibility"), "visible")
     if res == 9:
+        # Zur Sicherheit zusaetzlich die Workshop-Seite ohne Login ansehen (hoechstens alle 3 min, sonst 429):
+        # "Nicht gelistet" ist per Link fuer alle sichtbar - zeigt die Seite das Item, ist die Pruefung durch.
+        if time.time() - status.get("page_at", 0) >= 180:
+            status["page_at"] = time.time()
+            try:
+                req = urllib.request.Request("https://steamcommunity.com/sharedfiles/filedetails/?id=" + ITEM_ID + "&l=english", headers=PAGE_UA)
+                with urllib.request.urlopen(req, timeout=20) as r:
+                    html = r.read().decode("utf-8", "ignore")
+                if "workshopItemTitle" in html and "<title>Steam Community :: Error" not in html:
+                    return "unlisted" if "Unlisted" in html or "unlisted" in html else "visible"
+            except Exception:
+                pass
         return "review"
     return None  # unklare Antwort, ignorieren
 
