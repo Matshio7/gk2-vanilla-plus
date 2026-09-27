@@ -426,6 +426,7 @@ namespace GK2Tweaks
     {
         private static void Postfix(UICraftWidget __instance)
         {
+            if (!SafeMode.On("Pins")) return;
             try
             {
                 var d = Traverse.Create(__instance).Field("data").GetValue<UIBaseCraftWidgetData>();
@@ -438,7 +439,7 @@ namespace GK2Tweaks
                     return Pins.Build("craft:" + def.id, def.id, d.CraftsCount > 1 ? " ×" + d.CraftsCount : "", icon, d.CraftItemCellsData, d.WgoData, d.CraftsCount);
                 });
             }
-            catch (Exception e) { Plugin.Log.LogWarning("Pin craft: " + e.Message); }
+            catch (Exception e) { SafeMode.Fail("Pins", e); }
         }
     }
 
@@ -448,6 +449,7 @@ namespace GK2Tweaks
     {
         private static void Postfix(UICraftPreviewItemCell __instance)
         {
+            if (!SafeMode.On("Pins")) return;
             try
             {
                 var d = Traverse.Create(__instance).Field("data").GetValue<UICraftPreviewItemCellData>();
@@ -456,7 +458,7 @@ namespace GK2Tweaks
                 WgoData wgo = d.WgoData;
                 PinButton.Attach(__instance, "craft:" + def.id, () => Pins.FromCraftDef(def, wgo), 16f);
             }
-            catch (Exception e) { Plugin.Log.LogWarning("Pin cell: " + e.Message); }
+            catch (Exception e) { SafeMode.Fail("Pins", e); }
         }
     }
 
@@ -470,8 +472,8 @@ namespace GK2Tweaks
         {
             if (!Plugin.PinsEnabled.Value || Time.unscaledTime < next) return;
             next = Time.unscaledTime + 0.25f;
-            try { ScanBuild(); } catch (Exception e) { Plugin.Log.LogWarning("Pin build: " + e.Message); next = Time.unscaledTime + 5f; }
-            try { ScanTown(); } catch (Exception e) { Plugin.Log.LogWarning("Pin town: " + e.Message); next = Time.unscaledTime + 5f; }
+            try { ScanBuild(); } catch (Exception e) { SafeMode.Fail("Pins", e); next = Time.unscaledTime + 5f; }
+            try { ScanTown(); } catch (Exception e) { SafeMode.Fail("Pins", e); next = Time.unscaledTime + 5f; }
         }
 
         private static void ScanBuild()
@@ -519,6 +521,7 @@ namespace GK2Tweaks
     {
         private static void Postfix(UIBaseCraftSelectionWindow __instance, UIBaseCraftSelectionWindowData data)
         {
+            if (!SafeMode.On("Pins")) return;
             try
             {
                 CraftDef def = data?.CraftDefinition;
@@ -535,7 +538,7 @@ namespace GK2Tweaks
                     return Pins.Build("craft:" + def.id, def.id, n > 1 ? " ×" + n : "", icon, data.CraftItemCellsData, data.WgoData, n);
                 }, 30f, true, 64f);
             }
-            catch (Exception e) { Plugin.Log.LogWarning("Pin selection: " + e.Message); }
+            catch (Exception e) { SafeMode.Fail("Pins", e); }
         }
     }
 
@@ -545,6 +548,7 @@ namespace GK2Tweaks
     {
         private static void Postfix(UIQuestInfoWindow __instance)
         {
+            if (!SafeMode.On("Pins")) return;
             try
             {
                 var d = Traverse.Create(__instance).Field("data").GetValue<UIQuestInfoWindowData>();
@@ -555,7 +559,7 @@ namespace GK2Tweaks
                 if (q == null || q.status == QuestStatus.Completed) { PinButton.Attach(host, null, null, 30f, true, 64f); return; }
                 PinButton.Attach(host, "quest:" + q.id, () => Pins.FromQuest(q), 30f, true, 64f);
             }
-            catch (Exception e) { Plugin.Log.LogWarning("Pin quest: " + e.Message); }
+            catch (Exception e) { SafeMode.Fail("Pins", e); }
         }
     }
 

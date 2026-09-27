@@ -276,3 +276,24 @@ OLED black => Negro OLED
 Pure black instead of dark gray around the map (e.g. outside the church or at the level edge). Good for OLED screens. => Negro puro en lugar de gris oscuro alrededor del mapa (p. ej. fuera de la iglesia o en el borde del nivel). Ideal para pantallas OLED.
 Full-width rain => Lluvia a todo el ancho
 Rain and snow cover the whole screen on ultrawide monitors and when zoomed out (the game only fills a 16:9 area). => La lluvia y la nieve cubren toda la pantalla en monitores ultrapanorámicos y al alejar el zoom (el juego solo llena un área 16:9).
+Show minimap => Mostrar minimapa
+Minimap key => Tecla del minimapa
+Small map in a screen corner: a section of the game's own world map around you (outdoors; indoors your location on the map). => Mapa pequeño en una esquina: una parte del mapa del mundo del juego a tu alrededor (en exteriores; en interiores, tu ubicación en el mapa).
+Screen corner of the minimap. => Esquina de la pantalla del minimapa.
+Size of the minimap. => Tamaño del minimapa.
+Zoom of the minimap in percent (higher = closer). => Zoom del minimapa en porcentaje (más alto = más cerca).
+Key to show or hide the minimap (empty = only in the mod menu). => Tecla para mostrar u ocultar el minimapa (vacío = solo en el menú del mod).
+Internal: game version at the last start (safe mode shows a note after game updates). => Interno: versión del juego en el último inicio (el modo seguro muestra un aviso tras actualizaciones del juego).
+Vanilla+: "{0}" was turned off (errors, possibly after a game update). => Vanilla+: «{0}» se ha desactivado (errores, posiblemente tras una actualización del juego).
+Game update detected ({0} → {1}): Vanilla+ checked everything, all features work. => Actualización del juego detectada ({0} → {1}): Vanilla+ lo ha comprobado todo, todas las funciones funcionan.
+Game update detected ({0} → {1}): Vanilla+ turned off {2} feature(s) to be safe – details in the mod menu. => Actualización del juego detectada ({0} → {1}): Vanilla+ ha desactivado {2} función(es) por seguridad – detalles en el menú del mod.
+Safe mode: {0} turned off because the game changed. Everything else works – please wait for a mod update. => Modo seguro: {0} desactivado porque el juego ha cambiado. Todo lo demás funciona – espera una actualización del mod.
+Minimap => Minimapa
+Mods button => Botón Mods
+Skip intro logos => Saltar logos de inicio
+Version note in main menu => Nota de versión en el menú principal
+Graphics settings => Ajustes gráficos
+Saving & backups => Guardado y copias
+Ultrawide main menu => Menú principal ultrapanorámico
+Hide HUD => Ocultar HUD
+Workshop upload => Subida al Workshop

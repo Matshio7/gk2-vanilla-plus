@@ -276,3 +276,24 @@ OLED black => Noir OLED
 Pure black instead of dark gray around the map (e.g. outside the church or at the level edge). Good for OLED screens. => Noir pur au lieu de gris foncé autour de la carte (p. ex. hors de l'église ou au bord du niveau). Idéal pour les écrans OLED.
 Full-width rain => Pluie sur toute la largeur
 Rain and snow cover the whole screen on ultrawide monitors and when zoomed out (the game only fills a 16:9 area). => La pluie et la neige couvrent tout l'écran sur les moniteurs ultra-larges et en dézoomant (le jeu ne remplit qu'une zone 16:9).
+Show minimap => Afficher la minicarte
+Minimap key => Touche minicarte
+Small map in a screen corner: a section of the game's own world map around you (outdoors; indoors your location on the map). => Petite carte dans un coin de l'écran : une partie de la carte du monde du jeu autour de vous (à l'extérieur ; à l'intérieur, votre position sur la carte).
+Screen corner of the minimap. => Coin de l'écran de la minicarte.
+Size of the minimap. => Taille de la minicarte.
+Zoom of the minimap in percent (higher = closer). => Zoom de la minicarte en pourcentage (plus élevé = plus proche).
+Key to show or hide the minimap (empty = only in the mod menu). => Touche pour afficher ou masquer la minicarte (vide = seulement dans le menu du mod).
+Internal: game version at the last start (safe mode shows a note after game updates). => Interne : version du jeu au dernier démarrage (le mode sécurisé affiche une note après une mise à jour du jeu).
+Vanilla+: "{0}" was turned off (errors, possibly after a game update). => Vanilla+ : « {0} » a été désactivé (erreurs, peut-être après une mise à jour du jeu).
+Game update detected ({0} → {1}): Vanilla+ checked everything, all features work. => Mise à jour du jeu détectée ({0} → {1}) : Vanilla+ a tout vérifié, toutes les fonctions marchent.
+Game update detected ({0} → {1}): Vanilla+ turned off {2} feature(s) to be safe – details in the mod menu. => Mise à jour du jeu détectée ({0} → {1}) : Vanilla+ a désactivé {2} fonction(s) par sécurité – détails dans le menu du mod.
+Safe mode: {0} turned off because the game changed. Everything else works – please wait for a mod update. => Mode sécurisé : {0} désactivé car le jeu a changé. Tout le reste fonctionne – veuillez attendre une mise à jour du mod.
+Minimap => Minicarte
+Mods button => Bouton Mods
+Skip intro logos => Passer les logos d'intro
+Version note in main menu => Mention de version au menu principal
+Graphics settings => Réglages graphiques
+Saving & backups => Sauvegarde et copies
+Ultrawide main menu => Menu principal ultra-large
+Hide HUD => Masquer l'interface
+Workshop upload => Envoi Workshop

@@ -276,3 +276,24 @@ OLED black => OLED 纯黑
 Pure black instead of dark gray around the map (e.g. outside the church or at the level edge). Good for OLED screens. => 地图周围使用纯黑而不是深灰（例如教堂外或关卡边缘）。适合 OLED 屏幕。
 Full-width rain => 全宽降雨
 Rain and snow cover the whole screen on ultrawide monitors and when zoomed out (the game only fills a 16:9 area). => 在超宽显示器上以及缩小视角时，雨雪覆盖整个屏幕（游戏本身只填充 16:9 区域）。
+Show minimap => 显示小地图
+Minimap key => 小地图按键
+Small map in a screen corner: a section of the game's own world map around you (outdoors; indoors your location on the map). => 屏幕角落的小地图：显示你周围的游戏世界地图区域（室外；室内显示你在地图上的位置）。
+Screen corner of the minimap. => 小地图所在的屏幕角落。
+Size of the minimap. => 小地图大小。
+Zoom of the minimap in percent (higher = closer). => 小地图缩放百分比（越高越近）。
+Key to show or hide the minimap (empty = only in the mod menu). => 显示或隐藏小地图的按键（留空 = 仅在模组菜单中）。
+Internal: game version at the last start (safe mode shows a note after game updates). => 内部：上次启动时的游戏版本（游戏更新后安全模式会显示提示）。
+Vanilla+: "{0}" was turned off (errors, possibly after a game update). => Vanilla+：“{0}”已关闭（出现错误，可能是游戏更新导致）。
+Game update detected ({0} → {1}): Vanilla+ checked everything, all features work. => 检测到游戏更新（{0} → {1}）：Vanilla+ 已检查全部内容，所有功能正常。
+Game update detected ({0} → {1}): Vanilla+ turned off {2} feature(s) to be safe – details in the mod menu. => 检测到游戏更新（{0} → {1}）：为安全起见，Vanilla+ 关闭了 {2} 项功能 – 详情见模组菜单。
+Safe mode: {0} turned off because the game changed. Everything else works – please wait for a mod update. => 安全模式：由于游戏已更改，{0} 已关闭。其他功能正常 – 请等待模组更新。
+Minimap => 小地图
+Mods button => 模组按钮
+Skip intro logos => 跳过开场标志
+Version note in main menu => 主菜单版本说明
+Graphics settings => 图形设置
+Saving & backups => 存档与备份
+Ultrawide main menu => 超宽主菜单
+Hide HUD => 隐藏界面
+Workshop upload => 创意工坊上传

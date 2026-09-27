@@ -276,3 +276,24 @@ OLED black => OLED-чёрный
 Pure black instead of dark gray around the map (e.g. outside the church or at the level edge). Good for OLED screens. => Чистый чёрный вместо тёмно-серого вокруг карты (например, за пределами церкви или на краю уровня). Подходит для OLED-экранов.
 Full-width rain => Дождь на всю ширину
 Rain and snow cover the whole screen on ultrawide monitors and when zoomed out (the game only fills a 16:9 area). => Дождь и снег покрывают весь экран на сверхшироких мониторах и при отдалении камеры (игра заполняет только область 16:9).
+Show minimap => Показывать миникарту
+Minimap key => Клавиша миникарты
+Small map in a screen corner: a section of the game's own world map around you (outdoors; indoors your location on the map). => Маленькая карта в углу экрана: фрагмент карты мира игры вокруг вас (на улице; в помещениях — ваше место на карте).
+Screen corner of the minimap. => Угол экрана для миникарты.
+Size of the minimap. => Размер миникарты.
+Zoom of the minimap in percent (higher = closer). => Масштаб миникарты в процентах (больше = ближе).
+Key to show or hide the minimap (empty = only in the mod menu). => Клавиша для показа или скрытия миникарты (пусто = только в меню мода).
+Internal: game version at the last start (safe mode shows a note after game updates). => Служебное: версия игры при последнем запуске (безопасный режим показывает уведомление после обновлений игры).
+Vanilla+: "{0}" was turned off (errors, possibly after a game update). => Vanilla+: «{0}» отключено (ошибки, возможно после обновления игры).
+Game update detected ({0} → {1}): Vanilla+ checked everything, all features work. => Обнаружено обновление игры ({0} → {1}): Vanilla+ всё проверил, все функции работают.
+Game update detected ({0} → {1}): Vanilla+ turned off {2} feature(s) to be safe – details in the mod menu. => Обнаружено обновление игры ({0} → {1}): Vanilla+ на всякий случай отключил функций: {2} – подробности в меню мода.
+Safe mode: {0} turned off because the game changed. Everything else works – please wait for a mod update. => Безопасный режим: {0} отключено, так как игра изменилась. Всё остальное работает – дождитесь обновления мода.
+Minimap => Миникарта
+Mods button => Кнопка «Моды»
+Skip intro logos => Пропуск логотипов
+Version note in main menu => Пометка версии в главном меню
+Graphics settings => Настройки графики
+Saving & backups => Сохранения и резервные копии
+Ultrawide main menu => Главное меню ultrawide
+Hide HUD => Скрыть HUD
+Workshop upload => Загрузка в Workshop

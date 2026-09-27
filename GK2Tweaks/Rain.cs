@@ -61,7 +61,7 @@ namespace GK2Tweaks
                     }
                 }
             }
-            catch (Exception e) { Plugin.Log.LogWarning("Rain: " + e.Message); next = Time.unscaledTime + 30f; }
+            catch (Exception e) { SafeMode.Fail("Rain", e); next = Time.unscaledTime + 10f; }
         }
 
         // zuletzt angewendeter Faktor je Emitter (fuer das Umrechnen der laufenden Rate)

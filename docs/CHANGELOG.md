@@ -1,5 +1,15 @@
 # Changelog
 
+## 1.5.0 – 2026-09-27
+
+**EN**
+- New: **minimap** – a section of the game's own world map around you in a screen corner (outdoors; indoors it shows where you are on the map). Undiscovered areas stay hidden. Turn it on in the mod menu (Minimap), corner, size and zoom selectable, optional key.
+- New: **safe mode** – after a game update the mod checks everything it relies on. If something changed, only the affected feature is turned off (with a note in the mod menu) instead of causing errors – the rest keeps working. Features that keep throwing errors are turned off automatically too.
+
+**DE**
+- Neu: **Minimap** – ein Ausschnitt der Weltkarte des Spiels rund um dich in einer Bildschirmecke (draußen; in Innenräumen zeigt sie, wo du auf der Karte bist). Unentdeckte Gebiete bleiben verdeckt. Einschalten im Mod-Menü (Minimap), Ecke, Größe und Zoom wählbar, optional per Taste.
+- Neu: **Sicherer Modus** – nach einem Spiel-Update prüft der Mod alles, worauf er zugreift. Hat sich etwas geändert, wird nur die betroffene Funktion abgeschaltet (mit Hinweis im Mod-Menü), statt Fehler zu verursachen – der Rest läuft weiter. Funktionen, die wiederholt Fehler werfen, werden ebenfalls automatisch abgeschaltet.
+
 ## 1.4.3 – 2026-09-27
 
 **EN**

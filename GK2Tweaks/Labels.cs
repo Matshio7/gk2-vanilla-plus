@@ -101,6 +101,10 @@ namespace GK2Tweaks
             { "CheckForUpdates", new[] { "Nach Updates suchen", "Check for updates" } },
             { "Language", new[] { "Sprache", "Language" } },
             { "Corner", new[] { "Position", "Position" } },
+            { "Minimap.Enabled", new[] { "Minimap anzeigen", "Show minimap" } },
+            { "Minimap.Size", new[] { "Größe", "Size" } },
+            { "Minimap.Zoom", new[] { "Zoom", "Zoom" } },
+            { "Minimap.Key", new[] { "Taste Minimap", "Minimap key" } },
             { "Enabled", new[] { "Anpinnen", "Pinning" } },
             { "Size", new[] { "Größe", "Size" } },
             { "Layout", new[] { "Anordnung", "Layout" } },
@@ -165,6 +169,10 @@ namespace GK2Tweaks
             { "StatsLogSeconds", "Frame-Statistik regelmäßig ins BepInEx-Log schreiben." },
             { "Language", "Sprache des Mod-Menüs. Automatisch = Sprache des Spiels." },
             { "Corner", "In welcher Bildschirmecke die Anzeige steht." },
+            { "Minimap.Enabled", "Kleine Karte in einer Bildschirmecke: ein Ausschnitt der Weltkarte des Spiels rund um dich (draußen; in Innenräumen dein Ort auf der Karte). Unentdeckte Gebiete bleiben verdeckt." },
+            { "Minimap.Size", "Größe der Minimap." },
+            { "Minimap.Zoom", "Zoom der Minimap in Prozent (höher = näher dran)." },
+            { "Minimap.Key", "Taste zum Ein- und Ausblenden der Minimap (leer = nur im Mod-Menü)." },
             { "Enabled", "Rezepte, Baupläne und Stadtgebäude über die Pinnadel oben rechts anpinnen. Die Liste zeigt pro Zutat Haben/Brauchen aus deinem Inventar (ohne Truhen)." },
             { "Size", "Text- und Symbolgröße der Pin-Liste." },
             { "Layout", "Nebeneinander = alles in einer Zeile. Untereinander = ein Wert pro Zeile." },
@@ -236,11 +244,13 @@ namespace GK2Tweaks
         internal static string Name(ConfigEntryBase e)
         {
             string key = e.Definition.Key;
+            if (Names.TryGetValue(e.Definition.Section + "." + key, out string[] sn)) return T(sn[0], sn[1]);
             return Names.TryGetValue(key, out string[] n) ? T(n[0], n[1]) : key;
         }
 
         internal static string Tip(ConfigEntryBase e)
         {
+            if (German && TipsDe.TryGetValue(e.Definition.Section + "." + e.Definition.Key, out string st)) return st;
             if (German && TipsDe.TryGetValue(e.Definition.Key, out string t)) return t;
             string d = e.Description?.Description ?? "";
             int slash = d.IndexOf(" / ");
@@ -257,6 +267,7 @@ namespace GK2Tweaks
                 if (key == "TargetFps") return i == 0 ? T("Unbegrenzt", "Unlimited") : i + " FPS";
                 if (key == "PhysicsHz") return i == 0 ? T("Standard (50 Hz)", "Default (50 Hz)") : i + " Hz";
                 if (key == "Zoom") return i + " %";
+                if (key == "Size") return i + " px";
                 if (key == "InteriorZoom") return i == 0 ? T("wie draußen", "same as outside") : i + " %";
                 if (key == "MenuScale") return i == 0 ? T("Automatisch", "Automatic") : i + " %";
                 if (key == "Scale") return i + "×";

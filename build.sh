@@ -5,8 +5,8 @@ set -euo pipefail
 ROOT="${0:A:h}"; B="$ROOT/_deps"; R="$ROOT/release"
 V=$(sed -nE 's/.*PluginVersion = "([0-9.]+)".*/\1/p' "$ROOT/GK2Tweaks/Plugin.cs")
 export PATH=/usr/local/share/dotnet:$PATH
-(cd "$ROOT/GK2Ultrawide" && dotnet build -c Release -v q -nologo | grep -E "error|Build succeeded")
-(cd "$ROOT/GK2Tweaks" && dotnet build -c Release -v q -nologo | grep -E "error|Build succeeded")
+(cd "$ROOT/GK2Ultrawide" && dotnet build -c Release --no-restore -v q -nologo | grep -E "error|Build succeeded")
+(cd "$ROOT/GK2Tweaks" && dotnet build -c Release --no-restore -v q -nologo | grep -E "error|Build succeeded")
 N="GK2-VanillaPlus-$V"; S="$R/stage/$N"; F="$S/installer/files"
 rm -rf "$R/stage"; mkdir -p "$F/BepInEx/plugins/GK2Ultrawide" "$F/BepInEx/plugins/GK2Tweaks" "$F/BepInEx/GK2VanillaPlus" "$S/docs/licenses"
 cp -R "$B/BepInEx/." "$F/"
@@ -42,7 +42,7 @@ GAME="$BOTTLE/Program Files (x86)/Steam/steamapps/common/Graveyard Keeper 2"
 if [ -d "$GAME/BepInEx" ]; then mkdir -p "$GAME/BepInEx/GK2VanillaPlus"; cp "$ROOT/workshop/description.bbcode" "$GAME/BepInEx/GK2VanillaPlus/workshop_description.bbcode"; fi
 if [ -d "$BOTTLE" ]; then rm -rf "$BOTTLE/GK2VanillaPlus-Workshop"; cp -R "$R/workshop/GK2-VanillaPlus" "$BOTTLE/GK2VanillaPlus-Workshop"; fi
 # Nexus-Ausgabe: ohne Update-Pruefung und Online-Updater (Nexus erlaubt keine Selbst-Updates)
-(cd "$ROOT/GK2Tweaks" && dotnet build -c Nexus -v q -nologo | grep -E "error|Build succeeded")
+(cd "$ROOT/GK2Tweaks" && dotnet build -c Nexus --no-restore -v q -nologo | grep -E "error|Build succeeded")
 NX="$R/stage/nexus/$N"; rm -rf "$R/stage/nexus"; mkdir -p "$R/stage/nexus"; cp -R "$S" "$NX"
 cp "$ROOT/GK2Tweaks/bin/Nexus/GK2Tweaks.dll" "$NX/installer/files/BepInEx/plugins/GK2Tweaks/"
 rm -f "$NX/installer/files/BepInEx/GK2VanillaPlus/update.ps1"
