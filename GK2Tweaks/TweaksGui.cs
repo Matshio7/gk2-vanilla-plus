@@ -222,6 +222,28 @@ namespace GK2Tweaks
             return Plugin.HighContrast.Value ? "<b><color=" + col + ">" + t + "</color></b>" : "<color=" + col + ">" + t + "</color>";
         }
 
+        private static readonly Vector3[] npcCorners = new Vector3[4];
+
+        // Bildschirmbereich des NPC-Ansehen-Fensters (Portrait, Name, Ansehen) in GUI-Koordinaten, sonst leer
+        private static Rect NpcWidgetRect(float scale)
+        {
+            try
+            {
+                UINpcWidget wdg = GUIElements.Instance != null ? GUIElements.Instance.NpcWidget : null;
+                if (wdg == null || !wdg.gameObject.activeInHierarchy) return Rect.zero;
+                var rt = wdg.transform as RectTransform;
+                Canvas cv = wdg.GetComponentInParent<Canvas>();
+                if (rt == null || cv == null) return Rect.zero;
+                Camera cam = cv.rootCanvas.renderMode == RenderMode.ScreenSpaceOverlay ? null : cv.rootCanvas.worldCamera;
+                rt.GetWorldCorners(npcCorners);
+                Vector2 a = RectTransformUtility.WorldToScreenPoint(cam, npcCorners[0]), b = RectTransformUtility.WorldToScreenPoint(cam, npcCorners[2]);
+                float x0 = Mathf.Min(a.x, b.x), x1 = Mathf.Max(a.x, b.x), y0 = Mathf.Min(a.y, b.y), y1 = Mathf.Max(a.y, b.y);
+                if (x1 - x0 < 4f || y1 - y0 < 4f) return Rect.zero;
+                return new Rect(x0 / scale, (Screen.height - y1) / scale, (x1 - x0) / scale, (y1 - y0) / scale);
+            }
+            catch { return Rect.zero; }
+        }
+
         private void DrawPins(float scale, Rect ov)
         {
             EnsurePinStyles();
@@ -251,6 +273,10 @@ namespace GK2Tweaks
             float y;
             if (c.StartsWith("Top")) y = ov.height > 0 ? ov.yMax + 6f : TopFor(c);
             else y = ov.height > 0 ? ov.y - 6f - h : sh - h - m;
+            // Nicht ueber das Ansehen-Fenster der Haupt-NPCs legen (erscheint, wenn man vor ihnen steht)
+            Rect npc = NpcWidgetRect(scale);
+            if (npc.width > 0 && npc.Overlaps(new Rect(x, y, w, h)))
+                y = c.StartsWith("Top") ? npc.yMax + 6f : npc.y - 6f - h;
             GUI.Box(new Rect(x, y, w, h), GUIContent.none, pinBoxStyle);
             float cy = y + 6f, cx = x + 12f;
             Pins.Pin remove = null;
