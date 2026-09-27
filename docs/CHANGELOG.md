@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.5.2 – 2026-09-27
+
+**EN**
+- Fix: the "controls when doing repaint" error window that could appear over the mod menu is now actually fixed – it was caused by the background update check flipping a value at exactly the wrong moment mid-frame; that value is now read once per frame instead of live during rendering
+
+**DE**
+- Fix: Das Fehlerfenster ("controls when doing repaint"), das über dem Mod-Menü erscheinen konnte, ist jetzt wirklich behoben – Ursache war die Update-Prüfung im Hintergrund, die genau zur falschen Zeit mitten im Frame einen Wert umgeschaltet hat; der Wert wird jetzt einmal pro Frame gelesen statt live während des Zeichnens
+
 ## 1.5.1 – 2026-09-27
 
 **EN**

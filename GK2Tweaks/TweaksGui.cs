@@ -115,6 +115,8 @@ namespace GK2Tweaks
 
         internal void Tick(float dt)
         {
+            updateAvailableSnap = UpdateCheck.Available;
+            safeNoticeSnap = SafeMode.MenuNotice();
             PadTick();
             RunPendingReopen();
             if (menuOpen && capturingKey == null && Input.GetKeyDown(KeyCode.Escape)) SetMenu(false);
@@ -449,15 +451,20 @@ namespace GK2Tweaks
 
         private GUIStyle warnStyle;
         private float footHeight;
+        // Einmal pro Frame (in Tick, nicht live in OnGUI) gelesen: UpdateCheck.Available kann durch die
+        // asynchrone GitHub-Abfrage genau zwischen dem Layout- und dem Repaint-Event umschlagen, was Unity
+        // sonst mit "control count mismatch" quittiert (fehlendes/zusaetzliches GUILayout-Element).
+        private bool updateAvailableSnap;
+        private string safeNoticeSnap;
 
         private void DrawWindow(int id)
         {
             PadWindowBegin(WindowId);
             if (skinned) GUILayout.Label("GK2 Vanilla+  ·  by McFly7", titleStyle);
-            if (UpdateCheck.Available) DrawUpdate();
+            if (updateAvailableSnap) DrawUpdate();
             GUILayout.Label(fpsText + "     " + SystemInfo.graphicsDeviceVersion, labelStyle);
             GUILayout.Label(Labels.T("Aktiv: ", "Active: ") + Plugin.DescribeFeatures(), smallStyle);
-            string safe = SafeMode.MenuNotice();
+            string safe = safeNoticeSnap;
             if (safe != null)
             {
                 if (warnStyle == null) { warnStyle = new GUIStyle(smallStyle) { wordWrap = true }; warnStyle.normal.textColor = new Color(1f, 0.62f, 0.3f); }
