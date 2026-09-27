@@ -11,11 +11,30 @@ namespace GK2Tweaks
     // Mod-Menue (F9) und FPS-Anzeige (F10). Zeigt alle Einstellungen dieses Mods und aller anderen BepInEx-Mods.
     internal sealed partial class TweaksGui : MonoBehaviour
     {
-        private const int WindowId = 0x6B2D, WeekWindowId = 0x6B2E, NewsWindowId = 0x6B2F;
+        private const int WindowId = 0x6B2D, WeekWindowId = 0x6B2E, NewsWindowId = 0x6B2F, RateWindowId = 0x6B30;
         private bool newsOpen, newsSinceUpdate;
         private Rect newsWin;
         private Vector2 newsScroll;
         private GUIStyle newsStyle;
+#if !NEXUS
+        private bool rateOpen;
+        private Rect rateWin;
+
+        internal void ShowRatePrompt()
+        {
+            rateOpen = true;
+            rateWin = new Rect(0, 0, 0, 0);
+            UpdateEnabled();
+        }
+
+        private void CloseRate(int laterSessions)
+        {
+            rateOpen = false;
+            if (laterSessions > 0) Plugin.RatePromptNextAt.Value = Plugin.RatePromptSessions.Value + laterSessions;
+            else Plugin.RatePromptDone.Value = true;
+            UpdateEnabled();
+        }
+#endif
 
         internal void ShowNews(bool sinceUpdate)
         {
@@ -349,13 +368,25 @@ namespace GK2Tweaks
 
         private void UpdateEnabled()
         {
-            SetBlocker(menuOpen || newsOpen);
+            SetBlocker(menuOpen || newsOpen
+#if !NEXUS
+                || rateOpen
+#endif
+            );
             if (weekOpen && !WeekPlan.InGame) weekOpen = false;
-            bool want = menuOpen || weekOpen || newsOpen || Plugin.ShowOverlay.Value || ManualSave.ShowMessage || GraphicsBench.Running || (Pins.List.Count > 0 && Plugin.PinsEnabled.Value);
+            bool want = menuOpen || weekOpen || newsOpen ||
+#if !NEXUS
+                rateOpen ||
+#endif
+                Plugin.ShowOverlay.Value || ManualSave.ShowMessage || GraphicsBench.Running || (Pins.List.Count > 0 && Plugin.PinsEnabled.Value);
             if (enabled != want) enabled = want;
         }
 
-        internal bool AnyWindowOpen => menuOpen || weekOpen || newsOpen;
+        internal bool AnyWindowOpen => menuOpen || weekOpen || newsOpen
+#if !NEXUS
+            || rateOpen
+#endif
+            ;
 
         private void OnGUI()
         {
@@ -404,6 +435,13 @@ namespace GK2Tweaks
                 if (newsWin.width <= 0) newsWin = new Rect(Screen.width / scale / 2f - 380, 70, 760, 10);
                 newsWin = GUILayout.Window(NewsWindowId, newsWin, DrawNewsWindow, skinned ? "" : Labels.T("Was ist neu?", "What's new?"), windowStyle);
             }
+#if !NEXUS
+            if (rateOpen)
+            {
+                if (rateWin.width <= 0) rateWin = new Rect(Screen.width / scale / 2f - 260, 120, 520, 10);
+                rateWin = GUILayout.Window(RateWindowId, rateWin, DrawRateWindow, skinned ? "" : Labels.T("Gefällt dir der Mod?", "Enjoying the mod?"), windowStyle);
+            }
+#endif
             GUI.matrix = old;
             GUI.skin.verticalScrollbarThumb = oldThumb;
         }
@@ -651,6 +689,35 @@ namespace GK2Tweaks
             if (skinned && Event.current.type == EventType.Repaint) frameStyle.Draw(new Rect(0, 0, newsWin.width, newsWin.height), false, false, false, false);
             GUI.DragWindow(new Rect(0, 0, 10000, 40));
         }
+
+#if !NEXUS
+        // ---------- Bewertungshinweis ----------
+        private void DrawRateWindow(int id)
+        {
+            PadWindowBegin(RateWindowId);
+            if (newsStyle == null)
+            {
+                newsStyle = new GUIStyle(labelStyle) { fixedHeight = 0, wordWrap = true, richText = true, alignment = TextAnchor.UpperLeft, fontSize = 15 };
+            }
+            if (skinned) GUILayout.Label(Labels.T("Gefällt dir der Mod?", "Enjoying the mod?"), titleStyle);
+            GUILayout.Label(Labels.T(
+                "Wenn dir GK2 Vanilla+ gefällt, würde mich eine kurze Bewertung (Daumen hoch) im Steam Workshop riesig freuen – das hilft anderen, den Mod zu finden. Danke dir! ❤",
+                "If you're enjoying GK2 Vanilla+, a quick thumbs-up rating on the Steam Workshop would mean a lot – it helps other people find it. Thank you! ❤"), newsStyle);
+            GUILayout.Space(8);
+            GUILayout.BeginHorizontal();
+            if (Btn(Labels.T("👍 Jetzt bewerten", "👍 Rate it now"), buttonStyle))
+            {
+                Application.OpenURL(Plugin.WorkshopUrl);
+                CloseRate(0);
+            }
+            if (Btn(Labels.T("Später erinnern", "Remind me later"), buttonStyle)) CloseRate(6);
+            if (Btn(Labels.T("Nicht mehr fragen", "Don't ask again"), buttonStyle)) CloseRate(0);
+            GUILayout.EndHorizontal();
+            PadWindowEnd();
+            if (skinned && Event.current.type == EventType.Repaint) frameStyle.Draw(new Rect(0, 0, rateWin.width, rateWin.height), false, false, false, false);
+            GUI.DragWindow(new Rect(0, 0, 10000, 40));
+        }
+#endif
 
         // ---------- Wochenplan (F6) ----------
         private void DrawWeekWindow(int id)

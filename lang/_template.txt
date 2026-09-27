@@ -215,6 +215,9 @@ Size of the minimap. =>
 Zoom of the minimap in percent (higher = closer). => 
 Key to show or hide the minimap (empty = only in the mod menu). => 
 Internal: game version at the last start (safe mode shows a note after game updates). => 
+Internal: number of game starts (for the Steam rating prompt). => 
+Internal: session count at which the Steam rating prompt is shown next. => 
+Internal: the Steam rating prompt was answered (rated or dismissed) and won't be shown again. => 
 Write frame statistics to the BepInEx log every N seconds (0 = off). => 
 Steam Deck / battery => 
 Performance => 
@@ -252,6 +255,7 @@ ready =>
 done => 
 Unpin => 
 What's new? => 
+Enjoying the mod? => 
 Active: => 
 Game => 
 Frame rate => 
@@ -278,6 +282,10 @@ GK2 Vanilla+ was updated. Here is what changed: =>
 Version => 
 All versions => 
 Close => 
+If you're enjoying GK2 Vanilla+, a quick thumbs-up rating on the Steam Workshop would mean a lot – it helps other people find it. Thank you! ❤ => 
+👍 Rate it now => 
+Remind me later => 
+Don't ask again => 
 what's on when? => 
 · today => 
 · tomorrow => 

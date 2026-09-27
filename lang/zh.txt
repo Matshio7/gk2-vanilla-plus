@@ -335,3 +335,12 @@ The tier from the game menu. => 游戏菜单中的等级。
 (LB/RB: move) => （LB/RB：移动）
 GPU temperature => GPU 温度
 GPU temperature in °C. NVIDIA graphics cards only (AMD/Intel and the CPU temperature can't be read without an extra system driver). Not under Mac/Linux. => GPU 温度（°C）。仅限 NVIDIA 显卡（AMD/Intel 以及 CPU 温度需额外系统驱动才能读取）。Mac/Linux 不支持。
+
+Internal: number of game starts (for the Steam rating prompt). => 内部：游戏启动次数（用于 Steam 评分提示）。
+Internal: session count at which the Steam rating prompt is shown next. => 内部：下次显示 Steam 评分提示的会话计数。
+Internal: the Steam rating prompt was answered (rated or dismissed) and won't be shown again. => 内部：Steam 评分提示已被回应（已评分或已忽略），不会再次显示。
+Enjoying the mod? => 喜欢这个模组吗？
+If you're enjoying GK2 Vanilla+, a quick thumbs-up rating on the Steam Workshop would mean a lot – it helps other people find it. Thank you! ❤ => 如果你喜欢 GK2 Vanilla+，在 Steam 创意工坊给个赞对我意义重大——这能帮助更多人找到它。谢谢！❤
+👍 Rate it now => 👍 立即评分
+Remind me later => 稍后提醒我
+Don't ask again => 不再询问

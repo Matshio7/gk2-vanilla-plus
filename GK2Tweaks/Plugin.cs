@@ -13,7 +13,7 @@ namespace GK2Tweaks
     {
         public const string Guid = "mats.gk2.tweaks";
         public const string PluginName = "GK2 Tweaks";
-        public const string PluginVersion = "1.5.0";
+        public const string PluginVersion = "1.5.1";
         internal const string Keep = "Default";
 
         internal static Plugin Instance;
@@ -38,6 +38,11 @@ namespace GK2Tweaks
         internal static ConfigEntry<bool> ShowOverlay, CheckUpdates;
         internal static ConfigEntry<int> StatsLogSeconds;
         internal static ConfigEntry<string> Language, LastSeenVersion, LastGameVersion;
+#if !NEXUS
+        internal static ConfigEntry<int> RatePromptSessions, RatePromptNextAt;
+        internal static ConfigEntry<bool> RatePromptDone;
+        internal const string WorkshopUrl = "https://steamcommunity.com/sharedfiles/filedetails/?id=3808053878";
+#endif
 #if MINIMAP
         // [Minimap]
         internal static ConfigEntry<bool> MinimapEnabled;
@@ -96,6 +101,9 @@ namespace GK2Tweaks
             Application.runInBackground = !PauseInBackground.Value;
             Config.SettingChanged += OnSettingChanged;
 
+#if !NEXUS
+            RatePromptSessions.Value++;
+#endif
             Gui = gameObject.AddComponent<TweaksGui>();
             StartCoroutine(UpdateCheck.Run());
             WeekPlan.Init();
@@ -232,6 +240,11 @@ namespace GK2Tweaks
             MinimapKey = Config.Bind("Minimap", "Key", KeyboardShortcut.Empty, "Key to show or hide the minimap (empty = only in the mod menu).");
 #endif
             LastGameVersion = Config.Bind("Interface", "LastGameVersion", "", "Internal: game version at the last start (safe mode shows a note after game updates).");
+#if !NEXUS
+            RatePromptSessions = Config.Bind("Interface", "RatePromptSessions", 0, "Internal: number of game starts (for the Steam rating prompt).");
+            RatePromptNextAt = Config.Bind("Interface", "RatePromptNextAt", 3, "Internal: session count at which the Steam rating prompt is shown next.");
+            RatePromptDone = Config.Bind("Interface", "RatePromptDone", false, "Internal: the Steam rating prompt was answered (rated or dismissed) and won't be shown again.");
+#endif
             StatsLogSeconds = Config.Bind("Interface", "StatsLogSeconds", 0, new ConfigDescription(
                 "Write frame statistics to the BepInEx log every N seconds (0 = off).",
                 new AcceptableValueList<int>(0, 5, 10, 30, 60)));
@@ -283,6 +296,9 @@ namespace GK2Tweaks
             SafeMode.Run("Minimap", Minimap.Tick);
 #endif
             NewsTick();
+#if !NEXUS
+            RateTick();
+#endif
             Gui.Tick(dt);
 
             if (StatsLogSeconds.Value > 0)
@@ -325,6 +341,23 @@ namespace GK2Tweaks
             if (SafeMode.NoticePending) { SafeMode.NoticePending = false; ManualSave.Toast(SafeMode.UpdateNotice(), 10f); }
             if (Changelog.ShouldAutoShow()) Gui.ShowNews(true);
         }
+
+#if !NEXUS
+        private bool rateChecked;
+
+        // Bewertungshinweis: nach ein paar Spielsitzungen, nie zusammen mit "Was ist neu?" oder einem anderen Mod-Fenster
+        private void RateTick()
+        {
+            if (rateChecked || BenchOn) return;
+            if (RatePromptDone.Value || RatePromptSessions.Value < RatePromptNextAt.Value) return;
+            MainGame mg = MainGame.Instance;
+            if (mg == null || mg.gameState != MainGame.GameState.MainMenu) return;
+            if (menuSince < 0f || Time.realtimeSinceStartup - menuSince < 6f) return;
+            if (Gui.AnyWindowOpen) return; // z.B. "Was ist neu?" ist offen -> naechste Sitzung erneut versuchen
+            rateChecked = true;
+            Gui.ShowRatePrompt();
+        }
+#endif
 
         internal static void ReapplyGraphics()
         {

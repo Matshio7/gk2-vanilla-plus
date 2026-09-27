@@ -335,3 +335,12 @@ The tier from the game menu. => Уровень из меню игры.
 (LB/RB: move) => (LB/RB: переместить)
 GPU temperature => Температура GPU
 GPU temperature in °C. NVIDIA graphics cards only (AMD/Intel and the CPU temperature can't be read without an extra system driver). Not under Mac/Linux. => Температура GPU в °C. Только видеокарты NVIDIA (AMD/Intel и температуру CPU нельзя прочитать без дополнительного системного драйвера). Не на Mac/Linux.
+
+Internal: number of game starts (for the Steam rating prompt). => Внутреннее: количество запусков игры (для запроса оценки в Steam).
+Internal: session count at which the Steam rating prompt is shown next. => Внутреннее: количество сессий, после которого снова появится запрос оценки в Steam.
+Internal: the Steam rating prompt was answered (rated or dismissed) and won't be shown again. => Внутреннее: на запрос оценки в Steam уже ответили (оценили или отклонили), больше не появится.
+Enjoying the mod? => Нравится мод?
+If you're enjoying GK2 Vanilla+, a quick thumbs-up rating on the Steam Workshop would mean a lot – it helps other people find it. Thank you! ❤ => Если вам нравится GK2 Vanilla+, короткая оценка «палец вверх» в Steam Workshop очень помогла бы – это помогает другим найти мод. Спасибо! ❤
+👍 Rate it now => 👍 Оценить сейчас
+Remind me later => Напомнить позже
+Don't ask again => Больше не спрашивать

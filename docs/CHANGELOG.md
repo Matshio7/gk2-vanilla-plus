@@ -1,5 +1,15 @@
 # Changelog
 
+## 1.5.1 – 2026-09-27
+
+**EN**
+- New: the main menu now also shows the mod's version number next to "modded"
+- New: a small one-time popup asks (after a few play sessions) if you'd like to leave a rating on the Steam Workshop – with "Rate it now", "Remind me later" and "Don't ask again"
+
+**DE**
+- Neu: Im Hauptmenü steht jetzt auch die Versionsnummer des Mods neben "modded"
+- Neu: Ein kleines, einmaliges Fenster fragt (nach ein paar Spielsitzungen) nach einer Bewertung im Steam Workshop – mit „Jetzt bewerten“, „Später erinnern“ und „Nicht mehr fragen“
+
 ## 1.5.0 – 2026-09-27
 
 **EN**

@@ -96,7 +96,7 @@ namespace GK2Tweaks
             Traverse text = Traverse.Create(__instance).Field("versionLabel").Property("text");
             string t = text.GetValue<string>();
             if (t == null || t.Contains("modded")) return;
-            string add = "  <color=#8fd18f>· modded · GK2 Vanilla+ by McFly7</color>";
+            string add = "  <color=#8fd18f>· modded · GK2 Vanilla+ " + Plugin.PluginVersion + " by McFly7</color>";
             if (UpdateCheck.Available) add += "  <color=#ffd27f>· Update " + UpdateCheck.Latest + " (F9)</color>";
             text.SetValue(t + add);
         }

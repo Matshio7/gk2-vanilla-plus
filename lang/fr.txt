@@ -335,3 +335,12 @@ The tier from the game menu. => Le niveau du menu du jeu.
 (LB/RB: move) => (LB/RB : déplacer)
 GPU temperature => Température GPU
 GPU temperature in °C. NVIDIA graphics cards only (AMD/Intel and the CPU temperature can't be read without an extra system driver). Not under Mac/Linux. => Température du GPU en °C. Cartes NVIDIA uniquement (AMD/Intel et la température du CPU ne peuvent pas être lues sans pilote système supplémentaire). Pas sous Mac/Linux.
+
+Internal: number of game starts (for the Steam rating prompt). => Interne : nombre de démarrages du jeu (pour la demande d'évaluation Steam).
+Internal: session count at which the Steam rating prompt is shown next. => Interne : nombre de sessions auquel la demande d'évaluation Steam sera affichée à nouveau.
+Internal: the Steam rating prompt was answered (rated or dismissed) and won't be shown again. => Interne : la demande d'évaluation Steam a reçu une réponse (évalué ou ignoré) et ne sera plus affichée.
+Enjoying the mod? => Le mod vous plaît ?
+If you're enjoying GK2 Vanilla+, a quick thumbs-up rating on the Steam Workshop would mean a lot – it helps other people find it. Thank you! ❤ => Si GK2 Vanilla+ vous plaît, un petit pouce levé sur le Steam Workshop me ferait très plaisir – cela aide d'autres joueurs à le trouver. Merci ! ❤
+👍 Rate it now => 👍 Évaluer maintenant
+Remind me later => Me le rappeler plus tard
+Don't ask again => Ne plus demander
