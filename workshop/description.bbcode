@@ -4,29 +4,34 @@
 [i]The game stays vanilla: no gameplay changes, no game files touched, saves stay compatible.[/i]
 [b]English[/b] · [b]Deutsch weiter unten[/b]
 
-[h2]New in 1.4[/h2]
+[h2]Installation guide & FAQ[/h2]
+Full step-by-step install instructions for Windows/Mac/Linux and a complete FAQ are pinned in the [b]Discussions[/b] tab above. Found a bug? Please post it there too (attach [i]BepInEx\LogOutput.log[/i]) instead of only commenting – it's much easier to track and fix.
+
+[h2]New in 1.5[/h2]
 [list]
-[*][b]Pin recipes, blueprints, quests[/b] – mouse or controller (both sticks), saved per save
-[*][b]Save overview[/b] in the main menu, [b]Mods button[/b] in main and pause menu
-[*][b]Graphics benchmark[/b] with score and recommendation
-[*][b]Camera[/b]: zoom presets (F5), zoom indoors, mouse-wheel zoom
-[*][b]Screenshots[/b] (F12) in up to 4× resolution without HUD
-[*][b]6 languages[/b], high contrast, adjustable UI size, "What's new" after updates
-[*]Week plan, daily reminder, save backups, hide HUD, in-game time in the FPS display
+[*][b]Safe mode[/b] – after a game update the mod checks everything it relies on. If something changed, only that feature is switched off (with a note in the mod menu) instead of causing errors – the rest keeps working
+[*][b]Full controller support for the mod menu[/b] – D-pad/stick to navigate, A to confirm, B/Start to close
+[*][b]One-click profiles[/b] – Steam Deck/Battery, Performance, Quality, Game default
+[*][b]HUD to the center[/b] (ultrawide, optional) – HUD, area name, NPC window and mod displays move into the 16:9 middle area
+[*][b]FPS display[/b] – custom order of values, optional separator, GPU temperature (NVIDIA)
+[*]Pins: optional all-chests counting, ready notification with sound, auto-unpin on craft
+[*]Fix: pins and FPS display no longer cover the NPC reputation window
 [/list]
 
 [h2]Highlights[/h2]
 [list]
-[*][b]Ultrawide 21:9 / 32:9[/b] – 2560×1080, 3440×1440, 3840×1080, 5120×1440 and more. The main menu fills the whole screen, rain and snow cover the full width.
-[*][b]More FPS on any PC[/b] – the mod menu ([b]F9[/b] or [b]Mods[/b]) exposes hidden graphics switches: shadows, ambient occlusion, point lights, back light, water, clouds, render mode. Plus FPS cap / VSync and physics rate. Great for laptops, handhelds and Macs.
-[*][b]Graphics benchmark[/b] – one click tests all graphics tiers and recommends one. Your settings stay untouched.
-[*][b]Pinning[/b] – recipes, blueprints, town buildings, blockages and quests. The list shows have / need per ingredient or the current quest task.
-[*][b]Week plan[/b] ([b]F6[/b]) and a daily reminder – what's on which weekday. Spoiler-free: only what you have unlocked.
-[*][b]FPS display[/b] ([b]F10[/b]) – corner and contents selectable: FPS, 1% low, CPU, GPU, RAM, VRAM, clock, in-game weekday and time.
-[*][b]Saves & backups[/b] – save overview in the main menu, automatic backups (outside Steam Cloud) with one-click restore, "Save now", extra autosave.
-[*][b]Camera & screenshots[/b] – zoom presets, zoom indoors, mouse wheel; hi-res screenshots.
-[*][b]Hide HUD[/b] ([b]F7[/b]), OLED black, pause in background, skip intro logos.
-[*]Mod menu in the game's own look: English, German, French, Spanish, Russian, Chinese (more via a text file). One-click updates.
+[*][b]100% vanilla[/b] – no gameplay changes, no game files touched, fully save-compatible, can be removed anytime
+[*][b]Ultrawide 21:9 / 32:9[/b] – 2560×1080, 3440×1440, 3840×1080, 5120×1440 and more. Main menu, HUD and full-width rain/snow all covered.
+[*][b]More FPS on any PC[/b] – hidden graphics switches (shadows, ambient occlusion, lights, water, clouds, render mode), FPS cap/VSync, physics rate, and one-click Steam Deck/Performance/Quality profiles
+[*][b]Graphics benchmark[/b] – one click tests all graphics tiers and recommends one, your settings stay untouched
+[*][b]Pinning[/b] – recipes, blueprints, town buildings, blockages and quests, with have/need per ingredient (optionally counting all chests on the map). Mouse or controller (both sticks).
+[*][b]Full controller support[/b] – the entire mod menu can be navigated with a gamepad, no mouse/keyboard needed
+[*][b]Week plan[/b] and a daily reminder – what's on which weekday, spoiler-free (only unlocked content)
+[*][b]FPS display[/b] – custom order and separator, FPS/1% low/CPU/GPU/RAM/VRAM/clock/GPU temp/weekday/in-game time
+[*][b]Saves & backups[/b] – save overview in the main menu, automatic backups with one-click restore, extra autosave
+[*][b]Camera & screenshots[/b] – zoom presets, zoom indoors, mouse wheel; hi-res screenshots up to 4×
+[*][b]OLED black, hide HUD, HUD to center, pause in background, skip intro logos[/b]
+[*]Mod menu in the game's own look, 6 languages (EN/DE/FR/ES/RU/ZH), one-click updates
 [/list]
 
 [h2]Install (Windows)[/h2]
@@ -37,33 +42,50 @@
 [*]Start the game, press [b]F9[/b] or click [b]Mods[/b].
 [/olist]
 Includes BepInEx 5.4.23.5. [b]Updates:[/b] mod menu → [b]Save & update[/b]. [b]Uninstall:[/b] Installieren.bat → [b]Uninstall[/b].
-[b]Mac (CrossOver) / Linux (Proton):[/b] copy [i]installer\files[/i] into the game folder, DLL override [i]winhttp=n,b[/i].
+[b]Mac (CrossOver) / Linux (Proton):[/b] see the detailed step-by-step guide pinned in the Discussions tab.
 
 [h2]Mod packs & license[/h2]
 You may include GK2 Vanilla+ [b]unmodified[/b] in free mod packs, with credit ("GK2 Vanilla+ by McFly7"). Modifying it, re-uploading it as your own or removing credits is not allowed.
-Source & releases: [url=https://github.com/Matshio7/gk2-vanilla-plus]github.com/Matshio7/gk2-vanilla-plus[/url] · Problems? Comment and attach [i]BepInEx\LogOutput.log[/i].
+Source & releases: [url=https://github.com/Matshio7/gk2-vanilla-plus]github.com/Matshio7/gk2-vanilla-plus[/url] · Problems? Post in the Discussions tab and attach [i]BepInEx\LogOutput.log[/i].
 Pinning, daily reminder and full-width rain inspired by "Recipe Pin" (farfars), "Daily Reminder" (MrsKiraSayers) and "GK2 Ultrawide Rain Fix" (Dry Bones) – own implementation.
 
 [hr][/hr]
 
 [h1]Deutsch[/h1]
-[i]Das Spiel bleibt Vanilla: kein anderes Gameplay, keine Spieldateien verändert, Spielstände bleiben kompatibel.[/i]
+[i]Das Spiel bleibt zu 100% Vanilla: kein anderes Gameplay, keine Spieldateien verändert, Spielstände bleiben kompatibel, jederzeit entfernbar.[/i]
+
+[h2]Anleitung & FAQ[/h2]
+Eine ausführliche Installationsanleitung für Windows/Mac/Linux sowie ein komplettes FAQ findest du angepinnt im [b]Diskussionen[/b]-Tab oben. Einen Bug gefunden? Bitte dort posten (mit [i]BepInEx\LogOutput.log[/i]) statt nur im Kommentar – lässt sich so viel besser nachverfolgen und fixen.
+
+[h2]Neu in 1.5[/h2]
+[list]
+[*][b]Sicherer Modus[/b] – nach einem Spiel-Update prüft der Mod alles, worauf er zugreift; nur betroffene Funktionen werden abgeschaltet, der Rest läuft weiter
+[*][b]Volle Controller-Bedienung des Mod-Menüs[/b]
+[*][b]Ein-Klick-Profile[/b] – Steam Deck/Akku, Leistung, Qualität, Spiel-Standard
+[*][b]HUD zur Mitte[/b] (Ultrawide, optional)
+[*][b]FPS-Anzeige[/b] – eigene Reihenfolge, Trennzeichen, GPU-Temperatur (NVIDIA)
+[*]Pins: optional alle Truhen zählen, Meldung mit Ton, Auto-Lösen beim Herstellen
+[*]Fix: Pins und FPS-Anzeige verdecken das Ansehen-Fenster der Haupt-NPCs nicht mehr
+[/list]
 
 [h2]Highlights[/h2]
 [list]
-[*][b]Ultrawide 21:9 / 32:9[/b] – Hauptmenü füllt den ganzen Bildschirm, Regen und Schnee über die ganze Breite.
-[*][b]Mehr FPS[/b] – versteckte Grafik-Schalter im Mod-Menü ([b]F9[/b] oder [b]Mods[/b]), FPS-Limit/VSync, Physik-Takt.
-[*][b]Grafik-Benchmark[/b] mit Score und Empfehlung.
-[*][b]Anpinnen[/b] – Rezepte, Baupläne, Stadtgebäude, Hindernisse und Quests, pro Spielstand gespeichert; Controller: beide Sticks.
-[*][b]Wochenplan[/b] ([b]F6[/b]) und Tagesübersicht am Morgen – spoilerfrei.
-[*][b]FPS-Anzeige[/b] ([b]F10[/b]) – Ecke und Inhalt wählbar, auch Wochentag und Uhrzeit im Spiel.
-[*][b]Spielstände[/b] – Übersicht im Hauptmenü, Backups mit Wiederherstellen per Klick, „Jetzt speichern“, Autosave.
-[*][b]Kamera & Screenshots[/b] – Zoom-Stufen (F5), Innenraum-Zoom, Mausrad-Zoom; F12 für Screenshots bis 4-fache Auflösung.
-[*][b]HUD ausblenden[/b] ([b]F7[/b]), OLED-Schwarz, 6 Sprachen, hoher Kontrast, einstellbare Größe, Updates mit einem Klick.
+[*][b]100% Vanilla[/b] – kein anderes Gameplay, keine Spieldateien verändert, spielstand-kompatibel
+[*][b]Ultrawide 21:9 / 32:9[/b] – Hauptmenü, HUD und Regen/Schnee über die ganze Breite
+[*][b]Mehr FPS[/b] – versteckte Grafik-Schalter, FPS-Limit/VSync, Physik-Takt, Ein-Klick-Profile
+[*][b]Grafik-Benchmark[/b] mit Score und Empfehlung
+[*][b]Anpinnen[/b] – Rezepte, Baupläne, Stadtgebäude, Hindernisse, Quests; Maus oder Controller (beide Sticks)
+[*][b]Volle Controller-Bedienung[/b] des gesamten Mod-Menüs
+[*][b]Wochenplan[/b] und Tagesübersicht – spoilerfrei
+[*][b]FPS-Anzeige[/b] – frei wählbare Reihenfolge, GPU-Temperatur, Wochentag und Uhrzeit im Spiel
+[*][b]Spielstände[/b] – Übersicht im Hauptmenü, automatische Backups mit Wiederherstellen per Klick
+[*][b]Kamera & Screenshots[/b] bis 4-fache Auflösung
+[*][b]OLED-Schwarz, HUD ausblenden, HUD zur Mitte, 6 Sprachen, Updates mit einem Klick[/b]
 [/list]
 
 [h2]Installation (Windows)[/h2]
 [b]Abonnieren[/b] → Item-Ordner [i]steamapps\workshop\content\4358690\<ID>[/i] öffnen → [b]Installieren.bat[/b] doppelklicken → [b]Installieren[/b]. Im Spiel [b]F9[/b] drücken oder [b]Mods[/b] klicken.
+[b]Mac/Linux:[/b] ausführliche Anleitung im Diskussionen-Tab.
 
 Weitergabe in kostenlosen Modpacks [b]unverändert[/b] und mit Namensnennung erlaubt, Verändern nicht. Details: [url=https://github.com/Matshio7/gk2-vanilla-plus/blob/main/LICENSE.md]LICENSE[/url]
 
