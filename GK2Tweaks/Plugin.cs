@@ -49,7 +49,7 @@ namespace GK2Tweaks
         internal static ConfigEntry<string> OvCorner, OvLayout, PinsCorner, PinsSize, OvOrder, OvSeparator;
         internal static ConfigEntry<bool> PinsEnabled, PinsNotify, PinsAutoUnpin;
         internal static ConfigEntry<string> PinsChests;
-        internal static ConfigEntry<bool> OvFps, OvLows, OvFrameTime, OvCpu, OvGpu, OvRam, OvVram, OvResolution, OvClock, OvWeekday, OvGameTime;
+        internal static ConfigEntry<bool> OvGpuTemp, OvFps, OvLows, OvFrameTime, OvCpu, OvGpu, OvRam, OvVram, OvResolution, OvClock, OvWeekday, OvGameTime;
 #if DEV
         // [Benchmark] – nur fuer Messlaeufe (Dev-Build)
         internal static ConfigEntry<bool> BenchEnabled, BenchMenuShot;
@@ -205,6 +205,7 @@ namespace GK2Tweaks
             OvFrameTime = Config.Bind("Overlay", "FrameTime", false, "Frame time in ms (average and slowest frame).");
             OvCpu = Config.Bind("Overlay", "Cpu", false, "CPU load of the game (100 % = all cores busy).");
             OvGpu = Config.Bind("Overlay", "Gpu", false, "GPU load (3D engine, like Task Manager). Windows only.");
+            OvGpuTemp = Config.Bind("Overlay", "GpuTemp", false, "GPU temperature in °C. NVIDIA graphics cards only (AMD/Intel and the CPU temperature can't be read without an extra system driver). Not under Mac/Linux.");
             OvRam = Config.Bind("Overlay", "Ram", false, "RAM used by the game / installed RAM.");
             OvVram = Config.Bind("Overlay", "Vram", false, "Video memory used by the game's textures and buffers / GPU memory.");
             OvResolution = Config.Bind("Overlay", "Resolution", false, "Current render resolution.");

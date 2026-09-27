@@ -333,3 +333,5 @@ Profile => 配置
 Sets several options at once. Everything stays adjustable afterwards. => 一次设置多个选项，之后仍可单独调整。
 The tier from the game menu. => 游戏菜单中的等级。
 (LB/RB: move) => （LB/RB：移动）
+GPU temperature => GPU 温度
+GPU temperature in °C. NVIDIA graphics cards only (AMD/Intel and the CPU temperature can't be read without an extra system driver). Not under Mac/Linux. => GPU 温度（°C）。仅限 NVIDIA 显卡（AMD/Intel 以及 CPU 温度需额外系统驱动才能读取）。Mac/Linux 不支持。

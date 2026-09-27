@@ -101,7 +101,7 @@ namespace GK2Tweaks
             if (menuOpen && capturingKey == null && Input.GetKeyDown(KeyCode.Escape)) SetMenu(false);
             else if (newsOpen && Input.GetKeyDown(KeyCode.Escape)) CloseNews();
             UpdateEnabled();
-            OverlayStats.Configure(Plugin.ShowOverlay.Value, Plugin.OvCpu.Value, Plugin.OvGpu.Value, Plugin.OvRam.Value, Plugin.OvVram.Value, Plugin.OvFrameTime.Value);
+            OverlayStats.Configure(Plugin.ShowOverlay.Value, Plugin.OvCpu.Value, Plugin.OvGpu.Value, Plugin.OvRam.Value, Plugin.OvVram.Value, Plugin.OvFrameTime.Value, Plugin.OvGpuTemp.Value);
             if (!enabled) return;
             stats.Add(dt);
             float now = Time.realtimeSinceStartup;
@@ -130,6 +130,7 @@ namespace GK2Tweaks
                 else if (OverlayStats.GpuFrameMs > 0) val["Gpu"] = $"GPU {OverlayStats.GpuFrameMs:0.0} ms";
                 else val["Gpu"] = "GPU n/a";
             }
+            if (Plugin.OvGpuTemp.Value) val["GpuTemp"] = OverlayStats.GpuTemp > 0 ? $"GPU {OverlayStats.GpuTemp:0} °C" : "GPU °C n/a";
             if (Plugin.OvRam.Value)
             {
                 long ram = OverlayStats.RamUsed;
@@ -189,6 +190,9 @@ namespace GK2Tweaks
             float ins = GK2Tweaks.HudCenter.Inset(scale);
             float x = c.EndsWith("Right") ? w - size.x - m - ins : m + ins;
             float y = c.StartsWith("Top") ? TopFor(c) : h - size.y - m;
+            Rect npc = NpcWidgetRect(scale);
+            if (npc.width > 0 && npc.Overlaps(new Rect(x, y, size.x, size.y)))
+                y = c.StartsWith("Top") ? npc.yMax + 6f : npc.y - 6f - size.y;
             var r = new Rect(x, y, size.x, size.y);
             GUI.Label(r, content, overlayStyle);
             return r;
@@ -405,6 +409,7 @@ namespace GK2Tweaks
         }
 
         private GUIStyle warnStyle;
+        private float footHeight;
 
         private void DrawWindow(int id)
         {
@@ -538,11 +543,17 @@ namespace GK2Tweaks
                 tipStyle = new GUIStyle(smallStyle) { fontSize = Plugin.HighContrast.Value ? 17 : 15, wordWrap = true };
                 tipStyle.normal.textColor = Plugin.HighContrast.Value ? Color.white : new Color(0.86f, 0.82f, 0.74f);
             }
-            GUILayout.Label(string.IsNullOrEmpty(foot) ? " " : foot, tipStyle, GUILayout.Height(Plugin.HighContrast.Value ? 60 : 48));
+            // Hoehe passend zum Text (mind. 3 Zeilen), damit lange Erklaerungen nicht abgeschnitten werden
+            var footContent = new GUIContent(string.IsNullOrEmpty(foot) ? " " : foot);
+            float footH = Mathf.Max(tipStyle.lineHeight * 3f + 6f, tipStyle.CalcHeight(footContent, win.width - 40f) + 6f);
+            if (Event.current.type == EventType.Layout) footHeight = Mathf.Max(footHeight, footH);
+            GUILayout.Label(footContent, tipStyle, GUILayout.Height(footHeight));
             PadWindowEnd();
             if (skinned && Event.current.type == EventType.Repaint) frameStyle.Draw(new Rect(0, 0, win.width, win.height), false, false, false, false);
             GUI.DragWindow(new Rect(0, 0, 10000, 40));
         }
+
+        private GUIStyle wineInfoStyle;
 
         // Nur unter Wine/CrossOver sichtbar: Controller-Fix (Registry-Schalter in der Wine-Umgebung)
         private void DrawWineFix()
@@ -556,6 +567,14 @@ namespace GK2Tweaks
             bool on = WineFix.Enabled;
             if (Btn(on ? Labels.T("An", "On") : Labels.T("Aus", "Off"), buttonStyle, GUILayout.Width(310))) WineFix.Enabled = !on;
             GUILayout.EndHorizontal();
+            if (wineInfoStyle == null) wineInfoStyle = new GUIStyle(smallStyle) { wordWrap = true };
+            GUILayout.Label(Labels.T(
+                "Wofür? Mit PlayStation-Controllern (DualSense, DualShock 4) ruckelt das Spiel unter CrossOver/Wine oft spürbar, obwohl die FPS hoch sind. Grund: Wine liest diese Controller standardmäßig über einen aufwendigen Rohdaten-Weg (hidraw), der pro Bild mehrere Millisekunden kostet.\n" +
+                "Was passiert? Der Schalter setzt in der Wine-Registry den Wert „DisableHidraw“. Wine liest den Controller dann über den normalen, sparsamen Weg – Tasten und Sticks funktionieren wie gewohnt; nur Sonderfunktionen wie Touchpad-Klick, Lichtleiste oder adaptive Trigger können wegfallen.\n" +
+                "Wann einschalten? Wenn du mit PlayStation-Controller spielst und es ruckelt. Mit Xbox- oder anderen Controllern ist er nicht nötig. Er gilt für die ganze CrossOver-Flasche bzw. das Proton-Prefix und lässt sich jederzeit wieder ausschalten.",
+                "What for? With PlayStation controllers (DualSense, DualShock 4) the game often stutters noticeably under CrossOver/Wine even though the FPS are high. Reason: by default Wine reads these controllers through an expensive raw-data path (hidraw) that costs several milliseconds per frame.\n" +
+                "What does it do? The switch sets the value \"DisableHidraw\" in the Wine registry. Wine then reads the controller through the normal, cheaper path – buttons and sticks work as usual; only extras like touchpad click, light bar or adaptive triggers may stop working.\n" +
+                "When to turn it on? If you play with a PlayStation controller and the game stutters. Not needed for Xbox or other controllers. It applies to the whole CrossOver bottle / Proton prefix and can be turned off again at any time."), wineInfoStyle);
             if (WineFix.Pending)
                 GUILayout.Label(Labels.T("Wirkt nach Neustart: Spiel UND Steam beenden (bzw. die CrossOver-Flasche neu starten).",
                     "Applies after a restart: quit the game AND Steam (or restart the CrossOver bottle)."), smallStyle);

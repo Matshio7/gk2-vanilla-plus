@@ -74,6 +74,7 @@ Language =>
 Position => 
 Separator => 
 HUD to the center (ultrawide) => 
+GPU temperature => 
 Counts => 
 Notify when ready => 
 Unpin after crafting => 
@@ -195,6 +196,7 @@ Frames per second (average over 0.5 s). =>
 Frame time in ms (average and slowest frame). => 
 CPU load of the game (100 % = all cores busy). => 
 GPU load (3D engine, like Task Manager). Windows only. => 
+GPU temperature in °C. NVIDIA graphics cards only (AMD/Intel and the CPU temperature can't be read without an extra system driver). Not under Mac/Linux. => 
 RAM used by the game => 
 Video memory used by the game's textures and buffers => 
 Current render resolution. => 

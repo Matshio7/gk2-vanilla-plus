@@ -10,6 +10,9 @@
 - New: **one-click profiles** in the mod menu – "Steam Deck / battery", "Performance", "Quality" and "Game default"
 - New: **HUD to the center** (ultrawide, optional) – HUD, area name, NPC window and the mod displays move into the 16:9 area in the middle
 - New: pins – optional counting of **all chests on the map**, a **short message with sound** when a pinned item is ready, and **automatic unpinning** when you start crafting it
+- New: FPS display can show the **GPU temperature** (NVIDIA graphics cards)
+- Fix: the FPS display no longer covers the reputation window of the main NPCs either
+- Mod menu: longer explanations at the bottom are no longer cut off; the Mac/Linux controller fix is explained in detail
 
 **DE**
 - Neu: **Sicherer Modus** – nach einem Spiel-Update prüft der Mod alles, worauf er zugreift. Hat sich etwas geändert, wird nur die betroffene Funktion abgeschaltet (mit Hinweis im Mod-Menü), statt Fehler zu verursachen – der Rest läuft weiter. Funktionen, die wiederholt Fehler werfen, werden ebenfalls automatisch abgeschaltet.
@@ -19,6 +22,9 @@
 - Neu: **Ein-Klick-Profile** im Mod-Menü – „Steam Deck / Akku“, „Leistung“, „Qualität“ und „Spiel-Standard“
 - Neu: **HUD zur Mitte** (Ultrawide, optional) – HUD, Gebietsname, NPC-Fenster und die Mod-Anzeigen rücken in den 16:9-Bereich in der Mitte
 - Neu: Pins – optional **alle Truhen auf der Karte** mitzählen, **kurze Meldung mit Ton**, wenn ein Pin fertig ist, und **automatisch lösen**, sobald du das Rezept herstellst
+- Neu: FPS-Anzeige kann die **GPU-Temperatur** zeigen (NVIDIA-Grafikkarten)
+- Fix: Auch die FPS-Anzeige verdeckt das Ansehen-Fenster der Haupt-NPCs nicht mehr
+- Mod-Menü: lange Erklärungen unten werden nicht mehr abgeschnitten; der Controller-Fix für Mac/Linux ist ausführlich erklärt
 
 ## 1.4.3 – 2026-09-27
 

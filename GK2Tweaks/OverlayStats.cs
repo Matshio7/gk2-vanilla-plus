@@ -14,10 +14,12 @@ namespace GK2Tweaks
         internal static volatile float CpuPercent = -1f;   // Prozess-CPU, normiert auf alle Kerne
         internal static volatile float GpuPercent = -1f;   // GPU-Last 3D (Windows-Leistungsindikatoren), -1 = nicht verfuegbar
         internal static long RamBytes = -1;                // Arbeitsspeicher des Spiels
+        internal static volatile float GpuTemp = -1f;      // GPU-Temperatur in °C (NVIDIA, NVML), -1 = nicht verfuegbar
         internal static double GpuFrameMs = -1, CpuFrameMs = -1;
 
         private static Thread thread;
-        private static volatile bool wantCpu, wantGpu, wantRam, wantVram, running;
+        private static bool tempFailed;
+        private static volatile bool wantCpu, wantGpu, wantRam, wantVram, wantTemp, running;
         private static ProfilerRecorder gfxRecorder;
         private static bool frameTimingChecked, frameTimingOn;
         private static readonly FrameTiming[] timings = new FrameTiming[1];
@@ -37,13 +39,14 @@ namespace GK2Tweaks
             }
         }
 
-        internal static void Configure(bool active, bool cpu, bool gpu, bool ram, bool vram, bool frameTime)
+        internal static void Configure(bool active, bool cpu, bool gpu, bool ram, bool vram, bool frameTime, bool temp)
         {
+            wantTemp = active && temp;
             wantCpu = active && cpu;
             wantGpu = active && gpu;
             wantRam = active && ram;
             wantVram = active && vram;
-            bool needThread = wantCpu || wantGpu || wantRam || wantVram;
+            bool needThread = wantCpu || wantGpu || wantRam || wantVram || wantTemp;
             if (wantRam && !sysRecorder.Valid) { try { sysRecorder = ProfilerRecorder.StartNew(ProfilerCategory.Memory, "System Used Memory"); } catch { } }
             else if (!wantRam && sysRecorder.Valid) sysRecorder.Dispose();
             if (needThread && !running)
@@ -91,6 +94,7 @@ namespace GK2Tweaks
             Pdh gpu = null;
             Dxgi dxgi = null;
             bool dxgiFailed = false;
+            tempFailed = false;
             int cores = Math.Max(1, Environment.ProcessorCount);
             while (running)
             {
@@ -122,6 +126,11 @@ namespace GK2Tweaks
                             else dxgiFailed = true;
                         }
                         catch (Exception e) { dxgiFailed = true; Plugin.Log.LogInfo("Overlay: DXGI VRAM query not available (" + e.Message + ")"); }
+                    }
+                    if (wantTemp && !tempFailed && !WineFix.IsWine)
+                    {
+                        try { GpuTemp = Nvml.Temperature(); }
+                        catch (Exception e) { tempFailed = true; GpuTemp = -1f; Plugin.Log.LogInfo("Overlay: GPU temperature not available (" + e.GetType().Name + ")"); }
                     }
                     if (wantGpu && !WineFix.IsWine)
                     {
@@ -254,6 +263,27 @@ namespace GK2Tweaks
                 if (query != IntPtr.Zero) PdhCloseQuery(query);
                 query = IntPtr.Zero;
             }
+        }
+    }
+
+    // GPU-Temperatur ueber die NVIDIA-Treiberbibliothek (nvml.dll, liegt bei jedem NVIDIA-Treiber in System32).
+    // AMD/Intel liefern ohne eigenen Treiberzugriff keine Temperatur; CPU-Temperatur braucht unter Windows einen Kernel-Treiber.
+    internal static class Nvml
+    {
+        [DllImport("nvml.dll")] private static extern int nvmlInit_v2();
+        [DllImport("nvml.dll")] private static extern int nvmlDeviceGetHandleByIndex_v2(uint index, out IntPtr device);
+        [DllImport("nvml.dll")] private static extern int nvmlDeviceGetTemperature(IntPtr device, int sensor, out uint temp);
+        private static bool init;
+        private static IntPtr dev;
+
+        internal static float Temperature()
+        {
+            if (!init)
+            {
+                if (nvmlInit_v2() != 0 || nvmlDeviceGetHandleByIndex_v2(0, out dev) != 0) throw new InvalidOperationException("NVML init failed");
+                init = true;
+            }
+            return nvmlDeviceGetTemperature(dev, 0, out uint t) == 0 ? t : -1f;
         }
     }
 }

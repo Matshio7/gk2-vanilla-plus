@@ -6,7 +6,7 @@ namespace GK2Tweaks
     // Reihenfolge der Werte in der FPS-Anzeige (Config "Overlay/Order", im Mod-Menue per Pfeil verschiebbar)
     internal static class OverlayOrder
     {
-        internal const string Default = "Fps,Lows,FrameTime,Cpu,Gpu,Ram,Vram,Resolution,Clock,Weekday,GameTime";
+        internal const string Default = "Fps,Lows,FrameTime,Cpu,Gpu,GpuTemp,Ram,Vram,Resolution,Clock,Weekday,GameTime";
         private static readonly string[] all = Default.Split(',');
         private static string cachedRaw;
         private static List<string> cached;
@@ -20,6 +20,7 @@ namespace GK2Tweaks
                 case "FrameTime": return Plugin.OvFrameTime;
                 case "Cpu": return Plugin.OvCpu;
                 case "Gpu": return Plugin.OvGpu;
+                case "GpuTemp": return Plugin.OvGpuTemp;
                 case "Ram": return Plugin.OvRam;
                 case "Vram": return Plugin.OvVram;
                 case "Resolution": return Plugin.OvResolution;
@@ -41,7 +42,12 @@ namespace GK2Tweaks
                 string k = p.Trim();
                 if (System.Array.IndexOf(all, k) >= 0 && !list.Contains(k)) list.Add(k);
             }
-            foreach (string k in all) if (!list.Contains(k)) list.Add(k);
+            for (int i = 0; i < all.Length; i++)
+            {
+                if (list.Contains(all[i])) continue;
+                int after = i > 0 ? list.IndexOf(all[i - 1]) : -1;
+                list.Insert(after + 1, all[i]);
+            }
             cachedRaw = raw;
             cached = list;
             return list;

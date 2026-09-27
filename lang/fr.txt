@@ -333,3 +333,5 @@ Profile => Profil
 Sets several options at once. Everything stays adjustable afterwards. => Règle plusieurs options d'un coup. Tout reste modifiable ensuite.
 The tier from the game menu. => Le niveau du menu du jeu.
 (LB/RB: move) => (LB/RB : déplacer)
+GPU temperature => Température GPU
+GPU temperature in °C. NVIDIA graphics cards only (AMD/Intel and the CPU temperature can't be read without an extra system driver). Not under Mac/Linux. => Température du GPU en °C. Cartes NVIDIA uniquement (AMD/Intel et la température du CPU ne peuvent pas être lues sans pilote système supplémentaire). Pas sous Mac/Linux.
