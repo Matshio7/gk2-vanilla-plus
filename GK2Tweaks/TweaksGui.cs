@@ -133,8 +133,16 @@ namespace GK2Tweaks
             safeNoticeSnap = SafeMode.MenuNotice();
             PadTick();
             RunPendingReopen();
-            if (menuOpen && capturingKey == null && Input.GetKeyDown(KeyCode.Escape)) SetMenu(false);
-            else if (newsOpen && Input.GetKeyDown(KeyCode.Escape)) CloseNews();
+            // Esc schliesst immer das oberste Fenster (gleiche Reihenfolge wie B am Controller)
+            if (capturingKey == null && Input.GetKeyDown(KeyCode.Escape))
+            {
+#if !NEXUS
+                if (rateOpen) CloseRate(6);
+                else
+#endif
+                if (newsOpen) CloseNews();
+                else if (menuOpen) SetMenu(false);
+            }
             UpdateEnabled();
             OverlayStats.Configure(Plugin.ShowOverlay.Value, Plugin.OvCpu.Value, Plugin.OvGpu.Value, Plugin.OvRam.Value, Plugin.OvVram.Value, Plugin.OvFrameTime.Value, Plugin.OvGpuTemp.Value);
             if (!enabled) return;
@@ -355,7 +363,7 @@ namespace GK2Tweaks
                 }
                 cy += 6f;
             }
-            if (remove != null) Pins.Unpin(remove);
+            if (remove != null) { Pins.Pin r = remove; Defer(() => Pins.Unpin(r)); }
         }
 
         // Unsichtbare Flaeche ueber der Spiel-Oberflaeche, solange ein Mod-Fenster offen ist:
@@ -567,7 +575,7 @@ namespace GK2Tweaks
             DrawEntry(Plugin.PinsAutoUnpin);
             DrawEntry(Plugin.PinsCorner);
             DrawEntry(Plugin.PinsSize);
-            if (Pins.List.Count > 0 && Btn(Labels.T("Alle Pins entfernen", "Remove all pins"), buttonStyle, GUILayout.Width(260))) Pins.ClearAll();
+            if (Pins.List.Count > 0 && Btn(Labels.T("Alle Pins entfernen", "Remove all pins"), buttonStyle, GUILayout.Width(260))) Defer(Pins.ClearAll);
 
             Header(Labels.T("FPS-Anzeige", "FPS display"));
             foreach (ConfigEntryBase e in new ConfigEntryBase[] { Plugin.ShowOverlay, Plugin.OvCorner, Plugin.OvLayout, Plugin.OvSeparator })
@@ -656,7 +664,7 @@ namespace GK2Tweaks
                 labelStyle, GUILayout.Width(268));
             GUI.enabled = GraphicsBench.CanRun;
             if (Btn(GraphicsBench.CanRun ? Labels.T("Benchmark starten", "Start benchmark") : Labels.T("nur im laufenden Spiel", "only while playing"), buttonStyle, GUILayout.Width(310)))
-                GraphicsBench.Start();
+                Defer(GraphicsBench.Start);
             GUI.enabled = true;
             GUILayout.EndHorizontal();
             if (Event.current.type == EventType.Repaint) benchY = GUILayoutUtility.GetLastRect().y;
@@ -778,11 +786,11 @@ namespace GK2Tweaks
         private void DrawSaves()
         {
             Header(Labels.T("Spielstände", "Saves"));
-            if (Time.realtimeSinceStartup > slotsAt)
+            if (Event.current.type == EventType.Layout && Time.realtimeSinceStartup > slotsAt)
             {
                 try { slots = new List<SaveSlotData>(SaveSystem.SaveSlotDataList); slots.Sort((a, b) => b.GetSaveDateTime().CompareTo(a.GetSaveDateTime())); }
                 catch (Exception e) { Plugin.Log.LogWarning("Saves: " + e.Message); slots = new List<SaveSlotData>(); }
-                if (Time.realtimeSinceStartup > backupListAt) { backupList = Backups.List(); backupListAt = Time.realtimeSinceStartup + 3f; }
+                if (Event.current.type == EventType.Layout && Time.realtimeSinceStartup > backupListAt) { backupList = Backups.List(); backupListAt = Time.realtimeSinceStartup + 3f; }
                 slotsAt = Time.realtimeSinceStartup + 3f;
             }
             if (slots.Count == 0) { GUILayout.Label(Labels.T("Keine Spielstände gefunden.", "No saves found."), smallStyle); return; }
@@ -820,7 +828,7 @@ namespace GK2Tweaks
                     if (Btn(confirm ? Labels.T("Sicher?", "Sure?") : Labels.T("Laden", "Restore"), buttonStyle, GUILayout.Width(110)))
                     {
                         if (!confirm) confirmRestore = b;
-                        else { Backups.Restore(b, out backupMsg); confirmRestore = null; backupListAt = 0; slotsAt = 0; }
+                        else { Backups.Item rb = b; Defer(() => { Backups.Restore(rb, out backupMsg); confirmRestore = null; backupListAt = 0; slotsAt = 0; }); }
                     }
                     GUILayout.EndHorizontal();
                 }
@@ -859,7 +867,7 @@ namespace GK2Tweaks
             Header(Labels.T("Spielstand-Backups", "Save backups"));
             DrawEntry(Plugin.BackupCount);
             DrawEntry(Plugin.BackupMinutes);
-            if (Time.realtimeSinceStartup > backupListAt) { backupList = Backups.List(); backupListAt = Time.realtimeSinceStartup + 3f; }
+            if (Event.current.type == EventType.Layout && Time.realtimeSinceStartup > backupListAt) { backupList = Backups.List(); backupListAt = Time.realtimeSinceStartup + 3f; }
             bool inMenu = MainGame.Instance != null && MainGame.Instance.gameState == MainGame.GameState.MainMenu;
             if (backupList.Count == 0) GUILayout.Label(Labels.T("Noch keine Backups vorhanden.", "No backups yet."), smallStyle);
             if (inMenu) GUILayout.Label(Labels.T("Backups laden: oben unter \"Spielstände\".", "Restore backups: see \"Saves\" at the top."), smallStyle);
@@ -874,7 +882,7 @@ namespace GK2Tweaks
                     if (Btn(confirm ? Labels.T("Sicher?", "Sure?") : Labels.T("Laden", "Restore"), buttonStyle, GUILayout.Width(110)))
                     {
                         if (!confirm) confirmRestore = b;
-                        else { Backups.Restore(b, out backupMsg); confirmRestore = null; backupListAt = 0; }
+                        else { Backups.Item rb = b; Defer(() => { Backups.Restore(rb, out backupMsg); confirmRestore = null; backupListAt = 0; }); }
                     }
                 }
                 GUILayout.EndHorizontal();
@@ -927,7 +935,7 @@ namespace GK2Tweaks
                 for (int c = 0; c < 2; c++)
                 {
                     string id = Profiles.Ids[r * 2 + c];
-                    if (Btn(new GUIContent(Profiles.Name(id), Profiles.Tip(id)), buttonStyle, GUILayout.Width(153))) Profiles.Apply(id);
+                    if (Btn(new GUIContent(Profiles.Name(id), Profiles.Tip(id)), buttonStyle, GUILayout.Width(153))) { string pid = id; Defer(() => Profiles.Apply(pid)); }
                 }
                 GUILayout.EndHorizontal();
             }

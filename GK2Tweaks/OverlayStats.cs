@@ -49,13 +49,18 @@ namespace GK2Tweaks
             bool needThread = wantCpu || wantGpu || wantRam || wantVram || wantTemp;
             if (wantRam && !sysRecorder.Valid) { try { sysRecorder = ProfilerRecorder.StartNew(ProfilerCategory.Memory, "System Used Memory"); } catch { } }
             else if (!wantRam && sysRecorder.Valid) sysRecorder.Dispose();
-            if (needThread && !running)
+            if (needThread)
             {
                 running = true;
-                thread = new Thread(Worker) { IsBackground = true, Name = "GK2Tweaks overlay", Priority = System.Threading.ThreadPriority.BelowNormal };
-                thread.Start();
+                // Schnelles Aus/An (F10): der alte Thread schlaeft evtl. noch und laeuft dann einfach weiter -
+                // nur einen neuen starten, wenn keiner mehr lebt (sonst sammeln sich Threads an)
+                if (thread == null || !thread.IsAlive)
+                {
+                    thread = new Thread(Worker) { IsBackground = true, Name = "GK2Tweaks overlay", Priority = System.Threading.ThreadPriority.BelowNormal };
+                    thread.Start();
+                }
             }
-            else if (!needThread) running = false;
+            else running = false;
 
             if (active && vram && !gfxRecorder.Valid)
             {

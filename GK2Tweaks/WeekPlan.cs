@@ -123,7 +123,7 @@ namespace GK2Tweaks
 
         internal static void OnNewDay(int dayNumber)
         {
-            if (!Plugin.WeekPlanNotify.Value || !InGame) return;
+            if (!Plugin.WeekPlanNotify.Value || !InGame || !SafeMode.On("WeekPlan")) return;
             try
             {
                 string id = IdForNumber(dayNumber);

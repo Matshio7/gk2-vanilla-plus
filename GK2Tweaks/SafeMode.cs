@@ -89,38 +89,50 @@ namespace GK2Tweaks
         }
 
         // ---------- Pruefung beim Start ----------
-        private static readonly List<KeyValuePair<string, Func<bool>>> checks = new List<KeyValuePair<string, Func<bool>>>();
-        private static void F(string feature, Type t, string field) => checks.Add(new KeyValuePair<string, Func<bool>>(feature + "|" + t.Name + "." + field, () => AccessTools.Field(t, field) != null || AccessTools.Property(t, field) != null));
-        private static void M(string feature, Type t, string method) => checks.Add(new KeyValuePair<string, Func<bool>>(feature + "|" + t.Name + "." + method + "()", () => AccessTools.Method(t, method) != null));
+        private sealed class Check { public string Feature, Member; public Func<Type> Type; public Func<Type, bool> Test; }
+        private static readonly List<Check> checks = new List<Check>();
+        // Der Typ steckt bewusst in einem Lambda (() => typeof(X)): fehlt nach einem Spiel-Update ein ganzer Typ,
+        // scheitert so nur diese eine Pruefung. Ein direktes typeof(X) hier im Methodenrumpf wuerde schon beim
+        // JIT-Kompilieren von CheckGame eine TypeLoadException werfen und den kompletten Mod beim Start mitreissen.
+        private static void F(string feature, Func<Type> type, string field) =>
+            checks.Add(new Check { Feature = feature, Type = type, Member = field, Test = t => AccessTools.Field(t, field) != null || AccessTools.Property(t, field) != null });
+        private static void M(string feature, Func<Type> type, string method) =>
+            checks.Add(new Check { Feature = feature, Type = type, Member = method + "()", Test = t => AccessTools.Method(t, method) != null });
 
         internal static void CheckGame()
         {
-            F("Pins", typeof(UICraftPreviewItemCell), "data");
-            F("Pins", typeof(UIBuildingWindow), "displayedBuildItemGUIs");
-            F("Pins", typeof(UIBuildingWidget), "data");
-            F("Pins", typeof(UITownBuildingWindow), "displayedBuildItemGUIs");
-            F("Pins", typeof(UITownBuildingWidget), "data");
-            F("Pins", typeof(UIBaseCraftSelectionWindow), "headerLabel");
-            F("Pins", typeof(UIQuestInfoWindow), "data");
-            F("Pins", typeof(UIQuestInfoWindow), "header");
-            F("Rain", typeof(WeatherComponent), "parameters");
-            F("Rain", typeof(CPParticleEmission), "defaultValue");
-            M("WeekPlan", typeof(UINotificator), "ShowNotification");
-            F("WeekPlan", typeof(UIHUDWheel), "dayIcons");
-            F("ModsButton", typeof(UIMainMenuWindow), "gameSettingsButton");
-            F("ModsButton", typeof(UIGamePauseWindow), "settingsBtn");
-            M("SkipLogos", typeof(LazyBearTechnology.Preloader.LazyPreloader), "RunLogoCoroutine");
-            F("SkipLogos", typeof(LazyBearTechnology.Preloader.LazyPreloader), "logoList");
-            F("SkipLogos", typeof(LazyBearTechnology.Preloader.LazyPreloader), "videoPlayer");
-            F("MenuInfo", typeof(UIMainMenuInfoPanel), "versionLabel");
-            M("WorkshopUpload", typeof(SteamWorkshopCreatorService), "SubmitContent");
+            F("Pins", () => typeof(UICraftPreviewItemCell), "data");
+            F("Pins", () => typeof(UIBuildingWindow), "displayedBuildItemGUIs");
+            F("Pins", () => typeof(UIBuildingWidget), "data");
+            F("Pins", () => typeof(UITownBuildingWindow), "displayedBuildItemGUIs");
+            F("Pins", () => typeof(UITownBuildingWidget), "data");
+            F("Pins", () => typeof(UIBaseCraftSelectionWindow), "headerLabel");
+            F("Pins", () => typeof(UIQuestInfoWindow), "data");
+            F("Pins", () => typeof(UIQuestInfoWindow), "header");
+            F("Rain", () => typeof(WeatherComponent), "parameters");
+            F("Rain", () => typeof(CPParticleEmission), "defaultValue");
+            M("WeekPlan", () => typeof(UINotificator), "ShowNotification");
+            F("WeekPlan", () => typeof(UIHUDWheel), "dayIcons");
+            F("ModsButton", () => typeof(UIMainMenuWindow), "gameSettingsButton");
+            F("ModsButton", () => typeof(UIGamePauseWindow), "settingsBtn");
+            M("SkipLogos", () => typeof(LazyBearTechnology.Preloader.LazyPreloader), "RunLogoCoroutine");
+            F("SkipLogos", () => typeof(LazyBearTechnology.Preloader.LazyPreloader), "logoList");
+            F("SkipLogos", () => typeof(LazyBearTechnology.Preloader.LazyPreloader), "videoPlayer");
+            F("MenuInfo", () => typeof(UIMainMenuInfoPanel), "versionLabel");
+            M("WorkshopUpload", () => typeof(SteamWorkshopCreatorService), "SubmitContent");
 
-            foreach (var c in checks)
+            foreach (Check c in checks)
             {
-                string feature = c.Key.Substring(0, c.Key.IndexOf('|'));
                 bool ok;
-                try { ok = c.Value(); } catch { ok = false; }
-                if (!ok) Disable(feature, "missing " + c.Key.Substring(c.Key.IndexOf('|') + 1), false);
+                string what = c.Member;
+                try
+                {
+                    Type t = c.Type();
+                    what = t.Name + "." + c.Member;
+                    ok = c.Test(t);
+                }
+                catch (Exception e) { ok = false; what += " (" + e.GetType().Name + ")"; }
+                if (!ok) Disable(c.Feature, "missing " + what, false);
             }
 
             string game = Application.version;

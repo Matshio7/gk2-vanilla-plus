@@ -565,7 +565,12 @@ namespace GK2Tweaks
                 if (header == null) return;
                 Component host = header.transform.parent;
                 Plugin.Log.LogInfo("Pin selection: " + __instance.GetType().Name + " " + (def != null ? def.id + (def.isAuto ? " (auto)" : "") : "-") + " cells " + (data?.CraftItemCellsData?.Count ?? -1));
-                if (def == null || (def.isAuto && (data.CraftItemCellsData == null || data.CraftItemCellsData.Count == 0))) { PinButton.Attach(host, null, null, 30f, true, 64f); return; }
+                if (def == null || (def.isAuto && (data.CraftItemCellsData == null || data.CraftItemCellsData.Count == 0)))
+                {
+                    PinButton.Attach(host, null, null, 30f, true, 64f);
+                    if (Traverse.Create(__instance).Field("onStartCraftPressed").GetValue<Action>()?.Target is CraftedHook old) old.Key = null;
+                    return;
+                }
                 PinButton.Attach(host, "craft:" + def.id, () =>
                 {
                     string icon = null;
@@ -576,8 +581,9 @@ namespace GK2Tweaks
                 // Herstellen gestartet -> Pin automatisch loesen (Option)
                 var f = Traverse.Create(__instance).Field("onStartCraftPressed");
                 Action orig = f.GetValue<Action>();
-                if (orig != null && !(orig.Target is CraftedHook))
-                    f.SetValue((Action)new CraftedHook(orig, "craft:" + def.id).Invoke);
+                // Wird das Fenster wiederverwendet, zeigt der Haken schon auf das vorige Rezept -> nur den Schluessel aktualisieren
+                if (orig != null && orig.Target is CraftedHook hook) hook.Key = "craft:" + def.id;
+                else if (orig != null) f.SetValue((Action)new CraftedHook(orig, "craft:" + def.id).Invoke);
             }
             catch (Exception e) { SafeMode.Fail("Pins", e); }
         }
@@ -684,12 +690,13 @@ namespace GK2Tweaks
     internal sealed class CraftedHook
     {
         private readonly Action orig;
-        private readonly string key;
-        internal CraftedHook(Action orig, string key) { this.orig = orig; this.key = key; }
+        internal string Key;
+        internal CraftedHook(Action orig, string key) { this.orig = orig; Key = key; }
         internal void Invoke()
         {
             orig();
-            try { Pins.OnCrafted(key); } catch (Exception e) { SafeMode.Fail("Pins", e); }
+            if (Key == null) return;
+            try { Pins.OnCrafted(Key); } catch (Exception e) { SafeMode.Fail("Pins", e); }
         }
     }
 }

@@ -40,11 +40,22 @@ namespace GK2Tweaks
                 if ((ci.opcode == System.Reflection.Emit.OpCodes.Call) && ci.operand is System.Reflection.MethodInfo m && m.DeclaringType == typeof(SteamUGC))
                 {
                     var w = AccessTools.Method(typeof(WorkshopUpload), "W" + m.Name);
-                    if (w != null) { ci.operand = w; n++; }
+                    // nur umleiten, wenn die Signatur exakt passt (sonst waere die IL nach einem Steamworks-Update ungueltig
+                    // und der Workshop-Uploader des Spiels wuerde fuer alle Modder abstuerzen)
+                    if (w != null && SameSignature(w, m)) { ci.operand = w; n++; }
                 }
                 yield return ci;
             }
             Plugin.Log.LogInfo("Workshop upload: " + n + " calls redirected");
+        }
+
+        private static bool SameSignature(System.Reflection.MethodInfo a, System.Reflection.MethodInfo b)
+        {
+            if (a.ReturnType != b.ReturnType) return false;
+            var pa = a.GetParameters(); var pb = b.GetParameters();
+            if (pa.Length != pb.Length) return false;
+            for (int i = 0; i < pa.Length; i++) if (pa[i].ParameterType != pb[i].ParameterType) return false;
+            return true;
         }
 
         private static bool WSetItemTitle(UGCUpdateHandle_t h, string t) { title = t; contentFolder = null; return SteamUGC.SetItemTitle(h, t); }
@@ -56,7 +67,9 @@ namespace GK2Tweaks
                 try
                 {
                     string desc = File.ReadAllText(DescriptionFile, Encoding.UTF8).Replace("\r\n", "\n");
-                    Plugin.Log.LogInfo("Workshop upload: description from file (" + desc.Length + " chars)");
+                    int bytes = Encoding.UTF8.GetByteCount(desc);
+                    Plugin.Log.LogInfo("Workshop upload: description from file (" + desc.Length + " chars, " + bytes + " bytes)");
+                    if (bytes > 8000) Plugin.Log.LogWarning("Workshop upload: description is " + bytes + " bytes - Steam allows 8000, it will be cut off or rejected");
                     return SteamUGC.SetItemDescription(h, desc);
                 }
                 catch (Exception e) { Plugin.Log.LogWarning("Workshop upload: " + e.Message); }

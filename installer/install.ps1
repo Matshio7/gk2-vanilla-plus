@@ -200,6 +200,17 @@ $uninstall.Add_Click({
     $all = [System.Windows.Forms.MessageBox]::Show((T "Mods entfernen.`n`nSoll auch BepInEx (der Mod-Loader) komplett entfernt werden?`n`nJa = alles entfernen, das Spiel ist danach wieder original.`nNein = nur diese beiden Mods entfernen." "Remove the mods.`n`nAlso remove BepInEx (the mod loader) completely?`n`nYes = remove everything, the game is back to original.`nNo = remove only these two mods."), 'GK2 Vanilla+', 'YesNoCancel', 'Question')
     if ($all -eq 'Cancel') { return }
     try {
+        # Spielstand-Backups und Screenshots des Mods nicht mitloeschen, sondern nach Dokumente\GK2 Vanilla+ retten
+        $kept = $null
+        foreach ($sub in 'Backups', 'Screenshots') {
+            $src = Join-Path $dir "BepInEx\GK2VanillaPlus\$sub"
+            if ((Test-Path $src) -and (Get-ChildItem -Path $src -Recurse -File -ErrorAction SilentlyContinue | Select-Object -First 1)) {
+                if (-not $kept) { $kept = Join-Path ([Environment]::GetFolderPath('MyDocuments')) 'GK2 Vanilla+'; New-Item -ItemType Directory -Force -Path $kept | Out-Null }
+                $dst = Join-Path $kept $sub
+                if (Test-Path $dst) { $dst = Join-Path $kept ($sub + ' ' + (Get-Date -Format 'yyyy-MM-dd HH-mm-ss')) }
+                Move-Item -Path $src -Destination $dst -Force
+            }
+        }
         foreach ($p in 'BepInEx\plugins\GK2Tweaks', 'BepInEx\plugins\GK2Ultrawide', 'BepInEx\GK2VanillaPlus', 'BepInEx\config\mats.gk2.tweaks.cfg', 'BepInEx\config\mats.gk2.ultrawide.cfg') {
             $f = Join-Path $dir $p; if (Test-Path $f) { Remove-Item $f -Recurse -Force }
         }
@@ -209,7 +220,9 @@ $uninstall.Add_Click({
             }
         }
         Set-Status
-        [System.Windows.Forms.MessageBox]::Show((T 'Entfernt.' 'Removed.'), 'GK2 Vanilla+', 'OK', 'Information') | Out-Null
+        $done = T 'Entfernt.' 'Removed.'
+        if ($kept) { $done += (T "`n`nDeine Spielstand-Backups und Screenshots des Mods wurden aufgehoben:`n" "`n`nThe mod's save backups and screenshots were kept:`n") + $kept }
+        [System.Windows.Forms.MessageBox]::Show($done, 'GK2 Vanilla+', 'OK', 'Information') | Out-Null
     } catch {
         [System.Windows.Forms.MessageBox]::Show($_.Exception.Message, 'GK2 Vanilla+', 'OK', 'Error') | Out-Null
     }

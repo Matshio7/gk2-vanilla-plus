@@ -47,12 +47,17 @@ namespace GK2Tweaks
             if (padWin != PadWindow) { padWin = PadWindow; padFocus = 0; }
             if ((Input.mousePosition - lastMouse).sqrMagnitude > 16f || Input.GetMouseButtonDown(0)) padMode = false;
             lastMouse = Input.mousePosition;
-            if (capturingKey != null) return;
             try
             {
                 if (!Rewired.ReInput.isReady) return;
                 Rewired.Player p = Rewired.ReInput.players.GetPlayer(0);
                 if (p == null) return;
+                // Tastenbelegung wartet auf eine Tastatur-Taste: mit B am Controller abbrechen (sonst haengt man z.B. am Steam Deck fest)
+                if (capturingKey != null)
+                {
+                    if (p.GetButtonDown(ActB)) { PlaySound("gui_click"); capturingKey = null; }
+                    return;
+                }
                 float h = p.GetAxis(0), v = p.GetAxis(1);
                 bool any = false;
                 any |= Dir(0, p.GetButton(ActUp) || v > 0.6f, ref padUp);

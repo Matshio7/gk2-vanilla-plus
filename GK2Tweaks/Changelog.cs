@@ -13,6 +13,7 @@ namespace GK2Tweaks
         internal sealed class Entry
         {
             public string Version, Date, En, De;
+            public bool Silent; // "<!-- silent -->" in der Ueberschrift: kleiner Hotfix, "Was ist neu?" oeffnet sich dafuer nicht von selbst
             public string Text => Labels.German && !string.IsNullOrEmpty(De) ? De : En;
         }
 
@@ -60,7 +61,7 @@ namespace GK2Tweaks
                 if (m.Success)
                 {
                     Flush();
-                    cur = new Entry { Version = m.Groups[1].Value, Date = m.Groups[2].Value };
+                    cur = new Entry { Version = m.Groups[1].Value, Date = m.Groups[2].Value, Silent = line.Contains("<!-- silent -->") };
                     en = new StringBuilder(); de = new StringBuilder(); target = en;
                     continue;
                 }
@@ -72,6 +73,8 @@ namespace GK2Tweaks
                 // Nexus-Ausgabe hat keinen Updater - Zeilen dazu weglassen
                 string low = line.ToLowerInvariant();
                 if (low.Contains("github") || low.Contains("update check") || low.Contains("update-prüfung") || low.Contains("online")) continue;
+                // ... und keinen Bewertungshinweis fuer den Steam Workshop
+                if (low.Contains("rating on the steam workshop") || low.Contains("bewertung im steam workshop")) continue;
 #endif
                 if (line.StartsWith("- ")) line = "•  " + line.Substring(2);
                 target.AppendLine(Bold.Replace(line, "<b>$1</b>"));
@@ -86,6 +89,10 @@ namespace GK2Tweaks
             string seen = Plugin.LastSeenVersion.Value;
             if (seen == Plugin.PluginVersion) return false;
             if (FreshInstall) { Plugin.LastSeenVersion.Value = Plugin.PluginVersion; return false; }
+            // nur stille Hotfixes seit der letzten gesehenen Version -> nicht aufpoppen, trotzdem als gesehen merken
+            bool anyLoud = false;
+            foreach (Entry e in Since(seen)) if (!e.Silent) { anyLoud = true; break; }
+            if (!anyLoud) { MarkSeen(); return false; }
             return true;
         }
 

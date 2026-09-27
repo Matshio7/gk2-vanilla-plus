@@ -13,7 +13,7 @@ namespace GK2Tweaks
     {
         public const string Guid = "mats.gk2.tweaks";
         public const string PluginName = "GK2 Tweaks";
-        public const string PluginVersion = "1.5.1";
+        public const string PluginVersion = "1.5.2";
         internal const string Keep = "Default";
 
         internal static Plugin Instance;
@@ -81,7 +81,7 @@ namespace GK2Tweaks
             Changelog.FreshInstall = !System.IO.File.Exists(Config.ConfigFilePath);
             BindConfig();
 
-            SafeMode.CheckGame();
+            try { SafeMode.CheckGame(); } catch (Exception e) { Log.LogError("Safe mode check failed: " + e); }
             var harmony = new Harmony(Guid);
             var patches = new System.Collections.Generic.List<Type> { typeof(TierPatch), typeof(ScreenSettingsPatch), typeof(SaveBlockPatch), typeof(ZoomPatch), typeof(ModdedLabelPatch), typeof(BackupPatch), typeof(MainMenuModsButtonPatch), typeof(PauseModsButtonPatch), typeof(CraftCellPinPatch), typeof(SelectionPinPatch), typeof(QuestPinPatch), typeof(LongNotes) };
 #if DEV
@@ -344,17 +344,19 @@ namespace GK2Tweaks
 
 #if !NEXUS
         private bool rateChecked;
+        private float rateMenuSince = -1f;
 
         // Bewertungshinweis: nach ein paar Spielsitzungen, nie zusammen mit "Was ist neu?" oder einem anderen Mod-Fenster
         private void RateTick()
         {
             if (rateChecked || BenchOn) return;
-            if (RatePromptDone.Value || RatePromptSessions.Value < RatePromptNextAt.Value) return;
+            if (RatePromptDone.Value || RatePromptSessions.Value < RatePromptNextAt.Value) { rateChecked = true; return; }
             MainGame mg = MainGame.Instance;
-            if (mg == null || mg.gameState != MainGame.GameState.MainMenu) return;
-            if (menuSince < 0f || Time.realtimeSinceStartup - menuSince < 6f) return;
-            if (Gui.AnyWindowOpen) return; // z.B. "Was ist neu?" ist offen -> naechste Sitzung erneut versuchen
+            if (mg == null || mg.gameState != MainGame.GameState.MainMenu) { rateMenuSince = -1f; return; }
+            if (rateMenuSince < 0f) { rateMenuSince = Time.realtimeSinceStartup; return; }
+            if (Time.realtimeSinceStartup - rateMenuSince < 6f) return;
             rateChecked = true;
+            if (Gui.AnyWindowOpen) return; // z.B. "Was ist neu?" ist offen -> erst in der naechsten Sitzung erneut versuchen
             Gui.ShowRatePrompt();
         }
 #endif

@@ -1,18 +1,28 @@
 # Changelog
 
+## 1.5.2 – 2026-09-27 <!-- silent -->
+
+**EN**
+- Small fixes: more robust after game updates, controller fixes in the mod menu (removing pins, restoring backups, B cancels a key assignment), Esc always closes the topmost mod window, quickly toggling the FPS display no longer starts extra background threads, auto-unpin after crafting picks the right recipe
+- Uninstall now keeps the mod's save backups and screenshots (moved to Documents\GK2 Vanilla+)
+
+**DE**
+- Kleine Korrekturen: robuster nach Spiel-Updates, Controller-Fixes im Mod-Menü (Pins entfernen, Backups wiederherstellen, B bricht eine Tastenbelegung ab), Esc schließt immer das oberste Mod-Fenster, schnelles An/Aus der FPS-Anzeige startet keine zusätzlichen Hintergrund-Threads mehr, automatisches Lösen nach dem Herstellen erwischt das richtige Rezept
+- Deinstallieren behält jetzt die Spielstand-Backups und Screenshots des Mods (werden nach Dokumente\GK2 Vanilla+ verschoben)
+
 ## 1.5.1 – 2026-09-27
 
 **EN**
 - 🎉 **200 subscribers on the Steam Workshop!** Genuinely did not expect that this fast – thank you all so much for trying the mod out, for the kind comments, and for the bug reports that help make it better. Means a lot to me.
 - New: the main menu now also shows the mod's version number next to "modded"
 - New: a small one-time popup asks (after a few play sessions) if you'd like to leave a rating on the Steam Workshop – with "Rate it now", "Remind me later" and "Don't ask again"
-- Fix: a rare error window that could appear over the mod menu (controller navigation / opening "What's new") – the "What's new" and rating popups also no longer sit on top of the game logo or the mod menu
+- Fix: a rare error window that could appear over the mod menu (controller navigation / opening "What's new")
 
 **DE**
 - 🎉 **200 Abonnenten im Steam Workshop!** Damit hatte ich ehrlich gesagt nicht so schnell gerechnet – vielen Dank euch allen fürs Ausprobieren, die netten Kommentare und die Bug-Reports, die den Mod besser machen. Das bedeutet mir viel.
 - Neu: Im Hauptmenü steht jetzt auch die Versionsnummer des Mods neben "modded"
 - Neu: Ein kleines, einmaliges Fenster fragt (nach ein paar Spielsitzungen) nach einer Bewertung im Steam Workshop – mit „Jetzt bewerten“, „Später erinnern“ und „Nicht mehr fragen“
-- Fix: Ein seltenes Fehlerfenster, das über dem Mod-Menü erscheinen konnte (Controller-Navigation / "Was ist neu?" öffnen) – "Was ist neu?" und der Bewertungshinweis verdecken jetzt auch nicht mehr das Spiel-Logo oder das Mod-Menü
+- Fix: Ein seltenes Fehlerfenster, das über dem Mod-Menü erscheinen konnte (Controller-Navigation / "Was ist neu?" öffnen)
 
 ## 1.5.0 – 2026-09-27
 
