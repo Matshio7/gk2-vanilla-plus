@@ -46,7 +46,7 @@ namespace GK2Tweaks
         internal static ConfigEntry<KeyboardShortcut> MinimapKey;
 #endif
         // [Overlay] – FPS-Anzeige
-        internal static ConfigEntry<string> OvCorner, OvLayout, PinsCorner, PinsSize;
+        internal static ConfigEntry<string> OvCorner, OvLayout, PinsCorner, PinsSize, OvOrder, OvSeparator;
         internal static ConfigEntry<bool> PinsEnabled;
         internal static ConfigEntry<bool> OvFps, OvLows, OvFrameTime, OvCpu, OvGpu, OvRam, OvVram, OvResolution, OvClock, OvWeekday, OvGameTime;
 #if DEV
@@ -195,6 +195,9 @@ namespace GK2Tweaks
                 new AcceptableValueList<string>("TopLeft", "TopRight", "BottomLeft", "BottomRight")));
             OvLayout = Config.Bind("Overlay", "Layout", "Row", new ConfigDescription("Row = all values in one line. Column = one value per line.",
                 new AcceptableValueList<string>("Row", "Column")));
+            OvOrder = Config.Bind("Overlay", "Order", OverlayOrder.Default, "Order of the values in the FPS display (comma-separated, set it with the arrows in the mod menu).");
+            OvSeparator = Config.Bind("Overlay", "Separator", "None", new ConfigDescription("Separator between the values when they are shown in one line. Set the order of the values below with the arrows.",
+                new AcceptableValueList<string>("None", "Dash", "Bar", "Dot")));
             OvFps = Config.Bind("Overlay", "Fps", true, "Frames per second (average over 0.5 s).");
             OvLows = Config.Bind("Overlay", "Lows", true, "1% low FPS: how smooth it feels. Close to the FPS value = no stutter.");
             OvFrameTime = Config.Bind("Overlay", "FrameTime", false, "Frame time in ms (average and slowest frame).");

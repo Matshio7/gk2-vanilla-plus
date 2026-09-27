@@ -101,6 +101,7 @@ namespace GK2Tweaks
             { "CheckForUpdates", new[] { "Nach Updates suchen", "Check for updates" } },
             { "Language", new[] { "Sprache", "Language" } },
             { "Corner", new[] { "Position", "Position" } },
+            { "Separator", new[] { "Trennzeichen", "Separator" } },
             { "Enabled", new[] { "Anpinnen", "Pinning" } },
             { "Size", new[] { "Größe", "Size" } },
             { "Layout", new[] { "Anordnung", "Layout" } },
@@ -165,6 +166,7 @@ namespace GK2Tweaks
             { "StatsLogSeconds", "Frame-Statistik regelmäßig ins BepInEx-Log schreiben." },
             { "Language", "Sprache des Mod-Menüs. Automatisch = Sprache des Spiels." },
             { "Corner", "In welcher Bildschirmecke die Anzeige steht." },
+            { "Separator", "Trennzeichen zwischen den Werten, wenn sie in einer Zeile stehen. Die Reihenfolge der Werte stellst du unten mit den Pfeilen ein." },
             { "Enabled", "Rezepte, Baupläne und Stadtgebäude über die Pinnadel oben rechts anpinnen. Die Liste zeigt pro Zutat Haben/Brauchen aus deinem Inventar (ohne Truhen)." },
             { "Size", "Text- und Symbolgröße der Pin-Liste." },
             { "Layout", "Nebeneinander = alles in einer Zeile. Untereinander = ein Wert pro Zeile." },
@@ -231,6 +233,10 @@ namespace GK2Tweaks
             { "Large", new[] { "Groß", "Large" } },
             { "ExtraLarge", new[] { "Sehr groß", "Extra large" } },
             { "Column", new[] { "Untereinander", "In a column" } },
+            { "None", new[] { "Keins", "None" } },
+            { "Dash", new[] { "Langer Strich  —", "Long dash  —" } },
+            { "Bar", new[] { "Senkrechter Strich  |", "Vertical bar  |" } },
+            { "Dot", new[] { "Punkt  ·", "Dot  ·" } },
         };
 
         internal static string Name(ConfigEntryBase e)

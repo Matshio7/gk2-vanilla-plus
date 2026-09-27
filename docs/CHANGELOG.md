@@ -5,10 +5,12 @@
 **EN**
 - New: **safe mode** – after a game update the mod checks everything it relies on. If something changed, only the affected feature is turned off (with a note in the mod menu) instead of causing errors – the rest keeps working. Features that keep throwing errors are turned off automatically too.
 - Fix: the pinned list no longer covers the reputation window of the main NPCs (it moves below it)
+- New: FPS display – **order of the values** can be changed with arrows in the mod menu, optional **separator** between the values (long dash, bar or dot)
 
 **DE**
 - Neu: **Sicherer Modus** – nach einem Spiel-Update prüft der Mod alles, worauf er zugreift. Hat sich etwas geändert, wird nur die betroffene Funktion abgeschaltet (mit Hinweis im Mod-Menü), statt Fehler zu verursachen – der Rest läuft weiter. Funktionen, die wiederholt Fehler werfen, werden ebenfalls automatisch abgeschaltet.
 - Fix: Die Pin-Liste verdeckt nicht mehr das Ansehen-Fenster der Haupt-NPCs (sie rückt darunter)
+- Neu: FPS-Anzeige – **Reihenfolge der Werte** im Mod-Menü per Pfeil einstellbar, optional **Trennzeichen** zwischen den Werten (langer Strich, senkrechter Strich oder Punkt)
 
 ## 1.4.3 – 2026-09-27
 

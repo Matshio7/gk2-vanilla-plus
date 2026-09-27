@@ -117,51 +117,60 @@ namespace GK2Tweaks
 
         private static string BuildOverlay(FrameResult r)
         {
-            var parts = new System.Collections.Generic.List<string>();
+            var val = new Dictionary<string, string>();
             const float GB = 1024f * 1024f * 1024f;
-            if (Plugin.OvFps.Value) parts.Add($"{r.AvgFps:0} FPS");
-            if (Plugin.OvLows.Value) parts.Add($"1%: {r.Low1Fps:0}");
-            if (Plugin.OvFrameTime.Value) parts.Add(r.AvgFps > 0 ? $"{1000f / r.AvgFps:0.0} ms (max {r.MaxMs:0})" : "- ms");
-            if (Plugin.OvCpu.Value) parts.Add(OverlayStats.CpuPercent >= 0 ? $"CPU {OverlayStats.CpuPercent:0} %" : "CPU …");
+            if (Plugin.OvFps.Value) val["Fps"] = $"{r.AvgFps:0} FPS";
+            if (Plugin.OvLows.Value) val["Lows"] = $"1%: {r.Low1Fps:0}";
+            if (Plugin.OvFrameTime.Value) val["FrameTime"] = r.AvgFps > 0 ? $"{1000f / r.AvgFps:0.0} ms (max {r.MaxMs:0})" : "- ms";
+            if (Plugin.OvCpu.Value) val["Cpu"] = OverlayStats.CpuPercent >= 0 ? $"CPU {OverlayStats.CpuPercent:0} %" : "CPU …";
             if (Plugin.OvGpu.Value)
             {
-                if (OverlayStats.GpuPercent >= 0) parts.Add($"GPU {OverlayStats.GpuPercent:0} %");
-                else if (OverlayStats.GpuFrameMs > 0) parts.Add($"GPU {OverlayStats.GpuFrameMs:0.0} ms");
-                else parts.Add("GPU n/a");
+                if (OverlayStats.GpuPercent >= 0) val["Gpu"] = $"GPU {OverlayStats.GpuPercent:0} %";
+                else if (OverlayStats.GpuFrameMs > 0) val["Gpu"] = $"GPU {OverlayStats.GpuFrameMs:0.0} ms";
+                else val["Gpu"] = "GPU n/a";
             }
             if (Plugin.OvRam.Value)
             {
                 long ram = OverlayStats.RamUsed;
-                parts.Add(ram > 0 ? $"RAM {ram / GB:0.0}/{SystemInfo.systemMemorySize / 1024f:0} GB" : "RAM …");
+                val["Ram"] = ram > 0 ? $"RAM {ram / GB:0.0}/{SystemInfo.systemMemorySize / 1024f:0} GB" : "RAM …";
             }
             if (Plugin.OvVram.Value)
             {
                 long v = OverlayStats.VramBytes;
                 long budget = System.Threading.Interlocked.Read(ref OverlayStats.VramBudget);
                 int total = SystemInfo.graphicsMemorySize > 0 ? SystemInfo.graphicsMemorySize : (int)(budget / (1024 * 1024));
-                parts.Add(v > 0 ? (total > 0 ? $"VRAM {v / GB:0.0}/{total / 1024f:0} GB" : $"VRAM {v / GB:0.0} GB") : "VRAM n/a");
+                val["Vram"] = v > 0 ? (total > 0 ? $"VRAM {v / GB:0.0}/{total / 1024f:0} GB" : $"VRAM {v / GB:0.0} GB") : "VRAM n/a";
             }
-            if (Plugin.OvResolution.Value) parts.Add($"{Screen.width}x{Screen.height}");
-            if (Plugin.OvClock.Value) parts.Add(DateTime.Now.ToString("HH:mm"));
+            if (Plugin.OvResolution.Value) val["Resolution"] = $"{Screen.width}x{Screen.height}";
+            if (Plugin.OvClock.Value) val["Clock"] = DateTime.Now.ToString("HH:mm");
             if ((Plugin.OvWeekday.Value || Plugin.OvGameTime.Value) && WeekPlan.InGame)
             {
                 try
                 {
                     var env = MainGame.Instance.GameSave.environmentData;
-                    string g = "";
-                    if (Plugin.OvWeekday.Value) { string id = WeekPlan.IdForNumber(env.CurrentDayNumber); if (id != null) g = WeekPlan.DayName(id); }
+                    if (Plugin.OvWeekday.Value) { string id = WeekPlan.IdForNumber(env.CurrentDayNumber); if (id != null) val["Weekday"] = WeekPlan.DayName(id); }
                     if (Plugin.OvGameTime.Value)
                     {
                         // Tageszeit 0..1 = 0..24 Uhr (0,25 Sonnenaufgang, 0,5 Mittag); auf 10 Minuten gerundet wie eine Spieluhr
                         int min = Mathf.FloorToInt(Mathf.Repeat(env.TimeOfDay, 1f) * 1440f) / 10 * 10;
-                        g += (g.Length > 0 ? " " : "") + (min / 60).ToString("00") + ":" + (min % 60).ToString("00");
+                        val["GameTime"] = (min / 60).ToString("00") + ":" + (min % 60).ToString("00");
                     }
-                    if (g.Length > 0) parts.Add(g);
                 }
                 catch { }
             }
+            var parts = new List<string>();
+            foreach (string k in OverlayOrder.Get()) if (val.TryGetValue(k, out string t)) parts.Add(t);
             if (parts.Count == 0) return "";
-            return string.Join(Plugin.OvLayout.Value == "Column" ? "\n" : "   ", parts.ToArray());
+            if (Plugin.OvLayout.Value == "Column") return string.Join("\n", parts.ToArray());
+            string sep;
+            switch (Plugin.OvSeparator.Value)
+            {
+                case "Dash": sep = "  —  "; break;
+                case "Bar": sep = "  |  "; break;
+                case "Dot": sep = "  ·  "; break;
+                default: sep = "   "; break;
+            }
+            return string.Join(sep, parts.ToArray());
         }
 
         // oben rechts steht im Spiel der Gebietsname - im Spiel darunter anfangen
@@ -485,9 +494,9 @@ namespace GK2Tweaks
             if (Pins.List.Count > 0 && GUILayout.Button(Labels.T("Alle Pins entfernen", "Remove all pins"), buttonStyle, GUILayout.Width(260))) Pins.ClearAll();
 
             Header(Labels.T("FPS-Anzeige", "FPS display"));
-            foreach (ConfigEntryBase e in new ConfigEntryBase[] { Plugin.ShowOverlay, Plugin.OvCorner, Plugin.OvLayout, Plugin.OvFps, Plugin.OvLows,
-                         Plugin.OvFrameTime, Plugin.OvCpu, Plugin.OvGpu, Plugin.OvRam, Plugin.OvVram, Plugin.OvResolution, Plugin.OvClock, Plugin.OvWeekday, Plugin.OvGameTime })
+            foreach (ConfigEntryBase e in new ConfigEntryBase[] { Plugin.ShowOverlay, Plugin.OvCorner, Plugin.OvLayout, Plugin.OvSeparator })
                 DrawEntry(e);
+            DrawOverlayItems();
 
             if (WineFix.IsWine) DrawWineFix();
 
@@ -797,6 +806,26 @@ namespace GK2Tweaks
             if (gs == null) return;
             gs.graphicsTier = tier;
             try { gs.ApplyGraphicsTier(applySave: true); } catch (Exception e) { Plugin.Log.LogWarning(e.Message); }
+        }
+
+        // Werte der FPS-Anzeige: an/aus und Reihenfolge (Pfeile)
+        private void DrawOverlayItems()
+        {
+            List<string> order = OverlayOrder.Get();
+            for (int i = 0; i < order.Count; i++)
+            {
+                ConfigEntry<bool> e = OverlayOrder.Entry(order[i]);
+                if (e == null) continue;
+                GUILayout.BeginHorizontal();
+                GUILayout.Label(new GUIContent(Labels.Name(e), Labels.Tip(e)), labelStyle, GUILayout.Width(268));
+                if (GUILayout.Button(e.Value ? Labels.T("An", "On") : Labels.T("Aus", "Off"), buttonStyle, GUILayout.Width(226))) e.Value = !e.Value;
+                GUI.enabled = i > 0;
+                if (GUILayout.Button(new GUIContent("^", Labels.T("Nach vorne", "Move up")), arrowStyle, GUILayout.Width(40))) OverlayOrder.Move(i, -1);
+                GUI.enabled = i < order.Count - 1;
+                if (GUILayout.Button(new GUIContent("v", Labels.T("Nach hinten", "Move down")), arrowStyle, GUILayout.Width(40))) OverlayOrder.Move(i, 1);
+                GUI.enabled = true;
+                GUILayout.EndHorizontal();
+            }
         }
 
         private void DrawEntry(ConfigEntryBase e)

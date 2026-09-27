@@ -72,6 +72,7 @@ Minimum interval =>
 Check for updates => 
 Language => 
 Position => 
+Separator => 
 Pinning => 
 Size => 
 Layout => 
@@ -125,6 +126,10 @@ Small =>
 Large => 
 Extra large => 
 In a column => 
+None => 
+Long dash  — => 
+Vertical bar  | => 
+Dot  · => 
 Mods => 
 off => 
 Lights => 
@@ -173,6 +178,8 @@ Language of the mod menu. Auto = game language (if a translation exists, otherwi
 Internal: mod version whose changelog was last shown (the 'What's new' window appears once after an update). => 
 Screen corner of the FPS display. => 
 Row = all values in one line. Column = one value per line. => 
+Order of the values in the FPS display (comma-separated, set it with the arrows in the mod menu). => 
+Separator between the values when they are shown in one line. Set the order of the values below with the arrows. => 
 Frames per second (average over 0.5 s). => 
 1% low FPS: how smooth it feels. Close to the FPS value = no stutter. => 
 Frame time in ms (average and slowest frame). => 
@@ -275,6 +282,8 @@ Saves (if in game), quits the game and installs the new version. The game can be
 Download page => 
 Graphics tier => 
 The tier from the game menu. The values under 'Graphics' override parts of it. => 
+Move up => 
+Move down => 
 Press a key … (Esc = none) => 
 – none – => 
 GK2 Vanilla+ {0} is available – press F9 to update => 
