@@ -344,3 +344,5 @@ If you're enjoying GK2 Vanilla+, a quick thumbs-up rating on the Steam Workshop 
 👍 Rate it now => 👍 Оценить сейчас
 Remind me later => Напомнить позже
 Don't ask again => Больше не спрашивать
+Instant removal => Мгновенный снос
+Remove mode (building): placed objects like workbenches, chests or furnaces are removed right away instead of your character walking there first. You get the same materials back. Helps with objects your character cannot reach. => Режим сноса (строительство): размещённые объекты — верстаки, сундуки, печи и т. д. — убираются сразу, без того чтобы персонаж сначала к ним подходил. Вы получаете те же материалы. Помогает с объектами, до которых персонаж не может добраться.

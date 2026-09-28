@@ -344,3 +344,5 @@ If you're enjoying GK2 Vanilla+, a quick thumbs-up rating on the Steam Workshop 
 👍 Rate it now => 👍 立即评分
 Remind me later => 稍后提醒我
 Don't ask again => 不再询问
+Instant removal => 即时拆除
+Remove mode (building): placed objects like workbenches, chests or furnaces are removed right away instead of your character walking there first. You get the same materials back. Helps with objects your character cannot reach. => 拆除模式（建造）：工作台、箱子、熔炉等已放置的物体会立即移除，角色无需先走过去。返还的材料与正常拆除相同。适用于角色无法到达的物体。

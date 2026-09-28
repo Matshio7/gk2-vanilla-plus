@@ -536,6 +536,7 @@ namespace GK2Tweaks
             DrawEntry(Plugin.MenuModdedLabel);
             DrawEntry(Plugin.GameMenuButton);
             DrawEntry(Plugin.WeekPlanNotify);
+            DrawEntry(Plugin.InstantRemove);
 
             DrawBackups();
 

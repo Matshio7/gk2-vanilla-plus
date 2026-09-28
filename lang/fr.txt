@@ -344,3 +344,5 @@ If you're enjoying GK2 Vanilla+, a quick thumbs-up rating on the Steam Workshop 
 👍 Rate it now => 👍 Évaluer maintenant
 Remind me later => Me le rappeler plus tard
 Don't ask again => Ne plus demander
+Instant removal => Suppression instantanée
+Remove mode (building): placed objects like workbenches, chests or furnaces are removed right away instead of your character walking there first. You get the same materials back. Helps with objects your character cannot reach. => Mode démolition (construction) : les objets placés comme établis, coffres ou fours sont retirés immédiatement, sans que ton personnage doive d'abord s'y rendre. Tu récupères les mêmes matériaux. Utile pour les objets que ton personnage ne peut pas atteindre.

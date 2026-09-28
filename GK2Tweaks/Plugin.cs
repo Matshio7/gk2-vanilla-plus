@@ -13,7 +13,7 @@ namespace GK2Tweaks
     {
         public const string Guid = "mats.gk2.tweaks";
         public const string PluginName = "GK2 Tweaks";
-        public const string PluginVersion = "1.5.2";
+        public const string PluginVersion = "1.5.3";
         internal const string Keep = "Default";
 
         internal static Plugin Instance;
@@ -33,7 +33,7 @@ namespace GK2Tweaks
         internal static ConfigEntry<string> GameLog;
         // [Interface]
         internal static ConfigEntry<KeyboardShortcut> MenuKey, OverlayKey, SaveKey, WeekPlanKey, HudKey;
-        internal static ConfigEntry<bool> WeekPlanNotify;
+        internal static ConfigEntry<bool> WeekPlanNotify, InstantRemove;
         internal static ConfigEntry<int> BackupCount, BackupMinutes;
         internal static ConfigEntry<bool> ShowOverlay, CheckUpdates;
         internal static ConfigEntry<int> StatsLogSeconds;
@@ -83,7 +83,7 @@ namespace GK2Tweaks
 
             try { SafeMode.CheckGame(); } catch (Exception e) { Log.LogError("Safe mode check failed: " + e); }
             var harmony = new Harmony(Guid);
-            var patches = new System.Collections.Generic.List<Type> { typeof(TierPatch), typeof(ScreenSettingsPatch), typeof(SaveBlockPatch), typeof(ZoomPatch), typeof(ModdedLabelPatch), typeof(BackupPatch), typeof(MainMenuModsButtonPatch), typeof(PauseModsButtonPatch), typeof(CraftCellPinPatch), typeof(SelectionPinPatch), typeof(QuestPinPatch), typeof(LongNotes) };
+            var patches = new System.Collections.Generic.List<Type> { typeof(TierPatch), typeof(ScreenSettingsPatch), typeof(SaveBlockPatch), typeof(ZoomPatch), typeof(ModdedLabelPatch), typeof(BackupPatch), typeof(MainMenuModsButtonPatch), typeof(PauseModsButtonPatch), typeof(CraftCellPinPatch), typeof(SelectionPinPatch), typeof(QuestPinPatch), typeof(LongNotes), typeof(InstantRemovePatch) };
 #if DEV
             if (BenchEnabled.Value) patches.Add(typeof(SystemProfiler));
 #endif
@@ -178,6 +178,7 @@ namespace GK2Tweaks
             WeekPlanKey = Config.Bind("Interface", "WeekPlanKey", new KeyboardShortcut(KeyCode.F6), "Key for the week plan (what is possible on which weekday).");
             HudKey = Config.Bind("Interface", "HideHudKey", new KeyboardShortcut(KeyCode.F7), "Key to hide/show the game's HUD, e.g. for screenshots. Esc shows it again.");
             WeekPlanNotify = Config.Bind("Comfort", "DailyReminder", true, "Show a notification each morning with what is possible today (only features you have already unlocked).");
+            InstantRemove = Config.Bind("Comfort", "InstantRemove", false, "Remove mode (building): placed objects like workbenches, chests or furnaces are removed right away instead of your character walking there first. You get the same materials back. Helps with objects your character cannot reach.");
             BackupCount = Config.Bind("Backups", "KeepBackups", 5, new ConfigDescription(
                 "Before the game overwrites a save, the previous save is backed up (BepInEx/GK2VanillaPlus/Backups). Number of backups kept per save slot, 0 = off.",
                 new AcceptableValueList<int>(0, 3, 5, 10, 20)));

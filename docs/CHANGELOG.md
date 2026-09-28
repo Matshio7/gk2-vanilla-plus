@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.5.3 – 2026-09-28
+
+**EN**
+- New: **Instant removal** (mod menu → Comfort, off by default) – in the building remove mode, workbenches, chests, furnaces etc. are removed right away instead of your character walking there first. You get the same materials back. Fixes objects placed next to the ruins that your character could never reach. Thanks for the suggestion!
+
+**DE**
+- Neu: **Sofort abbauen** (Mod-Menü → Komfort, standardmäßig aus) – im Abriss-Modus beim Bauen werden Werkbänke, Truhen, Öfen usw. sofort entfernt, statt dass deine Figur erst hinläuft. Du bekommst dieselben Materialien zurück. Hilft bei Objekten neben den Ruinen, die deine Figur nie erreicht. Danke für den Vorschlag!
+
 ## 1.5.2 – 2026-09-27 <!-- silent -->
 
 **EN**

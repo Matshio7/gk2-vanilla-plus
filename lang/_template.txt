@@ -67,6 +67,7 @@ Save key =>
 Week plan key => 
 Hide HUD key => 
 Daily reminder => 
+Instant removal => 
 Backups per save => 
 Minimum interval => 
 Check for updates => 
@@ -173,6 +174,7 @@ Check GitHub once per game start for a new version of GK2 Vanilla+ (only reads t
 Key for the week plan (what is possible on which weekday). => 
 Key to hide/show the game's HUD, e.g. for screenshots. Esc shows it again. => 
 Show a notification each morning with what is possible today (only features you have already unlocked). => 
+Remove mode (building): placed objects like workbenches, chests or furnaces are removed right away instead of your character walking there first. You get the same materials back. Helps with objects your character cannot reach. => 
 Before the game overwrites a save, the previous save is backed up (BepInEx/GK2VanillaPlus/Backups). Number of backups kept per save slot, 0 = off. => 
 Minimum minutes between two backups of the same slot (avoids a backup on every autosave). => 
 Key for saving the game manually (empty = only the button in the mod menu). => 

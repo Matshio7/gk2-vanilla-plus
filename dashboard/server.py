@@ -258,8 +258,13 @@ if __name__ == "__main__":
     restore_page_values()
     threading.Thread(target=poller, daemon=True).start()
     threading.Thread(target=status_poller, daemon=True).start()
-    srv = ThreadingHTTPServer(("127.0.0.1", PORT), Handler)
-    print("GK2 Vanilla+ Dashboard: http://localhost:%d  (Strg+C zum Beenden)" % PORT)
+    srv = ThreadingHTTPServer(("0.0.0.0", PORT), Handler)
+    try:
+        import socket
+        _s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM); _s.connect(("192.168.0.1", 1)); lan = _s.getsockname()[0]; _s.close()
+    except Exception:
+        lan = "?"
+    print("GK2 Vanilla+ Dashboard: http://localhost:%d  |  im Heimnetz: http://%s:%d  (Strg+C zum Beenden)" % (PORT, lan, PORT))
     try:
         srv.serve_forever()
     except KeyboardInterrupt:

@@ -40,6 +40,7 @@ namespace GK2Tweaks
             { "Ultrawide", new[] { "Ultrawide-Hauptmenü", "Ultrawide main menu" } },
             { "Hud", new[] { "HUD ausblenden", "Hide HUD" } },
             { "WorkshopUpload", new[] { "Workshop-Upload", "Workshop upload" } },
+            { "InstantRemove", new[] { "Sofort abbauen", "Instant removal" } },
         };
 
         internal static string Name(string f) => names.TryGetValue(f, out string[] n) ? Labels.T(n[0], n[1]) : f;
@@ -56,6 +57,7 @@ namespace GK2Tweaks
                 case "ZoomPatch": return "Zoom";
                 case "BackupPatch": case "SaveBlockPatch": return "Saves";
                 case "TierPatch": case "ScreenSettingsPatch": return "Graphics";
+                case "InstantRemovePatch": return "InstantRemove";
                 default: return patch.Name;
             }
         }
@@ -120,6 +122,9 @@ namespace GK2Tweaks
             F("SkipLogos", () => typeof(LazyBearTechnology.Preloader.LazyPreloader), "videoPlayer");
             F("MenuInfo", () => typeof(UIMainMenuInfoPanel), "versionLabel");
             M("WorkshopUpload", () => typeof(SteamWorkshopCreatorService), "SubmitContent");
+            M("InstantRemove", () => typeof(Wgo), "DoBuildRemove");
+            M("InstantRemove", () => typeof(CraftComponent), "TryFinishCurCraft");
+            F("InstantRemove", () => typeof(CraftComponent), "IsDestroyingCraftActive");
 
             foreach (Check c in checks)
             {
