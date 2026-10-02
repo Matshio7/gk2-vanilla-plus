@@ -696,7 +696,6 @@ namespace GK2Tweaks
                 DrawEntry(Plugin.MenuExtend);
                 DrawEntry(Plugin.MenuModdedLabel);
                 DrawEntry(Plugin.GameMenuButton);
-                if (ModsButton.FrameworkInstalled) GUILayout.Label(Labels.T("GK2 Mod Framework ist installiert – dessen „Mods“-Button wird genutzt, Vanilla+ öffnest du mit F9.", "GK2 Mod Framework is installed – its \"Mods\" button is used, open Vanilla+ with F9."), labelStyle);
 #if !NEXUS
                 DrawEntry(Plugin.CheckUpdates);
 #endif

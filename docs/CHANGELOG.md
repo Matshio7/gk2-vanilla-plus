@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.6.1 – 2026-10-02
+
+**EN**
+- **Hotfix:** the game could close on startup when **GK2 Mod Framework** was installed as well. Vanilla+ no longer hooks into the framework's Mods menu and shows its own "Mods" button again, like before 1.6.0. Both mods work side by side.
+
+**DE**
+- **Hotfix:** Das Spiel konnte sich beim Start schließen, wenn zusätzlich **GK2 Mod Framework** installiert war. Vanilla+ klinkt sich nicht mehr in dessen Mods-Menü ein und zeigt wieder seinen eigenen „Mods“-Button wie vor 1.6.0. Beide Mods laufen nebeneinander.
+
 ## 1.6.0 – 2026-10-02
 
 **EN**

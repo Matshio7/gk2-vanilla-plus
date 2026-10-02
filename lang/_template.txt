@@ -355,7 +355,6 @@ Not fully vanilla – often requested, so it's an option (off by default): =>
 Camera => 
 Remove all pins => 
 Interface => 
-GK2 Mod Framework is installed – its "Mods" button is used, open Vanilla+ with F9. => 
 Keys => 
 FPS display => 
 Open screenshot folder => 

@@ -25,13 +25,14 @@ namespace GK2Tweaks
                     bool has = false;
                     try { has = BepInEx.Bootstrap.Chainloader.PluginInfos.ContainsKey(FrameworkGuid); } catch { }
                     framework = has ? 1 : 0;
-                    if (has) Plugin.Log.LogInfo("GK2 Mod Framework detected: its Mods button is used, Vanilla+ adds no second one (menu: F9)");
+                    if (has) Plugin.Log.LogInfo("GK2 Mod Framework detected: both Mods buttons are shown, no bridge is loaded (1.6.1 hotfix)");
                 }
                 return framework == 1;
             }
         }
 
-        internal static bool Show => Plugin.GameMenuButton.Value && !FrameworkInstalled;
+        // 1.6.1 Hotfix: wieder ein eigener Button wie vor 1.6.0, auch wenn das Framework installiert ist
+        internal static bool Show => Plugin.GameMenuButton.Value;
 
         internal static void ApplyVisibility()
         {

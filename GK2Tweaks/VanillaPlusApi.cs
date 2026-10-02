@@ -67,9 +67,13 @@ namespace GK2Tweaks
     {
         internal const string File = "GK2VanillaPlus.FrameworkBridge.dll";
 
+        // 1.6.1 Hotfix: die Bruecke liess das Spiel zusammen mit GK2 Mod Framework beim Start abstuerzen.
+        // Bis das sicher geklaert ist, wird sie nicht mehr geladen (Vanilla+ hat wieder seinen eigenen Mods-Button).
+        internal static bool Enabled = false;
+
         internal static void TryLoad()
         {
-            if (!ModsButton.FrameworkInstalled) return;
+            if (!Enabled || !ModsButton.FrameworkInstalled) return;
             try
             {
                 string dir = System.IO.Path.GetDirectoryName(typeof(Plugin).Assembly.Location);

@@ -16,7 +16,6 @@ rm -rf "$R/stage"; mkdir -p "$F/BepInEx/plugins/GK2Ultrawide" "$F/BepInEx/plugin
 cp -R "$B/BepInEx/." "$F/"
 cp "$ROOT/GK2Ultrawide/bin/Release/GK2Ultrawide.dll" "$F/BepInEx/plugins/GK2Ultrawide/"
 cp "$ROOT/GK2Tweaks/bin/Release/GK2Tweaks.dll" "$F/BepInEx/plugins/GK2Tweaks/"
-cp "$ROOT/FrameworkBridge/bin/Release/GK2VanillaPlus.FrameworkBridge.dll" "$F/BepInEx/plugins/GK2Tweaks/"
 cp "$ROOT/LICENSE.md" "$F/BepInEx/GK2VanillaPlus/LICENSE.md"
 # Sprachen: eingebaut in der DLL; die Vorlage liegt fuer eigene Uebersetzungen bei
 python3 "$ROOT/tools/extract_strings.py" >/dev/null

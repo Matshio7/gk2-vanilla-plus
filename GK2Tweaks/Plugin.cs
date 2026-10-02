@@ -14,7 +14,7 @@ namespace GK2Tweaks
     {
         public const string Guid = "mats.gk2.tweaks";
         public const string PluginName = "GK2 Tweaks";
-        public const string PluginVersion = "1.6.0";
+        public const string PluginVersion = "1.6.1";
         internal const string Keep = "Default";
 
         internal static Plugin Instance;
