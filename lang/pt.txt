@@ -56,7 +56,7 @@ Widen main menu => Ampliar menu principal
 Skip logos => Pular logotipos
 "modded" note => Nota “modded”
 Game log => Log do jogo
-"Mods" button in menus => Botão “Mods” nos menus
+"Vanilla+" button in menus => Botão “Vanilla+” nos menus
 Show FPS display => Mostrar FPS
 Stats to log => Estatísticas no log
 Mod menu key => Tecla do menu do mod
@@ -181,7 +181,7 @@ Pause the game while its window is in the background (saves battery and heat). =
 Fill the sides of the main menu on ultrawide screens with a blurred copy of the menu image. => Preenche as laterais do menu principal em telas ultrawide com uma cópia desfocada da imagem do menu.
 Skip the logos and intro videos when the game starts. => Pula os logotipos e vídeos de introdução ao iniciar o jogo.
 Show a 'modded' note next to the version number in the main menu. => Mostra uma nota “modded” ao lado do número da versão no menu principal.
-Show a 'Mods' button in the main menu and the pause menu (opens this mod menu). => Mostra um botão “Mods” no menu principal e no menu de pausa (abre este menu do mod).
+Show a 'Vanilla+' button in the main menu and the pause menu (opens this mod menu). => Mostra um botão “Vanilla+” no menu principal e no menu de pausa (abre este menu do mod).
 Extra autosave every N minutes (0 = off). Only saves while you are in free control. => Salvamento automático extra a cada N minutos (0 = desligado). Só salva quando você controla o personagem livremente.
 Key for the mod menu. => Tecla do menu do mod.
 Key for the FPS display. => Tecla para mostrar o FPS.
@@ -400,10 +400,10 @@ Trade: suggest the thumbs-up amount => Comércio: sugerir a quantidade do joinha
 Rename zombies => Renomear zumbis
 Português => Português
 Inventory only => Só o inventário
-1,000+ players – thank you! => 1.000+ jogadores – obrigado!
+1,000+ players · thanks! => 1.000+ jogadores · obrigado!
 Controller: LB / RB switches tabs => Controle: LB / RB troca de aba
 All features => Todas as funções
-"All off" turns every feature of the mod off – the game is vanilla again. Then just turn on the 1–2 things you want. "Default" restores the mod's recommended setup. Keys, language and the Mods button stay. => "Desligar tudo" desliga todas as funções do mod – o jogo volta a ser vanilla. Depois ligue só as 1–2 coisas que quiser. "Padrão" restaura a configuração recomendada. Teclas, idioma e o botão Mods continuam.
+"All off" turns every feature of the mod off – the game is vanilla again. Then just turn on the 1–2 things you want. "Default" restores the mod's recommended setup. Keys, language and the Vanilla+ button stay. => "Desligar tudo" desliga todas as funções do mod – o jogo volta a ser vanilla. Depois ligue só as 1–2 coisas que quiser. "Padrão" restaura a configuração recomendada. Teclas, idioma e o botão Vanilla+ continuam.
 Sure? Click again => Certeza? Clique de novo
 All off (vanilla) => Desligar tudo (vanilla)
 All off – now turn on only what you want. => Tudo desligado – agora ligue só o que quiser.
@@ -443,3 +443,23 @@ New name => Novo nome
 Pinned => Fixado
 Nothing pinned. Use the pin icon in recipes, blueprints and quests. => Nada fixado. Use o ícone de alfinete em receitas, projetos e missões.
 A expand · ←→ amount · LB/RB variant · Y unpin · release RT = done => A expandir · ←→ quantidade · LB/RB variante · Y desafixar · soltar RT = pronto
+
+# 1.6.2
+Wake up with Esc/B => Acordar com Esc/B
+While sleeping in bed, Esc or B (Circle) wakes you up early, like in Graveyard Keeper 1. You keep only the energy you have slept so far. => Enquanto dorme na cama, Esc ou B (Círculo) acorda você mais cedo, como em Graveyard Keeper 1. Você mantém só a energia recuperada até ali.
+Wake up => Acordar
+"Better Sleep" is installed – wake up stays off. => "Better Sleep" está instalado – acordar continua desligado.
+Controller: hold RT for pins => Controle: segurar RT para os fixados
+Controller: hold RT (R2) during normal play to navigate the pinned list. Only works while no game window is open. => Controle: segure RT (R2) durante o jogo para navegar pela lista fixada. Só funciona quando nenhuma janela do jogo está aberta.
+Controller: hold button for pins => Controle: botão a segurar para os fixados
+Wake up early => Acordar mais cedo
+Wake up: key => Acordar: tecla
+Wake up: controller button => Acordar: botão do controle
+While sleeping in bed, a key (by default Esc or B) wakes you up early, like in Graveyard Keeper 1. You keep only the energy you have slept so far. => Enquanto dorme na cama, uma tecla (por padrão Esc ou B) acorda você mais cedo, como em Graveyard Keeper 1. Você mantém só a energia recuperada até ali.
+Keyboard key that wakes you up early while sleeping. => Tecla que acorda você mais cedo enquanto dorme.
+Controller button that wakes you up early while sleeping. => Botão do controle que acorda você mais cedo enquanto dorme.
+Controller: hold this button during normal play to navigate the pinned list (only while no game window is open). Off = never. => Controle: segure este botão durante o jogo para navegar pela lista fixada (só quando nenhuma janela do jogo está aberta). Desligado = nunca.
+– off – => – desligado –
+Controller: hold this button during normal play to navigate the pinned list (only while no game window is open). Click the field and press any controller button; Esc = off. => Controle: segure este botão durante o jogo para navegar pela lista fixada (só quando nenhuma janela do jogo está aberta). Clique no campo e pressione qualquer botão do controle; Esc = desligado.
+Press a controller button … (Esc = off) => Pressione um botão do controle … (Esc = desligado)
+Controller: button for pins => Controle: botão para os fixados

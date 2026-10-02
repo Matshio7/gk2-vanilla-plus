@@ -52,6 +52,17 @@ namespace GK2Tweaks
         // Tastenname fuer die Anzeige (z. B. "Y"), null = keine freie Taste
         internal static string Name(object window) => For(window)?.Name;
 
+        // frei belegbare Controller-Knoepfe (Einstellungen) -> Rewired-Aktion
+        internal static int Id(string name)
+        {
+            switch (name)
+            {
+                case "X": return 2; case "Y": return 3; case "A": return 4; case "B": return 5;
+                case "LB": return 6; case "RB": return 7; case "LT": return 8; case "RT": return 9;
+                default: return -1;
+            }
+        }
+
         internal static bool Down(object window)
         {
             Slot s = For(window);

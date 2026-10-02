@@ -11,7 +11,7 @@ namespace GK2Tweaks
     // man wieder ins Spielmenue zurueck.
     internal static class ModsButton
     {
-        internal static string Label => Labels.T("Mods", "Mods");
+        internal static string Label => "Vanilla+";   // eigener Name, damit es neben dem "Mods"-Button anderer Mods eindeutig ist
 
         // GK2 Mod Framework bringt einen eigenen "Mods"-Button mit -> dann keinen zweiten anzeigen
         internal const string FrameworkGuid = "ru.superman4eg.gk2.framework";

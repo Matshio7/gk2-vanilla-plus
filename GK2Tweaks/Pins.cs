@@ -79,12 +79,28 @@ namespace GK2Tweaks
             try { return Clean(LLBase.L(id)); } catch { return id; }
         }
 
+        // Titel eines Rezepts: viele Rezepte haben keinen eigenen Namen (dann stand die ID da, z. B. "set_grave_top_wd_1")
+        // -> Name des hergestellten Gegenstands nehmen
+        internal static string CraftTitleKey(CraftDef def)
+        {
+            try
+            {
+                string own = LLBase.L(def.id);
+                if (!string.IsNullOrEmpty(own) && own != def.id) return def.id;
+                string outId = Recipes.OutputOf(def);
+                if (!string.IsNullOrEmpty(outId) && LLBase.L(outId) != outId) return outId;
+            }
+            catch { }
+            return def.id;
+        }
+
         // Rezept direkt aus der Balance-Definition (Rezeptgitter der Werkbank)
         internal static Pin FromCraftDef(CraftDef def, WgoData wgo)
         {
             string icon = null;
             try { icon = def.GetOutputPreview(wgo).IconId; } catch { }
-            var p = new Pin { Key = "craft:" + def.id, Title = Loc(def.id), TitleKey = def.id, IconId = icon };
+            string tk = CraftTitleKey(def);
+            var p = new Pin { Key = "craft:" + def.id, Title = Loc(tk), TitleKey = tk, IconId = icon };
             foreach (NeedItemData n in def.needItems)
             {
                 if (n == null || string.IsNullOrEmpty(n.Id)) continue;
@@ -693,6 +709,11 @@ namespace GK2Tweaks
                     string[] f = l.Split('\t');
                     if (f.Length < 7 || f[0] != slot) continue;
                     var p = new Pins.Pin { Key = f[1], TitleKey = f[2], Suffix = f[3], IconId = N(f[4]), QuestId = N(f[5]) };
+                    if (p.Key != null && p.Key.StartsWith("craft:") && p.TitleKey == p.Key.Substring(6))
+                    {
+                        CraftDef cd = Recipes.Def(p.TitleKey);   // alte Pins mit Rezept-ID als Titel
+                        if (cd != null) p.TitleKey = Pins.CraftTitleKey(cd);
+                    }
                     p.Title = Pins.Loc(p.TitleKey) + p.Suffix;
                     if (p.QuestId != null)
                     {

@@ -14,7 +14,7 @@ namespace GK2Tweaks
     {
         public const string Guid = "mats.gk2.tweaks";
         public const string PluginName = "GK2 Tweaks";
-        public const string PluginVersion = "1.6.1";
+        public const string PluginVersion = "1.6.2";
         internal const string Keep = "Default";
 
         internal static Plugin Instance;
@@ -57,6 +57,7 @@ namespace GK2Tweaks
         // [Overlay] – FPS-Anzeige
         internal static ConfigEntry<string> OvCorner, OvLayout, PinsCorner, PinsSize, OvOrder, OvSeparator;
         internal static ConfigEntry<bool> PinsEnabled, PinsNotify, PinsAutoUnpin, PinsVariants, PinsTree, PinsFuel;
+        internal static ConfigEntry<string> PinsPadButton;
         internal static ConfigEntry<string> PinsChests;
         internal static ConfigEntry<bool> OvGpuTemp, OvFps, OvLows, OvFrameTime, OvCpu, OvGpu, OvRam, OvVram, OvResolution, OvClock, OvWeekday, OvGameTime;
 #if DEV
@@ -176,7 +177,7 @@ namespace GK2Tweaks
             MenuExtend = Config.Bind("Comfort", "MainMenuExtend", true, "Fill the sides of the main menu on ultrawide screens with a blurred copy of the menu image.");
             SkipIntro = Config.Bind("Comfort", "SkipIntro", false, "Skip the logos and intro videos when the game starts.");
             MenuModdedLabel = Config.Bind("Comfort", "MainMenuModdedLabel", true, "Show a 'modded' note next to the version number in the main menu.");
-            GameMenuButton = Config.Bind("Comfort", "GameMenuButton", true, "Show a 'Mods' button in the main menu and the pause menu (opens this mod menu).");
+            GameMenuButton = Config.Bind("Comfort", "GameMenuButton", true, "Show a 'Vanilla+' button in the main menu and the pause menu (opens this mod menu).");
             AutoSaveMinutes = Config.Bind("Comfort", "AutoSaveMinutes", 0, new ConfigDescription(
                 "Extra autosave every N minutes (0 = off). Only saves while you are in free control.",
                 new AcceptableValueList<int>(0, 5, 10, 15, 20, 30)));
@@ -249,6 +250,7 @@ namespace GK2Tweaks
             PinsAutoUnpin = Config.Bind("Pins", "AutoUnpin", true, "Unpin a recipe automatically when you start crafting it.");
             PinsVariants = Config.Bind("Pins", "RecipeVariants", true, "Under a pinned recipe: the workbench and, if the item can be made in several ways, < > to switch between the recipes (only known recipes).");
             PinsTree = Config.Bind("Pins", "IngredientTree", true, "Ingredients you can craft yourself get a + that shows their own ingredients (up to 3 levels).");
+            PinsPadButton = Config.Bind("Pins", "ControllerButton", "RT", "Controller: hold this button during normal play to navigate the pinned list (only while no game window is open). Click the field and press any controller button; Esc = off.");
             PinsFuel = Config.Bind("Pins", "ShowFuel", true, "Show the fuel a recipe needs from its workbench (e.g. a furnace) as an extra line.");
             PinsCorner = Config.Bind("Pins", "Corner", "TopRight", new ConfigDescription("Screen corner of the pinned list.",
                 new AcceptableValueList<string>("TopLeft", "TopRight", "BottomLeft", "BottomRight")));
@@ -319,6 +321,7 @@ namespace GK2Tweaks
             SafeMode.Run("HudCenter", GK2Tweaks.HudCenter.Tick);
             SafeMode.Run("HudClock", GK2Tweaks.HudClock.Tick);
             SafeMode.Run("EscLeave", () => GK2Tweaks.EscLeave.Tick(Gui.AnyWindowOpen));
+            SafeMode.Run("Pins", PadBind.Tick);
             SafeMode.Run("MoveObjects", BuildMove.Tick);
 #if MINIMAP
             SafeMode.Run("Minimap", Minimap.Tick);

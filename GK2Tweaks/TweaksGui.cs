@@ -681,6 +681,7 @@ namespace GK2Tweaks
                 DrawEntry(Plugin.PinsVariants);
                 DrawEntry(Plugin.PinsTree);
                 DrawEntry(Plugin.PinsFuel);
+                DrawEntry(Plugin.PinsPadButton);
                 DrawEntry(Plugin.PinsCorner);
                 DrawEntry(Plugin.PinsSize);
                 if (Pins.List.Count > 0 && Btn(Labels.T("Alle Pins entfernen", "Remove all pins"), buttonStyle, GUILayout.Width(260))) Defer(Pins.ClearAll);
@@ -1150,7 +1151,8 @@ namespace GK2Tweaks
             GUILayout.BeginHorizontal();
             GUILayout.Label(new GUIContent(Labels.Name(e), Labels.Tip(e)), labelStyle, GUILayout.Width(268));
             AcceptableValueBase acc = e.Description?.AcceptableValues;
-            if (e.SettingType == typeof(bool))
+            if (e == Plugin.PinsPadButton) PadBindField(Plugin.PinsPadButton, pf);
+            else if (e.SettingType == typeof(bool))
             {
                 bool v = (bool)e.BoxedValue;
                 if (GUILayout.Button(v ? Labels.T("An", "On") : Labels.T("Aus", "Off"), buttonStyle, GUILayout.Width(310))) e.BoxedValue = !v;
@@ -1172,6 +1174,16 @@ namespace GK2Tweaks
             if (GUILayout.Button("<", arrowStyle, GUILayout.Width(36))) e.BoxedValue = values[(i - 1 + values.Length) % values.Length];
             GUILayout.Label(Labels.Value(e, values[i]), valueStyle, GUILayout.Width(230));
             if (GUILayout.Button(">", arrowStyle, GUILayout.Width(36))) e.BoxedValue = values[(i + 1) % values.Length];
+        }
+
+        // Controller-Taste frei belegen: Feld anklicken (oder A), dann beliebige Controller-Taste druecken; Esc = aus
+        private void PadBindField(ConfigEntry<string> e, bool focused)
+        {
+            bool cap = PadBind.Capturing == e;
+            string text = cap ? Labels.T("Controller-Taste drücken … (Esc = aus)", "Press a controller button … (Esc = off)") : PadBind.Display(e.Value);
+            bool click = GUILayout.Button(text, buttonStyle, GUILayout.Width(310));
+            if (!cap && focused && Take(ref padA)) click = true;
+            if (click && !cap) Defer(() => PadBind.Start(e));
         }
 
         private void KeyField(ConfigEntry<KeyboardShortcut> e)

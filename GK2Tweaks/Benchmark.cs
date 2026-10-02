@@ -115,7 +115,7 @@ namespace GK2Tweaks
                     break;
 
                 case Phase.Warmup:
-                    if (Plugin.BenchMenuShot.Value) { if (Steam) SteamTour(inPhase); else if (Features) FeatureTour(inPhase); else MenuShot(inPhase); }
+                    if (Plugin.BenchMenuShot.Value) { if (Steam16) Steam16Tour(inPhase); else if (Steam) SteamTour(inPhase); else if (Features) FeatureTour(inPhase); else MenuShot(inPhase); }
                     if (inPhase >= Plugin.BenchWarmup.Value)
                     {
                         if (Plugin.Instance.Gui.MenuOpen) Plugin.Instance.Gui.SetMenu(false);
@@ -266,7 +266,8 @@ namespace GK2Tweaks
             else if (shotStep == 29 && inPhase > 142f) { Plugin.Instance.Gui.SetMenu(false); shotStep = 30; }
         }
 
-        private static bool Steam => Plugin.BenchShotSet.Value == "steam";
+        private static bool Steam => Plugin.BenchShotSet.Value == "steam" || Steam16;
+        private static bool Steam16 => Plugin.BenchShotSet.Value == "steam16";
         private static bool Features => Plugin.BenchShotSet.Value == "features";
         private bool savesShot;
         private bool featStarted;
@@ -438,6 +439,101 @@ namespace GK2Tweaks
                 case 27: if (t > 145f) { Shot("s14_benchmark_result"); shotStep++; } break;
                 case 28: if (t > 147f) { gui.SetMenu(false); TourRestore(); Plugin.LastSeenVersion.Value = "1.2.0"; if (origLang != null) Try(() => SetGameLanguage(origLang)); shotStep++; } break;
             }
+        }
+
+        // 1.6: Bilder fuer Store-Seite. Erst per Karte zum eigenen Hof (Werkbaenke, Zombies), dann je Bild:
+        // Zustand herstellen -> naechster Schritt Screenshot -> naechster Schritt aufraeumen (Screenshot wird erst am Frame-Ende gemacht)
+        private float tourT0 = -1f;
+        private void Steam16Tour(float t)
+        {
+            TweaksGui gui = Plugin.Instance.Gui;
+            if (tourT0 < 0f)
+            {
+                if (shotStep == 0 && t > 8f) { Try(OpenMap); shotStep = 1; }
+                else if (shotStep == 1 && t > 11f) { Try(TeleportHome); shotStep = 2; }
+                else if (shotStep == 2 && t > 26f) { tourT0 = t; shotStep = 0; }
+                return;
+            }
+            float u = t - tourT0;
+            switch (shotStep)
+            {
+                case 0: if (u > 1f) { Shot("v01_gameplay_clock"); shotStep++; } break;
+                case 1: if (u > 2f) { Pins.List.Clear(); Try(OpenNearestWorkbench); shotStep++; } break;
+                case 2: if (u > 5f) { Try(PinFirstRecipes); Try(PinOtherWorkbenches); Try(() => { if (Pins.List.Count > 0) { PinTree.StepMult(Pins.List[0], 1); PinTree.StepMult(Pins.List[0], 1); } }); shotStep++; } break;
+                case 3: if (u > 8f) { Shot("v02_workbench_pins"); shotStep++; } break;
+                case 4: if (u > 9f) { Try(() => LazyUI.GetWindow<UICraftWindow>().Close()); shotStep++; } break;
+                case 5: if (u > 10f) { Try(ExpandFirstRows); shotStep++; } break;
+                case 6: if (u > 13f) { Plugin.Log.LogInfo("[BENCH] pins " + Pins.List.Count); Shot("v03_pins_panel"); shotStep++; } break;
+                case 7: if (u > 14f) { Pins.List.Clear(); Try(OpenSomeZombie); shotStep++; } break;
+                case 8: if (u > 18f) { Shot("v04_zombie_rename"); shotStep++; } break;
+                case 9: if (u > 19f) { Try(() => LazyUI.GetWindow<UIZombieWorkerWindow>().Close()); gui.SetMenu(true); gui.TourTab(0); shotStep++; } break;
+                case 10: if (u > 22f) { Shot("v05_menu_overview"); shotStep++; } break;
+                case 11: if (u > 23f) { gui.TourTab(1); shotStep++; } break;
+                case 12: if (u > 25f) { Shot("v06_menu_graphics"); shotStep++; } break;
+                case 13: if (u > 26f) { gui.TourTab(2); shotStep++; } break;
+                case 14: if (u > 28f) { Shot("v07_menu_comfort"); shotStep++; } break;
+                case 15: if (u > 29f) { gui.TourTab(3); shotStep++; } break;
+                case 16: if (u > 31f) { Shot("v08_menu_pins"); shotStep++; } break;
+                case 17: if (u > 32f) { gui.TourTab(0); gui.SetMenu(false); shotStep++; } break;
+                case 18: if (u > 34f) { gui.ToggleWeekPlan(); shotStep++; } break;
+                case 19: if (u > 37f) { Shot("v09_weekplan"); shotStep++; } break;
+                case 20: if (u > 38f) { gui.ToggleWeekPlan(); shotStep++; } break;
+                case 21: if (u > 40f) { shotStep = 25; } break;
+                case 25: if (u > 51f)
+                    {
+                        TourSet(Plugin.ShowOverlay, true); TourSet(Plugin.OvCorner, "TopRight"); TourSet(Plugin.OvLayout, "Row");
+                        foreach (var e in new ConfigEntryBase[] { Plugin.OvFps, Plugin.OvLows, Plugin.OvCpu, Plugin.OvRam, Plugin.OvVram }) TourSet(e, true);
+                        TourSet(Plugin.OvFrameTime, false); TourSet(Plugin.OvGpu, false); TourSet(Plugin.OvResolution, false); TourSet(Plugin.OvClock, false); TourSet(Plugin.OvWeekday, false); TourSet(Plugin.OvGameTime, false);
+                        shotStep++;
+                    } break;
+                case 26: if (u > 54f) { Shot("v11_overlay"); shotStep++; } break;
+                case 27: if (u > 55f) { TourRestore(); if (origLang != null) Try(() => SetGameLanguage(origLang)); shotStep++; } break;
+            }
+        }
+
+        private static void OpenMap()
+        {
+            ((LazyWindow<MapPageWidgetData>)LazyUI.GetWindow<UIMapWindow>()).Open(new MapPageWidgetData(MainGame.Instance.GameSave, true, ""));
+        }
+
+        // Kartenpunkt "zu Hause" waehlen (Friedhof/Hof), wie ein Klick auf der Karte
+        private static void TeleportHome()
+        {
+            MapPageWidget page = UnityEngine.Object.FindFirstObjectByType<MapPageWidget>();
+            UIMapMilestone pick = null; int best = 99;
+            string[] prefer = { "home", "house", "yard", "grave", "church", "cemetery" };
+            foreach (UIMapMilestone m in UnityEngine.Object.FindObjectsByType<UIMapMilestone>(FindObjectsSortMode.None))
+            {
+                if (m == null || m.WgoData == null || m.UIMapMilestoneData == null) continue;
+                string id = m.WgoData.Definition != null ? m.WgoData.Definition.id : "?";
+                Plugin.Log.LogInfo("[BENCH] milestone " + id);
+                for (int i = 0; i < prefer.Length; i++)
+                    if (id.IndexOf(prefer[i], StringComparison.OrdinalIgnoreCase) >= 0 && i < best) { best = i; pick = m; }
+            }
+            Plugin.Log.LogInfo("[BENCH] teleport to " + (pick != null ? pick.WgoData.Definition.id : "none"));
+            if (pick != null && page != null) page.OnPressMapMilestone(pick);
+            else Try(() => LazyUI.GetWindow<UIMapWindow>().Close());
+        }
+
+        private static void ExpandFirstRows()
+        {
+            foreach (Pins.Pin p in Pins.List)
+                foreach (var r in p.Rows)
+                    if (r.Expandable && !r.Expanded) { PinTree.ToggleOpen(p, r.Path); break; }
+        }
+
+        private static void OpenSomeZombie()
+        {
+            Vector3 pos = MainGame.PlayerController.transform.position;
+            ZombieWgoData best = null; float bd = float.MaxValue;
+            foreach (Wgo w in UnityEngine.Object.FindObjectsByType<Wgo>(FindObjectsSortMode.None))
+            {
+                if (!(w.Data is ZombieWgoData z)) continue;
+                float d = Vector3.Distance(pos, w.transform.position);
+                if (d < bd) { bd = d; best = z; }
+            }
+            Plugin.Log.LogInfo("[BENCH] zombie " + (best != null));
+            if (best != null) ((LazyWindow<UIZombieWorkerWindowData>)LazyUI.GetWindow<UIZombieWorkerWindow>()).Open(new UIZombieWorkerWindowData(best));
         }
 
         private static void AccessTools_CloseNews(TweaksGui gui) => HarmonyLib.AccessTools.Method(typeof(TweaksGui), "CloseNews").Invoke(gui, null);

@@ -53,7 +53,7 @@ Widen main menu => 加宽主菜单
 Skip logos => 跳过开场标志
 "modded" note => “modded”标注
 Game log => 游戏日志
-"Mods" button in menus => 菜单中的“模组”按钮
+"Vanilla+" button in menus => 菜单中的“Vanilla+”按钮
 Show FPS display => 显示 FPS
 Stats to log => 统计写入日志
 Mod menu key => 模组菜单按键
@@ -145,7 +145,7 @@ Pause the game while its window is in the background (saves battery and heat). =
 Fill the sides of the main menu on ultrawide screens with a blurred copy of the menu image. => 在超宽屏上用模糊的菜单图像填充主菜单两侧。
 Skip the logos and intro videos when the game starts. => 启动游戏时跳过开场标志和视频。
 Show a 'modded' note next to the version number in the main menu. => 在主菜单版本号旁显示“modded”标注。
-Show a 'Mods' button in the main menu and the pause menu (opens this mod menu). => 在主菜单和暂停菜单中显示“模组”按钮（打开本菜单）。
+Show a 'Vanilla+' button in the main menu and the pause menu (opens this mod menu). => 在主菜单和暂停菜单中显示“Vanilla+”按钮（打开本菜单）。
 Extra autosave every N minutes (0 = off). Only saves while you are in free control. => 每 N 分钟额外自动存档（0 = 关）。仅在可自由操作时存档。
 Key for the mod menu. => 模组菜单按键。
 Key for the FPS display. => FPS 显示按键。
@@ -403,10 +403,10 @@ Rename zombies => 给僵尸改名
 No tearing (force VSync) => 防画面撕裂（强制垂直同步）
 Português => Português
 Inventory only => 仅背包
-1,000+ players – thank you! => 1000+ 玩家——谢谢！
+1,000+ players · thanks! => 1000+ 玩家 · 谢谢！
 Controller: LB / RB switches tabs => 手柄：LB / RB 切换标签页
 All features => 全部功能
-"All off" turns every feature of the mod off – the game is vanilla again. Then just turn on the 1–2 things you want. "Default" restores the mod's recommended setup. Keys, language and the Mods button stay. => “全部关闭”会关闭本模组的所有功能——游戏恢复原版。然后只开启你想要的 1–2 项即可。“默认”会恢复推荐设置。按键、语言和 Mods 按钮保持不变。
+"All off" turns every feature of the mod off – the game is vanilla again. Then just turn on the 1–2 things you want. "Default" restores the mod's recommended setup. Keys, language and the Vanilla+ button stay. => “全部关闭”会关闭本Vanilla+的所有功能——游戏恢复原版。然后只开启你想要的 1–2 项即可。“默认”会恢复推荐设置。按键、语言和 Vanilla+ 按钮保持不变。
 Sure? Click again => 确定？再点一次
 All off (vanilla) => 全部关闭（原版）
 All off – now turn on only what you want. => 已全部关闭——现在只开启你想要的。
@@ -447,3 +447,23 @@ New name => 新名字
 Pinned => 已置顶
 Nothing pinned. Use the pin icon in recipes, blueprints and quests. => 没有置顶内容。请在配方、蓝图和任务中使用图钉图标。
 A expand · ←→ amount · LB/RB variant · Y unpin · release RT = done => A 展开 · ←→ 数量 · LB/RB 配方 · Y 取消置顶 · 松开 RT = 完成
+
+# 1.6.2
+Wake up with Esc/B => 按 Esc/B 醒来
+While sleeping in bed, Esc or B (Circle) wakes you up early, like in Graveyard Keeper 1. You keep only the energy you have slept so far. => 在床上睡觉时，按 Esc 或 B（圆圈）可提前醒来，就像《Graveyard Keeper 1》一样。只保留到那时为止恢复的体力。
+Wake up => 醒来
+"Better Sleep" is installed – wake up stays off. => 已安装“Better Sleep”——醒来功能保持关闭。
+Controller: hold RT for pins => 手柄：按住 RT 操作固定列表
+Controller: hold RT (R2) during normal play to navigate the pinned list. Only works while no game window is open. => 手柄：在正常游戏中按住 RT（R2）可浏览固定列表。仅在未打开游戏窗口时生效。
+Controller: hold button for pins => 手柄：按住此键操作固定列表
+Wake up early => 提前醒来
+Wake up: key => 醒来：按键
+Wake up: controller button => 醒来：手柄按键
+While sleeping in bed, a key (by default Esc or B) wakes you up early, like in Graveyard Keeper 1. You keep only the energy you have slept so far. => 在床上睡觉时，按某个键（默认 Esc 或 B）可提前醒来，就像《Graveyard Keeper 1》一样。只保留到那时为止恢复的体力。
+Keyboard key that wakes you up early while sleeping. => 睡觉时提前醒来的键盘按键。
+Controller button that wakes you up early while sleeping. => 睡觉时提前醒来的手柄按键。
+Controller: hold this button during normal play to navigate the pinned list (only while no game window is open). Off = never. => 手柄：在正常游戏中按住此键可浏览固定列表（仅在未打开游戏窗口时）。关闭 = 从不。
+– off – => – 关闭 –
+Controller: hold this button during normal play to navigate the pinned list (only while no game window is open). Click the field and press any controller button; Esc = off. => 手柄：在正常游戏中按住此键可浏览固定列表（仅在未打开游戏窗口时）。点击此栏后按下任意手柄按键；Esc = 关闭。
+Press a controller button … (Esc = off) => 请按下手柄按键 …（Esc = 关闭）
+Controller: button for pins => 手柄：固定列表按键

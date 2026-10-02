@@ -1,5 +1,17 @@
 # Changelog
 
+## 1.6.2 – 2026-10-02
+
+**EN**
+- **Controller fix:** holding RT inside game windows (e.g. switching tabs) no longer takes over the pinned list – RT only controls pins during normal play. The button can be freely assigned or turned off: Pins → "Controller: button for pins", click and press any controller button.
+- Pins: recipes without their own name now show the item name instead of an internal ID.
+- The menu button is now called **"Vanilla+"** instead of "Mods", so it's clear next to the "Mods" button of other mods (e.g. GK2 Mod Framework).
+
+**DE**
+- **Controller-Fix:** RT in Spiel-Fenstern (z. B. Reiter wechseln) übernimmt nicht mehr die Pin-Liste – RT steuert Pins nur im normalen Spiel. Die Taste ist frei belegbar oder abschaltbar: Anpinnen → „Controller: Taste für Pins“ anklicken und beliebige Controller-Taste drücken.
+- Pins: Rezepte ohne eigenen Namen zeigen jetzt den Gegenstand statt einer internen ID.
+- Der Menü-Button heißt jetzt **„Vanilla+“** statt „Mods“ – so ist er neben dem „Mods“-Button anderer Mods (z. B. GK2 Mod Framework) eindeutig.
+
 ## 1.6.1 – 2026-10-02
 
 **EN**

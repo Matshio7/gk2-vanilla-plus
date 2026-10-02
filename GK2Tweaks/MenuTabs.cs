@@ -20,6 +20,8 @@ namespace GK2Tweaks
         private GUIStyle tabStyle, tabActiveStyle;
         private float masterConfirmUntil;
 
+        internal void TourTab(int t) => SetTab(t);
+
         private void SetTab(int t)
         {
             int n = tabNames.Length;
@@ -126,7 +128,7 @@ namespace GK2Tweaks
             GUILayout.BeginHorizontal();
             GUILayout.Label(new GUIContent(Labels.T("Alle Funktionen", "All features"), Labels.T(
                 "„Alles aus“ schaltet alle Funktionen des Mods ab – das Spiel ist dann wieder Vanilla. Danach einfach nur die 1–2 Dinge einschalten, die du willst. „Standard“ stellt die Empfehlung des Mods wieder her. Tasten, Sprache und der Mods-Knopf bleiben.",
-                "\"All off\" turns every feature of the mod off – the game is vanilla again. Then just turn on the 1–2 things you want. \"Default\" restores the mod's recommended setup. Keys, language and the Mods button stay.")),
+                "\"All off\" turns every feature of the mod off – the game is vanilla again. Then just turn on the 1–2 things you want. \"Default\" restores the mod's recommended setup. Keys, language and the Vanilla+ button stay.")),
                 labelStyle, GUILayout.Width(268));
             bool confirm = Time.realtimeSinceStartup < masterConfirmUntil;
             if (Btn(confirm ? Labels.T("Wirklich? Nochmal klicken", "Sure? Click again") : Labels.T("Alles aus (Vanilla)", "All off (vanilla)"), buttonStyle, GUILayout.Width(200)))

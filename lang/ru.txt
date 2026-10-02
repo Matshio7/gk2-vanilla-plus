@@ -53,7 +53,7 @@ Widen main menu => Расширить главное меню
 Skip logos => Пропускать логотипы
 "modded" note => Пометка «modded»
 Game log => Журнал игры
-"Mods" button in menus => Кнопка «Моды» в меню
+"Vanilla+" button in menus => Кнопка «Vanilla+» в меню
 Show FPS display => Показывать FPS
 Stats to log => Статистика в журнал
 Mod menu key => Клавиша меню мода
@@ -145,7 +145,7 @@ Pause the game while its window is in the background (saves battery and heat). =
 Fill the sides of the main menu on ultrawide screens with a blurred copy of the menu image. => Заполняет края главного меню на сверхшироких экранах размытой копией изображения меню.
 Skip the logos and intro videos when the game starts. => Пропускает логотипы и вступительные ролики при запуске игры.
 Show a 'modded' note next to the version number in the main menu. => Показывает пометку «modded» рядом с номером версии в главном меню.
-Show a 'Mods' button in the main menu and the pause menu (opens this mod menu). => Показывает кнопку «Моды» в главном меню и меню паузы (открывает это меню).
+Show a 'Vanilla+' button in the main menu and the pause menu (opens this mod menu). => Показывает кнопку «Vanilla+» в главном меню и меню паузы (открывает это меню).
 Extra autosave every N minutes (0 = off). Only saves while you are in free control. => Дополнительное автосохранение каждые N минут (0 = выкл.). Сохраняет только при свободном управлении.
 Key for the mod menu. => Клавиша меню мода.
 Key for the FPS display. => Клавиша показа FPS.
@@ -403,10 +403,10 @@ Rename zombies => Переименование зомби
 No tearing (force VSync) => Без разрывов (принудительная VSync)
 Português => Português
 Inventory only => Только инвентарь
-1,000+ players – thank you! => 1 000+ игроков – спасибо!
+1,000+ players · thanks! => 1 000+ игроков · спасибо!
 Controller: LB / RB switches tabs => Геймпад: LB / RB – смена вкладки
 All features => Все функции
-"All off" turns every feature of the mod off – the game is vanilla again. Then just turn on the 1–2 things you want. "Default" restores the mod's recommended setup. Keys, language and the Mods button stay. => «Всё выкл.» отключает все функции мода – игра снова ванильная. Затем включите только 1–2 нужные вещи. «По умолчанию» возвращает рекомендуемые настройки. Клавиши, язык и кнопка Mods остаются.
+"All off" turns every feature of the mod off – the game is vanilla again. Then just turn on the 1–2 things you want. "Default" restores the mod's recommended setup. Keys, language and the Vanilla+ button stay. => «Всё выкл.» отключает все функции мода – игра снова ванильная. Затем включите только 1–2 нужные вещи. «По умолчанию» возвращает рекомендуемые настройки. Клавиши, язык и кнопка Vanilla+ остаются.
 Sure? Click again => Точно? Нажмите ещё раз
 All off (vanilla) => Всё выкл. (ванилла)
 All off – now turn on only what you want. => Всё выключено – теперь включите только нужное.
@@ -447,3 +447,23 @@ New name => Новое имя
 Pinned => Закреплено
 Nothing pinned. Use the pin icon in recipes, blueprints and quests. => Ничего не закреплено. Используйте значок булавки в рецептах, чертежах и заданиях.
 A expand · ←→ amount · LB/RB variant · Y unpin · release RT = done => A развернуть · ←→ количество · LB/RB вариант · Y открепить · отпустить RT = готово
+
+# 1.6.2
+Wake up with Esc/B => Проснуться по Esc/B
+While sleeping in bed, Esc or B (Circle) wakes you up early, like in Graveyard Keeper 1. You keep only the energy you have slept so far. => Во время сна в кровати Esc или B (Круг) будит раньше, как в Graveyard Keeper 1. Сохраняется только энергия, восстановленная к этому моменту.
+Wake up => Проснуться
+"Better Sleep" is installed – wake up stays off. => «Better Sleep» установлен – пробуждение остаётся выключенным.
+Controller: hold RT for pins => Геймпад: удерживать RT для закреплённых
+Controller: hold RT (R2) during normal play to navigate the pinned list. Only works while no game window is open. => Геймпад: удерживайте RT (R2) во время игры, чтобы управлять списком закреплённого. Работает, только когда не открыто окно игры.
+Controller: hold button for pins => Геймпад: кнопка для закреплённого
+Wake up early => Проснуться раньше
+Wake up: key => Пробуждение: клавиша
+Wake up: controller button => Пробуждение: кнопка геймпада
+While sleeping in bed, a key (by default Esc or B) wakes you up early, like in Graveyard Keeper 1. You keep only the energy you have slept so far. => Во время сна в кровати клавиша (по умолчанию Esc или B) будит раньше, как в Graveyard Keeper 1. Сохраняется только энергия, восстановленная к этому моменту.
+Keyboard key that wakes you up early while sleeping. => Клавиша, которая будит раньше во время сна.
+Controller button that wakes you up early while sleeping. => Кнопка геймпада, которая будит раньше во время сна.
+Controller: hold this button during normal play to navigate the pinned list (only while no game window is open). Off = never. => Геймпад: удерживайте эту кнопку во время игры, чтобы управлять списком закреплённого (только когда не открыто окно игры). Выкл. = никогда.
+– off – => – выкл. –
+Controller: hold this button during normal play to navigate the pinned list (only while no game window is open). Click the field and press any controller button; Esc = off. => Геймпад: удерживайте эту кнопку во время игры, чтобы управлять списком закреплённого (только когда не открыто окно игры). Нажмите на поле и любую кнопку геймпада; Esc = выкл.
+Press a controller button … (Esc = off) => Нажмите кнопку геймпада … (Esc = выкл.)
+Controller: button for pins => Геймпад: кнопка для закреплённого

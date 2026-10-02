@@ -28,6 +28,18 @@ namespace GK2Tweaks
         }
 
         // in Tick (Update), vor PadTick
+        private bool rtStartedFree;
+
+        private static bool GameUiFree()
+        {
+            try
+            {
+                PlayerController pc = MainGame.PlayerController;
+                return pc != null && pc.IsControlEnabledByType(TakenControlType.ByUI) && !BigGameWindowOpen();
+            }
+            catch { return false; }
+        }
+
         private void PinPadTick()
         {
             bool want = false;
@@ -35,7 +47,11 @@ namespace GK2Tweaks
             try
             {
                 if (Rewired.ReInput.isReady) p = Rewired.ReInput.players.GetPlayer(0);
-                want = p != null && p.GetButton(ActRT) && PinsVisible && !menuOpen && !newsOpen && !weekOpen && !celebOpen && !Renaming;
+                // Nur im freien Spiel: ist ein Spiel-Fenster offen (Inventar, Werkbank, Haendler ... dort ist RT z. B. Reiter
+                // wechseln), bleibt RT beim Spiel. RT muss ausserdem ohne offenes Fenster gedrueckt worden sein.
+                bool uiFree = GameUiFree();
+                if (p != null && PadBind.Down(p, Plugin.PinsPadButton.Value)) rtStartedFree = uiFree;
+                want = p != null && PadBind.Held(p, Plugin.PinsPadButton.Value) && rtStartedFree && uiFree && PinsVisible && !menuOpen && !newsOpen && !weekOpen && !celebOpen && !Renaming;
             }
             catch { want = false; }
             if (want && !pinPad) { pinPad = true; PlaySound("gui_hover_light"); for (int i = 0; i < 4; i++) ppHeld[i] = true; }
