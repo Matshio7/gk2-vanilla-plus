@@ -1,1 +1,1 @@
-Ultrawide 21:9/32:9, hidden graphics settings & benchmark, FPS display, pinning with have/need list, week plan, save backups, zoom, full-width rain, controller support - in-game mod menu (F9). The game stays vanilla.
+Ultrawide 21:9/32:9, hidden graphics settings, Steam Deck fix, pinning with ingredient tree, rename zombies, thumbs-up trading, week plan, backups, zoom, full controller support - mod menu (F9). The game stays vanilla; optional extras like moving objects are off by default.
