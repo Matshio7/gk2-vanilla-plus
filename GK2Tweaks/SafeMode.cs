@@ -41,6 +41,12 @@ namespace GK2Tweaks
             { "Hud", new[] { "HUD ausblenden", "Hide HUD" } },
             { "WorkshopUpload", new[] { "Workshop-Upload", "Workshop upload" } },
             { "InstantRemove", new[] { "Sofort abbauen", "Instant removal" } },
+            { "HudClock", new[] { "Tag & Uhrzeit am HUD", "Day & time on HUD" } },
+            { "EscLeave", new[] { "Gespräch mit Esc/B verlassen", "Leave conversations with Esc/B" } },
+            { "Transitions", new[] { "Schnellere Übergänge", "Faster transitions" } },
+            { "MoveObjects", new[] { "Objekte verschieben", "Move objects" } },
+            { "TradeLikes", new[] { "Handel: passende Menge", "Trade: right amount" } },
+            { "ZombieRename", new[] { "Zombies umbenennen", "Rename zombies" } },
         };
 
         internal static string Name(string f) => names.TryGetValue(f, out string[] n) ? Labels.T(n[0], n[1]) : f;
@@ -58,6 +64,10 @@ namespace GK2Tweaks
                 case "BackupPatch": case "SaveBlockPatch": return "Saves";
                 case "TierPatch": case "ScreenSettingsPatch": return "Graphics";
                 case "InstantRemovePatch": return "InstantRemove";
+                case "MoveInputPatch": case "MoveTargetPatch": case "MoveCellsPatch": case "MoveBuildPatch": case "MoveDisablePatch": case "MoveRemoveLabelPatch": return "MoveObjects";
+                case "TradePressPatch": case "TradeCountPatch": return "TradeLikes";
+                case "ZoneRedrawPatch": return "HudClock";
+                case "TeleportPatch": case "FadeInPatch": case "FadeOutPatch": case "CleanupPatch": return "Transitions";
                 default: return patch.Name;
             }
         }
@@ -99,7 +109,17 @@ namespace GK2Tweaks
         private static void F(string feature, Func<Type> type, string field) =>
             checks.Add(new Check { Feature = feature, Type = type, Member = field, Test = t => AccessTools.Field(t, field) != null || AccessTools.Property(t, field) != null });
         private static void M(string feature, Func<Type> type, string method) =>
-            checks.Add(new Check { Feature = feature, Type = type, Member = method + "()", Test = t => AccessTools.Method(t, method) != null });
+            checks.Add(new Check { Feature = feature, Type = type, Member = method + "()", Test = t => HasMethod(t, method) });
+
+        // AccessTools.Method wirft bei ueberladenen Methoden (z. B. UIBasicFade.FadeIn) AmbiguousMatchException
+        private static bool HasMethod(Type t, string name)
+        {
+            for (Type c = t; c != null; c = c.BaseType)
+                foreach (System.Reflection.MethodInfo m in c.GetMethods(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic |
+                    System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.DeclaredOnly))
+                    if (m.Name == name) return true;
+            return false;
+        }
 
         internal static void CheckGame()
         {
@@ -125,6 +145,46 @@ namespace GK2Tweaks
             M("InstantRemove", () => typeof(Wgo), "DoBuildRemove");
             M("InstantRemove", () => typeof(CraftComponent), "TryFinishCurCraft");
             F("InstantRemove", () => typeof(CraftComponent), "IsDestroyingCraftActive");
+            F("HudClock", () => typeof(WorldZoneWidget), "worldZoneLabel");
+            F("HudClock", () => typeof(EnvironmentData), "Day");
+            F("HudClock", () => typeof(EnvironmentData), "TimeOfDay");
+            F("EscLeave", () => typeof(UIMultiAnswer), "multiAnswers");
+            F("EscLeave", () => typeof(UIMultiAnswer), "visualData");
+            F("EscLeave", () => typeof(UIMultiAnswer), "interactable");
+            M("EscLeave", () => typeof(UIMultiAnswer), "OnAnswerSelect");
+            M("Transitions", () => typeof(PlayerController), "Teleport");
+            M("Transitions", () => typeof(UIBasicFade), "FadeIn");
+            M("Transitions", () => typeof(UIBasicFade), "FadeOut");
+            M("Transitions", () => typeof(MainGame), "HiddenOptimization");
+            F("Transitions", () => typeof(TeleportDataBase), "delayInFade");
+            M("MoveObjects", () => typeof(BuildController), "UpdateBuildModeInput");
+            F("MoveObjects", () => typeof(BuildController), "buildPointer");
+            F("MoveObjects", () => typeof(BuildController), "isBuildModeInputLocked");
+            F("MoveObjects", () => typeof(RemovePointer), "currentRemovingSelection");
+            F("MoveObjects", () => typeof(WgoBuildPointer), "canTakeResources");
+            F("MoveObjects", () => typeof(WgoBuildPointer), "takeResourcesAction");
+            F("MoveObjects", () => typeof(WgoBuildPointer), "buildColliders");
+            F("MoveObjects", () => typeof(WgoBuildPointer), "shownAsActive");
+            F("MoveObjects", () => typeof(WgoData), "isRemovingFromData");
+            F("MoveObjects", () => typeof(WgoData), "gdPointsRegistered");
+            M("TradeLikes", () => typeof(Trading), "OnPlayerItemPress1");
+            F("TradeLikes", () => typeof(Trading), "cachedWindowData");
+            F("TradeLikes", () => typeof(Trading), "sellInventory");
+            F("TradeLikes", () => typeof(UIItemCountWindow), "slider");
+            M("TradeLikes", () => typeof(SmartSlider), "SetValue");
+            F("TradeLikes", () => typeof(UIVendorWindow), "sellDealInventoryWidget");
+            F("TradeLikes", () => typeof(VendorTierData), "townVendorProductInfos");
+            F("ZombieRename", () => typeof(UIZombieWorkerWindow), "nameLabel");
+            F("ZombieRename", () => typeof(LazyBearTechnology.LazyUI), "windowsCache");
+            F("TradeLikes", () => typeof(LazyBearTechnology.LazyUI), "windowsCache");
+            M("ZombieRename", () => typeof(UIZombieWorkerWindow), "RedrawName");
+            M("ZombieRename", () => typeof(ZombieWgoData), "SetName");
+            M("ZombieRename", () => typeof(ZombieWgoData), "RollName");
+            M("InstantRemove", () => typeof(CraftElementBase), "SetCustomOutputItems");
+            F("InstantRemove", () => typeof(CraftElementBase), "customCraftOutput");
+            F("Pins", () => typeof(GameBalance), "craftDefs");
+            F("Pins", () => typeof(CraftDefBase), "needItemsFromWgo");
+            F("Pins", () => typeof(CraftDefBase), "craftsIn");
 
             foreach (Check c in checks)
             {

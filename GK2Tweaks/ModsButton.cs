@@ -13,12 +13,32 @@ namespace GK2Tweaks
     {
         internal static string Label => Labels.T("Mods", "Mods");
 
+        // GK2 Mod Framework bringt einen eigenen "Mods"-Button mit -> dann keinen zweiten anzeigen
+        internal const string FrameworkGuid = "ru.superman4eg.gk2.framework";
+        private static int framework = -1;
+        internal static bool FrameworkInstalled
+        {
+            get
+            {
+                if (framework < 0)
+                {
+                    bool has = false;
+                    try { has = BepInEx.Bootstrap.Chainloader.PluginInfos.ContainsKey(FrameworkGuid); } catch { }
+                    framework = has ? 1 : 0;
+                    if (has) Plugin.Log.LogInfo("GK2 Mod Framework detected: its Mods button is used, Vanilla+ adds no second one (menu: F9)");
+                }
+                return framework == 1;
+            }
+        }
+
+        internal static bool Show => Plugin.GameMenuButton.Value && !FrameworkInstalled;
+
         internal static void ApplyVisibility()
         {
             try
             {
                 foreach (LazyButton b in Resources.FindObjectsOfTypeAll<LazyButton>())
-                    if (b != null && b.name == "GK2VanillaPlus_Mods" && b.gameObject.scene.IsValid()) b.gameObject.SetActive(Plugin.GameMenuButton.Value);
+                    if (b != null && b.name == "GK2VanillaPlus_Mods" && b.gameObject.scene.IsValid()) b.gameObject.SetActive(Show);
             }
             catch { }
         }
@@ -38,7 +58,7 @@ namespace GK2Tweaks
             foreach (LocalizedLabel l in go.GetComponentsInChildren<LocalizedLabel>(true)) l.IgnoreLocalize = true;
             TMP_Text text = go.GetComponentInChildren<TMP_Text>(true);
             if (text != null) text.text = Label;
-            go.SetActive(Plugin.GameMenuButton.Value);
+            go.SetActive(Show);
             return b;
         }
     }

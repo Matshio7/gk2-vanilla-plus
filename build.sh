@@ -7,15 +7,20 @@ V=$(sed -nE 's/.*PluginVersion = "([0-9.]+)".*/\1/p' "$ROOT/GK2Tweaks/Plugin.cs"
 export PATH=/usr/local/share/dotnet:$PATH
 (cd "$ROOT/GK2Ultrawide" && dotnet build -c Release --no-restore -v q -nologo | grep -E "error|Build succeeded")
 (cd "$ROOT/GK2Tweaks" && dotnet build -c Release --no-restore -v q -nologo | grep -E "error|Build succeeded")
+# Optionale Bruecke zu "GK2 Mod Framework" (nur Kompilier-Referenz: reference/fw = Framework-Quellcode, MIT, nicht mitgeliefert)
+[ -d "$ROOT/reference/fw" ] || git clone -q --depth 1 https://github.com/AcTePuKc/GK2-Mod-Framework.git "$ROOT/reference/fw"
+(cd "$ROOT/FrameworkRef" && dotnet build -c Release -v q -nologo --source "$HOME/.nuget/packages" | grep -E "error|Build succeeded")
+(cd "$ROOT/FrameworkBridge" && dotnet build -c Release -v q -nologo --source "$HOME/.nuget/packages" | grep -E "error|Build succeeded")
 N="GK2-VanillaPlus-$V"; S="$R/stage/$N"; F="$S/installer/files"
 rm -rf "$R/stage"; mkdir -p "$F/BepInEx/plugins/GK2Ultrawide" "$F/BepInEx/plugins/GK2Tweaks" "$F/BepInEx/GK2VanillaPlus" "$S/docs/licenses"
 cp -R "$B/BepInEx/." "$F/"
 cp "$ROOT/GK2Ultrawide/bin/Release/GK2Ultrawide.dll" "$F/BepInEx/plugins/GK2Ultrawide/"
 cp "$ROOT/GK2Tweaks/bin/Release/GK2Tweaks.dll" "$F/BepInEx/plugins/GK2Tweaks/"
+cp "$ROOT/FrameworkBridge/bin/Release/GK2VanillaPlus.FrameworkBridge.dll" "$F/BepInEx/plugins/GK2Tweaks/"
 cp "$ROOT/LICENSE.md" "$F/BepInEx/GK2VanillaPlus/LICENSE.md"
 # Sprachen: eingebaut in der DLL; die Vorlage liegt fuer eigene Uebersetzungen bei
 python3 "$ROOT/tools/extract_strings.py" >/dev/null
-mkdir -p "$F/BepInEx/GK2VanillaPlus/lang"; cp "$ROOT/lang/_template.txt" "$F/BepInEx/GK2VanillaPlus/lang/_template.txt"
+mkdir -p "$F/BepInEx/GK2VanillaPlus/lang"; cp "$ROOT/lang/_template.txt" "$F/BepInEx/GK2VanillaPlus/lang/translation-template.txt"
 # Textdateien fuer Windows: UTF-8 mit BOM, CRLF, Versionsnummer eintragen
 winText() { python3 - "$1" "$2" "$V" <<'PY'
 import re, sys

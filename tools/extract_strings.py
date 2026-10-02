@@ -65,7 +65,7 @@ def main():
     os.makedirs(LANG, exist_ok=True)
     with open(os.path.join(LANG, "_template.txt"), "w", encoding="utf-8") as f:
         f.write("# GK2 Vanilla+ - translation template\n")
-        f.write("# Copy this file to <language code>.txt (e.g. it.txt, pl.txt, pt.txt), put it into\n")
+        f.write("# Copy this file to <language code>.txt (e.g. it.txt, pl.txt, cs.txt), put it into\n")
         f.write("# <game folder>/BepInEx/GK2VanillaPlus/lang/ and write the translation after \" => \".\n")
         f.write("# Keep numbers, key names and symbols as they are. \\n = line break.\n")
         f.write("# The mod uses the file when the game is set to that language. Send finished files to the author (GitHub / Workshop comments).\n\n")

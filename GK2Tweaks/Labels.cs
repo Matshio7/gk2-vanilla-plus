@@ -21,6 +21,7 @@ namespace GK2Tweaks
                     case "Español": return "es";
                     case "Русский": return "ru";
                     case "中文": return "zh";
+                    case "Português": return "pt";
                 }
                 string g = null;
                 try { g = GameSettings.Instance?.language; } catch { }
@@ -32,6 +33,7 @@ namespace GK2Tweaks
                         case SystemLanguage.French: return "fr";
                         case SystemLanguage.Spanish: return "es";
                         case SystemLanguage.Russian: return "ru";
+                        case SystemLanguage.Portuguese: return "pt";
                         case SystemLanguage.Chinese: case SystemLanguage.ChineseSimplified: case SystemLanguage.ChineseTraditional: return "zh";
                         default: return "en";
                     }
@@ -97,6 +99,20 @@ namespace GK2Tweaks
             { "HideHudKey", new[] { "Taste HUD ausblenden", "Hide HUD key" } },
             { "DailyReminder", new[] { "Tagesübersicht am Morgen", "Daily reminder" } },
             { "InstantRemove", new[] { "Sofort abbauen", "Instant removal" } },
+            { "FullRefund", new[] { "Volle Erstattung beim Abbauen (nicht Vanilla)", "Full refund when removing (not vanilla)" } },
+            { "MoveObjects", new[] { "Objekte verschieben (nicht Vanilla)", "Move objects (not vanilla)" } },
+            { "TradeLikedAmount", new[] { "Handel: Daumen-hoch-Menge vorschlagen", "Trade: suggest the thumbs-up amount" } },
+            { "ZombieRename", new[] { "Zombies umbenennen", "Rename zombies" } },
+            { "HudClock", new[] { "Tag & Uhrzeit am HUD", "Day & time on HUD" } },
+            { "NoTearing", new[] { "Kein Tearing (VSync erzwingen)", "No tearing (force VSync)" } },
+            { "HudClockMode", new[] { "HUD-Zeile zeigt", "HUD line shows" } },
+            { "HudClock12h", new[] { "12-Stunden-Uhr", "12-hour clock" } },
+            { "EscLeavesConversation", new[] { "Gespräch mit Esc/B verlassen", "Leave conversations with Esc/B" } },
+            { "FasterTransitions", new[] { "Schnellere Übergänge", "Faster transitions" } },
+            { "LessMemoryCleanup", new[] { "Speicher seltener aufräumen", "Clean up memory less often" } },
+            { "RecipeVariants", new[] { "Werkbank & Rezept-Varianten", "Workbench & recipe variants" } },
+            { "IngredientTree", new[] { "Zutaten aufklappen", "Expand ingredients" } },
+            { "ShowFuel", new[] { "Brennstoff anzeigen", "Show fuel" } },
             { "KeepBackups", new[] { "Backups pro Spielstand", "Backups per save" } },
             { "MinMinutesBetween", new[] { "Mindestabstand", "Minimum interval" } },
             { "CheckForUpdates", new[] { "Nach Updates suchen", "Check for updates" } },
@@ -154,6 +170,20 @@ namespace GK2Tweaks
             { "Scale", "Auflösungs-Faktor: 2× = doppelte Bildschirmauflösung in jede Richtung (z. B. 3840×2160 aus 1920×1080)." },
             { "HideHud", "Blendet für den Screenshot die Spiel-Oberfläche und die Mod-Anzeigen aus." },
             { "PauseInBackground", "Spiel pausiert, wenn das Fenster nicht im Vordergrund ist (spart Akku und Hitze)." },
+            { "NoTearing", "Verhindert Bildrisse (Tearing): VSync bleibt an, auch wenn ein FPS-Limit gesetzt ist (das Spiel schaltet VSync dann ab). Automatisch = an auf Steam Deck / Linux, aus unter Windows." },
+            { "HudClock", "Zeigt Tag und Uhrzeit als zweite Zeile in der Gebietsanzeige oben rechts (unter dem Gebietsnamen), im Stil des Spiels." },
+            { "HudClockMode", "Was die HUD-Zeile zeigt: Tag und Uhrzeit, Wochentag und Uhrzeit oder nur die Uhrzeit." },
+            { "HudClock12h", "Uhrzeit als 12-Stunden-Uhr (5:00 AM) statt 24 Stunden (05:00)." },
+            { "EscLeavesConversation", "Im Gespräch wählt Esc bzw. B (Kreis) „Gehen“, wenn es angeboten wird und die Figur fertig gesprochen hat. Ein offenes Mod-Fenster wird zuerst geschlossen." },
+            { "FasterTransitions", "Türen und Kartenreisen: kürzere Abblende und Pause (etwa ein Drittel). Zwischensequenzen und Schlafen bleiben unverändert." },
+            { "LessMemoryCleanup", "Türen und Kartenreisen: Das Spiel räumt bei jeder Tür den kompletten Speicher auf – das kostet den Großteil der Wartezeit. Mit der Option nur noch alle 10 Minuten oder wenn der Speicher knapp wird (beim Laden immer). Braucht mehr RAM – unter 16 GB nicht empfohlen." },
+            { "RecipeVariants", "Unter einem angepinnten Rezept: die Werkbank und, wenn es den Gegenstand auf mehreren Wegen gibt, < > zum Umschalten (nur bekannte Rezepte)." },
+            { "IngredientTree", "Zutaten, die man selbst herstellen kann, bekommen ein +, das ihre eigenen Zutaten zeigt (bis 3 Ebenen)." },
+            { "ShowFuel", "Zeigt den Brennstoff, den ein Rezept aus der Werkbank braucht (z. B. Ofen), als eigene Zeile." },
+            { "FullRefund", "Nicht mehr ganz Vanilla – oft gewünscht, deshalb als Option: Beim Abbauen bekommst du die vollen Baukosten zurück statt nur einen Teil. Inhalt (Inventar, Brennstoff) kommt wie gewohnt zurück." },
+            { "MoveObjects", "Nicht mehr ganz Vanilla – oft gewünscht, deshalb als Option: Im Abriss-Modus mit der Dreh-Taste ein Objekt aufnehmen und woanders hinstellen. Es bleibt dasselbe Objekt (Inhalt und Herstell-Warteschlange bleiben), es wird nichts verbraucht oder erstattet. Geht für Werkbänke, Förderbänder und alle anderen Bauten: Zombie-Arbeiter landen auf dem Boden, verbundene Erweiterungen bleiben stehen, bis du sie auch verschiebst. Esc/Rechtsklick bricht ab." },
+            { "TradeLikedAmount", "Handel mit Stadt-Händlern: Der Mengen-Regler startet genau bei der Menge, die noch Zufriedenheit (Daumen hoch) bringt, und ein Knopf legt alle passenden Waren in der richtigen Menge in den Handel. Bestätigen musst du den Handel weiterhin selbst." },
+            { "ZombieRename", "Im Zombie-Fenster steht neben dem Namen ein „Umbenennen“-Knopf: eigenen Namen eintippen oder neu würfeln – jederzeit." },
             { "InstantRemove", "Abriss-Modus beim Bauen: Werkbänke, Truhen, Öfen usw. werden sofort entfernt, statt dass deine Figur erst hinläuft. Du bekommst dieselben Materialien zurück. Hilft bei Objekten, die deine Figur nicht erreicht." },
             { "AutoSaveMinutes", "Zusätzlicher Autosave. Speichert nur, wenn du frei steuerbar bist." },
             { "MainMenuExtend", "Füllt auf Ultrawide-Bildschirmen die Seiten des Hauptmenüs mit einer unscharfen Kopie des Menübilds." },
@@ -175,7 +205,7 @@ namespace GK2Tweaks
             { "Corner", "In welcher Bildschirmecke die Anzeige steht." },
             { "GpuTemp", "GPU-Temperatur in °C. Nur NVIDIA-Grafikkarten (AMD/Intel und die CPU-Temperatur lassen sich ohne zusätzlichen System-Treiber nicht auslesen). Nicht unter Mac/Linux." },
             { "HudCenter", "Ultrawide: HUD, Gebietsname, NPC-Fenster und die Mod-Anzeigen rücken in den 16:9-Bereich in der Mitte statt an die äußersten Bildschirmränder. Die Spielwelt bleibt ultrabreit." },
-            { "Chests", "Was als „Haben“ zählt: Gebiet = dein Inventar und die Truhen im Gebiet, in dem du bist (wie beim Herstellen im Spiel). „Alle Truhen“ = zusätzlich alle Truhen auf der ganzen Karte." },
+            { "Chests", "Was als „Haben“ zählt: Nur Inventar = nur was du dabei hast. Gebiet = dein Inventar und die Truhen im Gebiet, in dem du bist (wie beim Herstellen im Spiel). „Alle Truhen“ = zusätzlich alle Truhen auf der ganzen Karte." },
             { "NotifyReady", "Kurze Meldung mit Ton, wenn für ein angepinntes Rezept alles da ist oder eine angepinnte Quest erledigt ist." },
             { "AutoUnpin", "Ein Rezept automatisch loslösen, sobald du es herstellst." },
             { "Separator", "Trennzeichen zwischen den Werten, wenn sie in einer Zeile stehen. Die Reihenfolge der Werte stellst du unten mit den Pfeilen ein." },
@@ -235,6 +265,7 @@ namespace GK2Tweaks
             { "Español", new[] { "Español", "Español" } },
             { "Русский", new[] { "Русский", "Русский" } },
             { "中文", new[] { "中文", "中文" } },
+            { "Português", new[] { "Português", "Português" } },
             { "English", new[] { "English", "English" } },
             { "TopLeft", new[] { "Oben links", "Top left" } },
             { "TopRight", new[] { "Oben rechts", "Top right" } },
@@ -246,11 +277,15 @@ namespace GK2Tweaks
             { "ExtraLarge", new[] { "Sehr groß", "Extra large" } },
             { "Column", new[] { "Untereinander", "In a column" } },
             { "None", new[] { "Keins", "None" } },
+            { "Inventory", new[] { "Nur Inventar", "Inventory only" } },
             { "Area", new[] { "Inventar + Truhen im Gebiet", "Inventory + chests in the area" } },
             { "Everywhere", new[] { "Inventar + alle Truhen", "Inventory + all chests" } },
             { "Dash", new[] { "Langer Strich  —", "Long dash  —" } },
             { "Bar", new[] { "Senkrechter Strich  |", "Vertical bar  |" } },
             { "Dot", new[] { "Punkt  ·", "Dot  ·" } },
+            { "DayAndTime", new[] { "Tag + Uhrzeit", "Day + time" } },
+            { "WeekdayAndTime", new[] { "Wochentag + Uhrzeit", "Weekday + time" } },
+            { "TimeOnly", new[] { "Nur Uhrzeit", "Time only" } },
         };
 
         internal static string Name(ConfigEntryBase e)
@@ -310,7 +345,29 @@ namespace GK2Tweaks
     internal static class Translations
     {
         private static readonly Dictionary<string, Dictionary<string, string>> cache = new Dictionary<string, Dictionary<string, string>>();
-        internal static readonly string[] Shipped = { "fr", "es", "ru", "zh" };
+        internal static readonly string[] Shipped = { "fr", "es", "pt", "ru", "zh" };
+
+        // Vorlage fuer eigene Uebersetzungen in den Mod-Ordner schreiben (Steam laesst Dateien mit "_" beim Workshop-Upload weg)
+        internal const string TemplateFile = "translation-template.txt";
+        internal static void WriteTemplate()
+        {
+            try
+            {
+                using (var s = typeof(Translations).Assembly.GetManifestResourceStream("GK2Tweaks.lang.template.txt"))
+                {
+                    if (s == null) return;
+                    string text;
+                    using (var r = new System.IO.StreamReader(s, System.Text.Encoding.UTF8)) text = r.ReadToEnd();
+                    System.IO.Directory.CreateDirectory(Folder);
+                    string f = System.IO.Path.Combine(Folder, TemplateFile);
+                    if (!System.IO.File.Exists(f) || System.IO.File.ReadAllText(f, System.Text.Encoding.UTF8) != text)
+                        System.IO.File.WriteAllText(f, text, new System.Text.UTF8Encoding(false));
+                    string old = System.IO.Path.Combine(Folder, "_template.txt");
+                    if (System.IO.File.Exists(old) && new System.IO.FileInfo(old).Length < 64) System.IO.File.Delete(old);
+                }
+            }
+            catch (System.Exception e) { Plugin.Log.LogWarning("Translation template: " + e.Message); }
+        }
         internal static string Folder => System.IO.Path.Combine(BepInEx.Paths.BepInExRootPath, "GK2VanillaPlus", "lang");
 
         internal static bool Has(string code) => Load(code).Count > 0;

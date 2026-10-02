@@ -23,8 +23,8 @@ namespace GK2Tweaks
         {
             switch (id)
             {
-                case "Deck": return Labels.T("Für Steam Deck, Handhelds und Laptops im Akkubetrieb: halbe Auflösung für die Welt, einfache Schatten, keine Umgebungsverdeckung, 40 FPS, Physik mit 30 Hz. Leise und sparsam.",
-                    "For Steam Deck, handhelds and laptops on battery: world at half resolution, simple shadows, no ambient occlusion, 40 FPS, physics at 30 Hz. Quiet and efficient.");
+                case "Deck": return Labels.T("Für Steam Deck, Handhelds und Laptops im Akkubetrieb: halbe Auflösung für die Welt, einfache Schatten, keine Umgebungsverdeckung, VSync ohne Tearing, Physik mit 30 Hz. Für 40 FPS am Deck das Bildraten-Limit im Steam-Schnellmenü (…) nutzen – das stellt auch das Display auf 40 Hz.",
+                    "For Steam Deck, handhelds and laptops on battery: world at half resolution, simple shadows, no ambient occlusion, VSync without tearing, physics at 30 Hz. For 40 FPS on the Deck use the frame limit in Steam's quick access menu (…) – it also sets the display to 40 Hz.");
                 case "Performance": return Labels.T("Für schwächere PCs: volle Auflösung, einfachere Schatten und Lichter, keine Umgebungsverdeckung, stabile 60 FPS.",
                     "For weaker PCs: full resolution, simpler shadows and lights, no ambient occlusion, a steady 60 FPS.");
                 case "Quality": return Labels.T("Alles auf höchster Stufe (weiche PC-Schatten, beste Umgebungsverdeckung, echtes Licht), VSync mit voller Bildwiederholrate.",
@@ -40,7 +40,7 @@ namespace GK2Tweaks
             switch (id)
             {
                 case "Deck":
-                    Set("Lightweight", "Unity_Low", "Off", "Faked", "Off", "Light", "Replaced", "Limit", 40, 30); break;
+                    Set("Lightweight", "Unity_Low", "Off", "Faked", "Off", "Light", "Replaced", "VSync", 0, 30); Plugin.NoTearing.Value = "Auto"; Plugin.LessMemoryCleanup.Value = false; break;
                 case "Performance":
                     Set("Native", "Unity_Balanced", "Off", "Faked", "On", "Light", "Replaced", "Limit", 60, 0); break;
                 case "Quality":

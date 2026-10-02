@@ -1,9 +1,16 @@
 # GK2 Vanilla+ - translation template
-# Copy this file to <language code>.txt (e.g. it.txt, pl.txt, pt.txt), put it into
+# Copy this file to <language code>.txt (e.g. it.txt, pl.txt, cs.txt), put it into
 # <game folder>/BepInEx/GK2VanillaPlus/lang/ and write the translation after " => ".
 # Keep numbers, key names and symbols as they are. \n = line break.
 # The mod uses the file when the game is set to that language. Send finished files to the author (GitHub / Workshop comments).
 
+This can't be moved. => 
+This can't be moved right now. => 
+Moving failed. => 
+Remove & move => 
+1,000+ players! => 
+GK2 Vanilla+ is now played by more than a thousand people. I never expected that.\n\nThank you for your ratings, comments and ideas – many of them are in this update: renaming zombies, trading the right amount, moving objects, Portuguese and more. => 
+You're welcome – let's go! => 
 Restoring only works in the main menu. => 
 Restored. Please restart the game once, then "Continue". => 
 Screenshot saved: => 
@@ -18,6 +25,21 @@ Your own settings hold the target too. =>
 Recommended: => 
 (holds {0} FPS) => 
 Recommended: Lowest – no tier fully holds {0} FPS. Tip: render mode "Pixel" or a lower resolution. => 
+Day {0} => 
+No matching goods in your inventory. => 
+Vanilla+: pick a new spot and place it · Esc/right click: cancel => 
+Vanilla+: rotate key on an object = move it => 
+Move => 
+Cancel moving => 
+Rename => 
+New name => 
+Apply name (Enter) => 
+Random => 
+Random name from the game => 
+Cancel => 
+Esc => 
+Add liked goods => 
+Adds all goods the vendor likes, in exactly the amount that still gives happiness. => 
 Unlimited => 
 Default (50 Hz) => 
 same as outside => 
@@ -68,6 +90,20 @@ Week plan key =>
 Hide HUD key => 
 Daily reminder => 
 Instant removal => 
+Full refund when removing (not vanilla) => 
+Move objects (not vanilla) => 
+Trade: suggest the thumbs-up amount => 
+Rename zombies => 
+Day & time on HUD => 
+No tearing (force VSync) => 
+HUD line shows => 
+12-hour clock => 
+Leave conversations with Esc/B => 
+Faster transitions => 
+Clean up memory less often => 
+Workbench & recipe variants => 
+Expand ingredients => 
+Show fuel => 
 Backups per save => 
 Minimum interval => 
 Check for updates => 
@@ -122,6 +158,7 @@ Errors only =>
 Deutsch => 
 Français => 
 Español => 
+Português => 
 English => 
 Top left => 
 Top right => 
@@ -133,15 +170,46 @@ Large =>
 Extra large => 
 In a column => 
 None => 
+Inventory only => 
 Inventory + chests in the area => 
 Inventory + all chests => 
 Long dash  — => 
 Vertical bar  | => 
 Dot  · => 
+Day + time => 
+Weekday + time => 
+Time only => 
+1,000+ players – thank you! => 
+Controller: LB / RB switches tabs => 
+Pinned => 
+Nothing pinned. Use the pin icon in recipes, blueprints and quests. => 
+ready => 
+Expand => 
+Collapse => 
+Unpin => 
+All features => 
+"All off" turns every feature of the mod off – the game is vanilla again. Then just turn on the 1–2 things you want. "Default" restores the mod's recommended setup. Keys, language and the Mods button stay. => 
+Sure? Click again => 
+All off (vanilla) => 
+All off – now turn on only what you want. => 
+Default => 
+Default settings restored. => 
+Overview => 
+Graphics & speed => 
+Gameplay helpers => 
+Pins => 
+Interface & keys => 
 Mods => 
 A: select   left/right: change   B: close => 
+A expand · ←→ amount · LB/RB variant · Y unpin · release RT = done => 
+Craft => 
 Done: {0} => 
 Everything ready for: {0} => 
+done => 
+How many times to craft? Click = more, right click = less => 
+Other recipe variant => 
+Hide ingredients => 
+Show its ingredients => 
 off => 
 Lights => 
 on => 
@@ -154,7 +222,10 @@ Water quality. Default = as the graphics tier. =>
 Clouds normal or simplified. May apply only after changing area. Default = as the graphics tier. => 
 Game = setting from the game menu. Limit = software cap at TargetFps. VSync = synced to the refresh rate (60 FPS at 120 Hz = every 2nd refresh). => 
 Target FPS for Limit and VSync. 0 = unlimited => 
+Prevents screen tearing: keeps VSync on even when an FPS limit is set (the game turns VSync off then). Auto = on for Steam Deck and Linux, off on Windows. => 
 Physics rate. 0 = game default (50 Hz). 30 = like the Switch version, saves CPU. => 
+Doors and map travel: shorter fade to black and pause (about a third). Cutscenes and sleeping are not changed. => 
+Doors and map travel: the game cleans up all memory on every door, which takes most of the waiting time. With this on it only happens every 10 minutes or when memory gets tight (always when loading a save). Uses more RAM - not recommended below 16 GB. => 
 What the game writes to Player.log. Warning or Error suppresses log spam. => 
 Camera zoom in percent. Below 100 = see more, above 100 = closer. => 
 Separate camera zoom inside buildings (church, morgue, houses ...). 0 = same as outside. => 
@@ -174,7 +245,16 @@ Check GitHub once per game start for a new version of GK2 Vanilla+ (only reads t
 Key for the week plan (what is possible on which weekday). => 
 Key to hide/show the game's HUD, e.g. for screenshots. Esc shows it again. => 
 Show a notification each morning with what is possible today (only features you have already unlocked). => 
+Show the day and the time of day as a second line in the area name box at the top right, in the game's own look. => 
+What the HUD line shows: day number and time, weekday and time, or only the time. => 
+Show the HUD time as 12-hour clock (5:00 AM) instead of 24-hour (05:00). => 
+In conversations, Esc or B (Circle) picks "Leave" when it is offered and the character has finished talking. An open mod window is closed first. => 
 Remove mode (building): placed objects like workbenches, chests or furnaces are removed right away instead of your character walking there first. You get the same materials back. Helps with objects your character cannot reach. => 
+[Not fully vanilla] Remove mode: you get the full building costs back instead of only a part. Contents (inventory, fuel) come back as usual. => 
+[Not fully vanilla] Remove mode: press the rotate key on an object to pick it up and place it somewhere else. It stays the same object (contents and crafting queue are kept), nothing is used or refunded. Works for workbenches, conveyors and all other buildings: zombie workers are put on the ground, connected extensions stay where they are until you move them too. Esc or right click cancels. => 
+Trading with town vendors: the amount slider starts at exactly the amount that still gives happiness (thumbs up), and a button adds all liked goods in the right amount. You still confirm the deal yourself. => 
+Internal: the 1,000+ players thank-you banner was shown. => 
+Zombie window: a Rename button next to the name - type your own name or roll a new one at any time. => 
 Before the game overwrites a save, the previous save is backed up (BepInEx/GK2VanillaPlus/Backups). Number of backups kept per save slot, 0 = off. => 
 Minimum minutes between two backups of the same slot (avoids a backup on every autosave). => 
 Key for saving the game manually (empty = only the button in the mod menu). => 
@@ -206,9 +286,12 @@ Current time. =>
 In-game weekday (Pride, Sloth, ...). => 
 In-game time of day. => 
 Pin recipes, blueprints and town buildings (pin icon in their top right corner). Pinned items show have/need counts. => 
-Which items count as 'have': your inventory and the chests in the area you are in (like the game's crafting), or additionally all chests on the map. => 
+Which items count as 'have': only your inventory, your inventory and the chests in the area you are in (like the game's crafting), or additionally all chests on the map. => 
 Short message with a sound when a pinned item becomes ready (you have everything) or a pinned quest is done. => 
 Unpin a recipe automatically when you start crafting it. => 
+Under a pinned recipe: the workbench and, if the item can be made in several ways, < > to switch between the recipes (only known recipes). => 
+Ingredients you can craft yourself get a + that shows their own ingredients (up to 3 levels). => 
+Show the fuel a recipe needs from its workbench (e.g. a furnace) as an extra line. => 
 Screen corner of the pinned list. => 
 Text and icon size of the pinned list. => 
 Small map in a screen corner: a section of the game's own world map around you (outdoors; indoors your location on the map). => 
@@ -225,7 +308,7 @@ Steam Deck / battery =>
 Performance => 
 Quality => 
 Game default => 
-For Steam Deck, handhelds and laptops on battery: world at half resolution, simple shadows, no ambient occlusion, 40 FPS, physics at 30 Hz. Quiet and efficient. => 
+For Steam Deck, handhelds and laptops on battery: world at half resolution, simple shadows, no ambient occlusion, VSync without tearing, physics at 30 Hz. For 40 FPS on the Deck use the frame limit in Steam's quick access menu (…) – it also sets the display to 40 Hz. => 
 For weaker PCs: full resolution, simpler shadows and lights, no ambient occlusion, a steady 60 FPS. => 
 Everything at the highest level (soft PC shadows, best ambient occlusion, real lights), VSync at the full refresh rate. => 
 Removes all graphics and frame rate overrides of the mod – only the graphics tier from the game menu applies. => 
@@ -253,21 +336,29 @@ Screenshots =>
 Ultrawide main menu => 
 Hide HUD => 
 Workshop upload => 
-ready => 
-done => 
-Unpin => 
+Move objects => 
+Trade: right amount => 
 What's new? => 
 Enjoying the mod? => 
 Active: => 
+Quick start => 
 Game => 
 Frame rate => 
 Graphics (overrides parts of the graphics tier) => 
+"Instant Transitions" is installed – its settings apply. => 
+Doors / travel recently: avg {0} s ({1}×) => 
+In the game => 
+"What time is it" is installed – the HUD line stays off. => 
+"ESC to Leave" is installed – its function is used. => 
+Building => 
+Not fully vanilla – often requested, so it's an option (off by default): => 
 Camera => 
-Comfort => 
-Open screenshot folder => 
-Interface => 
 Remove all pins => 
+Interface => 
+GK2 Mod Framework is installed – its "Mods" button is used, open Vanilla+ with F9. => 
+Keys => 
 FPS display => 
+Open screenshot folder => 
 (applies after restart) => 
 Save now => 
 Reset graphics => 

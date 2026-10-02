@@ -126,5 +126,45 @@ namespace GK2Tweaks
         }
 
         internal static Texture2D Tex(string sprite) => cache[sprite].Key;
+
+        // Rahmen direkt aus einem UI-Bild des Spiels (z. B. der Gebietsanzeige oben rechts) - sieht garantiert gleich aus
+        private static readonly Dictionary<string, GUIStyle> spriteStyles = new Dictionary<string, GUIStyle>();
+        internal static GUIStyle FromSprite(Sprite s, int fontSize, Color text)
+        {
+            if (s == null) return null;
+            string key = s.name + "#" + fontSize;
+            if (spriteStyles.TryGetValue(key, out GUIStyle st)) return st;
+            Texture2D tex = Upscale(Extract(s));
+            st = new GUIStyle(GUIStyle.none)
+            {
+                border = new RectOffset(Mathf.RoundToInt(s.border.x) * K, Mathf.RoundToInt(s.border.z) * K, Mathf.RoundToInt(s.border.w) * K, Mathf.RoundToInt(s.border.y) * K),
+                fontSize = fontSize
+            };
+            st.normal.background = tex;
+            st.normal.textColor = text;
+            if (PixelFont != null) st.font = PixelFont;
+            spriteStyles[key] = st;
+            return st;
+        }
+
+        // Hintergrund der Gebietsanzeige des Spiels (dunkler Schiefer-Rahmen)
+        internal static Sprite ZoneBoxSprite()
+        {
+            try
+            {
+                WorldZoneWidget wz = GUIElements.Instance != null ? GUIElements.Instance.WorldZoneWidget : null;
+                if (wz == null) return null;
+                Sprite best = null; float area = 0f;
+                foreach (UnityEngine.UI.Image img in wz.GetComponentsInChildren<UnityEngine.UI.Image>(true))
+                {
+                    if (img == null || img.sprite == null || img.sprite.border == Vector4.zero) continue;
+                    var rt = (RectTransform)img.transform;
+                    float a = rt.rect.width * rt.rect.height;
+                    if (a > area) { area = a; best = img.sprite; }
+                }
+                return best;
+            }
+            catch { return null; }
+        }
     }
 }

@@ -30,6 +30,13 @@ namespace GK2Tweaks
             public string QuestId, Note;           // Quest-Pins: Aufgabentext statt Zutaten
             public List<Need> Needs = new List<Need>();
             public bool Ready, Checked;
+            // Pin-Liste 2.0 (PinTree): Menge (x N), eingeklappt, aufgeklappte Zutaten, berechnete Zeilen
+            public int Mult = 1;
+            public bool Collapsed;
+            public HashSet<string> Open = new HashSet<string>();
+            public List<PinRow> Rows = new List<PinRow>();
+            public int VarIndex, VarCount, OutCount = 1, FuelCount;
+            public string Station, FuelName, FuelIcon;
         }
 
         internal static readonly List<Pin> List = new List<Pin>();
@@ -55,6 +62,9 @@ namespace GK2Tweaks
         internal static void Unpin(string key) { if (List.RemoveAll(p => p.Key == key) > 0) Changed(); }
 
         internal static void ClearAll() { List.Clear(); Changed(); }
+
+        // nach Aendern von Variante / Auf- / Einklappen
+        internal static void AfterEdit() { Refresh(); Changed(); }
 
         private static void Changed()
         {
@@ -96,7 +106,7 @@ namespace GK2Tweaks
 
         internal static Pin Build(string key, string titleKey, string suffix, string iconId, List<UICraftItemCellData> cells, WgoData wgo, int multiplier)
         {
-            var p = new Pin { Key = key, Title = Loc(titleKey) + suffix, TitleKey = titleKey, Suffix = suffix, IconId = iconId };
+            var p = new Pin { Key = key, Title = Loc(titleKey) + suffix, TitleKey = titleKey, Suffix = suffix, IconId = iconId, Mult = Math.Max(1, multiplier) };
             if (cells == null) return p;
             foreach (UICraftItemCellData c in cells)
             {
@@ -180,7 +190,16 @@ namespace GK2Tweaks
             refreshAt = Time.realtimeSinceStartup + 0.5f;
             if (!WeekPlan.InGame) return;
             MultiInventory inv;
-            try { inv = Plugin.PinsChests.Value == "Everywhere" ? AllChests() : MainGame.PlayerController.WorkerMultiInventory; } catch { return; }
+            try
+            {
+                switch (Plugin.PinsChests.Value)
+                {
+                    case "Everywhere": inv = AllChests(); break;
+                    case "Inventory": inv = new MultiInventory(MainGame.PlayerData, false); break;
+                    default: inv = MainGame.PlayerController.WorkerMultiInventory; break;
+                }
+            }
+            catch { return; }
             foreach (Pin p in List)
             {
                 bool wasReady = p.Ready;
@@ -199,25 +218,37 @@ namespace GK2Tweaks
                 bool ready = true;
                 foreach (Need n in p.Needs)
                 {
-                    int have = 0;
-                    try
-                    {
-                        if (n.Group)
-                        {
-                            var probe = new NeedItemData(n.Id, 1);
-                            if (probe.TryGetGroupItemDefs(out List<ItemDef> defs) && defs != null)
-                                foreach (ItemDef d in defs) have += inv.GetTotalCount(d.id);
-                        }
-                        else have = inv.GetTotalCount(n.Id);
-                    }
-                    catch { }
+                    int have = HaveOf(inv, n.Id, n.Group);
                     n.Have = have;
                     if (have < n.Count) ready = false;
                 }
                 p.Ready = ready;
+                try
+                {
+                    if (PinTree.Enabled && SafeMode.On("Pins")) PinTree.Build(p, (id, g) => HaveOf(inv, id, g));
+                    else p.Rows.Clear();
+                }
+                catch (Exception e) { p.Rows.Clear(); Plugin.Log.LogWarning("Pin tree: " + e.Message); }
                 if (ready && !wasReady && p.Checked) NotifyReady(p);
                 p.Checked = true;
             }
+        }
+
+        private static int HaveOf(MultiInventory inv, string id, bool group)
+        {
+            int have = 0;
+            try
+            {
+                if (group)
+                {
+                    var probe = new NeedItemData(id, 1);
+                    if (probe.TryGetGroupItemDefs(out List<ItemDef> defs) && defs != null)
+                        foreach (ItemDef d in defs) have += inv.GetTotalCount(d.id);
+                }
+                else have = inv.GetTotalCount(id);
+            }
+            catch { }
+            return have;
         }
 
         // Kurze Meldung mit Ton, wenn ein Pin fertig wird (alle Zutaten da / Quest erledigt)
@@ -638,7 +669,10 @@ namespace GK2Tweaks
                 {
                     var needs = new List<string>();
                     foreach (Pins.Need n in p.Needs) needs.Add(Esc(n.Id) + "|" + (n.Group ? 1 : 0) + "|" + n.Count + "|" + Esc(n.IconId));
-                    lines.Add(string.Join("\t", new[] { Esc(slot), Esc(p.Key), Esc(p.TitleKey), Esc(p.Suffix), Esc(p.IconId), Esc(p.QuestId), string.Join(";", needs.ToArray()) }));
+                    var open = new List<string>();
+                    foreach (string o in p.Open) open.Add(Esc(o).Replace(",", " "));
+                    string extra = Math.Max(1, p.Mult) + "|" + (p.Collapsed ? 1 : 0) + "|" + string.Join(",", open.ToArray());
+                    lines.Add(string.Join("\t", new[] { Esc(slot), Esc(p.Key), Esc(p.TitleKey), Esc(p.Suffix), Esc(p.IconId), Esc(p.QuestId), string.Join(";", needs.ToArray()), extra }));
                 }
                 System.IO.Directory.CreateDirectory(System.IO.Path.GetDirectoryName(FilePath));
                 System.IO.File.WriteAllLines(FilePath, lines.ToArray());
@@ -675,6 +709,13 @@ namespace GK2Tweaks
                         if (nf.Length < 4) continue;
                         int.TryParse(nf[2], out int cnt);
                         p.Needs.Add(new Pins.Need { Id = nf[0], Group = nf[1] == "1", Count = cnt, IconId = N(nf[3]), Name = Pins.Loc(nf[0]) });
+                    }
+                    if (f.Length >= 8)
+                    {
+                        string[] x = f[7].Split('|');
+                        if (x.Length > 0 && int.TryParse(x[0], out int mult)) p.Mult = Math.Max(1, mult);
+                        if (x.Length > 1) p.Collapsed = x[1] == "1";
+                        if (x.Length > 2) foreach (string o in x[2].Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries)) p.Open.Add(o);
                     }
                     if (Pins.List.Count < Pins.Max) Pins.List.Add(p);
                 }

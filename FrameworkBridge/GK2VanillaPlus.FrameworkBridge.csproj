@@ -1,0 +1,21 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net472</TargetFramework>
+    <AssemblyName>GK2VanillaPlus.FrameworkBridge</AssemblyName>
+    <RootNamespace>GK2VanillaPlus.FrameworkBridge</RootNamespace>
+    <LangVersion>latest</LangVersion>
+    <Nullable>disable</Nullable>
+    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+    <BepInExDir Condition="'$(BepInExDir)' == ''">$(MSBuildThisFileDirectory)../_deps/BepInEx/BepInEx/core/</BepInExDir>
+    <ManagedDir Condition="'$(ManagedDir)' == ''">$(MSBuildThisFileDirectory)../_ref/Managed/</ManagedDir>
+    <!-- nur zum Kompilieren: GK2.Framework.dll aus dem Quellcode gebaut (reference/fw), wird nicht mitgeliefert -->
+    <FrameworkDll Condition="'$(FrameworkDll)' == ''">$(MSBuildThisFileDirectory)../FrameworkRef/bin/Release/GK2.Framework.dll</FrameworkDll>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.3" PrivateAssets="all" />
+    <Reference Include="BepInEx"><HintPath>$(BepInExDir)BepInEx.dll</HintPath><Private>false</Private></Reference>
+    <Reference Include="UnityEngine.CoreModule"><HintPath>$(ManagedDir)UnityEngine.CoreModule.dll</HintPath><Private>false</Private></Reference>
+    <Reference Include="GK2.Framework"><HintPath>$(FrameworkDll)</HintPath><Private>false</Private></Reference>
+    <Reference Include="GK2Tweaks"><HintPath>$(MSBuildThisFileDirectory)../GK2Tweaks/bin/Release/GK2Tweaks.dll</HintPath><Private>false</Private></Reference>
+  </ItemGroup>
+</Project>

@@ -1,5 +1,35 @@
 # Changelog
 
+## 1.6.0 – 2026-10-02
+
+**EN**
+- **1,000+ players – thank you!** A small thank-you in the main menu (once), then just a little note next to "modded".
+- New: **Rename zombies** – a Rename button next to the name in the zombie window: type your own name or roll a new one, any time.
+- New: **Trade the right amount** – with town vendors the amount slider starts at exactly the amount that still gives happiness (thumbs up), and "Add liked goods" puts all of them in at once in the right amount. You still confirm the deal yourself. (Idea from the Steam discussions.)
+- New, **not fully vanilla** (often requested, off by default): **Full refund** when removing buildings, and **Move objects** – in remove mode press the rotate key on an object and place it somewhere else. It stays the same object, contents and crafting queue are kept – works for workbenches, conveyors and everything else; zombie workers are put on the ground, extensions stay until you move them too.
+- New: **Day & time on the HUD** as a second line in the area name box at the top right – where and when in one place (day + time, weekday + time or only the time; 12/24 h).
+- New: **Leave conversations with Esc / B**, **faster transitions** through doors and on the map, **Pinned list 2.0** (workbench, recipe variants, ingredient tree, fuel, collapsible) and pins can count **only your inventory**.
+- New: **Portuguese** (pt-BR). The translation template is now always in BepInEx/GK2VanillaPlus/lang/translation-template.txt (it was missing in the Workshop version).
+- Steam Deck / Linux: **no more tearing** with an FPS limit (VSync stays on, setting "No tearing" in Graphics & speed).
+- **Controller:** hold **RT** to navigate the pinned list (A expand, ←→ amount, LB/RB variant, Y unpin); at vendors **LT** adds the liked goods; in the zombie window **Y** rolls a new name; pins can also be managed in the mod menu.
+- Pins: craft a recipe **2–10 times** (×1…×10 button, all amounts scale), pinned list redesigned and hidden while the character/inventory window is open.
+- **Mod menu reorganized** into tabs, plus **All off (vanilla)** – turn everything off and switch on only the 1–2 things you want. "Default" brings back the recommended setup.
+- Ideas from the Nexus mods "What time is it", "ESC to Leave" (OrionAF) and "Instant Transitions" (LeBetoven) – own implementation. If one of them is installed, Vanilla+ leaves that part to it.
+
+**DE**
+- **1.000+ Spieler – danke!** Ein kleines Dankeschön im Hauptmenü (einmalig), danach nur noch ein kleiner Hinweis neben „modded“.
+- Neu: **Zombies umbenennen** – ein „Umbenennen“-Knopf neben dem Namen im Zombie-Fenster: eigenen Namen eintippen oder neu würfeln, jederzeit.
+- Neu: **Handel mit der passenden Menge** – bei Stadt-Händlern startet der Mengen-Regler genau bei der Menge, die noch Zufriedenheit (Daumen hoch) bringt, und „Daumen-hoch-Waren einlegen“ legt alle auf einmal in der richtigen Menge hinein. Bestätigen musst du weiterhin selbst. (Idee aus den Steam-Diskussionen.)
+- Neu, **nicht mehr ganz Vanilla** (oft gewünscht, standardmäßig aus): **Volle Erstattung** beim Abbauen und **Objekte verschieben** – im Abriss-Modus mit der Dreh-Taste ein Objekt aufnehmen und woanders hinstellen. Es bleibt dasselbe Objekt, Inhalt und Herstell-Warteschlange bleiben erhalten – geht für Werkbänke, Förderbänder und alles andere; Zombie-Arbeiter landen auf dem Boden, Erweiterungen bleiben stehen, bis du sie auch verschiebst.
+- Neu: **Tag & Uhrzeit am HUD** als zweite Zeile in der Gebietsanzeige oben rechts – Wo und Wann an einer Stelle (Tag + Uhrzeit, Wochentag + Uhrzeit oder nur Uhrzeit; 12/24 h).
+- Neu: **Gespräch mit Esc / B verlassen**, **schnellere Übergänge** durch Türen und auf der Karte, **Pin-Liste 2.0** (Werkbank, Rezept-Varianten, Zutatenbaum, Brennstoff, einklappbar) und Pins können **nur das Inventar** zählen.
+- Neu: **Portugiesisch** (pt-BR). Die Übersetzungsvorlage liegt jetzt immer in BepInEx/GK2VanillaPlus/lang/translation-template.txt (fehlte in der Workshop-Version).
+- Steam Deck / Linux: **kein Tearing mehr** mit FPS-Limit (VSync bleibt an, Einstellung „Kein Tearing“ unter Grafik & Leistung).
+- **Controller:** **RT** gedrückt halten steuert die Pin-Liste (A auf/zu, ←→ Menge, LB/RB Variante, Y lösen); beim Händler legt **LT** die Daumen-hoch-Waren ein; im Zombie-Fenster würfelt **Y** einen neuen Namen; Pins lassen sich auch im Mod-Menü verwalten.
+- Pins: Rezept **2–10-mal** herstellen (Knopf ×1…×10, alle Mengen rechnen mit), Pin-Liste neu gestaltet und ausgeblendet, solange das Charakter-/Inventar-Fenster offen ist.
+- **Mod-Menü neu sortiert** in Reiter, dazu **Alles aus (Vanilla)** – alles abschalten und nur die 1–2 Dinge einschalten, die du willst. „Standard“ holt die Empfehlung zurück.
+- Ideen aus den Nexus-Mods „What time is it“, „ESC to Leave“ (OrionAF) und „Instant Transitions“ (LeBetoven) – eigene Umsetzung. Ist einer davon installiert, überlässt Vanilla+ ihm diesen Teil.
+
 ## 1.5.3 – 2026-09-28
 
 **EN**

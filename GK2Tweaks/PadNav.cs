@@ -26,7 +26,7 @@ namespace GK2Tweaks
         private readonly bool[] held = new bool[4];
         private static Texture2D focusTex;
 
-        private bool AnyModWindow => menuOpen || newsOpen || weekOpen
+        private bool AnyModWindow => menuOpen || newsOpen || weekOpen || Renaming || celebOpen || pinPad
 #if !NEXUS
             || rateOpen
 #endif
@@ -37,7 +37,7 @@ namespace GK2Tweaks
 #if !NEXUS
             rateOpen ? RateWindowId :
 #endif
-            newsOpen ? NewsWindowId : menuOpen ? WindowId : weekOpen ? WeekWindowId : -1;
+            celebOpen ? CelebWindowId : newsOpen ? NewsWindowId : menuOpen ? WindowId : weekOpen ? WeekWindowId : -1;
 
         // in Update (einmal pro Frame)
         private void PadTick()
@@ -86,6 +86,7 @@ namespace GK2Tweaks
         private void PadClose()
         {
             PlaySound("gui_click");
+            if (celebOpen) { CloseCeleb(); return; }
 #if !NEXUS
             if (rateOpen) CloseRate(6);
             else

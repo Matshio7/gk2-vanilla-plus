@@ -131,6 +131,8 @@ namespace GK2Tweaks
             }
             updateAvailableSnap = UpdateCheck.Available;
             safeNoticeSnap = SafeMode.MenuNotice();
+            InGameTick();
+            PinPadTick();
             PadTick();
             RunPendingReopen();
             // Esc schliesst immer das oberste Fenster (gleiche Reihenfolge wie B am Controller)
@@ -140,7 +142,8 @@ namespace GK2Tweaks
                 if (rateOpen) CloseRate(6);
                 else
 #endif
-                if (newsOpen) CloseNews();
+                if (celebOpen) CloseCeleb();
+                else if (newsOpen) CloseNews();
                 else if (menuOpen) SetMenu(false);
             }
             UpdateEnabled();
@@ -220,7 +223,19 @@ namespace GK2Tweaks
 
         // oben rechts steht im Spiel der Gebietsname - im Spiel darunter anfangen
         private float curScale = 1f;
-        private float TopFor(string corner) => corner == "TopRight" && WeekPlan.InGame ? 66f * Mathf.Clamp(Screen.height / 1080f, 0.75f, 2.5f) / curScale : 12f;
+        // Unter der Gebietsanzeige des Spiels (die mit Tag & Uhrzeit zweizeilig sein kann) anfangen
+        private float TopFor(string corner)
+        {
+            if (corner != "TopRight" || !WeekPlan.InGame) return 12f;
+            float top = 66f * Mathf.Clamp(Screen.height / 1080f, 0.75f, 2.5f) / curScale;
+            try
+            {
+                WorldZoneWidget wz = GUIElements.Instance != null ? GUIElements.Instance.WorldZoneWidget : null;
+                if (wz != null && wz.gameObject.activeInHierarchy) top = Mathf.Max(top, GuiRect((RectTransform)wz.transform, curScale).yMax + 6f);
+            }
+            catch { }
+            return top;
+        }
 
         private Rect DrawOverlay(float scale)
         {
@@ -242,7 +257,7 @@ namespace GK2Tweaks
         }
 
         // ---------- Pin-Liste ----------
-        private GUIStyle pinTitleStyle, pinRowStyle, pinBoxStyle, pinXStyle, pinNoteStyle;
+        private GUIStyle pinTitleStyle, pinRowStyle, pinBoxStyle, pinXStyle, pinNoteStyle, pinInfoStyle;
         private string pinStyleKey;
         private Texture2D pinDarkTex;
 
@@ -267,16 +282,20 @@ namespace GK2Tweaks
             pinRowStyle = new GUIStyle(labelStyle) { fontSize = f, fixedHeight = 0, wordWrap = false, alignment = TextAnchor.MiddleLeft, richText = true };
             if (hc) pinRowStyle.normal.textColor = Color.white;
             pinNoteStyle = new GUIStyle(pinRowStyle) { wordWrap = true, alignment = TextAnchor.UpperLeft, fontSize = Mathf.Max(12, f - 2) };
+            pinInfoStyle = new GUIStyle(pinRowStyle) { fontSize = Mathf.Max(11, f - 1) };
+            pinInfoStyle.normal.textColor = hc ? new Color(0.85f, 0.85f, 0.85f) : new Color(0.72f, 0.7f, 0.62f);
             pinXStyle = new GUIStyle(pinRowStyle) { alignment = TextAnchor.MiddleCenter, fontStyle = FontStyle.Bold };
             pinXStyle.normal.textColor = new Color(0.85f, 0.6f, 0.5f);
             pinXStyle.hover.textColor = Color.white;
         }
 
-        private static string Count(Pins.Need n)
+        private static string Count(Pins.Need n) => CountText(n.Have, n.Count);
+
+        private static string CountText(int have, int count)
         {
-            bool ok = n.Have >= n.Count;
+            bool ok = have >= count;
             string col = Plugin.HighContrast.Value ? (ok ? "#7dff5c" : "#ff4d3d") : (ok ? "#9be27f" : "#ff7a6a");
-            string t = n.Have + " / " + n.Count;
+            string t = have + " / " + count;
             return Plugin.HighContrast.Value ? "<b><color=" + col + ">" + t + "</color></b>" : "<color=" + col + ">" + t + "</color>";
         }
 
@@ -302,28 +321,40 @@ namespace GK2Tweaks
             catch { return Rect.zero; }
         }
 
-        private void DrawPins(float scale, Rect ov)
+        private void DrawPinsOld(float scale, Rect ov)
         {
             EnsurePinStyles();
             float line = pinRowStyle.fontSize + 10f, icon = line - 2f, w = 0f, h = 0f;
-            float noteW = pinRowStyle.fontSize * 20f;
+            float noteW = pinRowStyle.fontSize * 20f, indent = pinRowStyle.fontSize + 2f, btn = line - 4f;
             string ready = "  " + Labels.T("bereit", "ready"), done = "  " + Labels.T("erledigt", "done");
             // Breite und Hoehe vorab berechnen
             foreach (Pins.Pin p in Pins.List)
             {
-                w = Mathf.Max(w, pinTitleStyle.CalcSize(new GUIContent(p.Title + ready)).x + icon + 34f);
+                w = Mathf.Max(w, pinTitleStyle.CalcSize(new GUIContent(p.Title + ready)).x + icon + 38f + btn);
                 h += line + 4f;
-                foreach (Pins.Need n in p.Needs)
-                {
-                    w = Mathf.Max(w, pinRowStyle.CalcSize(new GUIContent(n.Name + "   " + n.Have + " / " + n.Count)).x + icon + 22f);
-                    h += line;
-                }
+                if (p.Collapsed) { h += 6f; continue; }
+                string head = PinHeader(p);
+                if (head != null) { w = Mathf.Max(w, pinInfoStyle.CalcSize(new GUIContent(head)).x + 26f + (p.VarCount > 1 ? 2f * btn + 12f : 0f)); h += line; }
+                if (p.Rows.Count > 0)
+                    foreach (PinRow r in p.Rows)
+                    {
+                        string t = r.Info ? r.Name : r.Name + "   " + r.Have + " / " + r.Count;
+                        w = Mathf.Max(w, (r.Info ? pinInfoStyle : pinRowStyle).CalcSize(new GUIContent(t)).x + icon + 26f + indent * r.Depth + btn);
+                        h += line;
+                    }
+                else
+                    foreach (Pins.Need n in p.Needs)
+                    {
+                        w = Mathf.Max(w, pinRowStyle.CalcSize(new GUIContent(n.Name + "   " + n.Have + " / " + n.Count)).x + icon + 22f);
+                        h += line;
+                    }
+                if (p.FuelName != null) { w = Mathf.Max(w, pinRowStyle.CalcSize(new GUIContent(p.FuelName + "  ×" + p.FuelCount)).x + icon + 26f); h += line; }
                 if (!string.IsNullOrEmpty(p.Note)) w = Mathf.Max(w, Mathf.Min(noteW, pinNoteStyle.CalcSize(new GUIContent(p.Note)).x + 30f));
                 h += 6f;
             }
             w = Mathf.Max(w, 200f);
             foreach (Pins.Pin p in Pins.List)
-                if (!string.IsNullOrEmpty(p.Note)) h += Mathf.Min(pinNoteStyle.CalcHeight(new GUIContent(p.Note), w - 40f), pinNoteStyle.lineHeight * 4f + 4f);
+                if (!p.Collapsed && !string.IsNullOrEmpty(p.Note)) h += Mathf.Min(pinNoteStyle.CalcHeight(new GUIContent(p.Note), w - 40f), pinNoteStyle.lineHeight * 4f + 4f);
             w += 24f; h += 12f;
             float sw = Screen.width / scale, sh = Screen.height / scale, m = 12f;
             string c = Plugin.PinsCorner.Value;
@@ -336,34 +367,103 @@ namespace GK2Tweaks
             Rect npc = NpcWidgetRect(scale);
             if (npc.width > 0 && npc.Overlaps(new Rect(x, y, w, h)))
                 y = c.StartsWith("Top") ? npc.yMax + 6f : npc.y - 6f - h;
+            // sehr lange Liste: oben am Bildschirm halten
+            if (y + h > sh - m && c.StartsWith("Top")) h = Mathf.Max(line * 3f, sh - m - y);
             GUI.Box(new Rect(x, y, w, h), GUIContent.none, pinBoxStyle);
-            float cy = y + 6f, cx = x + 12f;
+            float cy = y + 6f, cx = x + 12f, bottom = y + h - 4f;
             Pins.Pin remove = null;
+            Action act = null;
             foreach (Pins.Pin p in Pins.List)
             {
+                if (cy + line > bottom + 1f) break;
+                Pins.Pin pp = p;
+                if (GUI.Button(new Rect(cx - 4f, cy + 2f, btn, line - 4f), new GUIContent(p.Collapsed ? "+" : "-", p.Collapsed ? Labels.T("Aufklappen", "Expand") : Labels.T("Einklappen", "Collapse")), pinXStyle))
+                    act = () => PinTree.ToggleCollapsed(pp);
+                float tx = cx + btn;
                 Texture2D ti = Pins.Icon(p.IconId);
-                float tx = cx;
-                if (ti != null) { GUI.DrawTexture(new Rect(cx, cy, icon, icon), ti, ScaleMode.ScaleToFit); tx += icon + 6f; }
+                if (ti != null) { GUI.DrawTexture(new Rect(tx, cy, icon, icon), ti, ScaleMode.ScaleToFit); tx += icon + 6f; }
                 string status = p.Ready ? "  <color=#9be27f>" + (p.QuestId != null ? done.Trim() : ready.Trim()) + "</color>" : "";
                 GUI.Label(new Rect(tx, cy, w - (tx - x) - 36f, line), p.Title + status, pinTitleStyle);
                 if (GUI.Button(new Rect(x + w - 30f, cy, 22f, line), new GUIContent("x", Labels.T("Loslösen", "Unpin")), pinXStyle)) remove = p;
                 cy += line + 4f;
+                if (p.Collapsed) { cy += 6f; continue; }
                 if (!string.IsNullOrEmpty(p.Note))
                 {
                     float nh = Mathf.Min(pinNoteStyle.CalcHeight(new GUIContent(p.Note), w - 40f), pinNoteStyle.lineHeight * 4f + 4f);
                     GUI.Label(new Rect(cx + 10f, cy, w - 40f, nh), p.Note, pinNoteStyle);
                     cy += nh;
                 }
-                foreach (Pins.Need n in p.Needs)
+                string head = PinHeader(p);
+                if (head != null && cy + line <= bottom + 1f)
                 {
-                    Texture2D ni = Pins.Icon(n.IconId);
-                    if (ni != null) GUI.DrawTexture(new Rect(cx + 10f, cy + 1f, icon - 2f, icon - 2f), ni, ScaleMode.ScaleToFit);
-                    GUI.Label(new Rect(cx + icon + 14f, cy, w - icon - 30f, line), n.Name + "   " + Count(n), pinRowStyle);
+                    float hw = w - 36f;
+                    if (p.VarCount > 1)
+                    {
+                        hw -= 2f * btn + 8f;
+                        if (GUI.Button(new Rect(x + w - 30f - 2f * btn - 4f, cy + 2f, btn, line - 4f), new GUIContent("<", Labels.T("Andere Rezept-Variante", "Other recipe variant")), pinXStyle)) act = () => PinTree.Switch(pp, -1);
+                        if (GUI.Button(new Rect(x + w - 30f - btn, cy + 2f, btn, line - 4f), new GUIContent(">", Labels.T("Andere Rezept-Variante", "Other recipe variant")), pinXStyle)) act = () => PinTree.Switch(pp, 1);
+                    }
+                    GUI.Label(new Rect(cx + 10f, cy, hw, line), head, pinInfoStyle);
+                    cy += line;
+                }
+                if (p.Rows.Count > 0)
+                {
+                    foreach (PinRow r in p.Rows)
+                    {
+                        if (cy + line > bottom + 1f) break;
+                        float rx = cx + 10f + indent * r.Depth;
+                        if (r.Info)
+                        {
+                            GUI.Label(new Rect(rx, cy, w - (rx - x) - 12f, line), "· " + r.Name, pinInfoStyle);
+                            cy += line;
+                            continue;
+                        }
+                        if (r.Expandable)
+                        {
+                            string path = r.Path;
+                            if (GUI.Button(new Rect(rx - 4f, cy + 2f, btn, line - 4f), new GUIContent(r.Expanded ? "-" : "+", r.Expanded ? Labels.T("Zutaten zuklappen", "Hide ingredients") : Labels.T("Zutaten dafür zeigen", "Show its ingredients")), pinXStyle))
+                                act = () => PinTree.ToggleOpen(pp, path);
+                        }
+                        rx += btn;
+                        Texture2D ni = Pins.Icon(r.IconId);
+                        if (ni != null) GUI.DrawTexture(new Rect(rx, cy + 1f, icon - 2f, icon - 2f), ni, ScaleMode.ScaleToFit);
+                        GUI.Label(new Rect(rx + icon + 4f, cy, w - (rx - x) - icon - 16f, line), r.Name + "   " + CountText(r.Have, r.Count), pinRowStyle);
+                        cy += line;
+                    }
+                }
+                else
+                {
+                    foreach (Pins.Need n in p.Needs)
+                    {
+                        if (cy + line > bottom + 1f) break;
+                        Texture2D ni = Pins.Icon(n.IconId);
+                        if (ni != null) GUI.DrawTexture(new Rect(cx + 10f, cy + 1f, icon - 2f, icon - 2f), ni, ScaleMode.ScaleToFit);
+                        GUI.Label(new Rect(cx + icon + 14f, cy, w - icon - 30f, line), n.Name + "   " + Count(n), pinRowStyle);
+                        cy += line;
+                    }
+                }
+                if (p.FuelName != null && cy + line <= bottom + 1f)
+                {
+                    float fx = cx + 10f + btn;
+                    Texture2D fi = Pins.Icon(p.FuelIcon);
+                    if (fi != null) GUI.DrawTexture(new Rect(fx, cy + 1f, icon - 2f, icon - 2f), fi, ScaleMode.ScaleToFit);
+                    GUI.Label(new Rect(fx + icon + 4f, cy, w - (fx - x) - icon - 16f, line), p.FuelName + "  ×" + p.FuelCount, pinInfoStyle);
                     cy += line;
                 }
                 cy += 6f;
             }
             if (remove != null) { Pins.Pin r = remove; Defer(() => Pins.Unpin(r)); }
+            else if (act != null) Defer(act);
+        }
+
+        // "1/2 · Kreissaege ×4" unter dem Titel (nur Rezepte mit Varianten oder bekannter Werkbank)
+        private static string PinHeader(Pins.Pin p)
+        {
+            if (p.VarCount == 0 || (p.VarCount < 2 && p.Station == null)) return null;
+            string s = p.VarCount > 1 ? (p.VarIndex + 1) + "/" + p.VarCount : "";
+            if (p.Station != null) s += (s.Length > 0 ? "  ·  " : "") + p.Station;
+            if (p.OutCount > 1) s += "  ×" + p.OutCount;
+            return s;
         }
 
         // Unsichtbare Flaeche ueber der Spiel-Oberflaeche, solange ein Mod-Fenster offen ist:
@@ -392,21 +492,21 @@ namespace GK2Tweaks
 
         private void UpdateEnabled()
         {
-            SetBlocker(menuOpen || newsOpen
+            SetBlocker(menuOpen || newsOpen || celebOpen || Renaming
 #if !NEXUS
                 || rateOpen
 #endif
             );
             if (weekOpen && !WeekPlan.InGame) weekOpen = false;
-            bool want = menuOpen || weekOpen || newsOpen ||
+            bool want = menuOpen || weekOpen || newsOpen || celebOpen ||
 #if !NEXUS
                 rateOpen ||
 #endif
-                Plugin.ShowOverlay.Value || ManualSave.ShowMessage || GraphicsBench.Running || (Pins.List.Count > 0 && Plugin.PinsEnabled.Value);
+                Plugin.ShowOverlay.Value || ManualSave.ShowMessage || GraphicsBench.Running || (Pins.List.Count > 0 && Plugin.PinsEnabled.Value) || InGameUiWant;
             if (enabled != want) enabled = want;
         }
 
-        internal bool AnyWindowOpen => menuOpen || weekOpen || newsOpen
+        internal bool AnyWindowOpen => menuOpen || weekOpen || newsOpen || celebOpen
 #if !NEXUS
             || rateOpen
 #endif
@@ -434,7 +534,7 @@ namespace GK2Tweaks
             GUI.matrix = Matrix4x4.TRS(Vector3.zero, Quaternion.identity, new Vector3(scale, scale, 1f));
             Rect ov = Rect.zero;
             if (Plugin.ShowOverlay.Value) ov = DrawOverlay(scale);
-            if (Pins.List.Count > 0 && Plugin.PinsEnabled.Value && WeekPlan.InGame && !HudToggle.Hidden)
+            if (Pins.List.Count > 0 && Plugin.PinsEnabled.Value && WeekPlan.InGame && !HudToggle.Hidden && !BigGameWindowOpen())
                 DrawPins(scale, Plugin.PinsCorner.Value == Plugin.OvCorner.Value ? ov : Rect.zero);
             if (GraphicsBench.Running)
             {
@@ -448,6 +548,8 @@ namespace GK2Tweaks
                 Vector2 sz = overlayStyle.CalcSize(msg);
                 GUI.Label(new Rect((Screen.width / scale - sz.x) / 2f, 24, sz.x + 4, sz.y), msg, overlayStyle);
             }
+            InGameGUI(scale);
+            DrawConfetti(scale);
             if (menuOpen) win = GUILayout.Window(WindowId, win, DrawWindow, skinned ? "" : "GK2 Vanilla+ · by McFly7", windowStyle);
             if (weekOpen)
             {
@@ -467,6 +569,7 @@ namespace GK2Tweaks
                 rateWin = GUILayout.Window(RateWindowId, rateWin, DrawRateWindow, skinned ? "" : Labels.T("Gefällt dir der Mod?", "Enjoying the mod?"), windowStyle);
             }
 #endif
+            if (celebOpen) { DrawCelebration(scale); GUI.BringWindowToFront(CelebWindowId); }
             GUI.matrix = old;
             GUI.skin.verticalScrollbarThumb = oldThumb;
         }
@@ -494,108 +597,147 @@ namespace GK2Tweaks
             }
             GUILayout.Space(4);
 
-            scroll = skinned ? GUILayout.BeginScrollView(scroll, false, true, GUIStyle.none, vbarStyle, GUIStyle.none, GUILayout.Height(560))
-                             : GUILayout.BeginScrollView(scroll, GUILayout.Height(560));
+            DrawTabs();
+            scroll = skinned ? GUILayout.BeginScrollView(scroll, false, true, GUIStyle.none, vbarStyle, GUIStyle.none, GUILayout.Height(520))
+                             : GUILayout.BeginScrollView(scroll, GUILayout.Height(520));
             inScroll = true;
-            if (MainGame.Instance != null && MainGame.Instance.gameState == MainGame.GameState.MainMenu) DrawSaves();
-
-            Header(Labels.T("Spiel", "Game"));
-            DrawGameTier();
-            DrawProfiles();
-
-            DrawGfxBench();
-
-            Header(Labels.T("Bildrate", "Frame rate"));
-            DrawEntry(Plugin.Pacing);
-            DrawEntry(Plugin.TargetFps);
-
-            Header(Labels.T("Grafik (überschreibt einzelne Teile der Grafikstufe)", "Graphics (overrides parts of the graphics tier)"));
-            DrawEntry(Plugin.RenderMode);
-            DrawEntry(Plugin.Shadows);
-            DrawEntry(Plugin.Hbao);
-            DrawEntry(Plugin.PointLights);
-            DrawEntry(Plugin.BackLight);
-            DrawEntry(Plugin.Water);
-            DrawEntry(Plugin.Clouds);
-            DrawEntry(Plugin.OledBlack);
-            DrawEntry(Plugin.WideRain);
-
-            Header(Labels.T("Kamera", "Camera"));
-            DrawEntry(Plugin.Zoom);
-            DrawEntry(Plugin.InteriorZoom);
-            DrawEntry(Plugin.ZoomPresets);
-            DrawEntry(Plugin.ZoomPresetKey);
-            DrawEntry(Plugin.MouseWheelZoom);
-            DrawEntry(Plugin.SmoothZoom);
-
-            Header(Labels.T("Komfort", "Comfort"));
-            DrawEntry(Plugin.PauseInBackground);
-            DrawEntry(Plugin.AutoSaveMinutes);
-            DrawEntry(Plugin.SkipIntro);
-            DrawEntry(Plugin.MenuExtend);
-            DrawEntry(Plugin.MenuModdedLabel);
-            DrawEntry(Plugin.GameMenuButton);
-            DrawEntry(Plugin.WeekPlanNotify);
-            DrawEntry(Plugin.InstantRemove);
-
-            DrawBackups();
-
-            Header(Labels.T("Screenshots", "Screenshots"));
-            DrawEntry(Plugin.ShotKey);
-            DrawEntry(Plugin.ShotScale);
-            DrawEntry(Plugin.ShotHideHud);
-            if (Btn(Labels.T("Screenshot-Ordner öffnen", "Open screenshot folder"), buttonStyle, GUILayout.Width(260)))
+            if (menuTab == 0)
             {
-                System.IO.Directory.CreateDirectory(HiResShot.Folder);
-                Application.OpenURL("file:///" + HiResShot.Folder.Replace('\\', '/'));
+                if (MainGame.Instance != null && MainGame.Instance.gameState == MainGame.GameState.MainMenu) DrawSaves();
+                Header(Labels.T("Schnellstart", "Quick start"));
+                DrawProfiles();
+                DrawMaster();
+                Header(Labels.T("Spiel", "Game"));
+                DrawGameTier();
+                DrawGfxBench();
             }
+            else if (menuTab == 1)
+            {
+                Header(Labels.T("Bildrate", "Frame rate"));
+                DrawEntry(Plugin.Pacing);
+                DrawEntry(Plugin.TargetFps);
+                DrawEntry(Plugin.NoTearing);
 
-            Header(Labels.T("Leistung", "Performance"));
-            DrawEntry(Plugin.PhysicsHz);
-            DrawEntry(Plugin.GameLog);
+                Header(Labels.T("Grafik (überschreibt einzelne Teile der Grafikstufe)", "Graphics (overrides parts of the graphics tier)"));
+                DrawEntry(Plugin.RenderMode);
+                DrawEntry(Plugin.Shadows);
+                DrawEntry(Plugin.Hbao);
+                DrawEntry(Plugin.PointLights);
+                DrawEntry(Plugin.BackLight);
+                DrawEntry(Plugin.Water);
+                DrawEntry(Plugin.Clouds);
+                DrawEntry(Plugin.OledBlack);
+                DrawEntry(Plugin.WideRain);
 
-            Header(Labels.T("Anzeige", "Interface"));
-            DrawEntry(Plugin.Language);
-            DrawEntry(Plugin.MenuScale);
-            DrawEntry(Plugin.HudCenter);
-            DrawEntry(Plugin.HighContrast);
-            DrawEntry(Plugin.StatsLogSeconds);
-            DrawEntry(Plugin.MenuKey);
-            DrawEntry(Plugin.OverlayKey);
-            DrawEntry(Plugin.SaveKey);
-            DrawEntry(Plugin.WeekPlanKey);
-            DrawEntry(Plugin.HudKey);
+                Header(Labels.T("Leistung", "Performance"));
+                DrawEntry(Plugin.PhysicsHz);
+                DrawEntry(Plugin.GameLog);
+                DrawEntry(Plugin.FasterTransitions);
+                DrawEntry(Plugin.LessMemoryCleanup);
+                if (Transitions.OtherMod) GUILayout.Label(Labels.T("„Instant Transitions“ ist installiert – dessen Einstellungen gelten.", "\"Instant Transitions\" is installed – its settings apply."), labelStyle);
+                else if (Transitions.Count > 0) GUILayout.Label(string.Format(Labels.T("Türen / Reisen zuletzt: Ø {0} s ({1}×)", "Doors / travel recently: avg {0} s ({1}×)"), Transitions.Average.ToString("0.00"), Transitions.Count), labelStyle);
+                if (WineFix.IsWine) DrawWineFix();
+            }
+            else if (menuTab == 2)
+            {
+                Header(Labels.T("Im Spiel", "In the game"));
+                DrawEntry(Plugin.HudClock);
+                if (HudClock.OtherMod) GUILayout.Label(Labels.T("„What time is it“ ist installiert – die HUD-Zeile bleibt aus.", "\"What time is it\" is installed – the HUD line stays off."), labelStyle);
+                // immer zeichnen (nicht abhaengig vom Schalter darueber): sonst passt das IMGUI-Layout beim Umschalten nicht
+                DrawEntry(Plugin.HudClockMode);
+                DrawEntry(Plugin.HudClock12h);
+                DrawEntry(Plugin.EscLeave);
+                if (EscLeave.OtherMod) GUILayout.Label(Labels.T("„ESC to Leave“ ist installiert – dessen Funktion wird genutzt.", "\"ESC to Leave\" is installed – its function is used."), labelStyle);
+                DrawEntry(Plugin.WeekPlanNotify);
+                DrawEntry(Plugin.ZombieRename);
+                DrawEntry(Plugin.TradeLikes);
+                DrawEntry(Plugin.PauseInBackground);
+                DrawEntry(Plugin.AutoSaveMinutes);
+
+                Header(Labels.T("Bauen", "Building"));
+                DrawEntry(Plugin.InstantRemove);
+                GUILayout.Label(Labels.T("Nicht mehr ganz Vanilla – oft gewünscht, deshalb als Option (standardmäßig aus):", "Not fully vanilla – often requested, so it's an option (off by default):"), smallStyle);
+                DrawEntry(Plugin.FullRefund);
+                DrawEntry(Plugin.MoveObjects);
+
+                Header(Labels.T("Kamera", "Camera"));
+                DrawEntry(Plugin.Zoom);
+                DrawEntry(Plugin.InteriorZoom);
+                DrawEntry(Plugin.ZoomPresets);
+                DrawEntry(Plugin.ZoomPresetKey);
+                DrawEntry(Plugin.MouseWheelZoom);
+                DrawEntry(Plugin.SmoothZoom);
+
+                DrawBackups();
+            }
+            else if (menuTab == 3)
+            {
+                DrawPinControls();
+                Header(Labels.T("Anpinnen", "Pinning"));
+                DrawEntry(Plugin.PinsEnabled);
+                DrawEntry(Plugin.PinsChests);
+                DrawEntry(Plugin.PinsNotify);
+                DrawEntry(Plugin.PinsAutoUnpin);
+                DrawEntry(Plugin.PinsVariants);
+                DrawEntry(Plugin.PinsTree);
+                DrawEntry(Plugin.PinsFuel);
+                DrawEntry(Plugin.PinsCorner);
+                DrawEntry(Plugin.PinsSize);
+                if (Pins.List.Count > 0 && Btn(Labels.T("Alle Pins entfernen", "Remove all pins"), buttonStyle, GUILayout.Width(260))) Defer(Pins.ClearAll);
+            }
+            else
+            {
+                Header(Labels.T("Anzeige", "Interface"));
+                DrawEntry(Plugin.Language);
+                DrawEntry(Plugin.MenuScale);
+                DrawEntry(Plugin.HighContrast);
+                DrawEntry(Plugin.HudCenter);
+                DrawEntry(Plugin.SkipIntro);
+                DrawEntry(Plugin.MenuExtend);
+                DrawEntry(Plugin.MenuModdedLabel);
+                DrawEntry(Plugin.GameMenuButton);
+                if (ModsButton.FrameworkInstalled) GUILayout.Label(Labels.T("GK2 Mod Framework ist installiert – dessen „Mods“-Button wird genutzt, Vanilla+ öffnest du mit F9.", "GK2 Mod Framework is installed – its \"Mods\" button is used, open Vanilla+ with F9."), labelStyle);
 #if !NEXUS
-            DrawEntry(Plugin.CheckUpdates);
+                DrawEntry(Plugin.CheckUpdates);
 #endif
 
-            Header(Labels.T("Anpinnen", "Pinning"));
-            DrawEntry(Plugin.PinsEnabled);
-            DrawEntry(Plugin.PinsChests);
-            DrawEntry(Plugin.PinsNotify);
-            DrawEntry(Plugin.PinsAutoUnpin);
-            DrawEntry(Plugin.PinsCorner);
-            DrawEntry(Plugin.PinsSize);
-            if (Pins.List.Count > 0 && Btn(Labels.T("Alle Pins entfernen", "Remove all pins"), buttonStyle, GUILayout.Width(260))) Defer(Pins.ClearAll);
+                Header(Labels.T("Tasten", "Keys"));
+                DrawEntry(Plugin.MenuKey);
+                DrawEntry(Plugin.OverlayKey);
+                DrawEntry(Plugin.SaveKey);
+                DrawEntry(Plugin.WeekPlanKey);
+                DrawEntry(Plugin.HudKey);
 
-            Header(Labels.T("FPS-Anzeige", "FPS display"));
-            foreach (ConfigEntryBase e in new ConfigEntryBase[] { Plugin.ShowOverlay, Plugin.OvCorner, Plugin.OvLayout, Plugin.OvSeparator })
-                DrawEntry(e);
-            DrawOverlayItems();
+                Header(Labels.T("FPS-Anzeige", "FPS display"));
+                foreach (ConfigEntryBase e in new ConfigEntryBase[] { Plugin.ShowOverlay, Plugin.OvCorner, Plugin.OvLayout, Plugin.OvSeparator })
+                    DrawEntry(e);
+                DrawOverlayItems();
+                DrawEntry(Plugin.StatsLogSeconds);
 
-            if (WineFix.IsWine) DrawWineFix();
+                Header(Labels.T("Screenshots", "Screenshots"));
+                DrawEntry(Plugin.ShotKey);
+                DrawEntry(Plugin.ShotScale);
+                DrawEntry(Plugin.ShotHideHud);
+                if (Btn(Labels.T("Screenshot-Ordner öffnen", "Open screenshot folder"), buttonStyle, GUILayout.Width(260)))
+                {
+                    System.IO.Directory.CreateDirectory(HiResShot.Folder);
+                    Application.OpenURL("file:///" + HiResShot.Folder.Replace('\\', '/'));
+                }
 
-            foreach (PluginInfo info in Chainloader.PluginInfos.Values)
-            {
-                if (info.Instance == null || info.Instance == Plugin.Instance) continue;
-                ConfigFile cfg = info.Instance.Config;
-                if (cfg == null || cfg.Count == 0) continue;
-                Header(info.Metadata.Name + Labels.T(" (wirkt nach Neustart)", " (applies after restart)"));
-                foreach (KeyValuePair<ConfigDefinition, ConfigEntryBase> kv in cfg) DrawEntry(kv.Value);
+                foreach (PluginInfo info in Chainloader.PluginInfos.Values)
+                {
+                    if (info.Instance == null || info.Instance == Plugin.Instance) continue;
+                    ConfigFile cfg = info.Instance.Config;
+                    if (cfg == null || cfg.Count == 0) continue;
+                    Header(info.Metadata.Name + Labels.T(" (wirkt nach Neustart)", " (applies after restart)"));
+                    foreach (KeyValuePair<ConfigDefinition, ConfigEntryBase> kv in cfg) DrawEntry(kv.Value);
+                }
             }
             GUILayout.EndScrollView();
             inScroll = false;
-            PadScrollInto(ref scroll, 560f);
+            PadScrollInto(ref scroll, 520f);
+            if (Take(ref padLB)) Defer(() => SetTab(menuTab - 1));
+            if (Take(ref padRB)) Defer(() => SetTab(menuTab + 1));
             if (scrollToBench && Event.current.type == EventType.Repaint) { scroll.y = Mathf.Max(0, benchY - 10); scrollToBench = false; }
             if (pendingScrollHeader != null && Event.current.type == EventType.Repaint && headerY.TryGetValue(pendingScrollHeader, out float hy)) { scroll.y = Mathf.Max(0, hy - 10); pendingScrollHeader = null; }
 
@@ -653,7 +795,7 @@ namespace GK2Tweaks
         private bool scrollToBench;
         private float benchY;
 
-        internal void ShowBenchResults() => scrollToBench = true;
+        internal void ShowBenchResults() { menuTab = 0; scrollToBench = true; }
 
         private void DrawGfxBench()
         {
@@ -915,7 +1057,7 @@ namespace GK2Tweaks
         private readonly Dictionary<string, float> headerY = new Dictionary<string, float>();
         private string pendingScrollHeader;
 
-        internal void ScrollToHeader(string text) => pendingScrollHeader = text;
+        internal void ScrollToHeader(string text) { if (text == Labels.T("Spielstand-Backups", "Save backups")) menuTab = 2; pendingScrollHeader = text; }
 
         private void Header(string text)
         {

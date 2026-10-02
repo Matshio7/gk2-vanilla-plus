@@ -9,11 +9,12 @@ using UnityEngine;
 namespace GK2Tweaks
 {
     [BepInPlugin(Guid, PluginName, PluginVersion)]
+    [BepInDependency(ModsButton.FrameworkGuid, BepInDependency.DependencyFlags.SoftDependency)]
     public class Plugin : BaseUnityPlugin
     {
         public const string Guid = "mats.gk2.tweaks";
         public const string PluginName = "GK2 Tweaks";
-        public const string PluginVersion = "1.5.3";
+        public const string PluginVersion = "1.6.0";
         internal const string Keep = "Default";
 
         internal static Plugin Instance;
@@ -24,6 +25,7 @@ namespace GK2Tweaks
         // [FrameRate]
         internal static ConfigEntry<string> Pacing;
         internal static ConfigEntry<int> TargetFps;
+        internal static ConfigEntry<string> NoTearing;
         // [Performance]
         internal static ConfigEntry<int> PhysicsHz, Zoom, AutoSaveMinutes, InteriorZoom, MenuScale, ShotScale;
         internal static ConfigEntry<bool> MouseWheelZoom, SmoothZoom, HighContrast, ShotHideHud, OledBlack, WideRain, HudCenter;
@@ -33,7 +35,9 @@ namespace GK2Tweaks
         internal static ConfigEntry<string> GameLog;
         // [Interface]
         internal static ConfigEntry<KeyboardShortcut> MenuKey, OverlayKey, SaveKey, WeekPlanKey, HudKey;
-        internal static ConfigEntry<bool> WeekPlanNotify, InstantRemove;
+        internal static ConfigEntry<bool> WeekPlanNotify, InstantRemove, HudClock, HudClock12h, EscLeave, FasterTransitions, LessMemoryCleanup;
+        internal static ConfigEntry<bool> FullRefund, MoveObjects, TradeLikes, ZombieRename, Celebrated;
+        internal static ConfigEntry<string> HudClockMode;
         internal static ConfigEntry<int> BackupCount, BackupMinutes;
         internal static ConfigEntry<bool> ShowOverlay, CheckUpdates;
         internal static ConfigEntry<int> StatsLogSeconds;
@@ -52,7 +56,7 @@ namespace GK2Tweaks
 #endif
         // [Overlay] – FPS-Anzeige
         internal static ConfigEntry<string> OvCorner, OvLayout, PinsCorner, PinsSize, OvOrder, OvSeparator;
-        internal static ConfigEntry<bool> PinsEnabled, PinsNotify, PinsAutoUnpin;
+        internal static ConfigEntry<bool> PinsEnabled, PinsNotify, PinsAutoUnpin, PinsVariants, PinsTree, PinsFuel;
         internal static ConfigEntry<string> PinsChests;
         internal static ConfigEntry<bool> OvGpuTemp, OvFps, OvLows, OvFrameTime, OvCpu, OvGpu, OvRam, OvVram, OvResolution, OvClock, OvWeekday, OvGameTime;
 #if DEV
@@ -83,7 +87,7 @@ namespace GK2Tweaks
 
             try { SafeMode.CheckGame(); } catch (Exception e) { Log.LogError("Safe mode check failed: " + e); }
             var harmony = new Harmony(Guid);
-            var patches = new System.Collections.Generic.List<Type> { typeof(TierPatch), typeof(ScreenSettingsPatch), typeof(SaveBlockPatch), typeof(ZoomPatch), typeof(ModdedLabelPatch), typeof(BackupPatch), typeof(MainMenuModsButtonPatch), typeof(PauseModsButtonPatch), typeof(CraftCellPinPatch), typeof(SelectionPinPatch), typeof(QuestPinPatch), typeof(LongNotes), typeof(InstantRemovePatch) };
+            var patches = new System.Collections.Generic.List<Type> { typeof(TierPatch), typeof(ScreenSettingsPatch), typeof(SaveBlockPatch), typeof(ZoomPatch), typeof(ModdedLabelPatch), typeof(BackupPatch), typeof(MainMenuModsButtonPatch), typeof(PauseModsButtonPatch), typeof(CraftCellPinPatch), typeof(SelectionPinPatch), typeof(QuestPinPatch), typeof(LongNotes), typeof(InstantRemovePatch), typeof(TeleportPatch), typeof(FadeInPatch), typeof(FadeOutPatch), typeof(CleanupPatch), typeof(MoveInputPatch), typeof(MoveTargetPatch), typeof(MoveCellsPatch), typeof(MoveBuildPatch), typeof(MoveDisablePatch), typeof(TradePressPatch), typeof(TradeCountPatch), typeof(ZoneRedrawPatch), typeof(MoveRemoveLabelPatch) };
 #if DEV
             if (BenchEnabled.Value) patches.Add(typeof(SystemProfiler));
 #endif
@@ -105,6 +109,8 @@ namespace GK2Tweaks
             RatePromptSessions.Value++;
 #endif
             Gui = gameObject.AddComponent<TweaksGui>();
+            FrameworkBridgeLoader.TryLoad();
+            Translations.WriteTemplate();
             StartCoroutine(UpdateCheck.Run());
             WeekPlan.Init();
 #if DEV
@@ -144,9 +150,14 @@ namespace GK2Tweaks
                 "Target FPS for Limit and VSync. 0 = unlimited / full refresh rate.",
                 new AcceptableValueList<int>(0, 30, 40, 45, 50, 60, 72, 90, 120, 144)));
 
+            NoTearing = Config.Bind("FrameRate", "NoTearing", "Auto", new ConfigDescription(
+                "Prevents screen tearing: keeps VSync on even when an FPS limit is set (the game turns VSync off then). Auto = on for Steam Deck and Linux, off on Windows.",
+                new AcceptableValueList<string>("Auto", "On", "Off")));
             PhysicsHz = Config.Bind("Performance", "PhysicsHz", 0, new ConfigDescription(
                 "Physics rate. 0 = game default (50 Hz). 30 = like the Switch version, saves CPU.",
                 new AcceptableValueList<int>(0, 60, 50, 40, 30)));
+            FasterTransitions = Config.Bind("Performance", "FasterTransitions", true, "Doors and map travel: shorter fade to black and pause (about a third). Cutscenes and sleeping are not changed.");
+            LessMemoryCleanup = Config.Bind("Performance", "LessMemoryCleanup", false, "Doors and map travel: the game cleans up all memory on every door, which takes most of the waiting time. With this on it only happens every 10 minutes or when memory gets tight (always when loading a save). Uses more RAM - not recommended below 16 GB.");
             GameLog = Config.Bind("Performance", "GameLog", "All", new ConfigDescription(
                 "What the game writes to Player.log. Warning or Error suppresses log spam.",
                 new AcceptableValueList<string>("All", "Warning", "Error")));
@@ -178,7 +189,17 @@ namespace GK2Tweaks
             WeekPlanKey = Config.Bind("Interface", "WeekPlanKey", new KeyboardShortcut(KeyCode.F6), "Key for the week plan (what is possible on which weekday).");
             HudKey = Config.Bind("Interface", "HideHudKey", new KeyboardShortcut(KeyCode.F7), "Key to hide/show the game's HUD, e.g. for screenshots. Esc shows it again.");
             WeekPlanNotify = Config.Bind("Comfort", "DailyReminder", true, "Show a notification each morning with what is possible today (only features you have already unlocked).");
+            HudClock = Config.Bind("Comfort", "HudClock", true, "Show the day and the time of day as a second line in the area name box at the top right, in the game's own look.");
+            HudClockMode = Config.Bind("Comfort", "HudClockMode", "DayAndTime", new ConfigDescription("What the HUD line shows: day number and time, weekday and time, or only the time.",
+                new AcceptableValueList<string>("DayAndTime", "WeekdayAndTime", "TimeOnly")));
+            HudClock12h = Config.Bind("Comfort", "HudClock12h", false, "Show the HUD time as 12-hour clock (5:00 AM) instead of 24-hour (05:00).");
+            EscLeave = Config.Bind("Comfort", "EscLeavesConversation", true, "In conversations, Esc or B (Circle) picks \"Leave\" when it is offered and the character has finished talking. An open mod window is closed first.");
             InstantRemove = Config.Bind("Comfort", "InstantRemove", false, "Remove mode (building): placed objects like workbenches, chests or furnaces are removed right away instead of your character walking there first. You get the same materials back. Helps with objects your character cannot reach.");
+            FullRefund = Config.Bind("Comfort", "FullRefund", false, "[Not fully vanilla] Remove mode: you get the full building costs back instead of only a part. Contents (inventory, fuel) come back as usual.");
+            MoveObjects = Config.Bind("Comfort", "MoveObjects", false, "[Not fully vanilla] Remove mode: press the rotate key on an object to pick it up and place it somewhere else. It stays the same object (contents and crafting queue are kept), nothing is used or refunded. Works for workbenches, conveyors and all other buildings: zombie workers are put on the ground, connected extensions stay where they are until you move them too. Esc or right click cancels.");
+            TradeLikes = Config.Bind("Comfort", "TradeLikedAmount", true, "Trading with town vendors: the amount slider starts at exactly the amount that still gives happiness (thumbs up), and a button adds all liked goods in the right amount. You still confirm the deal yourself.");
+            Celebrated = Config.Bind("Interface", "Celebrated1000", false, "Internal: the 1,000+ players thank-you banner was shown.");
+            ZombieRename = Config.Bind("Comfort", "ZombieRename", true, "Zombie window: a Rename button next to the name - type your own name or roll a new one at any time.");
             BackupCount = Config.Bind("Backups", "KeepBackups", 5, new ConfigDescription(
                 "Before the game overwrites a save, the previous save is backed up (BepInEx/GK2VanillaPlus/Backups). Number of backups kept per save slot, 0 = off.",
                 new AcceptableValueList<int>(0, 3, 5, 10, 20)));
@@ -200,7 +221,7 @@ namespace GK2Tweaks
             ShowOverlay = Config.Bind("Interface", "ShowOverlay", false, "Show the FPS display (toggle with F10). Position and contents: section [Overlay].");
             Language = Config.Bind("Interface", "Language", "Auto", new ConfigDescription(
                 "Language of the mod menu. Auto = game language (if a translation exists, otherwise English). Translations: BepInEx/GK2VanillaPlus/lang.",
-                new AcceptableValueList<string>("Auto", "Deutsch", "English", "Français", "Español", "Русский", "中文")));
+                new AcceptableValueList<string>("Auto", "Deutsch", "English", "Français", "Español", "Português", "Русский", "中文")));
             LastSeenVersion = Config.Bind("Interface", "LastSeenVersion", "", "Internal: mod version whose changelog was last shown (the 'What's new' window appears once after an update).");
             OvCorner = Config.Bind("Overlay", "Corner", "BottomLeft", new ConfigDescription("Screen corner of the FPS display.",
                 new AcceptableValueList<string>("TopLeft", "TopRight", "BottomLeft", "BottomRight")));
@@ -222,10 +243,13 @@ namespace GK2Tweaks
             OvWeekday = Config.Bind("Overlay", "Weekday", false, "In-game weekday (Pride, Sloth, ...).");
             OvGameTime = Config.Bind("Overlay", "GameTime", false, "In-game time of day.");
             PinsEnabled = Config.Bind("Pins", "Enabled", true, "Pin recipes, blueprints and town buildings (pin icon in their top right corner). Pinned items show have/need counts.");
-            PinsChests = Config.Bind("Pins", "Chests", "Area", new ConfigDescription("Which items count as 'have': your inventory and the chests in the area you are in (like the game's crafting), or additionally all chests on the map.",
-                new AcceptableValueList<string>("Area", "Everywhere")));
+            PinsChests = Config.Bind("Pins", "Chests", "Area", new ConfigDescription("Which items count as 'have': only your inventory, your inventory and the chests in the area you are in (like the game's crafting), or additionally all chests on the map.",
+                new AcceptableValueList<string>("Inventory", "Area", "Everywhere")));
             PinsNotify = Config.Bind("Pins", "NotifyReady", true, "Short message with a sound when a pinned item becomes ready (you have everything) or a pinned quest is done.");
             PinsAutoUnpin = Config.Bind("Pins", "AutoUnpin", true, "Unpin a recipe automatically when you start crafting it.");
+            PinsVariants = Config.Bind("Pins", "RecipeVariants", true, "Under a pinned recipe: the workbench and, if the item can be made in several ways, < > to switch between the recipes (only known recipes).");
+            PinsTree = Config.Bind("Pins", "IngredientTree", true, "Ingredients you can craft yourself get a + that shows their own ingredients (up to 3 levels).");
+            PinsFuel = Config.Bind("Pins", "ShowFuel", true, "Show the fuel a recipe needs from its workbench (e.g. a furnace) as an extra line.");
             PinsCorner = Config.Bind("Pins", "Corner", "TopRight", new ConfigDescription("Screen corner of the pinned list.",
                 new AcceptableValueList<string>("TopLeft", "TopRight", "BottomLeft", "BottomRight")));
             PinsSize = Config.Bind("Pins", "Size", "Medium", new ConfigDescription("Text and icon size of the pinned list.",
@@ -293,6 +317,9 @@ namespace GK2Tweaks
             SafeMode.Run("Oled", Oled.Tick);
             SafeMode.Run("Rain", Rain.Tick);
             SafeMode.Run("HudCenter", GK2Tweaks.HudCenter.Tick);
+            SafeMode.Run("HudClock", GK2Tweaks.HudClock.Tick);
+            SafeMode.Run("EscLeave", () => GK2Tweaks.EscLeave.Tick(Gui.AnyWindowOpen));
+            SafeMode.Run("MoveObjects", BuildMove.Tick);
 #if MINIMAP
             SafeMode.Run("Minimap", Minimap.Tick);
 #endif
@@ -301,6 +328,7 @@ namespace GK2Tweaks
             RateTick();
 #endif
             Gui.Tick(dt);
+            VanillaPlusApi.Tick();
 
             if (StatsLogSeconds.Value > 0)
             {
@@ -340,7 +368,9 @@ namespace GK2Tweaks
             if (Time.realtimeSinceStartup - menuSince < 3f) return;
             newsChecked = true;
             if (SafeMode.NoticePending) { SafeMode.NoticePending = false; ManualSave.Toast(SafeMode.UpdateNotice(), 10f); }
-            if (Changelog.ShouldAutoShow()) Gui.ShowNews(true);
+            bool news = Changelog.ShouldAutoShow();
+            if (!Celebrated.Value) { Gui.ShowCelebration(news ? (Action)(() => Gui.ShowNews(true)) : null); return; }
+            if (news) Gui.ShowNews(true);
         }
 
 #if !NEXUS
@@ -377,17 +407,32 @@ namespace GK2Tweaks
             if (Pacing.Value == "Game")
             {
                 try { GameSettings.Instance?.ApplyScreenSettings(); } catch (Exception ex) { Log.LogWarning(ex.Message); }
-                return;
             }
             ApplyPacing();
         }
 
+        // Steam Deck / Linux (Proton) erkennen
+        internal static bool IsDeck => Environment.GetEnvironmentVariable("SteamDeck") == "1";
+        internal static bool IsLinux => !string.IsNullOrEmpty(Environment.GetEnvironmentVariable("STEAM_COMPAT_DATA_PATH")) || IsDeck;
+        internal static bool TearFix => NoTearing.Value == "On" || (NoTearing.Value == "Auto" && IsLinux);
+
         internal static void ApplyPacing()
         {
             string mode = Pacing.Value;
-            if (mode == "Game") return;
+            if (mode == "Game")
+            {
+                // Das Spiel schaltet VSync ab, sobald ein FPS-Limit unter der Bildwiederholrate gesetzt ist -> Tearing (v. a. Steam Deck)
+                if (TearFix && QualitySettings.vSyncCount == 0)
+                {
+                    int hz0 = MonitorHz(), lim = Application.targetFrameRate;
+                    QualitySettings.vSyncCount = (lim > 0 && hz0 > 0) ? Mathf.Clamp(Mathf.RoundToInt((float)hz0 / lim), 1, 4) : 1;
+                    Application.targetFrameRate = -1;
+                    Log.LogInfo($"Tearing fix: VSync kept on (vSyncCount {QualitySettings.vSyncCount}, monitor {hz0} Hz)");
+                }
+                return;
+            }
             int fps = TargetFps.Value;
-            if (mode == "Limit")
+            if (mode == "Limit" && !TearFix)
             {
                 QualitySettings.vSyncCount = 0;
                 Application.targetFrameRate = fps > 0 ? fps : -1;
