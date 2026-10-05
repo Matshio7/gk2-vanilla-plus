@@ -501,8 +501,8 @@ The linked perk is removed. => Le perk lié est retiré.
 Refund "{0}"? => Rembourser « {0} » ?
 Refund talents & research => Rembourser talents et recherche
 "Talent & Tech Refund" is installed – its function is used. => « Talent & Tech Refund » est installé – sa fonction est utilisée.
-Rain & snow: amount => Pluie et neige : quantité
-Amount of rain and snow particles in percent. Less rain helps on weak PCs and the Steam Deck, 0 turns the particles off (the weather itself stays). => Quantité de particules de pluie et de neige en pourcentage. Moins de pluie aide sur les PC faibles et le Steam Deck, 0 désactive les particules (la météo reste).
+Rain: amount => Pluie : quantité
+Amount of rain particles in percent. Less rain helps on weak PCs and the Steam Deck, 0 turns the particles off (the weather itself stays). => Quantité de gouttes de pluie en pourcentage. Moins de pluie aide sur les PC faibles et le Steam Deck, 0 désactive les particules (la météo reste).
 
 # 1.7.0
 Light => Léger

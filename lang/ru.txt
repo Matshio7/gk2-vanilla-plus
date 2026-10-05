@@ -501,8 +501,8 @@ The linked perk is removed. => Связанный перк удаляется.
 Refund "{0}"? => Вернуть «{0}»?
 Refund talents & research => Возврат талантов и исследований
 "Talent & Tech Refund" is installed – its function is used. => «Talent & Tech Refund» установлен – используется его функция.
-Rain & snow: amount => Дождь и снег: количество
-Amount of rain and snow particles in percent. Less rain helps on weak PCs and the Steam Deck, 0 turns the particles off (the weather itself stays). => Количество частиц дождя и снега в процентах. Меньше дождя помогает на слабых ПК и Steam Deck, 0 отключает частицы (сама погода остаётся).
+Rain: amount => Дождь: количество
+Amount of rain particles in percent. Less rain helps on weak PCs and the Steam Deck, 0 turns the particles off (the weather itself stays). => Количество капель дождя в процентах. Меньше дождя помогает на слабых ПК и Steam Deck, 0 отключает частицы (сама погода остаётся).
 
 # 1.7.0
 Light => Слабое

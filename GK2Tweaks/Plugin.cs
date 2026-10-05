@@ -234,7 +234,7 @@ namespace GK2Tweaks
                 "Fog color over the main menu picture: light mist or dark, gloomy fog.",
                 new AcceptableValueList<string>("FogDark", "FogLight")));
             RainAmount = Config.Bind("Interface", "RainAmount", 100, new ConfigDescription(
-                "Amount of rain and snow particles in percent. Less rain helps on weak PCs and the Steam Deck, 0 turns the particles off (the weather itself stays).",
+                "Amount of rain particles in percent. Less rain helps on weak PCs and the Steam Deck, 0 turns the particles off (the weather itself stays).",
                 new AcceptableValueList<int>(100, 75, 50, 25, 0)));
             WideRain = Config.Bind("Interface", "WideRain", true, "Rain and snow cover the whole screen on ultrawide monitors and when zoomed out (the game only fills a 16:9 area).");
             HudCenter = Config.Bind("Interface", "HudCenter", false, "Ultrawide: move the HUD, area name, NPC window and the mod displays into the 16:9 area in the middle instead of the outer screen edges. The world stays ultrawide.");

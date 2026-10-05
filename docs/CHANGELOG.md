@@ -8,7 +8,7 @@
 - New: **Pin alchemy recipes** – the Folio in the alchemy lab now has pin buttons too. Alchemy has no fixed ingredients, so the pin shows the runes you need (red / green / blue).
 - New: **Max button when crafting** – next to the amount, sets it to as many as your ingredients allow (counted like the game: inventory and reachable chests). Controller: "Max" in the button bar at the bottom of the window.
 - New, **not fully vanilla** (off by default): **Refund talents & research** – right click an unlocked talent or zombie perk (controller: the button shown below it), or click a researched tech and choose "Refund". Always asks first, nodes that depend on it are refunded too. Idea from "Talent & Tech Refund" – own implementation; if that mod is installed, Vanilla+ leaves it to it.
-- New: **Rain & snow amount** (100 / 75 / 50 / 25 % / off) – less rain helps on weak PCs and the Steam Deck.
+- New: **Rain amount** (100 / 75 / 50 / 25 % / off) – less rain helps on weak PCs and the Steam Deck.
 - New: **Keep backups** – "Keep" on a save backup protects it from automatic deletion (kept backups don't count towards "Backups per save").
 - Fix: **moving a workbench with extensions** – after moving, the extensions are connected again (before, the workbench could lose them until the next reload).
 - Fix: **controller lost after Alt-Tab / Windows key** – "Pause in background" no longer stops the whole application, the game just stands still, so the controller stays connected.
@@ -21,7 +21,7 @@
 - Neu: **Alchemie-Rezepte anpinnen** – auch das Folio im Alchemielabor hat jetzt Pin-Knöpfe. Alchemie hat keine festen Zutaten, deshalb zeigt der Pin die benötigten Runen (rot / grün / blau).
 - Neu: **Max-Knopf beim Herstellen** – neben der Menge, stellt so viele ein, wie deine Zutaten hergeben (gezählt wie im Spiel: Inventar und erreichbare Truhen). Controller: „Max“ in der Tastenleiste unten im Fenster.
 - Neu, **nicht ganz Vanilla** (standardmäßig aus): **Talente & Forschung zurückerstatten** – Rechtsklick auf ein freigeschaltetes Talent oder einen Zombie-Perk (Controller: die Taste, die darunter steht), oder erforschte Technik anklicken → „Zurückerstatten“. Fragt immer vorher, was davon abhängt, wird mit erstattet. Idee von „Talent & Tech Refund“ – eigene Umsetzung; ist diese Mod installiert, überlässt Vanilla+ ihr das.
-- Neu: **Regen & Schnee: Menge** (100 / 75 / 50 / 25 % / aus) – weniger Regen hilft auf schwachen PCs und dem Steam Deck.
+- Neu: **Regen: Menge** (100 / 75 / 50 / 25 % / aus) – weniger Regen hilft auf schwachen PCs und dem Steam Deck.
 - Neu: **Backups behalten** – „Behalten“ an einem Backup schützt es vor dem automatischen Löschen (behaltene zählen nicht zu „Backups pro Spielstand“).
 - Fix: **Werkbank mit Erweiterungen verschieben** – nach dem Verschieben sind die Erweiterungen wieder verbunden (vorher konnte die Werkbank sie bis zum nächsten Laden verlieren).
 - Fix: **Controller weg nach Alt-Tab / Windows-Taste** – „Im Hintergrund pausieren“ hält nicht mehr die ganze Anwendung an, nur das Spiel steht still, der Controller bleibt verbunden.
