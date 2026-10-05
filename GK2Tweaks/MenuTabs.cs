@@ -57,8 +57,8 @@ namespace GK2Tweaks
         {
             var l = new List<KeyValuePair<ConfigEntryBase, object>>();
             void Add(ConfigEntryBase e, object off) { if (e != null) l.Add(new KeyValuePair<ConfigEntryBase, object>(e, off)); }
-            foreach (var b in new[] { Plugin.HudClock, Plugin.EscLeave, Plugin.WeekPlanNotify, Plugin.ZombieRename, Plugin.TradeLikes, Plugin.InstantRemove,
-                                      Plugin.FullRefund, Plugin.MoveObjects, Plugin.PauseInBackground, Plugin.FasterTransitions, Plugin.LessMemoryCleanup,
+            foreach (var b in new[] { Plugin.HudClock, Plugin.EscLeave, Plugin.WeekPlanNotify, Plugin.ZombieRename, Plugin.TradeLikes, Plugin.CraftMaxButton, Plugin.InstantRemove,
+                                      Plugin.FullRefund, Plugin.MoveObjects, Plugin.Respec, Plugin.PauseInBackground, Plugin.FasterTransitions, Plugin.LessMemoryCleanup,
                                       Plugin.MouseWheelZoom, Plugin.SmoothZoom, Plugin.PinsEnabled, Plugin.ShowOverlay, Plugin.HudCenter, Plugin.OledBlack,
                                       Plugin.WideRain, Plugin.MenuExtend, Plugin.MenuModdedLabel, Plugin.SkipIntro })
                 Add(b, false);

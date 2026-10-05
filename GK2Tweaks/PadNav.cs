@@ -14,7 +14,7 @@ namespace GK2Tweaks
         // Rewired-Aktionen des Spiels (LazyBearTechnology.GamepadController)
         private const int ActA = 4, ActB = 5, ActLB = 6, ActRB = 7, ActStart = 11, ActUp = 12, ActDown = 13, ActLeft = 14, ActRight = 15;
 
-        private bool padMode;
+        private bool padMode, padMouseSeen;
         private int padFocus, padCount, padCounter, padWin = -1, curWin = -1;
         private bool padUp, padDown, padLeft, padRight, padA, padB, padLB, padRB;
         private Rect padRect;
@@ -42,10 +42,18 @@ namespace GK2Tweaks
         // in Update (einmal pro Frame)
         private void PadTick()
         {
-            if (!AnyModWindow) { ReleaseInput(); padMode = false; return; }
+            if (!AnyModWindow)
+            {
+                // Menue zu: Zeiger wieder so, wie das Spiel ihn will (Controller = versteckt)
+                if (padMouseSeen) { try { if (LazyInput.IsGamepadActive) Cursor.visible = false; } catch { } padMouseSeen = false; }
+                ReleaseInput(); padMode = false; return;
+            }
             BlockInput();
             if (padWin != PadWindow) { padWin = PadWindow; padFocus = 0; }
-            if ((Input.mousePosition - lastMouse).sqrMagnitude > 16f || Input.GetMouseButtonDown(0)) padMode = false;
+            if ((Input.mousePosition - lastMouse).sqrMagnitude > 16f || Input.GetMouseButtonDown(0)) { padMode = false; padMouseSeen = true; }
+            // Das Spiel versteckt den Zeiger im Controller-Modus und merkt die Maus nicht, solange unser Menue die
+            // Eingaben blockiert (gl7) -> bei Mausbewegung selbst einblenden
+            if (padMouseSeen && !padMode) { Cursor.visible = true; if (Cursor.lockState != CursorLockMode.None) Cursor.lockState = CursorLockMode.None; }
             lastMouse = Input.mousePosition;
             try
             {

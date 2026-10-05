@@ -467,3 +467,39 @@ Controller: hold this button during normal play to navigate the pinned list (onl
 Controller: hold this button during normal play to navigate the pinned list (only while no game window is open). Click the field and press any controller button; Esc = off. => Manette : maintenez ce bouton en jeu pour naviguer dans la liste épinglée (uniquement si aucune fenêtre du jeu n'est ouverte). Cliquez sur le champ et appuyez sur n'importe quel bouton ; Échap = désactivé.
 Press a controller button … (Esc = off) => Appuyez sur un bouton de la manette … (Échap = désactivé)
 Controller: button for pins => Manette : bouton pour les épingles
+
+# 1.6.3
+Alchemy => Alchimie
+Red => Rouge
+Green => Vert
+Blue => Bleu
+Runes => Runes
+Craft as many as your ingredients allow => Fabriquer autant que tes ingrédients le permettent
+Crafting: Max button => Fabrication : bouton Max
+Order => Commande
+Order done: {0} => Commande terminée : {0}
+Crafting: a Max button next to the amount sets it to as many as your ingredients allow (inventory and reachable chests, like the game counts). With a controller use the button shown on it. => Fabrication : un bouton Max à côté de la quantité la règle au maximum permis par tes ingrédients (inventaire et coffres accessibles, comme le compte le jeu). À la manette, utilise le bouton indiqué dessus.
+· kept => · conservée
+Unkeep => Libérer
+Keep => Garder
+"Restore" replaces the save with the backup (the current save is backed up first). "Keep" protects a backup from automatic deletion. => « Restaurer » remplace la sauvegarde par la copie (la sauvegarde actuelle est d'abord copiée). « Garder » protège une copie de la suppression automatique.
+Refund => Rembourser
+Right click: refund => Clic droit : rembourser
+Refund talents & research (not vanilla) => Rembourser talents et recherche (pas vanilla)
+[Not fully vanilla] Refund talents, zombie perks and research. Talents and zombie perks: right click an unlocked node (controller: the button shown below it). Research: click a researched tech and choose Refund. Always asks first; nodes that depend on it are refunded too. Starter nodes and reputation research are never refunded, effects from buying (e.g. items) stay. Changes your save, backups are made automatically. => [Pas tout à fait vanilla] Rembourser talents, perks de zombies et recherche. Talents et perks de zombies : clic droit sur un nœud débloqué (manette : le bouton affiché dessous). Recherche : clique sur une technologie recherchée et choisis Rembourser. Demande toujours confirmation ; ce qui en dépend est aussi remboursé. Les nœuds de départ et la recherche de réputation ne sont jamais remboursés, les effets d'achat (p. ex. objets) restent. Modifie ta sauvegarde, des copies sont faites automatiquement.
+talent points => points de talent
+Refunded: {0} => Remboursé : {0}
+red => rouge
+green => vert
+blue => bleu
+nothing => rien
+spheres => sphères
+You get back: {0} => Tu récupères : {0}
+Depends on it and is refunded too: => En dépend et est aussi remboursé :
+What it unlocked (recipes, blueprints) is locked again. => Ce qu'elle a débloqué (recettes, plans) est de nouveau verrouillé.
+The linked perk is removed. => Le perk lié est retiré.
+Refund "{0}"? => Rembourser « {0} » ?
+Refund talents & research => Rembourser talents et recherche
+"Talent & Tech Refund" is installed – its function is used. => « Talent & Tech Refund » est installé – sa fonction est utilisée.
+Rain & snow: amount => Pluie et neige : quantité
+Amount of rain and snow particles in percent. Less rain helps on weak PCs and the Steam Deck, 0 turns the particles off (the weather itself stays). => Quantité de particules de pluie et de neige en pourcentage. Moins de pluie aide sur les PC faibles et le Steam Deck, 0 désactive les particules (la météo reste).

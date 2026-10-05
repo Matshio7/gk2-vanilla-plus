@@ -17,6 +17,22 @@ namespace GK2Tweaks
             public string Slot, Dir;
             public DateTime Time;
             public long Bytes;
+            public bool Kept;   // vom Spieler behalten: wird nie automatisch geloescht
+        }
+
+        private const string KeepMark = "keep.txt";
+        internal static bool IsKept(string dir) => File.Exists(Path.Combine(dir, KeepMark));
+
+        internal static void SetKept(Item item, bool kept)
+        {
+            try
+            {
+                string f = Path.Combine(item.Dir, KeepMark);
+                if (kept) File.WriteAllText(f, "Kept by GK2 Vanilla+ - this backup is never deleted automatically.");
+                else if (File.Exists(f)) File.Delete(f);
+                item.Kept = kept;
+            }
+            catch (Exception ex) { Plugin.Log.LogWarning("Backup keep: " + ex.Message); }
         }
 
         private static readonly Dictionary<string, DateTime> lastBackup = new Dictionary<string, DateTime>();
@@ -58,7 +74,7 @@ namespace GK2Tweaks
         private static void Prune(string slot, int keep)
         {
             string dir = Path.Combine(Root, slot);
-            var dirs = Directory.GetDirectories(dir).Where(d => !Path.GetFileName(d).EndsWith("_restore")).OrderByDescending(d => d).ToList();
+            var dirs = Directory.GetDirectories(dir).Where(d => !Path.GetFileName(d).EndsWith("_restore") && !IsKept(d)).OrderByDescending(d => d).ToList();
             foreach (string old in dirs.Skip(keep))
                 try { Directory.Delete(old, true); } catch { }
         }
@@ -77,11 +93,15 @@ namespace GK2Tweaks
                         if (!File.Exists(dat)) continue;
                         string n = Path.GetFileName(d).Replace("_restore", "");
                         DateTime.TryParseExact(n, Stamp, null, System.Globalization.DateTimeStyles.None, out DateTime t);
-                        list.Add(new Item { Slot = slot, Dir = d, Time = t, Bytes = new FileInfo(dat).Length });
+                        list.Add(new Item { Slot = slot, Dir = d, Time = t, Bytes = new FileInfo(dat).Length, Kept = IsKept(d) });
                     }
             }
             catch (Exception e) { Plugin.Log.LogWarning("Backup list: " + e.Message); }
-            return list.OrderByDescending(i => i.Time).Take(max).ToList();
+            // behaltene Backups immer anzeigen, dazu die neuesten
+            var sorted = list.OrderByDescending(i => i.Time).ToList();
+            var shown = sorted.Take(max).ToList();
+            foreach (Item k in sorted.Skip(max)) if (k.Kept) shown.Add(k);
+            return shown;
         }
 
         // Nur im Hauptmenue: aktuellen Stand sichern, dann Backup zurueckkopieren

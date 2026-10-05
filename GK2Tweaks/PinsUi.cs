@@ -144,7 +144,7 @@ namespace GK2Tweaks
                 {
                     if (TakeCmd(ref pinCmdA)) act = () => PinTree.ToggleCollapsed(pp);
                     int lr = TakeLR();
-                    if (lr != 0 && p.QuestId == null && p.Needs.Count > 0) act = () => PinTree.StepMult(pp, lr);
+                    if (lr != 0 && p.QuestId == null && p.Needs.Count > 0 && !IsOrder(p)) act = () => PinTree.StepMult(pp, lr);
                     if (TakeCmd(ref pinCmdLB) && p.VarCount > 1) act = () => PinTree.Switch(pp, -1);
                     if (TakeCmd(ref pinCmdRB) && p.VarCount > 1) act = () => PinTree.Switch(pp, 1);
                     if (TakeCmd(ref pinCmdY)) remove = p;
@@ -156,7 +156,7 @@ namespace GK2Tweaks
                 if (ti != null) { GUI.DrawTexture(new Rect(tx, hr.y + (head - icon) / 2f, icon, icon), ti, ScaleMode.ScaleToFit); tx += icon + 7f; }
                 float rightW = bs + 6f;
                 // Menge: wie oft das Rezept hergestellt werden soll (Klick = mehr, Rechtsklick = weniger)
-                if (p.QuestId == null && p.Needs.Count > 0)
+                if (p.QuestId == null && p.Needs.Count > 0 && !IsOrder(p))
                 {
                     string mt = "×" + Math.Max(1, p.Mult);
                     float mw = Mathf.Max(bs, pnBtn.CalcSize(new GUIContent(mt)).x + 10f);
@@ -270,5 +270,7 @@ namespace GK2Tweaks
             if (remove != null) { Pins.Pin r = remove; Defer(() => Pins.Unpin(r)); }
             else if (act != null) Defer(act);
         }
+
+        private static bool IsOrder(Pins.Pin p) => p.Key != null && p.Key.StartsWith(OrderPins.Prefix);
     }
 }

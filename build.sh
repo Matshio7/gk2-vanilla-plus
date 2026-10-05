@@ -66,8 +66,8 @@ s = re.sub(r'UPDATE\r\n.*?\r\n\r\n', 'UPDATE\r\nDownload the new version from Ne
 open(p, 'w', encoding='utf-8-sig', newline='').write(s)
 PY
 mkdir -p "$R/nexus"; rm -f "$R/nexus/"*.zip
-(cd "$R/stage/nexus" && zip -qrX "$R/nexus/$N-Nexus.zip" "$N" -x '*.DS_Store')
-(cd "$NX/installer/files" && zip -qrX "$R/nexus/$N-Nexus-Manual.zip" . -x '*.DS_Store')
+# Nexus: NUR die Dateien zum Entpacken, keine .bat/.ps1 - Skripte im Archiv fuehren zur Quarantaene ("Executables")
+(cd "$NX/installer/files" && zip -qrX "$R/nexus/$N-Nexus.zip" . -x '*.DS_Store')
 rm -rf "$R/stage"
 echo "$R/dist/$N.zip"
 ls -la "$R/nexus"

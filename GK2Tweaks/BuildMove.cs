@@ -238,6 +238,25 @@ namespace GK2Tweaks
             }
             catch (Exception e) { Plugin.Log.LogWarning("Move: extension link " + e.Message); }
 
+            // Erweiterungen in Reichweite (Werkzeugkiste, Haertungseimer ...) am neuen Platz neu verbinden.
+            // Das Spiel macht das selbst nur beim allerersten Erscheinen eines Objekts - ein verschobenes Objekt
+            // ist schon einmal erschienen, darum hier derselbe Aufruf wie beim Bauen.
+            try
+            {
+                if (wgo != null)
+                {
+                    WGODef logic = GameBalance.Me.GetWorkbenchExtensionLogicDef(d.id);
+                    bool parent = logic != null && GameBalance.Me.workbenchesWhichUseExtensions.Contains(logic);
+                    if (parent || GameBalance.Me.IsWorkbenchExtensionId(d.id))
+                    {
+                        var m = AccessTools.Method(typeof(Wgo), "TryRegisterWorkbenchExtensionDelayed");
+                        if (m != null) wgo.StartCoroutine((System.Collections.IEnumerator)m.Invoke(wgo, new object[] { parent }));
+                        Plugin.Log.LogInfo("Move: re-linking extensions of " + d.id + (parent ? " (workbench)" : " (extension)"));
+                    }
+                }
+            }
+            catch (Exception e) { Plugin.Log.LogWarning("Move: extension relink " + e.Message); }
+
             // Foerderband: am neuen Platz neu verbinden (wie beim Bauen)
             if (wgo != null && d is ConveyorWgoData && p is ConveyorBuildPointer cp)
             {

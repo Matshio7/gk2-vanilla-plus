@@ -75,13 +75,18 @@ namespace GK2Tweaks
         private bool tradeCan;
         private float tradeCheckAt;
         private string moveHint;
+        private RectTransform respecAnchor;
+        private string respecHint;
+        private UIBaseCraftSelectionWindow craftWin;
+        private RectTransform craftPlus;
+        private int craftTarget;
 
-        internal bool InGameUiWant => renameZombie != null || tradeAnchor != null || moveHint != null;
+        internal bool InGameUiWant => renameZombie != null || tradeAnchor != null || moveHint != null || craftPlus != null || respecAnchor != null;
         internal bool Renaming => renaming && renameZombie != null;
 
         private void InGameTick()
         {
-            renameZombie = null; renameAnchor = null; tradeAnchor = null; tradeAnchor2 = null; tradeMoney = null; moveHint = null;
+            renameZombie = null; renameAnchor = null; tradeAnchor = null; tradeAnchor2 = null; tradeMoney = null; moveHint = null; craftWin = null; craftPlus = null; respecAnchor = null; respecHint = null;
             if (!WeekPlan.InGame || HudToggle.Hidden) { renaming = false; return; }
             if (Plugin.ZombieRename.Value && SafeMode.On("ZombieRename"))
             {
@@ -147,13 +152,53 @@ namespace GK2Tweaks
                 catch (Exception e) { SafeMode.Fail("TradeLikes", e); }
             }
 
+            if (Plugin.CraftMaxButton.Value && SafeMode.On("CraftMax"))
+            {
+                try
+                {
+                    craftWin = CraftMax.Open();
+                    if (craftWin != null)
+                    {
+                        craftPlus = CraftMax.PlusAnchor(craftWin);
+                        craftTarget = CraftMax.Target(CraftMax.Data(craftWin));
+                        if (craftPlus == null) craftWin = null;
+                    }
+                }
+                catch (Exception e) { craftWin = null; craftPlus = null; SafeMode.Fail("CraftMax", e); }
+            }
+
+            // Talente zurueckerstatten: Rechtsklick bzw. freie Controller-Taste auf freigeschaltetem Knoten
+            bool padUsed = false;
+            if (Respec.On && !AnyModWindow)
+            {
+                try
+                {
+                    TalentLevelUpWidget h = Respec.Hovered;
+                    if (h != null && ((Component)h).gameObject.activeInHierarchy && Respec.CanRefund(h))
+                    {
+                        object win = h.Data.Def.isZombiePerk ? (object)TradeHelper.Cached<UIZombieWorkerWindow>() : TradeHelper.Cached<CharacterWindow>();
+                        string pn = LazyInput.IsGamepadActive ? PadExtra.Name(win) : null;
+                        respecAnchor = ((Component)h).transform as RectTransform;
+                        respecHint = pn != null ? "[" + pn + "] " + Labels.T("Zurückerstatten", "Refund") : Labels.T("Rechtsklick: zurückerstatten", "Right click: refund");
+                        bool pad = pn != null && PadExtra.Down(win);
+                        if (pad || (!LazyInput.IsGamepadActive && Input.GetMouseButtonDown(1)))
+                        {
+                            padUsed = pad;
+                            Respec.AskTalent(h);
+                        }
+                    }
+                }
+                catch (Exception e) { SafeMode.Fail("Respec", e); }
+            }
+
             // Controller: freie Taste im Fenster (meist Y) = Wuerfeln bzw. Daumen-hoch-Waren einlegen
-            if (!AnyModWindow)
+            if (!AnyModWindow && !padUsed)
             {
                 try
                 {
                     if (renameZombie != null && !renaming && PadExtra.Down(renameWindow)) ZombieRename.Roll(renameZombie, renameWindow);
                     UIVendorWindow vw = tradeAnchor != null ? TradeHelper.Cached<UIVendorWindow>() : null;
+                    if (craftWin != null && PadExtra.Down(craftWin)) CraftMax.Apply(craftWin);
                     if (vw != null && PadExtra.Down(vw))
                     {
                         int n = TradeHelper.FillAll();
@@ -382,6 +427,37 @@ namespace GK2Tweaks
                     else if (clicked) ManualSave.Toast(Labels.T("Keine passenden Waren im Inventar.", "No matching goods in your inventory."), 2.5f);
                 }
                 catch (Exception e) { SafeMode.Fail("TradeLikes", e); }
+            }
+            if (respecAnchor != null && respecHint != null)
+            {
+                Rect nr = GuiRect(respecAnchor, scale);
+                var c = new GUIContent(respecHint);
+                var st = new GUIStyle(igHint) { fontSize = 13, padding = new RectOffset(8, 8, 3, 3) };
+                Vector2 sz = st.CalcSize(c);
+                GUI.Label(new Rect(nr.center.x - sz.x / 2f, nr.yMax + 4f, sz.x, sz.y), c, st);
+            }
+            // Controller: kein eigener Knopf - "Max" steht in der Tastenleiste des Spiels (CraftMaxTipPatch)
+            if (craftPlus != null && craftWin != null && !LazyInput.IsGamepadActive)
+            {
+                try
+                {
+                    EnsureTradeStyle();
+                    Rect pr = GuiRect(craftPlus, scale);
+                    var c = new GUIContent("Max", Labels.T("So viele herstellen, wie die Zutaten hergeben", "Craft as many as your ingredients allow"));
+                    float h = Mathf.Clamp(pr.height, 24f, 34f);
+                    float w = Mathf.Max(h * 1.5f, tradeLabel.CalcSize(c).x + 18f);
+                    var b = new Rect(pr.xMax + 4f, pr.center.y - h / 2f, w, h);
+                    var data = CraftMax.Data(craftWin);
+                    bool can = craftTarget > 0 && data != null && data.CraftsCount != craftTarget;
+                    Color oc = GUI.color;
+                    if (!can) GUI.color = new Color(1f, 1f, 1f, 0.45f);
+                    bool hit = GUI.Button(b, GUIContent.none, tradeStyle);
+                    var ls = new GUIStyle(tradeLabel) { alignment = TextAnchor.MiddleCenter, fontSize = 14 };
+                    GUI.Label(b, c, ls);
+                    GUI.color = oc;
+                    if (hit && can) CraftMax.Apply(craftWin);
+                }
+                catch (Exception e) { SafeMode.Fail("CraftMax", e); }
             }
             if (moveHint != null)
             {

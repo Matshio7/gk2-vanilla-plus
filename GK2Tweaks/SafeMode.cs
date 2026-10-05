@@ -47,6 +47,8 @@ namespace GK2Tweaks
             { "MoveObjects", new[] { "Objekte verschieben", "Move objects" } },
             { "TradeLikes", new[] { "Handel: passende Menge", "Trade: right amount" } },
             { "ZombieRename", new[] { "Zombies umbenennen", "Rename zombies" } },
+            { "Respec", new[] { "Talente & Forschung zurückerstatten", "Refund talents & research" } },
+            { "CraftMax", new[] { "Herstellen: Max-Knopf", "Crafting: Max button" } },
         };
 
         internal static string Name(string f) => names.TryGetValue(f, out string[] n) ? Labels.T(n[0], n[1]) : f;
@@ -56,7 +58,7 @@ namespace GK2Tweaks
         {
             switch (patch.Name)
             {
-                case "CraftCellPinPatch": case "SelectionPinPatch": case "QuestPinPatch": return "Pins";
+                case "OrderPinPatch": case "AlchemyPinPatch": case "CraftCellPinPatch": case "SelectionPinPatch": case "QuestPinPatch": return "Pins";
                 case "LongNotes": return "WeekPlan";
                 case "MainMenuModsButtonPatch": case "PauseModsButtonPatch": return "ModsButton";
                 case "ModdedLabelPatch": return "MenuInfo";
@@ -66,6 +68,8 @@ namespace GK2Tweaks
                 case "InstantRemovePatch": return "InstantRemove";
                 case "MoveInputPatch": case "MoveTargetPatch": case "MoveCellsPatch": case "MoveBuildPatch": case "MoveDisablePatch": case "MoveRemoveLabelPatch": return "MoveObjects";
                 case "TradePressPatch": case "TradeCountPatch": return "TradeLikes";
+                case "CraftMaxTipPatch": return "CraftMax";
+                case "RespecOverPatch": case "RespecOutPatch": case "RespecTechPatch": return "Respec";
                 case "ZoneRedrawPatch": return "HudClock";
                 case "TeleportPatch": case "FadeInPatch": case "FadeOutPatch": case "CleanupPatch": return "Transitions";
                 default: return patch.Name;
@@ -148,6 +152,7 @@ namespace GK2Tweaks
             F("HudClock", () => typeof(WorldZoneWidget), "worldZoneLabel");
             F("HudClock", () => typeof(EnvironmentData), "Day");
             F("HudClock", () => typeof(EnvironmentData), "TimeOfDay");
+            M("MoveObjects", () => typeof(Wgo), "TryRegisterWorkbenchExtensionDelayed");
             F("EscLeave", () => typeof(UIMultiAnswer), "multiAnswers");
             F("EscLeave", () => typeof(UIMultiAnswer), "visualData");
             F("EscLeave", () => typeof(UIMultiAnswer), "interactable");
@@ -167,6 +172,13 @@ namespace GK2Tweaks
             F("MoveObjects", () => typeof(WgoBuildPointer), "shownAsActive");
             F("MoveObjects", () => typeof(WgoData), "isRemovingFromData");
             F("MoveObjects", () => typeof(WgoData), "gdPointsRegistered");
+            F("CraftMax", () => typeof(UIBaseCraftSelectionWindow), "plusCraftButton");
+            M("Respec", () => typeof(TalentLevelUpWidget), "OnOver");
+            M("Respec", () => typeof(TalentLevelUpWidget), "OnOut");
+            M("Respec", () => typeof(TechTreePageWidget), "OnTechClicked");
+            M("Respec", () => typeof(TechTreePageWidget), "UpdateElements");
+            M("CraftMax", () => typeof(UIBaseCraftSelectionWindow), "ChangeCraftCount");
+            M("CraftMax", () => typeof(UIBaseCraftSelectionWindow), "AddCraftCountGamepadTips");
             M("TradeLikes", () => typeof(Trading), "OnPlayerItemPress1");
             F("TradeLikes", () => typeof(Trading), "cachedWindowData");
             F("TradeLikes", () => typeof(Trading), "sellInventory");

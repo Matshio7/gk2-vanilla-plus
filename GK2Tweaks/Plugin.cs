@@ -14,7 +14,7 @@ namespace GK2Tweaks
     {
         public const string Guid = "mats.gk2.tweaks";
         public const string PluginName = "GK2 Tweaks";
-        public const string PluginVersion = "1.6.2";
+        public const string PluginVersion = "1.6.3";
         internal const string Keep = "Default";
 
         internal static Plugin Instance;
@@ -36,9 +36,9 @@ namespace GK2Tweaks
         // [Interface]
         internal static ConfigEntry<KeyboardShortcut> MenuKey, OverlayKey, SaveKey, WeekPlanKey, HudKey;
         internal static ConfigEntry<bool> WeekPlanNotify, InstantRemove, HudClock, HudClock12h, EscLeave, FasterTransitions, LessMemoryCleanup;
-        internal static ConfigEntry<bool> FullRefund, MoveObjects, TradeLikes, ZombieRename, Celebrated;
+        internal static ConfigEntry<bool> FullRefund, MoveObjects, TradeLikes, ZombieRename, Celebrated, CraftMaxButton, Respec;
         internal static ConfigEntry<string> HudClockMode;
-        internal static ConfigEntry<int> BackupCount, BackupMinutes;
+        internal static ConfigEntry<int> BackupCount, BackupMinutes, RainAmount;
         internal static ConfigEntry<bool> ShowOverlay, CheckUpdates;
         internal static ConfigEntry<int> StatsLogSeconds;
         internal static ConfigEntry<string> Language, LastSeenVersion, LastGameVersion;
@@ -88,7 +88,7 @@ namespace GK2Tweaks
 
             try { SafeMode.CheckGame(); } catch (Exception e) { Log.LogError("Safe mode check failed: " + e); }
             var harmony = new Harmony(Guid);
-            var patches = new System.Collections.Generic.List<Type> { typeof(TierPatch), typeof(ScreenSettingsPatch), typeof(SaveBlockPatch), typeof(ZoomPatch), typeof(ModdedLabelPatch), typeof(BackupPatch), typeof(MainMenuModsButtonPatch), typeof(PauseModsButtonPatch), typeof(CraftCellPinPatch), typeof(SelectionPinPatch), typeof(QuestPinPatch), typeof(LongNotes), typeof(InstantRemovePatch), typeof(TeleportPatch), typeof(FadeInPatch), typeof(FadeOutPatch), typeof(CleanupPatch), typeof(MoveInputPatch), typeof(MoveTargetPatch), typeof(MoveCellsPatch), typeof(MoveBuildPatch), typeof(MoveDisablePatch), typeof(TradePressPatch), typeof(TradeCountPatch), typeof(ZoneRedrawPatch), typeof(MoveRemoveLabelPatch) };
+            var patches = new System.Collections.Generic.List<Type> { typeof(TierPatch), typeof(ScreenSettingsPatch), typeof(SaveBlockPatch), typeof(ZoomPatch), typeof(ModdedLabelPatch), typeof(BackupPatch), typeof(MainMenuModsButtonPatch), typeof(PauseModsButtonPatch), typeof(CraftCellPinPatch), typeof(SelectionPinPatch), typeof(QuestPinPatch), typeof(LongNotes), typeof(InstantRemovePatch), typeof(TeleportPatch), typeof(FadeInPatch), typeof(FadeOutPatch), typeof(CleanupPatch), typeof(MoveInputPatch), typeof(MoveTargetPatch), typeof(MoveCellsPatch), typeof(MoveBuildPatch), typeof(MoveDisablePatch), typeof(TradePressPatch), typeof(TradeCountPatch), typeof(ZoneRedrawPatch), typeof(MoveRemoveLabelPatch), typeof(OrderPinPatch), typeof(AlchemyPinPatch), typeof(CraftMaxTipPatch), typeof(RespecOverPatch), typeof(RespecOutPatch), typeof(RespecTechPatch) };
 #if DEV
             if (BenchEnabled.Value) patches.Add(typeof(SystemProfiler));
 #endif
@@ -103,13 +103,14 @@ namespace GK2Tweaks
             if (SafeMode.On("WorkshopUpload")) WorkshopUpload.Apply(harmony);
             ApplyPhysics();
             ApplyLogFilter();
-            Application.runInBackground = !PauseInBackground.Value;
+            Application.runInBackground = true;   // Pause im Hintergrund macht BackgroundPause (Controller bleibt erkannt)
             Config.SettingChanged += OnSettingChanged;
 
 #if !NEXUS
             RatePromptSessions.Value++;
 #endif
             Gui = gameObject.AddComponent<TweaksGui>();
+            gameObject.AddComponent<BackgroundPause>();
             FrameworkBridgeLoader.TryLoad();
             Translations.WriteTemplate();
             StartCoroutine(UpdateCheck.Run());
@@ -200,6 +201,8 @@ namespace GK2Tweaks
             MoveObjects = Config.Bind("Comfort", "MoveObjects", false, "[Not fully vanilla] Remove mode: press the rotate key on an object to pick it up and place it somewhere else. It stays the same object (contents and crafting queue are kept), nothing is used or refunded. Works for workbenches, conveyors and all other buildings: zombie workers are put on the ground, connected extensions stay where they are until you move them too. Esc or right click cancels.");
             TradeLikes = Config.Bind("Comfort", "TradeLikedAmount", true, "Trading with town vendors: the amount slider starts at exactly the amount that still gives happiness (thumbs up), and a button adds all liked goods in the right amount. You still confirm the deal yourself.");
             Celebrated = Config.Bind("Interface", "Celebrated1000", false, "Internal: the 1,000+ players thank-you banner was shown.");
+            Respec = Config.Bind("Comfort", "Respec", false, "[Not fully vanilla] Refund talents, zombie perks and research. Talents and zombie perks: right click an unlocked node (controller: the button shown below it). Research: click a researched tech and choose Refund. Always asks first; nodes that depend on it are refunded too. Starter nodes and reputation research are never refunded, effects from buying (e.g. items) stay. Changes your save, backups are made automatically.");
+            CraftMaxButton = Config.Bind("Comfort", "CraftMax", true, "Crafting: a Max button next to the amount sets it to as many as your ingredients allow (inventory and reachable chests, like the game counts). With a controller use the button shown on it.");
             ZombieRename = Config.Bind("Comfort", "ZombieRename", true, "Zombie window: a Rename button next to the name - type your own name or roll a new one at any time.");
             BackupCount = Config.Bind("Backups", "KeepBackups", 5, new ConfigDescription(
                 "Before the game overwrites a save, the previous save is backed up (BepInEx/GK2VanillaPlus/Backups). Number of backups kept per save slot, 0 = off.",
@@ -211,6 +214,9 @@ namespace GK2Tweaks
             MenuScale = Config.Bind("Interface", "MenuScale", 0, new ConfigDescription(
                 "Size of the mod menu, FPS display and pinned list. 0 = automatic (follows the screen height).",
                 new AcceptableValueList<int>(0, 80, 90, 100, 110, 125, 150, 175, 200)));
+            RainAmount = Config.Bind("Interface", "RainAmount", 100, new ConfigDescription(
+                "Amount of rain and snow particles in percent. Less rain helps on weak PCs and the Steam Deck, 0 turns the particles off (the weather itself stays).",
+                new AcceptableValueList<int>(100, 75, 50, 25, 0)));
             WideRain = Config.Bind("Interface", "WideRain", true, "Rain and snow cover the whole screen on ultrawide monitors and when zoomed out (the game only fills a 16:9 area).");
             HudCenter = Config.Bind("Interface", "HudCenter", false, "Ultrawide: move the HUD, area name, NPC window and the mod displays into the 16:9 area in the middle instead of the outer screen edges. The world stays ultrawide.");
             OledBlack = Config.Bind("Interface", "OledBlack", false, "Pure black instead of dark gray around the map (e.g. outside the church or at the level edge). Good for OLED screens.");
@@ -297,7 +303,7 @@ namespace GK2Tweaks
                 case "Performance": ApplyPhysics(); ApplyLogFilter(); break;
                 case "Pins": PinButton.RefreshAll(); break;
                 case "Camera": CameraZoom.OnSettingsChanged(); break;
-                case "Comfort": CameraZoom.OnSettingsChanged(); Application.runInBackground = !PauseInBackground.Value; ModsButton.ApplyVisibility(); break;
+                case "Comfort": CameraZoom.OnSettingsChanged(); Application.runInBackground = true; ModsButton.ApplyVisibility(); break;
             }
         }
 

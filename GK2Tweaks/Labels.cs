@@ -80,6 +80,7 @@ namespace GK2Tweaks
             { "HighContrast", new[] { "Hoher Kontrast", "High contrast" } },
             { "OledBlack", new[] { "OLED-Schwarz", "OLED black" } },
             { "WideRain", new[] { "Regen über ganze Breite", "Full-width rain" } },
+            { "RainAmount", new[] { "Regen & Schnee: Menge", "Rain & snow: amount" } },
             { "Key", new[] { "Taste Screenshot", "Screenshot key" } },
             { "Scale", new[] { "Auflösung", "Resolution" } },
             { "HideHud", new[] { "Ohne HUD", "Without HUD" } },
@@ -102,6 +103,8 @@ namespace GK2Tweaks
             { "FullRefund", new[] { "Volle Erstattung beim Abbauen (nicht Vanilla)", "Full refund when removing (not vanilla)" } },
             { "MoveObjects", new[] { "Objekte verschieben (nicht Vanilla)", "Move objects (not vanilla)" } },
             { "TradeLikedAmount", new[] { "Handel: Daumen-hoch-Menge vorschlagen", "Trade: suggest the thumbs-up amount" } },
+            { "Respec", new[] { "Talente & Forschung zurückerstatten (nicht Vanilla)", "Refund talents & research (not vanilla)" } },
+            { "CraftMax", new[] { "Herstellen: Max-Knopf", "Crafting: Max button" } },
             { "ZombieRename", new[] { "Zombies umbenennen", "Rename zombies" } },
             { "HudClock", new[] { "Tag & Uhrzeit am HUD", "Day & time on HUD" } },
             { "NoTearing", new[] { "Kein Tearing (VSync erzwingen)", "No tearing (force VSync)" } },
@@ -164,6 +167,7 @@ namespace GK2Tweaks
             { "MouseWheelZoom", "Stufenlos zoomen mit dem Mausrad – nur beim Herumlaufen, nicht über Menüs. Beim nächsten Start gilt wieder der Kamera-Zoom." },
             { "SmoothZoom", "Weicher Übergang, wenn sich der Zoom ändert." },
             { "MenuScale", "Größe von Mod-Menü, FPS-Anzeige und Pin-Liste. Automatisch = passend zur Bildschirmhöhe." },
+            { "RainAmount", "Wie viele Regen- und Schneepartikel gezeichnet werden. Weniger Regen hilft auf schwachen PCs und dem Steam Deck, 0 % schaltet die Partikel ab (das Wetter selbst bleibt)." },
             { "WideRain", "Regen und Schnee über den ganzen Bildschirm – auf Ultrawide-Monitoren und beim Herauszoomen (das Spiel füllt nur einen 16:9-Bereich)." },
             { "OledBlack", "Reines Schwarz statt Dunkelgrau um die Karte herum (z. B. außerhalb der Kirche oder am Levelrand). Gut für OLED-Bildschirme." },
             { "HighContrast", "Stärkerer Kontrast: dunkler Hintergrund für die Pin-Liste, fette und hellere Haben/Brauchen-Zahlen, größere Tooltips." },
@@ -184,6 +188,8 @@ namespace GK2Tweaks
             { "ShowFuel", "Zeigt den Brennstoff, den ein Rezept aus der Werkbank braucht (z. B. Ofen), als eigene Zeile." },
             { "FullRefund", "Nicht mehr ganz Vanilla – oft gewünscht, deshalb als Option: Beim Abbauen bekommst du die vollen Baukosten zurück statt nur einen Teil. Inhalt (Inventar, Brennstoff) kommt wie gewohnt zurück." },
             { "MoveObjects", "Nicht mehr ganz Vanilla – oft gewünscht, deshalb als Option: Im Abriss-Modus mit der Dreh-Taste ein Objekt aufnehmen und woanders hinstellen. Es bleibt dasselbe Objekt (Inhalt und Herstell-Warteschlange bleiben), es wird nichts verbraucht oder erstattet. Geht für Werkbänke, Förderbänder und alle anderen Bauten: Zombie-Arbeiter landen auf dem Boden, verbundene Erweiterungen bleiben stehen, bis du sie auch verschiebst. Esc/Rechtsklick bricht ab." },
+            { "Respec", "Nicht mehr ganz Vanilla – oft gewünscht, deshalb als Option: Talente, Zombie-Perks und Forschung zurückerstatten. Talente und Zombie-Perks: Rechtsklick auf einen freigeschalteten Knoten (Controller: die Taste, die darunter steht). Forschung: erforschte Technik anklicken → „Zurückerstatten“. Fragt immer vorher; was davon abhängt, wird mit erstattet. Start-Knoten und Ruf-Forschung nie, Effekte beim Kauf (z. B. Gegenstände) bleiben. Verändert den Spielstand – Backups werden automatisch angelegt." },
+            { "CraftMax", "Herstellen: Ein Knopf „Max“ neben der Mengenwahl stellt so viele ein, wie deine Zutaten hergeben (Inventar und erreichbare Truhen, wie das Spiel zählt). Am Controller mit der Taste, die auf dem Knopf steht." },
             { "TradeLikedAmount", "Handel mit Stadt-Händlern: Der Mengen-Regler startet genau bei der Menge, die noch Zufriedenheit (Daumen hoch) bringt, und ein Knopf legt alle passenden Waren in der richtigen Menge in den Handel. Bestätigen musst du den Handel weiterhin selbst." },
             { "ZombieRename", "Im Zombie-Fenster steht neben dem Namen ein „Umbenennen“-Knopf: eigenen Namen eintippen oder neu würfeln – jederzeit." },
             { "InstantRemove", "Abriss-Modus beim Bauen: Werkbänke, Truhen, Öfen usw. werden sofort entfernt, statt dass deine Figur erst hinläuft. Du bekommst dieselben Materialien zurück. Hilft bei Objekten, die deine Figur nicht erreicht." },
@@ -316,6 +322,7 @@ namespace GK2Tweaks
                 if (key == "TargetFps") return i == 0 ? T("Unbegrenzt", "Unlimited") : i + " FPS";
                 if (key == "PhysicsHz") return i == 0 ? T("Standard (50 Hz)", "Default (50 Hz)") : i + " Hz";
                 if (key == "Zoom") return i + " %";
+                if (key == "RainAmount") return i == 0 ? T("Aus", "Off") : i + " %";
                 if (key == "Size") return i + " px";
                 if (key == "InteriorZoom") return i == 0 ? T("wie draußen", "same as outside") : i + " %";
                 if (key == "MenuScale") return i == 0 ? T("Automatisch", "Automatic") : i + " %";

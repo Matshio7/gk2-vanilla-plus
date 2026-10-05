@@ -467,3 +467,39 @@ Controller: hold this button during normal play to navigate the pinned list (onl
 Controller: hold this button during normal play to navigate the pinned list (only while no game window is open). Click the field and press any controller button; Esc = off. => 手柄：在正常游戏中按住此键可浏览固定列表（仅在未打开游戏窗口时）。点击此栏后按下任意手柄按键；Esc = 关闭。
 Press a controller button … (Esc = off) => 请按下手柄按键 …（Esc = 关闭）
 Controller: button for pins => 手柄：固定列表按键
+
+# 1.6.3
+Alchemy => 炼金
+Red => 红
+Green => 绿
+Blue => 蓝
+Runes => 符文
+Craft as many as your ingredients allow => 按现有材料制作最大数量
+Crafting: Max button => 制作：最大按钮
+Order => 订单
+Order done: {0} => 订单完成：{0}
+Crafting: a Max button next to the amount sets it to as many as your ingredients allow (inventory and reachable chests, like the game counts). With a controller use the button shown on it. => 制作：数量旁的“最大”按钮会设为材料允许的最大数量（背包和可用箱子，与游戏计数方式相同）。手柄请使用按钮上显示的键。
+· kept => · 已保留
+Unkeep => 取消保留
+Keep => 保留
+"Restore" replaces the save with the backup (the current save is backed up first). "Keep" protects a backup from automatic deletion. => “恢复”会用备份替换存档（会先备份当前存档）。“保留”可防止备份被自动删除。
+Refund => 退还
+Right click: refund => 右键：退还
+Refund talents & research (not vanilla) => 退还天赋和研究（非原版）
+[Not fully vanilla] Refund talents, zombie perks and research. Talents and zombie perks: right click an unlocked node (controller: the button shown below it). Research: click a researched tech and choose Refund. Always asks first; nodes that depend on it are refunded too. Starter nodes and reputation research are never refunded, effects from buying (e.g. items) stay. Changes your save, backups are made automatically. => [非完全原版] 退还天赋、僵尸特性和研究。天赋和僵尸特性：右键点击已解锁的节点（手柄：节点下方显示的按键）。研究：点击已研究的科技并选择“退还”。总会先确认；依赖它的节点也会一并退还。初始节点和声望研究不会退还，购买效果（如物品）保留。会修改存档，会自动创建备份。
+talent points => 天赋点
+Refunded: {0} => 已退还：{0}
+red => 红
+green => 绿
+blue => 蓝
+nothing => 无
+spheres => 球
+You get back: {0} => 你将获得：{0}
+Depends on it and is refunded too: => 依赖于它并一并退还：
+What it unlocked (recipes, blueprints) is locked again. => 它解锁的内容（配方、蓝图）将重新锁定。
+The linked perk is removed. => 关联的特性将被移除。
+Refund "{0}"? => 退还“{0}”？
+Refund talents & research => 退还天赋和研究
+"Talent & Tech Refund" is installed – its function is used. => 已安装“Talent & Tech Refund”——使用它的功能。
+Rain & snow: amount => 雨雪：数量
+Amount of rain and snow particles in percent. Less rain helps on weak PCs and the Steam Deck, 0 turns the particles off (the weather itself stays). => 雨和雪粒子的数量（百分比）。减少雨量有助于低配电脑和 Steam Deck，0 关闭粒子（天气本身保留）。

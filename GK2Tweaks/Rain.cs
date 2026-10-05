@@ -15,7 +15,7 @@ namespace GK2Tweaks
         private static readonly Dictionary<ParticleSystem, Orig> done = new Dictionary<ParticleSystem, Orig>();
         private static readonly FieldInfo paramsField = typeof(WeatherComponent).GetField("parameters", BindingFlags.Instance | BindingFlags.NonPublic);
         private static readonly FieldInfo defaultField = typeof(CPParticleEmission).GetField("defaultValue", BindingFlags.Instance | BindingFlags.NonPublic);
-        private static float next, lastW = 1f, lastH = 1f;
+        private static float next, lastW = 1f, lastH = 1f, lastA = 1f;
 
         internal static void Tick()
         {
@@ -32,9 +32,11 @@ namespace GK2Tweaks
                     w = Mathf.Max(1f, aspect / (16f / 9f)) * zoomOut;
                     h = zoomOut;
                 }
-                bool changed = Mathf.Abs(w - lastW) > 0.01f || Mathf.Abs(h - lastH) > 0.01f;
-                lastW = w; lastH = h;
-                if (w <= 1.01f && h <= 1.01f && done.Count == 0) return;
+                // Menge (Saisuke: Regen kostet auf schwachen PCs viel Leistung) - wirkt nur auf die Rate, nicht auf die Breite
+                float amount = Mathf.Clamp01(Plugin.RainAmount.Value / 100f);
+                bool changed = Mathf.Abs(w - lastW) > 0.01f || Mathf.Abs(h - lastH) > 0.01f || Mathf.Abs(amount - lastA) > 0.01f;
+                lastW = w; lastH = h; lastA = amount;
+                if (w <= 1.01f && h <= 1.01f && amount >= 0.99f && done.Count == 0) return;
                 foreach (WeatherComponent wc in UnityEngine.Object.FindObjectsByType<WeatherComponent>(FindObjectsInactive.Include, FindObjectsSortMode.None))
                 {
                     var list = paramsField?.GetValue(wc) as ControllableParameterList;
@@ -52,12 +54,17 @@ namespace GK2Tweaks
                         if (!changed) continue;
                         ParticleSystem.ShapeModule shape = cp.particleSystem.shape;
                         shape.scale = new Vector3(o.scale.x * w, o.scale.y * h, o.scale.z);
-                        defaultField.SetValue(cp, o.rate * w * h);
+                        float f = w * h * amount;
+                        defaultField.SetValue(cp, o.rate * f);
                         // aktuelle Rate sofort mitziehen (sonst erst beim naechsten Wetterwechsel)
                         ParticleSystem.EmissionModule em = cp.particleSystem.emission;
-                        if (em.rateOverTime.constant > 0f && o.rate > 0f)
-                            em.rateOverTime = em.rateOverTime.constant / Mathf.Max(0.01f, cur(cp, o)) * w * h;
-                        cur(cp, o, w * h);
+                        float prev = cur(cp, o);
+                        if (f <= 0f) em.rateOverTime = 0f;
+                        else if (prev <= 0f) { if (o.rate > 0f) em.rateOverTime = o.rate * f; }
+                        else if (em.rateOverTime.constant > 0f && o.rate > 0f)
+                            em.rateOverTime = em.rateOverTime.constant / prev * f;
+                        if (f <= 0f && prev > 0f) cp.particleSystem.Clear();
+                        cur(cp, o, f);
                     }
                 }
             }

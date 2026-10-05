@@ -10,7 +10,7 @@ namespace GK2Tweaks
     // (Y, X, RT oder LT laut Tastenbelegung des Spiels), und fragt sie direkt ueber Rewired ab.
     internal static class PadExtra
     {
-        private sealed class Slot { public int Rewired; public string Name; }
+        private sealed class Slot { public int Rewired, Gp; public string Name; }
         private static readonly Dictionary<Type, Slot> cache = new Dictionary<Type, Slot>();
         private static readonly int[] candGp = { 4, 3, 14, 13 };          // GamepadButton.Y, X, RT, LT (Enumeration-Werte)
         private static readonly int[] candRw = { 3, 2, 9, 8 };            // Rewired-Aktionen dazu
@@ -40,13 +40,27 @@ namespace GK2Tweaks
             if (window is UIVendorWindow) used.Add(4);
             s = null;
             // Haendler: fest LT (Y = Handeln, X = Ware bewegen im Spiel)
-            if (window is UIVendorWindow) s = new Slot { Rewired = 8, Name = "LT" };
+            if (window is UIVendorWindow) s = new Slot { Rewired = 8, Gp = 13, Name = "LT" };
             else
             for (int i = 0; i < candGp.Length; i++)
-                if (!used.Contains(candGp[i])) { s = new Slot { Rewired = candRw[i], Name = candName[i] }; break; }
+                if (!used.Contains(candGp[i])) { s = new Slot { Rewired = candRw[i], Gp = candGp[i], Name = candName[i] }; break; }
             cache[t] = s;
             Plugin.Log.LogInfo("Pad: " + t.Name + " used=[" + string.Join(",", new List<int>(used).ConvertAll(x => x.ToString()).ToArray()) + "] -> " + (s != null ? s.Name : "no free button"));
             return s;
+        }
+
+        // eine GameKey des Spiels, die auf derselben Controller-Taste liegt (nur fuers Symbol in der Tastenleiste)
+        internal static GameKey KeyFor(object window)
+        {
+            Slot s = For(window);
+            if (s == null) return null;
+            try
+            {
+                foreach (GamepadBinding b in LazyInput.GameBindings.gamepadBindings)
+                    if (b != null && b.gameKey != null && b.gamepadButton != null && b.gamepadButton.value == s.Gp) return b.gameKey;
+            }
+            catch { }
+            return null;
         }
 
         // Tastenname fuer die Anzeige (z. B. "Y"), null = keine freie Taste

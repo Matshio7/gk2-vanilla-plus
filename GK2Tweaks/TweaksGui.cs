@@ -628,6 +628,7 @@ namespace GK2Tweaks
                 DrawEntry(Plugin.Clouds);
                 DrawEntry(Plugin.OledBlack);
                 DrawEntry(Plugin.WideRain);
+                DrawEntry(Plugin.RainAmount);
 
                 Header(Labels.T("Leistung", "Performance"));
                 DrawEntry(Plugin.PhysicsHz);
@@ -651,6 +652,7 @@ namespace GK2Tweaks
                 DrawEntry(Plugin.WeekPlanNotify);
                 DrawEntry(Plugin.ZombieRename);
                 DrawEntry(Plugin.TradeLikes);
+                DrawEntry(Plugin.CraftMaxButton);
                 DrawEntry(Plugin.PauseInBackground);
                 DrawEntry(Plugin.AutoSaveMinutes);
 
@@ -659,6 +661,8 @@ namespace GK2Tweaks
                 GUILayout.Label(Labels.T("Nicht mehr ganz Vanilla – oft gewünscht, deshalb als Option (standardmäßig aus):", "Not fully vanilla – often requested, so it's an option (off by default):"), smallStyle);
                 DrawEntry(Plugin.FullRefund);
                 DrawEntry(Plugin.MoveObjects);
+                if (Respec.OtherMod) GUILayout.Label(Labels.T("„Talent & Tech Refund“ ist installiert – dessen Funktion wird genutzt.", "\"Talent & Tech Refund\" is installed – its function is used."), smallStyle);
+                DrawEntry(Plugin.Respec);
 
                 Header(Labels.T("Kamera", "Camera"));
                 DrawEntry(Plugin.Zoom);
@@ -966,7 +970,8 @@ namespace GK2Tweaks
                     GUILayout.BeginHorizontal();
                     GUILayout.Space(24);
                     string when = b.Time == default(DateTime) ? System.IO.Path.GetFileName(b.Dir) : b.Time.ToString(fmt);
-                    GUILayout.Label(Labels.T("Backup ", "Backup ") + when + (b.Dir.EndsWith("_restore") ? Labels.T("  (vor Wiederherstellung)", "  (before restore)") : ""), smallStyle, GUILayout.Width(436));
+                    GUILayout.Label(Labels.T("Backup ", "Backup ") + when + (b.Dir.EndsWith("_restore") ? Labels.T("  (vor Wiederherstellung)", "  (before restore)") : "") + (b.Kept ? Labels.T("  · behalten", "  · kept") : ""), smallStyle, GUILayout.Width(436));
+                    KeepButton(b);
                     bool confirm = confirmRestore == b;
                     if (Btn(confirm ? Labels.T("Sicher?", "Sure?") : Labels.T("Laden", "Restore"), buttonStyle, GUILayout.Width(110)))
                     {
@@ -978,6 +983,16 @@ namespace GK2Tweaks
                 GUILayout.Space(4);
             }
             if (!string.IsNullOrEmpty(backupMsg)) GUILayout.Label(backupMsg, smallStyle);
+        }
+
+        // Backup behalten / freigeben (behaltene werden nie automatisch geloescht und zaehlen nicht zur Anzahl)
+        private void KeepButton(Backups.Item b)
+        {
+            if (Btn(b.Kept ? Labels.T("Freigeben", "Unkeep") : Labels.T("Behalten", "Keep"), buttonStyle, GUILayout.Width(120)))
+            {
+                Backups.Item kb = b;
+                Defer(() => { Backups.SetKept(kb, !kb.Kept); backupListAt = 0; });
+            }
         }
 
         private GUIStyle richLabelStyle;
@@ -1018,7 +1033,8 @@ namespace GK2Tweaks
             {
                 GUILayout.BeginHorizontal();
                 string when = b.Time == default(System.DateTime) ? System.IO.Path.GetFileName(b.Dir) : b.Time.ToString(Labels.German ? "dd.MM.yyyy HH:mm" : "yyyy-MM-dd HH:mm");
-                GUILayout.Label(when + "   " + b.Slot + "   " + (b.Bytes / 1048576f).ToString("0.0") + " MB" + (b.Dir.EndsWith("_restore") ? Labels.T("  (vor Wiederherstellung)", "  (before restore)") : ""), labelStyle, GUILayout.Width(460));
+                GUILayout.Label(when + "   " + b.Slot + "   " + (b.Bytes / 1048576f).ToString("0.0") + " MB" + (b.Dir.EndsWith("_restore") ? Labels.T("  (vor Wiederherstellung)", "  (before restore)") : "") + (b.Kept ? Labels.T("  · behalten", "  · kept") : ""), labelStyle, GUILayout.Width(460));
+                KeepButton(b);
                 if (inMenu)
                 {
                     bool confirm = confirmRestore == b;
@@ -1030,7 +1046,7 @@ namespace GK2Tweaks
                 }
                 GUILayout.EndHorizontal();
             }
-            GUILayout.Label(!string.IsNullOrEmpty(backupMsg) ? backupMsg : (inMenu ? Labels.T("\"Laden\" ersetzt den Spielstand durch das Backup (der aktuelle Stand wird vorher gesichert).", "\"Restore\" replaces the save with the backup (the current save is backed up first).")
+            GUILayout.Label(!string.IsNullOrEmpty(backupMsg) ? backupMsg : (inMenu ? Labels.T("\"Laden\" ersetzt den Spielstand durch das Backup (der aktuelle Stand wird vorher gesichert). \"Behalten\" schützt ein Backup vor dem automatischen Löschen.", "\"Restore\" replaces the save with the backup (the current save is backed up first). \"Keep\" protects a backup from automatic deletion.")
                 : Labels.T("Wiederherstellen ist im Hauptmenü möglich.", "Restoring is available in the main menu.")), smallStyle);
             if (Btn(Labels.T("Backup-Ordner öffnen", "Open backup folder"), buttonStyle, GUILayout.Width(260)))
             {

@@ -216,6 +216,18 @@ namespace GK2Tweaks
                 }
             }
             catch { return; }
+            // Stadtauftraege: Restmenge nachziehen, erledigte abpinnen
+            var done = new List<Pin>();
+            try { OrderPins.Update(List, done); } catch (Exception e) { Plugin.Log.LogWarning("Order pins: " + e.Message); }
+            if (done.Count > 0)
+            {
+                foreach (Pin d in done)
+                {
+                    List.Remove(d);
+                    if (Plugin.PinsNotify.Value) ManualSave.Toast(string.Format(Labels.T("Auftrag erledigt: {0}", "Order done: {0}"), d.Title), 4f);
+                }
+                Changed();
+            }
             foreach (Pin p in List)
             {
                 bool wasReady = p.Ready;
@@ -231,6 +243,7 @@ namespace GK2Tweaks
                     p.Checked = true;
                     continue;
                 }
+                if (AlchemyPins.Is(p)) { p.Ready = false; p.Rows.Clear(); p.Checked = true; continue; }   // nur Runen-Notiz
                 bool ready = true;
                 foreach (Need n in p.Needs)
                 {
@@ -724,6 +737,7 @@ namespace GK2Tweaks
                         }
                         catch { }
                     }
+                    AlchemyPins.Restore(p);
                     foreach (string ns in f[6].Split(new[] { ';' }, StringSplitOptions.RemoveEmptyEntries))
                     {
                         string[] nf = ns.Split('|');
