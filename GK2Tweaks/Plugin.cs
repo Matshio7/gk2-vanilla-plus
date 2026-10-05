@@ -47,6 +47,7 @@ namespace GK2Tweaks
         internal static ConfigEntry<int> RatePromptSessions, RatePromptNextAt;
         internal static ConfigEntry<bool> RatePromptDone;
         internal const string WorkshopUrl = "https://steamcommunity.com/sharedfiles/filedetails/?id=3808053878";
+        internal const string KofiUrl = "https://ko-fi.com/mcfly7";
 #endif
 #if MINIMAP
         // [Minimap]

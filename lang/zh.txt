@@ -541,3 +541,5 @@ Fog color => 雾的颜色
 Gloomy (dark) => 阴郁（暗）
 Light mist => 淡雾
 Fog color over the main menu picture: light mist or dark, gloomy fog. => 主菜单图片上雾的颜色：淡雾或阴暗的浓雾。
+Support => 支持
+Vanilla+ stays free. If you enjoy the mod, a coffee on Ko-fi is very welcome (opens your browser). => Vanilla+ 永久免费。如果你喜欢这个模组，欢迎在 Ko-fi 请我喝杯咖啡（将打开浏览器）。

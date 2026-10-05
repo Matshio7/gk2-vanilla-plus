@@ -541,3 +541,5 @@ Fog color => Color de la niebla
 Gloomy (dark) => Sombría (oscura)
 Light mist => Bruma clara
 Fog color over the main menu picture: light mist or dark, gloomy fog. => Color de la niebla sobre la imagen del menú principal: bruma clara o niebla oscura y sombría.
+Support => Apoyar
+Vanilla+ stays free. If you enjoy the mod, a coffee on Ko-fi is very welcome (opens your browser). => Vanilla+ sigue siendo gratis. Si te gusta el mod, un café en Ko-fi es muy bienvenido (abre el navegador).

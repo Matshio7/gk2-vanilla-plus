@@ -541,3 +541,5 @@ Fog color => Цвет тумана
 Gloomy (dark) => Мрачный (тёмный)
 Light mist => Светлая дымка
 Fog color over the main menu picture: light mist or dark, gloomy fog. => Цвет тумана над картинкой главного меню: светлая дымка или тёмный мрачный туман.
+Support => Поддержать
+Vanilla+ stays free. If you enjoy the mod, a coffee on Ko-fi is very welcome (opens your browser). => Vanilla+ остаётся бесплатным. Если мод тебе нравится, буду рад кофе на Ko-fi (откроется браузер).

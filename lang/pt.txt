@@ -537,3 +537,5 @@ Fog color => Cor da névoa
 Gloomy (dark) => Sombria (escura)
 Light mist => Névoa clara
 Fog color over the main menu picture: light mist or dark, gloomy fog. => Cor da névoa sobre a imagem do menu principal: névoa clara ou névoa escura e sombria.
+Support => Apoiar
+Vanilla+ stays free. If you enjoy the mod, a coffee on Ko-fi is very welcome (opens your browser). => O Vanilla+ continua gratuito. Se você gosta do mod, um café no Ko-fi é muito bem-vindo (abre o navegador).

@@ -541,3 +541,5 @@ Fog color => Couleur du brouillard
 Gloomy (dark) => Lugubre (sombre)
 Light mist => Brume claire
 Fog color over the main menu picture: light mist or dark, gloomy fog. => Couleur du brouillard sur l'image du menu principal : brume claire ou brouillard sombre et lugubre.
+Support => Soutenir
+Vanilla+ stays free. If you enjoy the mod, a coffee on Ko-fi is very welcome (opens your browser). => Vanilla+ reste gratuit. Si le mod te plaît, un café sur Ko-fi fait très plaisir (ouvre le navigateur).

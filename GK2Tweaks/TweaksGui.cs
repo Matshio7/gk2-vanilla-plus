@@ -768,6 +768,8 @@ namespace GK2Tweaks
             GUILayout.BeginHorizontal();
             if (Btn(Labels.T("Jetzt speichern", "Save now"), buttonStyle)) ManualSave.Save(true);
             if (Btn(Labels.T("Was ist neu?", "What's new?"), buttonStyle)) Defer(() => ShowNews(false));
+            // freiwillige Unterstuetzung: oeffnet nur die Ko-fi-Seite im Browser, keine Funktion haengt daran
+            if (Btn(new GUIContent(Labels.T("Unterstützen", "Support"), Labels.T("Vanilla+ bleibt kostenlos. Wenn dir der Mod gefällt, freue ich mich über einen Kaffee auf Ko-fi (öffnet den Browser).", "Vanilla+ stays free. If you enjoy the mod, a coffee on Ko-fi is very welcome (opens your browser).")), buttonStyle)) Application.OpenURL(Plugin.KofiUrl);
             if (Btn(Labels.T("Grafik zurücksetzen", "Reset graphics"), buttonStyle)) ResetTweaks();
             if (Btn(Labels.T("Schließen (", "Close (") + Plugin.MenuKey.Value + ")", buttonStyle)) Defer(() => SetMenu(false));
             GUILayout.EndHorizontal();
