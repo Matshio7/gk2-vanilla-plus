@@ -6,7 +6,7 @@ using UnityEngine;
 namespace GK2Tweaks
 {
     // Hauptmenue: alternative Hintergruende. "Default" = die animierte Szene des Spiels. Sonst ein Bild:
-    // drei Motive von uns (BepInEx/GK2VanillaPlus/MenuBackground/bg1-3.jpg) oder ein eigenes Bild aus dem Spielstand ("Aktuelle Ansicht als
+    // sechs Motive von uns (BepInEx/GK2VanillaPlus/MenuBackground/bg1-6.jpg) oder ein eigenes Bild aus dem Spielstand ("Aktuelle Ansicht als
     // Menü-Hintergrund" im Mod-Menue, ohne HUD aufgenommen). Darueber Filter-Ebenen: Stil (Farbe), Weichzeichnen,
     // Vignette und Abdunkeln, damit das Menue lesbar bleibt. Berechnet wird einmal beim Laden, im Menue kostet es nichts.
     internal sealed class MenuBackground : MonoBehaviour
@@ -70,6 +70,8 @@ namespace GK2Tweaks
 
         private void OnRenderImage(RenderTexture src, RenderTexture dst)
         {
+            // Sicherung: nie ausserhalb des Hauptmenues zeichnen (auch wenn Tick einmal nicht laeuft)
+            if (!Active) { Graphics.Blit(src, dst); enabled = false; return; }
             Texture2D t = null;
             try
             {
@@ -85,6 +87,62 @@ namespace GK2Tweaks
             if (sa > ta) { scale.y = ta / sa; offset.y = (1f - scale.y) / 2f; }
             else { scale.x = sa / ta; offset.x = (1f - scale.x) / 2f; }
             Graphics.Blit(t, dst, scale, offset);
+            try { if (Plugin.MenuBgFog.Value > 0) DrawFog(dst, src.width, src.height); } catch (Exception e) { SafeMode.Fail("MenuBackground", e); }
+        }
+
+        // ---------- Nebel: zwei weiche, kachelbare Rausch-Ebenen, die langsam gegeneinander ziehen ----------
+        private static Texture2D fogTex;
+
+        private static Texture2D FogTexture()
+        {
+            if (fogTex != null) return fogTex;
+            const int N = 256;
+            var rnd = new System.Random(7);
+            // kachelbares Value-Noise mit mehreren Oktaven
+            float[,] Grid(int g) { var a = new float[g, g]; for (int y = 0; y < g; y++) for (int x = 0; x < g; x++) a[x, y] = (float)rnd.NextDouble(); return a; }
+            float Sample(float[,] a, int g, float u, float v)
+            {
+                float fx = u * g, fy = v * g; int x0 = (int)fx, y0 = (int)fy; float tx = fx - x0, ty = fy - y0;
+                tx = tx * tx * (3f - 2f * tx); ty = ty * ty * (3f - 2f * ty);
+                int x1 = (x0 + 1) % g, y1 = (y0 + 1) % g; x0 %= g; y0 %= g;
+                return Mathf.Lerp(Mathf.Lerp(a[x0, y0], a[x1, y0], tx), Mathf.Lerp(a[x0, y1], a[x1, y1], tx), ty);
+            }
+            var oct = new[] { 4, 8, 16, 32 };
+            var grids = new float[oct.Length][,];
+            for (int i = 0; i < oct.Length; i++) grids[i] = Grid(oct[i]);
+            var px = new Color32[N * N];
+            for (int y = 0; y < N; y++)
+                for (int x = 0; x < N; x++)
+                {
+                    float u = x / (float)N, v = y / (float)N, n = 0f, amp = 0.55f, sum = 0f;
+                    for (int i = 0; i < oct.Length; i++) { n += Sample(grids[i], oct[i], u, v) * amp; sum += amp; amp *= 0.5f; }
+                    n /= sum;
+                    float a = Mathf.SmoothStep(0.35f, 0.85f, n);       // Schwaden statt gleichmaessiger Schleier
+                    px[y * N + x] = new Color32(186, 194, 206, (byte)(a * 255f));
+                }
+            fogTex = new Texture2D(N, N, TextureFormat.RGBA32, false) { wrapMode = TextureWrapMode.Repeat, filterMode = FilterMode.Bilinear, hideFlags = HideFlags.HideAndDontSave };
+            fogTex.SetPixels32(px);
+            fogTex.Apply(false, false);
+            return fogTex;
+        }
+
+        // dst ist null, wenn die Kamera direkt auf den Bildschirm zeichnet - Groesse daher von src
+        private static void DrawFog(RenderTexture dst, int w, int h)
+        {
+            Texture2D fog = FogTexture();
+            float strength = Plugin.MenuBgFog.Value == 1 ? 0.35f : Plugin.MenuBgFog.Value == 2 ? 0.55f : 0.8f;
+            // Graphics.DrawTexture verdoppelt Farbe und Deckkraft (GUI-Shader) - daher 0.5 = 1x
+            float tm = Time.unscaledTime;
+            RenderTexture prev = RenderTexture.active;
+            RenderTexture.active = dst;
+            GL.PushMatrix();
+            GL.LoadPixelMatrix(0, w, h, 0);
+            // Ebene 1: grosse Schwaden, langsam nach rechts; Ebene 2: kleiner, schneller nach links
+            float tiles1 = w / (float)h * 0.9f, tiles2 = w / (float)h * 1.6f;
+            Graphics.DrawTexture(new Rect(0, 0, w, h), fog, new Rect(-tm * 0.006f, tm * 0.0015f, tiles1, 0.9f), 0, 0, 0, 0, new Color(0.5f, 0.5f, 0.5f, 0.5f * 0.5f * strength));
+            Graphics.DrawTexture(new Rect(0, 0, w, h), fog, new Rect(0.37f + tm * 0.011f, 0.21f - tm * 0.002f, tiles2, 1.6f), 0, 0, 0, 0, new Color(0.5f, 0.5f, 0.5f, 0.32f * 0.5f * strength));
+            GL.PopMatrix();
+            RenderTexture.active = prev;
         }
 
         private void OnDestroy() { }

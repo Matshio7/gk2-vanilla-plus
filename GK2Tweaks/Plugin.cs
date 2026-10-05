@@ -38,7 +38,7 @@ namespace GK2Tweaks
         internal static ConfigEntry<bool> WeekPlanNotify, InstantRemove, HudClock, HudClock12h, EscLeave, FasterTransitions, LessMemoryCleanup;
         internal static ConfigEntry<bool> FullRefund, MoveObjects, TradeLikes, ZombieRename, Celebrated, CraftMaxButton, Respec;
         internal static ConfigEntry<string> HudClockMode;
-        internal static ConfigEntry<int> BackupCount, BackupMinutes, RainAmount, MenuBgBlur, MenuBgDim;
+        internal static ConfigEntry<int> BackupCount, BackupMinutes, RainAmount, MenuBgBlur, MenuBgDim, MenuBgFog;
         internal static ConfigEntry<string> MenuBg, MenuBgStyle;
         internal static ConfigEntry<bool> ShowOverlay, CheckUpdates;
         internal static ConfigEntry<int> StatsLogSeconds;
@@ -216,8 +216,8 @@ namespace GK2Tweaks
                 "Size of the mod menu, FPS display and pinned list. 0 = automatic (follows the screen height).",
                 new AcceptableValueList<int>(0, 80, 90, 100, 110, 125, 150, 175, 200)));
             MenuBg = Config.Bind("Interface", "MenuBackground", "Scene", new ConfigDescription(
-                "Main menu background: the game's animated scene (Scene), one of three Vanilla+ pictures, or your own picture from your save (Mine).",
-                new AcceptableValueList<string>("Scene", "Bg1", "Bg2", "Bg3", "Mine")));
+                "Main menu background: the game's animated scene (Scene), one of six Vanilla+ pictures, or your own picture from your save (Mine).",
+                new AcceptableValueList<string>("Scene", "Bg1", "Bg2", "Bg3", "Bg4", "Bg5", "Bg6", "Mine")));
             MenuBgStyle = Config.Bind("Interface", "MenuBackgroundStyle", "Gloomy", new ConfigDescription(
                 "Color style of the main menu picture.",
                 new AcceptableValueList<string>("Natural", "Gloomy", "Sepia", "Night", "Painting")));
@@ -227,6 +227,9 @@ namespace GK2Tweaks
             MenuBgDim = Config.Bind("Interface", "MenuBackgroundDim", 25, new ConfigDescription(
                 "Darkens the main menu picture in percent, so the buttons stay easy to read.",
                 new AcceptableValueList<int>(0, 15, 25, 40, 55)));
+            MenuBgFog = Config.Bind("Interface", "MenuBackgroundFog", 1, new ConfigDescription(
+                "Slowly drifting fog over the main menu picture.",
+                new AcceptableValueList<int>(0, 1, 2, 3)));
             RainAmount = Config.Bind("Interface", "RainAmount", 100, new ConfigDescription(
                 "Amount of rain and snow particles in percent. Less rain helps on weak PCs and the Steam Deck, 0 turns the particles off (the weather itself stays).",
                 new AcceptableValueList<int>(100, 75, 50, 25, 0)));

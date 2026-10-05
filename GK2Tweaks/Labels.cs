@@ -83,6 +83,7 @@ namespace GK2Tweaks
             { "MenuBackground", new[] { "Bild", "Picture" } },
             { "MenuBackgroundStyle", new[] { "Stil", "Style" } },
             { "MenuBackgroundBlur", new[] { "Weichzeichnen", "Blur" } },
+            { "MenuBackgroundFog", new[] { "Nebel", "Fog" } },
             { "MenuBackgroundDim", new[] { "Abdunkeln", "Darken" } },
             { "RainAmount", new[] { "Regen & Schnee: Menge", "Rain & snow: amount" } },
             { "Key", new[] { "Taste Screenshot", "Screenshot key" } },
@@ -247,6 +248,9 @@ namespace GK2Tweaks
             { "Bg1", new[] { "Friedhof im Regen", "Graveyard in the rain" } },
             { "Bg2", new[] { "Überflutetes Viertel", "Flooded quarter" } },
             { "Bg3", new[] { "Stadt bei Nacht", "Town at night" } },
+            { "Bg4", new[] { "Dein Hof", "Your yard" } },
+            { "Bg5", new[] { "Das Dorf", "The village" } },
+            { "Bg6", new[] { "Weinberg am Teich", "Vineyard by the pond" } },
             { "Mine", new[] { "Eigenes Bild (Spielstand)", "My picture (from my save)" } },
             { "Natural", new[] { "Natürlich", "Natural" } },
             { "Gloomy", new[] { "Düster", "Gloomy" } },
@@ -337,6 +341,7 @@ namespace GK2Tweaks
                 if (key == "PhysicsHz") return i == 0 ? T("Standard (50 Hz)", "Default (50 Hz)") : i + " Hz";
                 if (key == "Zoom") return i + " %";
                 if (key == "MenuBackgroundBlur") return i == 0 ? T("Aus", "Off") : i == 1 ? T("Leicht", "Light") : i == 2 ? T("Mittel", "Medium") : T("Stark", "Strong");
+                if (key == "MenuBackgroundFog") return i == 0 ? T("Aus", "Off") : i == 1 ? T("Leicht", "Light") : i == 2 ? T("Mittel", "Medium") : T("Dicht", "Dense");
                 if (key == "MenuBackgroundDim") return i == 0 ? T("Aus", "Off") : i + " %";
                 if (key == "RainAmount") return i == 0 ? T("Aus", "Off") : i + " %";
                 if (key == "Size") return i + " px";

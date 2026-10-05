@@ -3,7 +3,7 @@
 ## 1.7.0 – 2026-10-05
 
 **EN**
-- New: **Main menu backgrounds** – instead of the game's scene: three Vanilla+ pictures (graveyard in the rain, flooded quarter, town at night) or **your own picture from your save** – in game, mod menu → "Use current view as menu background" (taken without HUD). Filters on top: style (natural, gloomy, sepia, night, painting), blur and darken. Pictures are in up to 4K and 32:9.
+- New: **Main menu backgrounds** – instead of the game's scene: six Vanilla+ pictures (graveyard in the rain, flooded quarter, town at night, your yard, the village, vineyard by the pond) or **your own picture from your save** – in game, mod menu → "Use current view as menu background" (taken without HUD). Filters on top: style (natural, gloomy, sepia, night, painting), blur, darken and slowly drifting **fog**. Pictures are in up to 4K and 32:9.
 - New: **Pin town orders** – a pin button on every order, in the order window and in the order list at the warehouse. The pin shows the item and how many are still missing; it disappears by itself once the order is done.
 - New: **Pin alchemy recipes** – the Folio in the alchemy lab now has pin buttons too. Alchemy has no fixed ingredients, so the pin shows the runes you need (red / green / blue).
 - New: **Max button when crafting** – next to the amount, sets it to as many as your ingredients allow (counted like the game: inventory and reachable chests). Controller: "Max" in the button bar at the bottom of the window.
@@ -16,7 +16,7 @@
 - Nexus download is now a plain zip with the files only (no installer scripts), so it isn't flagged anymore.
 
 **DE**
-- Neu: **Hauptmenü-Hintergründe** – statt der Szene des Spiels: drei Vanilla+-Motive (Friedhof im Regen, überflutetes Viertel, Stadt bei Nacht) oder **dein eigenes Bild aus deinem Spielstand** – im Spiel Mod-Menü → „Aktuelle Ansicht als Menü-Hintergrund“ (ohne HUD aufgenommen). Darüber Filter: Stil (natürlich, düster, Sepia, Nacht, Gemälde), Weichzeichnen und Abdunkeln. Bilder in bis zu 4K und 32:9.
+- Neu: **Hauptmenü-Hintergründe** – statt der Szene des Spiels: sechs Vanilla+-Motive (Friedhof im Regen, überflutetes Viertel, Stadt bei Nacht, dein Hof, das Dorf, Weinberg am Teich) oder **dein eigenes Bild aus deinem Spielstand** – im Spiel Mod-Menü → „Aktuelle Ansicht als Menü-Hintergrund“ (ohne HUD aufgenommen). Darüber Filter: Stil (natürlich, düster, Sepia, Nacht, Gemälde), Weichzeichnen, Abdunkeln und langsam ziehender **Nebel**. Bilder in bis zu 4K und 32:9.
 - Neu: **Stadt-Aufträge anpinnen** – an jedem Auftrag gibt es einen Pin-Knopf, im Auftragsfenster und in der Auftragsliste im Lagerhaus. Der Pin zeigt die Ware und wie viel noch fehlt und verschwindet von selbst, sobald der Auftrag erledigt ist.
 - Neu: **Alchemie-Rezepte anpinnen** – auch das Folio im Alchemielabor hat jetzt Pin-Knöpfe. Alchemie hat keine festen Zutaten, deshalb zeigt der Pin die benötigten Runen (rot / grün / blau).
 - Neu: **Max-Knopf beim Herstellen** – neben der Menge, stellt so viele ein, wie deine Zutaten hergeben (gezählt wie im Spiel: Inventar und erreichbare Truhen). Controller: „Max“ in der Tastenleiste unten im Fenster.

@@ -268,7 +268,8 @@ namespace GK2Tweaks
 
         private static bool Steam => Plugin.BenchShotSet.Value == "steam" || Steam16;
         private static bool Steam16 => Plugin.BenchShotSet.Value == "steam16";
-        private static bool MenuBgSet => Plugin.BenchShotSet.Value == "menubg";
+        private static bool MenuBgSet => Plugin.BenchShotSet.Value == "menubg" || MenuBgDry;
+        private static bool MenuBgDry => Plugin.BenchShotSet.Value == "menubgdry";
 
         // 1.7: Motive fuer die Hauptmenue-Hintergruende - jeden Kartenpunkt anreisen und das Spielbild ohne HUD aufnehmen
         private static readonly System.Collections.Generic.List<string> bgIds = new System.Collections.Generic.List<string>();
@@ -284,7 +285,7 @@ namespace GK2Tweaks
                 switch (bgStage)
                 {
                     case 0: // Karte oeffnen (beim ersten Mal: hoechste Grafikqualitaet - Bildrate ist hier egal)
-                        if (bgIndex < 0 && !bgQuality) { bgQuality = true; Try(() => Profiles.Apply("Quality")); TourSet(Plugin.RainAmount, 100); TourSet(Plugin.WideRain, true); bgNext = t + 4f; break; }
+                        if (bgIndex < 0 && !bgQuality) { bgQuality = true; Try(() => Profiles.Apply("Quality")); TourSet(Plugin.RainAmount, MenuBgDry ? 0 : 100); TourSet(Plugin.WideRain, true); bgNext = t + 4f; break; }
                         Try(OpenMap); bgStage = 1; bgNext = t + 3f; break;
                     case 1: // naechsten Kartenpunkt waehlen
                         {
@@ -310,6 +311,17 @@ namespace GK2Tweaks
                                 var ws = WeatherSystem.Instance;
                                 if (ws == null) return;
                                 if (bgIndex == 0) Plugin.Log.LogInfo("[BENCH] weather components: " + string.Join(", ", new System.Collections.Generic.List<string>(ws.components.Keys).ToArray()));
+                                if (MenuBgDry)
+                                {
+                                    // trocken: klares Wetter, alle Regen-/Nebel-Komponenten aus
+                                    // Wetter wie in Zwischensequenzen anhalten (blendet Regen/Nebel ganz aus) und Tageszeit auf Nachmittag
+                                    foreach (string k in new System.Collections.Generic.List<string>(ws.components.Keys))
+                                        if (k.IndexOf("Rain", StringComparison.OrdinalIgnoreCase) >= 0 || k.IndexOf("ist", StringComparison.OrdinalIgnoreCase) >= 0 || k.IndexOf("Fog", StringComparison.OrdinalIgnoreCase) >= 0)
+                                            try { ws.components[k].ClearState(); ws.SetWeatherComponent(k, false); } catch { }
+                                    try { EnvironmentEngine.Instance.SetTimeOfDayFake(0.58f); } catch (Exception e) { Plugin.Log.LogWarning("[BENCH] time: " + e.Message); }
+                                    Plugin.Log.LogInfo("[BENCH] weather clean, time 0.58");
+                                }
+                                else
                                 foreach (string k in ws.components.Keys)
                                     if (k.IndexOf("rain", StringComparison.OrdinalIgnoreCase) >= 0 && k.IndexOf("heavy", StringComparison.OrdinalIgnoreCase) < 0) { ws.SetWeatherComponent(k, true); Plugin.Log.LogInfo("[BENCH] rain on: " + k); break; }
                             });
@@ -317,7 +329,7 @@ namespace GK2Tweaks
                         }
                         {
                             Try(() => { var w = LazyUI.GetWindow<UIMapWindow>(); if (w != null && w.IsShown) w.Close(); });
-                            string p = System.IO.Path.Combine(BepInEx.Paths.BepInExRootPath, "menubg_" + bgIndex.ToString("00") + "_" + bgIds[bgIndex] + ".png");
+                            string p = System.IO.Path.Combine(BepInEx.Paths.BepInExRootPath, (MenuBgDry ? "menubgdry_" : "menubg_") + bgIndex.ToString("00") + "_" + bgIds[bgIndex] + ".png");
                             Plugin.Instance.StartCoroutine(MenuBackground.CaptureRoutine(p, false, 2));
                             bgStage = 0; bgNext = t + 8f; break;
                         }

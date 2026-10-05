@@ -708,6 +708,7 @@ namespace GK2Tweaks
                     DrawEntry(Plugin.MenuBgStyle);
                     DrawEntry(Plugin.MenuBgBlur);
                     DrawEntry(Plugin.MenuBgDim);
+                    DrawEntry(Plugin.MenuBgFog);
                 }
                 if (WeekPlan.InGame)
                 {
