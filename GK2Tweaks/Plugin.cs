@@ -39,7 +39,7 @@ namespace GK2Tweaks
         internal static ConfigEntry<bool> FullRefund, MoveObjects, TradeLikes, ZombieRename, Celebrated, CraftMaxButton, Respec;
         internal static ConfigEntry<string> HudClockMode;
         internal static ConfigEntry<int> BackupCount, BackupMinutes, RainAmount, MenuBgBlur, MenuBgDim, MenuBgFog;
-        internal static ConfigEntry<string> MenuBg, MenuBgStyle;
+        internal static ConfigEntry<string> MenuBg, MenuBgStyle, MenuBgFogTone;
         internal static ConfigEntry<bool> ShowOverlay, CheckUpdates;
         internal static ConfigEntry<int> StatsLogSeconds;
         internal static ConfigEntry<string> Language, LastSeenVersion, LastGameVersion;
@@ -230,6 +230,9 @@ namespace GK2Tweaks
             MenuBgFog = Config.Bind("Interface", "MenuBackgroundFog", 1, new ConfigDescription(
                 "Slowly drifting fog over the main menu picture.",
                 new AcceptableValueList<int>(0, 1, 2, 3)));
+            MenuBgFogTone = Config.Bind("Interface", "MenuBackgroundFogTone", "FogDark", new ConfigDescription(
+                "Fog color over the main menu picture: light mist or dark, gloomy fog.",
+                new AcceptableValueList<string>("FogDark", "FogLight")));
             RainAmount = Config.Bind("Interface", "RainAmount", 100, new ConfigDescription(
                 "Amount of rain and snow particles in percent. Less rain helps on weak PCs and the Steam Deck, 0 turns the particles off (the weather itself stays).",
                 new AcceptableValueList<int>(100, 75, 50, 25, 0)));

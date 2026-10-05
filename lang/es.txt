@@ -537,3 +537,7 @@ Vineyard by the pond => Viñedo junto al estanque
 Fog => Niebla
 Dense => Densa
 Slowly drifting fog over the main menu picture. => Niebla que se desplaza lentamente sobre la imagen del menú principal.
+Fog color => Color de la niebla
+Gloomy (dark) => Sombría (oscura)
+Light mist => Bruma clara
+Fog color over the main menu picture: light mist or dark, gloomy fog. => Color de la niebla sobre la imagen del menú principal: bruma clara o niebla oscura y sombría.

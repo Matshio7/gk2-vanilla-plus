@@ -537,3 +537,7 @@ Vineyard by the pond => 池塘边的葡萄园
 Fog => 雾
 Dense => 浓
 Slowly drifting fog over the main menu picture. => 主菜单图片上缓缓飘动的雾。
+Fog color => 雾的颜色
+Gloomy (dark) => 阴郁（暗）
+Light mist => 淡雾
+Fog color over the main menu picture: light mist or dark, gloomy fog. => 主菜单图片上雾的颜色：淡雾或阴暗的浓雾。

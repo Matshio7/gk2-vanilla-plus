@@ -131,6 +131,10 @@ namespace GK2Tweaks
         {
             Texture2D fog = FogTexture();
             float strength = Plugin.MenuBgFog.Value == 1 ? 0.35f : Plugin.MenuBgFog.Value == 2 ? 0.55f : 0.8f;
+            // dunkler Nebel: gleiche Schwaden, fast schwarz-blau eingefaerbt und etwas kraeftiger - dunkelt die Szene ab
+            bool dark = Plugin.MenuBgFogTone.Value != "FogLight";
+            Color tint = dark ? new Color(0.06f, 0.065f, 0.085f, 1f) : new Color(0.5f, 0.5f, 0.5f, 1f);
+            if (dark) strength *= 1.5f;
             // Graphics.DrawTexture verdoppelt Farbe und Deckkraft (GUI-Shader) - daher 0.5 = 1x
             float tm = Time.unscaledTime;
             RenderTexture prev = RenderTexture.active;
@@ -139,8 +143,8 @@ namespace GK2Tweaks
             GL.LoadPixelMatrix(0, w, h, 0);
             // Ebene 1: grosse Schwaden, langsam nach rechts; Ebene 2: kleiner, schneller nach links
             float tiles1 = w / (float)h * 0.9f, tiles2 = w / (float)h * 1.6f;
-            Graphics.DrawTexture(new Rect(0, 0, w, h), fog, new Rect(-tm * 0.006f, tm * 0.0015f, tiles1, 0.9f), 0, 0, 0, 0, new Color(0.5f, 0.5f, 0.5f, 0.5f * 0.5f * strength));
-            Graphics.DrawTexture(new Rect(0, 0, w, h), fog, new Rect(0.37f + tm * 0.011f, 0.21f - tm * 0.002f, tiles2, 1.6f), 0, 0, 0, 0, new Color(0.5f, 0.5f, 0.5f, 0.32f * 0.5f * strength));
+            Graphics.DrawTexture(new Rect(0, 0, w, h), fog, new Rect(-tm * 0.006f, tm * 0.0015f, tiles1, 0.9f), 0, 0, 0, 0, new Color(tint.r, tint.g, tint.b, 0.5f * 0.5f * strength));
+            Graphics.DrawTexture(new Rect(0, 0, w, h), fog, new Rect(0.37f + tm * 0.011f, 0.21f - tm * 0.002f, tiles2, 1.6f), 0, 0, 0, 0, new Color(tint.r, tint.g, tint.b, 0.32f * 0.5f * strength));
             GL.PopMatrix();
             RenderTexture.active = prev;
         }

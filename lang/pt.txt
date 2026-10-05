@@ -533,3 +533,7 @@ Vineyard by the pond => Vinhedo junto ao lago
 Fog => Névoa
 Dense => Densa
 Slowly drifting fog over the main menu picture. => Névoa que se move devagar sobre a imagem do menu principal.
+Fog color => Cor da névoa
+Gloomy (dark) => Sombria (escura)
+Light mist => Névoa clara
+Fog color over the main menu picture: light mist or dark, gloomy fog. => Cor da névoa sobre a imagem do menu principal: névoa clara ou névoa escura e sombria.
