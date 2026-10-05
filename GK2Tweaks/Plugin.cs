@@ -14,7 +14,7 @@ namespace GK2Tweaks
     {
         public const string Guid = "mats.gk2.tweaks";
         public const string PluginName = "GK2 Tweaks";
-        public const string PluginVersion = "1.6.3";
+        public const string PluginVersion = "1.7.0";
         internal const string Keep = "Default";
 
         internal static Plugin Instance;
@@ -38,7 +38,8 @@ namespace GK2Tweaks
         internal static ConfigEntry<bool> WeekPlanNotify, InstantRemove, HudClock, HudClock12h, EscLeave, FasterTransitions, LessMemoryCleanup;
         internal static ConfigEntry<bool> FullRefund, MoveObjects, TradeLikes, ZombieRename, Celebrated, CraftMaxButton, Respec;
         internal static ConfigEntry<string> HudClockMode;
-        internal static ConfigEntry<int> BackupCount, BackupMinutes, RainAmount;
+        internal static ConfigEntry<int> BackupCount, BackupMinutes, RainAmount, MenuBgBlur, MenuBgDim;
+        internal static ConfigEntry<string> MenuBg, MenuBgStyle;
         internal static ConfigEntry<bool> ShowOverlay, CheckUpdates;
         internal static ConfigEntry<int> StatsLogSeconds;
         internal static ConfigEntry<string> Language, LastSeenVersion, LastGameVersion;
@@ -214,6 +215,18 @@ namespace GK2Tweaks
             MenuScale = Config.Bind("Interface", "MenuScale", 0, new ConfigDescription(
                 "Size of the mod menu, FPS display and pinned list. 0 = automatic (follows the screen height).",
                 new AcceptableValueList<int>(0, 80, 90, 100, 110, 125, 150, 175, 200)));
+            MenuBg = Config.Bind("Interface", "MenuBackground", "Scene", new ConfigDescription(
+                "Main menu background: the game's animated scene (Scene), one of three Vanilla+ pictures, or your own picture from your save (Mine).",
+                new AcceptableValueList<string>("Scene", "Bg1", "Bg2", "Bg3", "Mine")));
+            MenuBgStyle = Config.Bind("Interface", "MenuBackgroundStyle", "Gloomy", new ConfigDescription(
+                "Color style of the main menu picture.",
+                new AcceptableValueList<string>("Natural", "Gloomy", "Sepia", "Night", "Painting")));
+            MenuBgBlur = Config.Bind("Interface", "MenuBackgroundBlur", 1, new ConfigDescription(
+                "Blur of the main menu picture, so the menu stays in focus.",
+                new AcceptableValueList<int>(0, 1, 2, 3)));
+            MenuBgDim = Config.Bind("Interface", "MenuBackgroundDim", 25, new ConfigDescription(
+                "Darkens the main menu picture in percent, so the buttons stay easy to read.",
+                new AcceptableValueList<int>(0, 15, 25, 40, 55)));
             RainAmount = Config.Bind("Interface", "RainAmount", 100, new ConfigDescription(
                 "Amount of rain and snow particles in percent. Less rain helps on weak PCs and the Steam Deck, 0 turns the particles off (the weather itself stays).",
                 new AcceptableValueList<int>(100, 75, 50, 25, 0)));
@@ -358,6 +371,7 @@ namespace GK2Tweaks
             SafeMode.Run("Zoom", () => CameraZoom.Tick(dt));
             SafeMode.Run("Screenshots", HiResShot.Tick);
             SafeMode.Run("Ultrawide", MenuSideFill.Tick);
+            SafeMode.Run("MenuBackground", MenuBackground.Tick);
             SafeMode.Run("SkipLogos", SkipLogosPatch.Tick);
 #if DEV
             UiDump.Tick();

@@ -115,7 +115,7 @@ namespace GK2Tweaks
                     break;
 
                 case Phase.Warmup:
-                    if (Plugin.BenchMenuShot.Value) { if (Steam16) Steam16Tour(inPhase); else if (Steam) SteamTour(inPhase); else if (Features) FeatureTour(inPhase); else MenuShot(inPhase); }
+                    if (Plugin.BenchMenuShot.Value) { if (MenuBgSet) MenuBgTour(inPhase); else if (Steam16) Steam16Tour(inPhase); else if (Steam) SteamTour(inPhase); else if (Features) FeatureTour(inPhase); else MenuShot(inPhase); }
                     if (inPhase >= Plugin.BenchWarmup.Value)
                     {
                         if (Plugin.Instance.Gui.MenuOpen) Plugin.Instance.Gui.SetMenu(false);
@@ -268,6 +268,63 @@ namespace GK2Tweaks
 
         private static bool Steam => Plugin.BenchShotSet.Value == "steam" || Steam16;
         private static bool Steam16 => Plugin.BenchShotSet.Value == "steam16";
+        private static bool MenuBgSet => Plugin.BenchShotSet.Value == "menubg";
+
+        // 1.7: Motive fuer die Hauptmenue-Hintergruende - jeden Kartenpunkt anreisen und das Spielbild ohne HUD aufnehmen
+        private static readonly System.Collections.Generic.List<string> bgIds = new System.Collections.Generic.List<string>();
+        private float bgNext = 6f;
+        private int bgIndex = -1, bgStage;
+        private bool bgQuality;
+        private int bgRainAt = -1;
+        private void MenuBgTour(float t)
+        {
+            if (t < bgNext || MenuBackground.Capturing) return;
+            try
+            {
+                switch (bgStage)
+                {
+                    case 0: // Karte oeffnen (beim ersten Mal: hoechste Grafikqualitaet - Bildrate ist hier egal)
+                        if (bgIndex < 0 && !bgQuality) { bgQuality = true; Try(() => Profiles.Apply("Quality")); TourSet(Plugin.RainAmount, 100); TourSet(Plugin.WideRain, true); bgNext = t + 4f; break; }
+                        Try(OpenMap); bgStage = 1; bgNext = t + 3f; break;
+                    case 1: // naechsten Kartenpunkt waehlen
+                        {
+                            var all = new System.Collections.Generic.List<UIMapMilestone>();
+                            foreach (UIMapMilestone m in UnityEngine.Object.FindObjectsByType<UIMapMilestone>(FindObjectsSortMode.None))
+                                if (m != null && m.WgoData != null && m.WgoData.Definition != null && m.UIMapMilestoneData != null) all.Add(m);
+                            all.Sort((x, y) => string.CompareOrdinal(x.WgoData.Definition.id, y.WgoData.Definition.id));
+                            if (bgIds.Count == 0) foreach (var m in all) { bgIds.Add(m.WgoData.Definition.id); Plugin.Log.LogInfo("[BENCH] bg milestone " + m.WgoData.Definition.id); }
+                            bgIndex++;
+                            if (bgIndex >= bgIds.Count || bgIndex >= 14) { Try(() => LazyUI.GetWindow<UIMapWindow>().Close()); bgStage = 9; Plugin.Log.LogInfo("[BENCH] bg tour done"); break; }
+                            UIMapMilestone pick = all.Find(m => m.WgoData.Definition.id == bgIds[bgIndex]);
+                            MapPageWidget page = UnityEngine.Object.FindFirstObjectByType<MapPageWidget>();
+                            Plugin.Log.LogInfo("[BENCH] bg teleport " + bgIds[bgIndex]);
+                            if (pick != null && page != null) page.OnPressMapMilestone(pick);
+                            bgStage = 2; bgNext = t + 16f; break;
+                        }
+                    case 2: // aufnehmen - vorher Regen einschalten (Wetter wird beim Ortswechsel neu gesetzt)
+                        if (bgRainAt != bgIndex)
+                        {
+                            bgRainAt = bgIndex;
+                            Try(() =>
+                            {
+                                var ws = WeatherSystem.Instance;
+                                if (ws == null) return;
+                                if (bgIndex == 0) Plugin.Log.LogInfo("[BENCH] weather components: " + string.Join(", ", new System.Collections.Generic.List<string>(ws.components.Keys).ToArray()));
+                                foreach (string k in ws.components.Keys)
+                                    if (k.IndexOf("rain", StringComparison.OrdinalIgnoreCase) >= 0 && k.IndexOf("heavy", StringComparison.OrdinalIgnoreCase) < 0) { ws.SetWeatherComponent(k, true); Plugin.Log.LogInfo("[BENCH] rain on: " + k); break; }
+                            });
+                            bgNext = t + 7f; break;
+                        }
+                        {
+                            Try(() => { var w = LazyUI.GetWindow<UIMapWindow>(); if (w != null && w.IsShown) w.Close(); });
+                            string p = System.IO.Path.Combine(BepInEx.Paths.BepInExRootPath, "menubg_" + bgIndex.ToString("00") + "_" + bgIds[bgIndex] + ".png");
+                            Plugin.Instance.StartCoroutine(MenuBackground.CaptureRoutine(p, false, 2));
+                            bgStage = 0; bgNext = t + 8f; break;
+                        }
+                }
+            }
+            catch (Exception e) { Plugin.Log.LogWarning("[BENCH] bg tour: " + e.Message); bgStage = 0; bgNext = t + 4f; }
+        }
         private static bool Features => Plugin.BenchShotSet.Value == "features";
         private bool savesShot;
         private bool featStarted;

@@ -16,7 +16,7 @@ namespace GK2Tweaks
                 Camera cam = CameraSystem.Instance != null ? CameraSystem.Instance.WorldCamera : null;
                 if (cam == null) return;
                 MenuSideFill f = cam.GetComponent<MenuSideFill>();
-                bool want = Plugin.MenuExtend.Value && MainGame.Instance != null
+                bool want = Plugin.MenuExtend.Value && !MenuBackground.Active && MainGame.Instance != null
                     && MainGame.Instance.gameState == MainGame.GameState.MainMenu
                     && (float)Screen.width / Screen.height > 16f / 9f + 0.05f;
                 if (f == null) { if (!want) return; f = cam.gameObject.AddComponent<MenuSideFill>(); }

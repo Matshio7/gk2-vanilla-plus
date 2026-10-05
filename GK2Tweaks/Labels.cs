@@ -80,6 +80,10 @@ namespace GK2Tweaks
             { "HighContrast", new[] { "Hoher Kontrast", "High contrast" } },
             { "OledBlack", new[] { "OLED-Schwarz", "OLED black" } },
             { "WideRain", new[] { "Regen über ganze Breite", "Full-width rain" } },
+            { "MenuBackground", new[] { "Bild", "Picture" } },
+            { "MenuBackgroundStyle", new[] { "Stil", "Style" } },
+            { "MenuBackgroundBlur", new[] { "Weichzeichnen", "Blur" } },
+            { "MenuBackgroundDim", new[] { "Abdunkeln", "Darken" } },
             { "RainAmount", new[] { "Regen & Schnee: Menge", "Rain & snow: amount" } },
             { "Key", new[] { "Taste Screenshot", "Screenshot key" } },
             { "Scale", new[] { "Auflösung", "Resolution" } },
@@ -239,6 +243,16 @@ namespace GK2Tweaks
         {
             { "Default", new[] { "wie Grafikstufe", "as graphics tier" } },
             { "Game", new[] { "wie im Spielmenü", "game setting" } },
+            { "Scene", new[] { "Standard (Szene des Spiels)", "Default (game scene)" } },
+            { "Bg1", new[] { "Friedhof im Regen", "Graveyard in the rain" } },
+            { "Bg2", new[] { "Überflutetes Viertel", "Flooded quarter" } },
+            { "Bg3", new[] { "Stadt bei Nacht", "Town at night" } },
+            { "Mine", new[] { "Eigenes Bild (Spielstand)", "My picture (from my save)" } },
+            { "Natural", new[] { "Natürlich", "Natural" } },
+            { "Gloomy", new[] { "Düster", "Gloomy" } },
+            { "Sepia", new[] { "Sepia", "Sepia" } },
+            { "Night", new[] { "Nacht", "Night" } },
+            { "Painting", new[] { "Gemälde", "Painting" } },
             { "Limit", new[] { "Software-Limit", "Software limit" } },
             { "VSync", new[] { "VSync", "VSync" } },
             { "Off", new[] { "Aus", "Off" } },
@@ -322,6 +336,8 @@ namespace GK2Tweaks
                 if (key == "TargetFps") return i == 0 ? T("Unbegrenzt", "Unlimited") : i + " FPS";
                 if (key == "PhysicsHz") return i == 0 ? T("Standard (50 Hz)", "Default (50 Hz)") : i + " Hz";
                 if (key == "Zoom") return i + " %";
+                if (key == "MenuBackgroundBlur") return i == 0 ? T("Aus", "Off") : i == 1 ? T("Leicht", "Light") : i == 2 ? T("Mittel", "Medium") : T("Stark", "Strong");
+                if (key == "MenuBackgroundDim") return i == 0 ? T("Aus", "Off") : i + " %";
                 if (key == "RainAmount") return i == 0 ? T("Aus", "Off") : i + " %";
                 if (key == "Size") return i + " px";
                 if (key == "InteriorZoom") return i == 0 ? T("wie draußen", "same as outside") : i + " %";

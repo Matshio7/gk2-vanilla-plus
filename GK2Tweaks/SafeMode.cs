@@ -47,6 +47,7 @@ namespace GK2Tweaks
             { "MoveObjects", new[] { "Objekte verschieben", "Move objects" } },
             { "TradeLikes", new[] { "Handel: passende Menge", "Trade: right amount" } },
             { "ZombieRename", new[] { "Zombies umbenennen", "Rename zombies" } },
+            { "MenuBackground", new[] { "Hauptmenü-Hintergrund", "Main menu background" } },
             { "Respec", new[] { "Talente & Forschung zurückerstatten", "Refund talents & research" } },
             { "CraftMax", new[] { "Herstellen: Max-Knopf", "Crafting: Max button" } },
         };

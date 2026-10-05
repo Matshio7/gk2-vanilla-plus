@@ -700,6 +700,23 @@ namespace GK2Tweaks
                 DrawEntry(Plugin.SkipIntro);
                 DrawEntry(Plugin.MenuExtend);
                 DrawEntry(Plugin.MenuModdedLabel);
+
+                Header(Labels.T("Hauptmenü-Hintergrund", "Main menu background"));
+                DrawEntry(Plugin.MenuBg);
+                if (Plugin.MenuBg.Value != "Scene")
+                {
+                    DrawEntry(Plugin.MenuBgStyle);
+                    DrawEntry(Plugin.MenuBgBlur);
+                    DrawEntry(Plugin.MenuBgDim);
+                }
+                if (WeekPlan.InGame)
+                {
+                    if (Btn(Labels.T("Aktuelle Ansicht als Menü-Hintergrund", "Use current view as menu background"), buttonStyle, GUILayout.Width(420))) Defer(MenuBackground.CaptureMine);
+                    GUILayout.Label(Labels.T("Nimmt das Spielbild ohne HUD auf und stellt „Eigenes Bild“ ein. Zu sehen beim nächsten Besuch im Hauptmenü.", "Captures the game view without HUD and selects \"My picture\". Shown next time you are in the main menu."), smallStyle);
+                }
+                else if (Plugin.MenuBg.Value == "Mine" && !MenuBackground.HasMine)
+                    GUILayout.Label(Labels.T("Noch kein eigenes Bild: im Spiel hier „Aktuelle Ansicht als Menü-Hintergrund“ wählen.", "No picture yet: in game, choose \"Use current view as menu background\" here."), smallStyle);
+
                 DrawEntry(Plugin.GameMenuButton);
 #if !NEXUS
                 DrawEntry(Plugin.CheckUpdates);

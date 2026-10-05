@@ -19,6 +19,8 @@ cp "$ROOT/GK2Tweaks/bin/Release/GK2Tweaks.dll" "$F/BepInEx/plugins/GK2Tweaks/"
 cp "$ROOT/LICENSE.md" "$F/BepInEx/GK2VanillaPlus/LICENSE.md"
 # Sprachen: eingebaut in der DLL; die Vorlage liegt fuer eigene Uebersetzungen bei
 python3 "$ROOT/tools/extract_strings.py" >/dev/null
+# Hauptmenue-Hintergruende (eigene Dateien statt im DLL: Workshop laedt sie nur bei Aenderung neu)
+mkdir -p "$F/BepInEx/GK2VanillaPlus/MenuBackground"; cp "$ROOT"/docs/menubg/bg?.jpg "$F/BepInEx/GK2VanillaPlus/MenuBackground/"
 mkdir -p "$F/BepInEx/GK2VanillaPlus/lang"; cp "$ROOT/lang/_template.txt" "$F/BepInEx/GK2VanillaPlus/lang/translation-template.txt"
 # Textdateien fuer Windows: UTF-8 mit BOM, CRLF, Versionsnummer eintragen
 winText() { python3 - "$1" "$2" "$V" <<'PY'
