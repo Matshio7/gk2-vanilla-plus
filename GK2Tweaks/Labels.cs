@@ -174,7 +174,7 @@ namespace GK2Tweaks
             { "SmoothZoom", "Weicher Übergang, wenn sich der Zoom ändert." },
             { "MenuScale", "Größe von Mod-Menü, FPS-Anzeige und Pin-Liste. Automatisch = passend zur Bildschirmhöhe." },
             { "RainAmount", "Wie viele Regentropfen gezeichnet werden. Weniger Regen hilft auf schwachen PCs und dem Steam Deck, 0 % schaltet die Partikel ab (das Wetter selbst bleibt)." },
-            { "WideRain", "Regen und Schnee über den ganzen Bildschirm – auf Ultrawide-Monitoren und beim Herauszoomen (das Spiel füllt nur einen 16:9-Bereich)." },
+            { "WideRain", "Regen über den ganzen Bildschirm – auf Ultrawide-Monitoren und beim Herauszoomen (das Spiel füllt nur einen 16:9-Bereich)." },
             { "OledBlack", "Reines Schwarz statt Dunkelgrau um die Karte herum (z. B. außerhalb der Kirche oder am Levelrand). Gut für OLED-Bildschirme." },
             { "HighContrast", "Stärkerer Kontrast: dunkler Hintergrund für die Pin-Liste, fette und hellere Haben/Brauchen-Zahlen, größere Tooltips." },
             { "Key", "Taste für einen Screenshot (gespeichert in BepInEx/GK2VanillaPlus/Screenshots)." },
