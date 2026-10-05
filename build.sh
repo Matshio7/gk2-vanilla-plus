@@ -52,6 +52,8 @@ if [ -d "$BOTTLE" ]; then rm -rf "$BOTTLE/GK2VanillaPlus-Workshop"; cp -R "$R/wo
 NX="$R/stage/nexus/$N"; rm -rf "$R/stage/nexus"; mkdir -p "$R/stage/nexus"; cp -R "$S" "$NX"
 cp "$ROOT/GK2Tweaks/bin/Nexus/GK2Tweaks.dll" "$NX/installer/files/BepInEx/plugins/GK2Tweaks/"
 rm -f "$NX/installer/files/BepInEx/GK2VanillaPlus/update.ps1"
+# Nexus: Menue-Hintergruende auf 3840 px verkleinern (Upload-Datei bleibt unter 10 MB)
+for j in "$NX"/installer/files/BepInEx/GK2VanillaPlus/MenuBackground/bg?.jpg; do sips -Z 3840 -s format jpeg -s formatOptions 80 "$j" --out "$j" >/dev/null; done
 python3 - "$NX" <<'PY'
 import re, sys
 nx = sys.argv[1]
