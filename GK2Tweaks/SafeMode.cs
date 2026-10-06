@@ -69,7 +69,6 @@ namespace GK2Tweaks
                 case "InstantRemovePatch": return "InstantRemove";
                 case "MoveInputPatch": case "MoveTargetPatch": case "MoveCellsPatch": case "MoveBuildPatch": case "MoveDisablePatch": case "MoveRemoveLabelPatch": return "MoveObjects";
                 case "TradePressPatch": case "TradeCountPatch": return "TradeLikes";
-                case "CraftMaxTipPatch": return "CraftMax";
                 case "RespecOverPatch": case "RespecOutPatch": case "RespecTechPatch": return "Respec";
                 case "ZoneRedrawPatch": return "HudClock";
                 case "TeleportPatch": case "FadeInPatch": case "FadeOutPatch": case "CleanupPatch": return "Transitions";
@@ -179,7 +178,6 @@ namespace GK2Tweaks
             M("Respec", () => typeof(TechTreePageWidget), "OnTechClicked");
             M("Respec", () => typeof(TechTreePageWidget), "UpdateElements");
             M("CraftMax", () => typeof(UIBaseCraftSelectionWindow), "ChangeCraftCount");
-            M("CraftMax", () => typeof(UIBaseCraftSelectionWindow), "AddCraftCountGamepadTips");
             M("TradeLikes", () => typeof(Trading), "OnPlayerItemPress1");
             F("TradeLikes", () => typeof(Trading), "cachedWindowData");
             F("TradeLikes", () => typeof(Trading), "sellInventory");

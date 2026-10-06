@@ -1,5 +1,15 @@
 # Changelog
 
+## 1.7.1 – 2026-10-06
+
+**EN**
+- **Fix:** crafting windows could get stuck (could not be closed, nothing could be crafted) with the new Max button. The Max button no longer touches the game's own button bar; on a controller a small "[Y] Max" hint is shown next to the amount instead.
+- New: **Support** button at the bottom of the mod menu – opens the Ko-fi page. The mod stays free, nothing depends on it.
+
+**DE**
+- **Fix:** Herstellen-Fenster konnten mit dem neuen Max-Knopf hängen bleiben (ließen sich nicht schließen, nichts herstellen). Der Max-Knopf greift nicht mehr in die Tastenleiste des Spiels ein; am Controller steht stattdessen ein kleiner Hinweis „[Y] Max“ neben der Menge.
+- Neu: Knopf **„Unterstützen“** unten im Mod-Menü – öffnet die Ko-fi-Seite. Der Mod bleibt kostenlos, nichts hängt daran.
+
 ## 1.7.0 – 2026-10-05
 
 **EN**

@@ -8,26 +8,8 @@ namespace GK2Tweaks
     // Herstellen: Knopf "Max" neben dem Plus der Mengenwahl - setzt die Anzahl auf so viele, wie die
     // vorhandenen Zutaten hergeben (gezaehlt wie im Spiel: Inventar + erreichbare Truhen der Werkbank).
     // Zutaten in der Warteschlange werden erst beim Start verbraucht, ein schon laufender Durchgang zaehlt extra.
-    // Controller: "Max" erscheint wie "+" und "-" in der Tastenleiste des Fensters (mit dem Tastensymbol des Spiels)
-    [HarmonyPatch(typeof(UIBaseCraftSelectionWindow), "AddCraftCountGamepadTips")]
-    internal static class CraftMaxTipPatch
-    {
-        private static void Postfix(UIBaseCraftSelectionWindow __instance, System.Collections.Generic.List<LazyGameKeyTip> tips)
-        {
-            if (tips == null || !Plugin.CraftMaxButton.Value || !SafeMode.On("CraftMax")) return;
-            try
-            {
-                if (CraftMax.PlusAnchor(__instance) == null) return;
-                GameKey k = PadExtra.KeyFor(__instance);
-                if (k == null) return;
-                var d = CraftMax.Data(__instance);
-                int t = CraftMax.Target(d);
-                tips.Add(new LazyGameKeyTip(k, "Max", t > 0 && d != null && d.CraftsCount != t, true, false));
-            }
-            catch (Exception e) { SafeMode.Fail("CraftMax", e); }
-        }
-    }
-
+    // 1.7.1: kein Eingriff mehr in die Tastenleiste des Spiels (Fenster blieben bei manchen Spielern haengen).
+    // Controller: Hinweis "[Y] Max" als eigener Text neben dem Plus, die Taste setzt die Menge.
     internal static class CraftMax
     {
         // offenes Herstell-Fenster (Werkbank, Brennstoff, Einzel-Herstellung) oder null
@@ -81,7 +63,6 @@ namespace GK2Tweaks
             int delta = t - d.CraftsCount;
             if (delta == 0) return false;
             Traverse.Create(w).Method("ChangeCraftCount", new[] { typeof(int) }).GetValue(delta);
-            try { Traverse.Create(w).Method("PrintTips").GetValue(); } catch { }
             try { LazyAudio.PlayAndForget("gui_click"); } catch { }
             return true;
         }

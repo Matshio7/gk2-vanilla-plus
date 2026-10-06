@@ -80,6 +80,8 @@ namespace GK2Tweaks
         private UIBaseCraftSelectionWindow craftWin;
         private RectTransform craftPlus;
         private int craftTarget;
+        private float craftTargetAt;
+        private UIBaseCraftSelectionWindow craftTargetWin;
 
         internal bool InGameUiWant => renameZombie != null || tradeAnchor != null || moveHint != null || craftPlus != null || respecAnchor != null;
         internal bool Renaming => renaming && renameZombie != null;
@@ -160,7 +162,11 @@ namespace GK2Tweaks
                     if (craftWin != null)
                     {
                         craftPlus = CraftMax.PlusAnchor(craftWin);
-                        craftTarget = CraftMax.Target(CraftMax.Data(craftWin));
+                        if (craftWin != craftTargetWin || Time.realtimeSinceStartup >= craftTargetAt)
+                        {
+                            craftTargetWin = craftWin; craftTargetAt = Time.realtimeSinceStartup + 0.5f;
+                            craftTarget = CraftMax.Target(CraftMax.Data(craftWin));
+                        }
                         if (craftPlus == null) craftWin = null;
                     }
                 }
@@ -198,7 +204,7 @@ namespace GK2Tweaks
                 {
                     if (renameZombie != null && !renaming && PadExtra.Down(renameWindow)) ZombieRename.Roll(renameZombie, renameWindow);
                     UIVendorWindow vw = tradeAnchor != null ? TradeHelper.Cached<UIVendorWindow>() : null;
-                    if (craftWin != null && PadExtra.Down(craftWin)) CraftMax.Apply(craftWin);
+                    if (craftWin != null && PadExtra.Down(craftWin)) { CraftMax.Apply(craftWin); craftTargetAt = 0; }
                     if (vw != null && PadExtra.Down(vw))
                     {
                         int n = TradeHelper.FillAll();
@@ -436,7 +442,19 @@ namespace GK2Tweaks
                 Vector2 sz = st.CalcSize(c);
                 GUI.Label(new Rect(nr.center.x - sz.x / 2f, nr.yMax + 4f, sz.x, sz.y), c, st);
             }
-            // Controller: kein eigener Knopf - "Max" steht in der Tastenleiste des Spiels (CraftMaxTipPatch)
+            // Controller: nur ein kleiner Hinweis "[Y] Max" rechts neben dem Plus (die Taste setzt die Menge)
+            if (craftPlus != null && craftWin != null && LazyInput.IsGamepadActive)
+            {
+                string pn = PadExtra.Name(craftWin);
+                if (pn != null)
+                {
+                    Rect pr = GuiRect(craftPlus, scale);
+                    var c = new GUIContent("[" + pn + "] Max");
+                    var st = new GUIStyle(igHint) { fontSize = 13, padding = new RectOffset(6, 6, 2, 2) };
+                    Vector2 sz = st.CalcSize(c);
+                    GUI.Label(new Rect(pr.xMax + 4f, pr.center.y - sz.y / 2f, sz.x, sz.y), c, st);
+                }
+            }
             if (craftPlus != null && craftWin != null && !LazyInput.IsGamepadActive)
             {
                 try
@@ -455,7 +473,7 @@ namespace GK2Tweaks
                     var ls = new GUIStyle(tradeLabel) { alignment = TextAnchor.MiddleCenter, fontSize = 14 };
                     GUI.Label(b, c, ls);
                     GUI.color = oc;
-                    if (hit && can) CraftMax.Apply(craftWin);
+                    if (hit && can) { CraftMax.Apply(craftWin); craftTargetAt = 0; }
                 }
                 catch (Exception e) { SafeMode.Fail("CraftMax", e); }
             }
