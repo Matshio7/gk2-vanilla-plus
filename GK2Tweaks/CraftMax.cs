@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using HarmonyLib;
 using LazyBearTechnology;
 using UnityEngine;
@@ -36,22 +37,69 @@ namespace GK2Tweaks
             return b != null && b.gameObject.activeInHierarchy ? b.transform as RectTransform : null;
         }
 
-        // wie oft das Rezept mit den aktuell gewaehlten Zutaten hergestellt werden kann (-1 = unbekannt)
+        // wie oft das Rezept mit den aktuell gewaehlten Zutaten hergestellt werden kann (-1 = unbekannt / gar nicht).
+        // 1.7.2: vorsichtig rechnen - lieber eins zu wenig als zu viel. Ein Auftrag mit mehr Durchgaengen als Zutaten
+        // bleibt im Spiel sonst als "wartet" an der Werkbank haengen und blockiert sie (auch ohne Mod im Spielstand).
+        // - kein +1 mehr fuer einen schon laufenden Durchgang
+        // - Zutaten, die noch nicht gestartete Auftraege in der Warteschlange brauchen, sind reserviert
+        // - Werkzeug mit Haltbarkeit (Saege ...): so viele Durchgaenge, wie die Haltbarkeit hergibt
         internal static int Target(UIBaseCraftSelectionWindowData d)
         {
             if (d == null || d.CurrentNeedItems == null || d.WgoData == null) return -1;
             MultiInventory inv = d.WgoData.GetCraftableMultiInventory();
+            var reserved = Reserved(d);
+            CraftDef def = d.CraftDefinition;
+            string toolId = def != null && def.hasDurabilityUseItem && def.durabilityUseItem != null ? def.durabilityUseItem.Id : null;
             int max = int.MaxValue;
             foreach (NeedItemData n in d.CurrentNeedItems)
             {
-                if (n == null || string.IsNullOrEmpty(n.Id)) continue;
+                if (n == null || string.IsNullOrEmpty(n.Id) || n.Id == toolId) continue;
                 int per = n.GetCount(d.WgoData);
                 if (per <= 0) continue;
-                max = Math.Min(max, inv.GetTotalCount(n.Id) / per);
+                reserved.TryGetValue(n.Id, out int r);
+                max = Math.Min(max, Math.Max(0, inv.GetTotalCount(n.Id) - r) / per);
             }
-            if (max == int.MaxValue) return -1;
-            bool started = d.CraftQueue != null && d.CraftQueue.Count > 0 && d.CraftQueue[0].IsStarted;
-            return Math.Max(1, max + (started ? 1 : 0));
+            if (toolId != null) max = Math.Min(max, ToolUses(d, toolId, def.needItemsDurabilityUse));
+            if (max == int.MaxValue || max < 1) return -1;
+            return max;
+        }
+
+        private static Dictionary<string, int> Reserved(UIBaseCraftSelectionWindowData d)
+        {
+            var res = new Dictionary<string, int>();
+            try
+            {
+                if (d.CraftQueue == null) return res;
+                foreach (CraftElementBase e in d.CraftQueue)
+                {
+                    if (e == null || e.IsStarted || e.Requirements == null || e.Count <= 0) continue;
+                    foreach (NeedItemData r in e.Requirements)
+                    {
+                        if (r == null || string.IsNullOrEmpty(r.Id)) continue;
+                        res.TryGetValue(r.Id, out int have);
+                        res[r.Id] = have + r.GetCount(d.WgoData) * e.Count;
+                    }
+                }
+            }
+            catch (Exception ex) { Plugin.Log.LogWarning("CraftMax reserved: " + ex.Message); }
+            return res;
+        }
+
+        // Durchgaenge, die die Werkzeuge im Inventar des Arbeiters (Spieler) noch schaffen
+        private static int ToolUses(UIBaseCraftSelectionWindowData d, string toolId, float need)
+        {
+            if (need <= 0f) return int.MaxValue;
+            Inventory inv = null;
+            try { inv = d.WgoData.CraftableAttachedWorker?.WorkerInventory; } catch { }
+            if (inv == null) try { inv = MainGame.PlayerData.Inventory; } catch { }
+            if (inv?.Data?.Inventory == null) return int.MaxValue;
+            int uses = 0;
+            foreach (Item it in inv.Data.Inventory)
+            {
+                if (it == null || ((ObjectLinkedToDefinition<ItemDef>)it).id != toolId) continue;
+                if (it.TryGetProperty<DurabilitySerializedItemProperty>(out var p)) uses += (int)Math.Floor(p.Durability / need + 1e-4f);
+            }
+            return uses;
         }
 
         // true = Anzahl geaendert
@@ -60,6 +108,7 @@ namespace GK2Tweaks
             UIBaseCraftSelectionWindowData d = Data(w);
             int t = Target(d);
             if (t < 1) return false;
+            if (d.CraftsCount > t) t = d.CraftsCount; // nur erhoehen, nie die eigene Eingabe kleiner machen
             int delta = t - d.CraftsCount;
             if (delta == 0) return false;
             Traverse.Create(w).Method("ChangeCraftCount", new[] { typeof(int) }).GetValue(delta);

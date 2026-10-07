@@ -17,6 +17,8 @@ namespace GK2Tweaks
         private static void Prefix(Wgo __instance, out bool __state)
         {
             __state = false;
+            // 1.7.2: haengende Auftraege blockieren auch das Abbauen - vorher loesen (siehe CraftRepair)
+            try { if (SafeMode.On("CraftRepair")) CraftRepair.Fix(__instance?.Data, "remove"); } catch { }
             try
             {
                 // Nur wenn noch kein Abbau laeuft (sonst ist der Klick ein "Abbruch" und bleibt wie im Spiel)

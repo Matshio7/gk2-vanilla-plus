@@ -50,6 +50,7 @@ namespace GK2Tweaks
             { "MenuBackground", new[] { "Hauptmenü-Hintergrund", "Main menu background" } },
             { "Respec", new[] { "Talente & Forschung zurückerstatten", "Refund talents & research" } },
             { "CraftMax", new[] { "Herstellen: Max-Knopf", "Crafting: Max button" } },
+            { "CraftRepair", new[] { "Hängende Werkbänke lösen", "Fix stuck workbenches" } },
         };
 
         internal static string Name(string f) => names.TryGetValue(f, out string[] n) ? Labels.T(n[0], n[1]) : f;
@@ -67,6 +68,7 @@ namespace GK2Tweaks
                 case "BackupPatch": case "SaveBlockPatch": return "Saves";
                 case "TierPatch": case "ScreenSettingsPatch": return "Graphics";
                 case "InstantRemovePatch": return "InstantRemove";
+                case "CraftRepairPatch": return "CraftRepair";
                 case "MoveInputPatch": case "MoveTargetPatch": case "MoveCellsPatch": case "MoveBuildPatch": case "MoveDisablePatch": case "MoveRemoveLabelPatch": return "MoveObjects";
                 case "TradePressPatch": case "TradeCountPatch": return "TradeLikes";
                 case "RespecOverPatch": case "RespecOutPatch": case "RespecTechPatch": return "Respec";
@@ -178,6 +180,10 @@ namespace GK2Tweaks
             M("Respec", () => typeof(TechTreePageWidget), "OnTechClicked");
             M("Respec", () => typeof(TechTreePageWidget), "UpdateElements");
             M("CraftMax", () => typeof(UIBaseCraftSelectionWindow), "ChangeCraftCount");
+            M("CraftRepair", () => typeof(CraftInteractionHandler), "Interact");
+            F("CraftRepair", () => typeof(WGOInteractionHandlerBase), "assignedWgo");
+            M("CraftRepair", () => typeof(CraftComponent), "RemoveFromQueue");
+            M("CraftRepair", () => typeof(CraftComponent), "GetStartCraftStatus");
             M("TradeLikes", () => typeof(Trading), "OnPlayerItemPress1");
             F("TradeLikes", () => typeof(Trading), "cachedWindowData");
             F("TradeLikes", () => typeof(Trading), "sellInventory");

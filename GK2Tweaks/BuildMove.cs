@@ -51,6 +51,10 @@ namespace GK2Tweaks
             if (!w.IsBuildRemovable() || d.CraftComponent == null || d.CraftComponent.IsDestroyingCraftActive || d.CraftComponent.IsPreFinishHeld)
                 return Labels.T("Das lässt sich gerade nicht verschieben.", "This can't be moved right now.");
             if (d.WorldId != MainGame.PlayerController.CurrentGameScene.Id) return "";
+            // 1.7.2: Fabrik-Maschinen (eigene Foerderband-Ein-/Ausgabe) verlieren beim Umsetzen ihr Ausgabe-Band (Xylem) -
+            // bis das sauber neu verbunden wird, bleiben sie stehen. Normale Foerderbaender lassen sich weiter verschieben.
+            if (d.CraftableType == CraftableType.ConveyorWorkbench || Def(d).conveyorType == ConveyorElementType.Workbench)
+                return Labels.T("Fabrik-Maschinen lassen sich noch nicht verschieben.", "Factory machines can't be moved yet.");
             switch (Def(d).interactionType)
             {
                 case WGODef.InteractionType.TownBuildingPlace: case WGODef.InteractionType.FighterContainer: case WGODef.InteractionType.FightBuilder:

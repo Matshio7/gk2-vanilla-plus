@@ -14,7 +14,10 @@ namespace GK2Tweaks
     {
         public const string Guid = "mats.gk2.tweaks";
         public const string PluginName = "GK2 Tweaks";
-        public const string PluginVersion = "1.7.1";
+        public const string PluginVersion = "1.7.2";
+        // Anzeige (Hauptmenue, Was ist neu, Log). "b" = schneller Hotfix, noch nicht voll getestet. PluginVersion bleibt
+        // eine reine Zahl - BepInEx, Update-Check und Installer lesen sie als Version.
+        internal const string DisplayVersion = PluginVersion + "b";
         internal const string Keep = "Default";
 
         internal static Plugin Instance;
@@ -90,7 +93,7 @@ namespace GK2Tweaks
 
             try { SafeMode.CheckGame(); } catch (Exception e) { Log.LogError("Safe mode check failed: " + e); }
             var harmony = new Harmony(Guid);
-            var patches = new System.Collections.Generic.List<Type> { typeof(TierPatch), typeof(ScreenSettingsPatch), typeof(SaveBlockPatch), typeof(ZoomPatch), typeof(ModdedLabelPatch), typeof(BackupPatch), typeof(MainMenuModsButtonPatch), typeof(PauseModsButtonPatch), typeof(CraftCellPinPatch), typeof(SelectionPinPatch), typeof(QuestPinPatch), typeof(LongNotes), typeof(InstantRemovePatch), typeof(TeleportPatch), typeof(FadeInPatch), typeof(FadeOutPatch), typeof(CleanupPatch), typeof(MoveInputPatch), typeof(MoveTargetPatch), typeof(MoveCellsPatch), typeof(MoveBuildPatch), typeof(MoveDisablePatch), typeof(TradePressPatch), typeof(TradeCountPatch), typeof(ZoneRedrawPatch), typeof(MoveRemoveLabelPatch), typeof(OrderPinPatch), typeof(AlchemyPinPatch), typeof(RespecOverPatch), typeof(RespecOutPatch), typeof(RespecTechPatch) };
+            var patches = new System.Collections.Generic.List<Type> { typeof(TierPatch), typeof(ScreenSettingsPatch), typeof(SaveBlockPatch), typeof(ZoomPatch), typeof(ModdedLabelPatch), typeof(BackupPatch), typeof(MainMenuModsButtonPatch), typeof(PauseModsButtonPatch), typeof(CraftCellPinPatch), typeof(SelectionPinPatch), typeof(QuestPinPatch), typeof(LongNotes), typeof(InstantRemovePatch), typeof(TeleportPatch), typeof(FadeInPatch), typeof(FadeOutPatch), typeof(CleanupPatch), typeof(MoveInputPatch), typeof(MoveTargetPatch), typeof(MoveCellsPatch), typeof(MoveBuildPatch), typeof(MoveDisablePatch), typeof(TradePressPatch), typeof(TradeCountPatch), typeof(ZoneRedrawPatch), typeof(MoveRemoveLabelPatch), typeof(OrderPinPatch), typeof(AlchemyPinPatch), typeof(RespecOverPatch), typeof(RespecOutPatch), typeof(RespecTechPatch), typeof(CraftRepairPatch) };
 #if DEV
             if (BenchEnabled.Value) patches.Add(typeof(SystemProfiler));
 #endif
@@ -119,8 +122,9 @@ namespace GK2Tweaks
             WeekPlan.Init();
 #if DEV
             if (BenchEnabled.Value) bench = new Benchmark();
+            gameObject.AddComponent<DevUpload>();
 #endif
-            Log.LogInfo(PluginName + " " + PluginVersion + " loaded" + (WineFix.IsWine ? " (Wine/CrossOver)" : ""));
+            Log.LogInfo(PluginName + " " + DisplayVersion + " loaded" + (WineFix.IsWine ? " (Wine/CrossOver)" : ""));
         }
 
         private void BindConfig()

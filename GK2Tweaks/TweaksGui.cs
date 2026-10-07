@@ -859,7 +859,7 @@ namespace GK2Tweaks
             {
                 newsStyle = new GUIStyle(labelStyle) { fixedHeight = 0, wordWrap = true, richText = true, alignment = TextAnchor.UpperLeft, fontSize = 15 };
             }
-            if (skinned) GUILayout.Label(Labels.T("Was ist neu?", "What's new?") + "  ·  GK2 Vanilla+ " + Plugin.PluginVersion, titleStyle);
+            if (skinned) GUILayout.Label(Labels.T("Was ist neu?", "What's new?") + "  ·  GK2 Vanilla+ " + Plugin.DisplayVersion, titleStyle);
             if (newsSinceUpdate) GUILayout.Label(Labels.T("GK2 Vanilla+ wurde aktualisiert. Das hat sich geändert:", "GK2 Vanilla+ was updated. Here is what changed:"), smallStyle);
             newsScroll = skinned ? GUILayout.BeginScrollView(newsScroll, false, true, GUIStyle.none, vbarStyle, GUIStyle.none, GUILayout.Height(460))
                                  : GUILayout.BeginScrollView(newsScroll, GUILayout.Height(460));
@@ -1079,7 +1079,7 @@ namespace GK2Tweaks
         private void DrawUpdate()
         {
             GUILayout.BeginHorizontal();
-            GUILayout.Label(Labels.T("Update verfügbar: ", "Update available: ") + Plugin.PluginVersion + " → " + UpdateCheck.Latest, headerStyle, GUILayout.Width(300));
+            GUILayout.Label(Labels.T("Update verfügbar: ", "Update available: ") + Plugin.DisplayVersion + " → " + UpdateCheck.Latest, headerStyle, GUILayout.Width(300));
             if (UpdateCheck.CanAutoUpdate)
             {
                 if (Btn(new GUIContent(Labels.T("Speichern & aktualisieren", "Save & update"),

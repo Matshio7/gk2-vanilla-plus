@@ -96,8 +96,8 @@ namespace GK2Tweaks
             Traverse text = Traverse.Create(__instance).Field("versionLabel").Property("text");
             string t = text.GetValue<string>();
             if (t == null || t.Contains("modded")) return;
-            string add = "  <color=#8fd18f>· modded · GK2 Vanilla+ " + Plugin.PluginVersion + " by McFly7</color>";
-            if (Plugin.Celebrated.Value) add += "  <color=#e8c56a>· " + Labels.T("2.500+ Spieler · danke!", "2,500+ players · thanks!") + "</color>";
+            string add = "  <color=#8fd18f>· modded · GK2 Vanilla+ " + Plugin.DisplayVersion + " by McFly7</color>";
+            if (Plugin.Celebrated.Value) add += "  <color=#e8c56a>· " + Labels.T("3.000+ Spieler · danke!", "3,000+ players · thanks!") + "</color>";
             if (UpdateCheck.Available) add += "  <color=#ffd27f>· Update " + UpdateCheck.Latest + " (F9)</color>";
             text.SetValue(t + add);
         }
