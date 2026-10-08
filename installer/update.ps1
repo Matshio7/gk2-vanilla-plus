@@ -3,7 +3,8 @@
 #   -GameDir  Spielordner (dort liegt GraveyardKeeper2.exe)
 #   -WaitPid  wartet, bis dieser Prozess (das Spiel) beendet ist  (Aufruf aus dem Mod-Menue)
 #   -Ask      erst fragen, ob installiert werden soll                (Aufruf aus dem Installer)
-param([string]$GameDir, [int]$WaitPid = 0, [switch]$Ask)
+#   -Channel  'stable' (Standard) oder 'beta' (Vorabversion, GitHub-Pre-release)
+param([string]$GameDir, [int]$WaitPid = 0, [switch]$Ask, [string]$Channel = 'stable')
 $ErrorActionPreference = 'Stop'
 $ProgressPreference = 'SilentlyContinue'
 Add-Type -AssemblyName System.Windows.Forms
@@ -21,6 +22,47 @@ function Get-InstalledVersion($dir) {
     if (-not (Test-Path $f)) { return $null }
     try { $v = [version](Get-Item $f).VersionInfo.FileVersion; return [version]('{0}.{1}.{2}' -f $v.Major, $v.Minor, [Math]::Max(0, $v.Build)) } catch { return [version]'0.0.0' }
 }
+
+# Update-Kanal in die Mod-Einstellungen schreiben (BepInEx\config\mats.gk2.tweaks.cfg, [Interface] UpdateChannel)
+function Set-UpdateChannel($dir, $channel) {
+    try {
+        $cfg = Join-Path $dir 'BepInEx\config\mats.gk2.tweaks.cfg'
+        $line = "UpdateChannel = $channel"
+        $lines = New-Object System.Collections.Generic.List[string]
+        if (Test-Path $cfg) { foreach ($l in (Get-Content $cfg -Encoding UTF8)) { $lines.Add($l) } }
+        $idx = -1
+        for ($i = 0; $i -lt $lines.Count; $i++) { if ($lines[$i] -match '^\s*UpdateChannel\s*=') { $idx = $i; break } }
+        if ($idx -ge 0) { $lines[$idx] = $line }
+        else {
+            $sec = -1
+            for ($i = 0; $i -lt $lines.Count; $i++) { if ($lines[$i].Trim() -eq '[Interface]') { $sec = $i; break } }
+            if ($sec -ge 0) { $lines.Insert($sec + 1, $line) } else { $lines.Add('[Interface]'); $lines.Add(''); $lines.Add($line) }
+        }
+        New-Item -ItemType Directory -Force -Path (Split-Path $cfg) | Out-Null
+        [System.IO.File]::WriteAllLines($cfg, $lines.ToArray(), (New-Object System.Text.UTF8Encoding($false)))
+    } catch {}
+}
+
+# Release-Schluessel: 4. Stelle = 65534 fuer stabile Versionen, Beta-Nummer fuer Betas (1.8.0-beta.2 < 1.8.0)
+function Get-TagKey($tag) {
+    $m = [regex]::Match([string]$tag, '^v?(\d+(?:\.\d+){1,2})(?:-beta\.?(\d+))?$')
+    if (-not $m.Success) { return $null }
+    $v = [version]$m.Groups[1].Value
+    $rev = if ($m.Groups[2].Success) { [int]$m.Groups[2].Value } else { 65534 }
+    return [version]('{0}.{1}.{2}.{3}' -f $v.Major, $v.Minor, [Math]::Max(0, $v.Build), $rev)
+}
+function Get-InstalledKey($dir) {
+    $v = Get-InstalledVersion $dir
+    if ($v -eq $null) { return $null }
+    $key = [version]('{0}.{1}.{2}.65534' -f $v.Major, $v.Minor, $v.Build)
+    $mark = Join-Path $dir 'BepInEx\GK2VanillaPlus\installed-tag.txt'
+    if (Test-Path $mark) {
+        $k = Get-TagKey ((Get-Content $mark -Raw).Trim())
+        if ($k -ne $null -and $k.Major -eq $key.Major -and $k.Minor -eq $key.Minor -and $k.Build -eq $key.Build) { $key = $k }
+    }
+    return $key
+}
+function Show-Key($k) { if ($k -eq $null) { return (T 'keine' 'none') } elseif ($k.Revision -eq 65534) { return ('{0}.{1}.{2}' -f $k.Major, $k.Minor, $k.Build) } else { return ('{0}.{1}.{2} Beta {3}' -f $k.Major, $k.Minor, $k.Build, $k.Revision) } }
 
 # kleines Statusfenster
 $form = New-Object System.Windows.Forms.Form
@@ -49,30 +91,46 @@ try {
     if (Get-Process -Name 'GraveyardKeeper2' -ErrorAction SilentlyContinue) { throw (T 'Das Spiel läuft noch. Bitte beenden und erneut versuchen.' 'The game is still running. Please quit it and try again.') }
 
     Status (T 'Suche nach der neuesten Version …' 'Looking for the latest version …')
-    $rel = Invoke-RestMethod -Uri "https://api.github.com/repos/$Repo/releases/latest" -Headers @{ 'User-Agent' = 'GK2VanillaPlus-Updater' } -UseBasicParsing
-    $latest = [version](($rel.tag_name -replace '^v', ''))
-    $have = Get-InstalledVersion $GameDir
+    $beta = ($Channel -eq 'beta')
+    $headers = @{ 'User-Agent' = 'GK2VanillaPlus-Updater' }
+    if ($beta) {
+        $list = Invoke-RestMethod -Uri "https://api.github.com/repos/$Repo/releases?per_page=20" -Headers $headers -UseBasicParsing
+        $rel = $null; $latest = $null
+        foreach ($r in $list) {
+            if ($r.draft) { continue }
+            $k = Get-TagKey $r.tag_name
+            if ($k -ne $null -and ($latest -eq $null -or $k -gt $latest)) { $latest = $k; $rel = $r }
+        }
+        if (-not $rel) { throw (T 'Keine Version gefunden.' 'No version found.') }
+    } else {
+        $rel = Invoke-RestMethod -Uri "https://api.github.com/repos/$Repo/releases/latest" -Headers $headers -UseBasicParsing
+        $latest = Get-TagKey $rel.tag_name
+        if ($latest -eq $null) { throw (T "Unbekanntes Versions-Tag: $($rel.tag_name)" "Unknown version tag: $($rel.tag_name)") }
+    }
+    $have = Get-InstalledKey $GameDir
     $asset = $rel.assets | Where-Object { $_.name -like 'GK2-VanillaPlus-*.zip' } | Select-Object -First 1
     if (-not $asset) { throw (T 'Im Release wurde keine ZIP-Datei gefunden.' 'No ZIP file found in the release.') }
+    $latestText = Show-Key $latest
 
     if ($have -ne $null -and $have -ge $latest) {
         $form.Hide()
-        Msg (T "Du hast bereits die neueste Version ($have)." "You already have the latest version ($have).") | Out-Null
+        Msg (T "Du hast bereits die neueste Version ($(Show-Key $have))." "You already have the latest version ($(Show-Key $have)).") | Out-Null
         exit 0
     }
     if ($Ask) {
         $form.Hide()
-        $haveText = if ($have) { "$have" } else { T 'keine' 'none' }
-        if ((Msg (T "Version $latest ist verfügbar (installiert: $haveText).`n`nJetzt herunterladen und installieren?" "Version $latest is available (installed: $haveText).`n`nDownload and install now?") 'YesNo' 'Question') -ne 'Yes') { exit 0 }
+        $q = T "Version $latestText ist verfügbar (installiert: $(Show-Key $have)).`n`nJetzt herunterladen und installieren?" "Version $latestText is available (installed: $(Show-Key $have)).`n`nDownload and install now?"
+        if ($beta) { $q = (T "BETA-Version $latestText (installiert: $(Show-Key $have)).`n`nVorabversion zum Testen – sie kann Fehler enthalten. Bitte sichere vorher deinen Spielstand. Fehler bitte melden.`n`nJetzt herunterladen und installieren?" "BETA version $latestText (installed: $(Show-Key $have)).`n`nA pre-release for testing – it may contain bugs. Please back up your saves first. Reports are welcome.`n`nDownload and install now?") }
+        if ((Msg $q 'YesNo' 'Question') -ne 'Yes') { exit 2 }
     }
 
-    Status (T "Lade Version $latest herunter …" "Downloading version $latest …")
+    Status (T "Lade Version $latestText herunter …" "Downloading version $latestText …")
     $tmp = Join-Path $env:TEMP ('gk2vp_' + [guid]::NewGuid().ToString('N'))
     New-Item -ItemType Directory -Path $tmp | Out-Null
     $zip = Join-Path $tmp $asset.name
     Invoke-WebRequest -Uri $asset.browser_download_url -OutFile $zip -UseBasicParsing -Headers @{ 'User-Agent' = 'GK2VanillaPlus-Updater' }
 
-    Status (T "Installiere Version $latest …" "Installing version $latest …")
+    Status (T "Installiere Version $latestText …" "Installing version $latestText …")
     Expand-Archive -Path $zip -DestinationPath (Join-Path $tmp 'x') -Force
     $files = Get-ChildItem -Path (Join-Path $tmp 'x') -Recurse -Directory -Filter 'files' | Where-Object { Test-Path (Join-Path $_.FullName 'winhttp.dll') } | Select-Object -First 1
     if (-not $files) { throw (T 'Die heruntergeladene Datei hat ein unerwartetes Format.' 'The downloaded file has an unexpected format.') }
@@ -80,17 +138,21 @@ try {
     Copy-Item -Path (Join-Path $files.FullName '*') -Destination $GameDir -Recurse -Force
     Get-ChildItem -Path $files.FullName -Force -File -Filter '.*' | Copy-Item -Destination $GameDir -Force
     Remove-Item -Path $tmp -Recurse -Force -ErrorAction SilentlyContinue
+    # Kanal merken (Mod-Einstellung) und installierte Release-Version (fuer Beta-Nummern)
+    Set-UpdateChannel $GameDir $(if ($beta) { 'Beta' } else { 'Stable' })
+    try { Set-Content -Path (Join-Path $GameDir 'BepInEx\GK2VanillaPlus\installed-tag.txt') -Value $rel.tag_name -Encoding ASCII } catch {}
 
     $form.Hide()
     if ($WaitPid -gt 0) {
-        if ((Msg (T "GK2 Vanilla+ $latest ist installiert. Deine Einstellungen bleiben erhalten.`n`nSpiel jetzt starten?" "GK2 Vanilla+ $latest is installed. Your settings are kept.`n`nStart the game now?") 'YesNo') -eq 'Yes') { Start-Process 'steam://rungameid/4358690' }
+        if ((Msg (T "GK2 Vanilla+ $latestText ist installiert. Deine Einstellungen bleiben erhalten.`n`nSpiel jetzt starten?" "GK2 Vanilla+ $latestText is installed. Your settings are kept.`n`nStart the game now?") 'YesNo') -eq 'Yes') { Start-Process 'steam://rungameid/4358690' }
     } else {
-        Msg (T "GK2 Vanilla+ $latest ist installiert. Deine Einstellungen bleiben erhalten." "GK2 Vanilla+ $latest is installed. Your settings are kept.") | Out-Null
+        Msg (T "GK2 Vanilla+ $latestText ist installiert. Deine Einstellungen bleiben erhalten." "GK2 Vanilla+ $latestText is installed. Your settings are kept.") | Out-Null
     }
     exit 0
 }
 catch {
     $form.Hide()
-    Msg ((T "Update fehlgeschlagen:`n" "Update failed:`n") + $_.Exception.Message + (T "`n`nDu kannst die neue Version auch manuell laden:`nhttps://github.com/$Repo/releases/latest" "`n`nYou can also download it manually:`nhttps://github.com/$Repo/releases/latest")) 'OK' 'Error' | Out-Null
+    $page = if ($Channel -eq 'beta') { "https://github.com/$Repo/releases" } else { "https://github.com/$Repo/releases/latest" }
+    Msg ((T "Update fehlgeschlagen:`n" "Update failed:`n") + $_.Exception.Message + (T "`n`nDu kannst die neue Version auch manuell laden:`n$page" "`n`nYou can also download it manually:`n$page")) 'OK' 'Error' | Out-Null
     exit 1
 }
