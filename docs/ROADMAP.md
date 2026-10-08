@@ -38,3 +38,4 @@ Umsetzung:
 - [ ] Alternatives Hauptmenü (Entwurf B, Weiterspielen-Karte).
 - [ ] Wünsche: Truhe aufwerten mit Inhalt, LB/RB +10 / Taschen wechseln (gl7), schnellerer Cursor beim Fabrik-Bau (jureth), Zombies auf der Karte, Zombie löschen, "Wake up" aus GK1 (Krunder), Unterstützer-Liste.
 - [ ] Store-Bilder für 1.7 (Auftrags-Pin, Alchemie-Pin, Max, Zurückerstatten).
+- [ ] Pinnen per Rechtsklick (HardWorkingLoner): Rechtsklick schließt im Spiel das Herstellen-Fenster – Klick über der Nadel abfangen, dann Einstellung "Maustaste zum Anpinnen" wieder einblenden (Code steckt in Pins.cs/Plugin.PinsClick).

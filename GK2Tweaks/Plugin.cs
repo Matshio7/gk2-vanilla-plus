@@ -292,8 +292,7 @@ namespace GK2Tweaks
             PinsFuel = Config.Bind("Pins", "ShowFuel", true, "Show the fuel a recipe needs from its workbench (e.g. a furnace) as an extra line.");
             PinsCorner = Config.Bind("Pins", "Corner", "TopRight", new ConfigDescription("Screen corner of the pinned list.",
                 new AcceptableValueList<string>("TopLeft", "TopRight", "BottomLeft", "BottomRight")));
-            PinsClick = Config.Bind("Pins", "ClickButton", "Left", new ConfigDescription("Mouse button that pins or unpins on the pin icon. Right avoids pinning by accident while clicking recipes.",
-                new AcceptableValueList<string>("Left", "Right")));
+            // PinsClick (Rechtsklick zum Anpinnen) kommt mit 1.8 - Rechtsklick schliesst im Spiel das Fenster
             PinsSize = Config.Bind("Pins", "Size", "Medium", new ConfigDescription("Text and icon size of the pinned list.",
                 new AcceptableValueList<string>("Small", "Medium", "Large", "ExtraLarge")));
 #if MINIMAP

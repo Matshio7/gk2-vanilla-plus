@@ -25,7 +25,7 @@ Status: ✅ erledigt (Version) · 🔧 in 1.7.3 (Branch `release/1.7.3`), im Spi
 | gl7 | Controller: +10 bei Mengen bzw. Ziffern einzeln ändern | ⬜ |
 | gl7 | Controller: Taschen mit Trigger/Bumper wechseln | ⬜ |
 | HardWorkingLoner | Pin-Nadel kleiner (zu groß/verpixelt bei 4K) | 🔧 1.7.3 (30 % kleiner, weicher) |
-| HardWorkingLoner | Pinnen per Rechtsklick statt Linksklick (versehentliche Pins) | 🔧 1.7.3 (Einstellung "Maustaste zum Anpinnen", Standard bleibt Links) |
+| HardWorkingLoner | Pinnen per Rechtsklick statt Linksklick (versehentliche Pins) | ⬜ 1.8: Rechtsklick schließt im Spiel das Fenster – erst wenn der Klick abgefangen wird (in 1.7.3 entfernt) |
 | HardWorkingLoner | Pinnen im Tech-Tree | ⬜ (Roadmap 1.8) |
 | jureth | Schnellerer Cursor beim Fabrik-Bau | ⬜ (aus Roadmap, Quelle nicht im Thread) |
 | (Roadmap) | Unterstützer-Liste, Alternatives Hauptmenü, Fabrik-Maschinen verschiebbar | ⬜ |

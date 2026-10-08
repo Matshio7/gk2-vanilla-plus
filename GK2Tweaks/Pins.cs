@@ -452,7 +452,8 @@ namespace GK2Tweaks
             }
         }
 
-        private static int ClickIndex => Plugin.PinsClick.Value == "Left" ? 0 : 1;
+        // 1.7.3: immer Linksklick - Rechtsklick schliesst im Spiel das Fenster (Option kommt mit 1.8, wenn der Klick abgefangen wird)
+        private static int ClickIndex => 0;
         private static int lastToggleFrame = -1;
         private static float lastPollToggle = -10f;
 
