@@ -344,6 +344,7 @@ Ingredients you can craft yourself get a + that shows their own ingredients (up 
 Controller: hold this button during normal play to navigate the pinned list (only while no game window is open). Click the field and press any controller button; Esc = off. => 
 Show the fuel a recipe needs from its workbench (e.g. a furnace) as an extra line. => 
 Screen corner of the pinned list. => 
+Mouse button that pins or unpins on the pin icon. Right avoids pinning by accident while clicking recipes. => 
 Text and icon size of the pinned list. => 
 Small map in a screen corner: a section of the game's own world map around you (outdoors; indoors your location on the map). => 
 Screen corner of the minimap. => 

@@ -60,7 +60,7 @@ namespace GK2Tweaks
         internal static ConfigEntry<KeyboardShortcut> MinimapKey;
 #endif
         // [Overlay] – FPS-Anzeige
-        internal static ConfigEntry<string> OvCorner, OvLayout, PinsCorner, PinsSize, OvOrder, OvSeparator;
+        internal static ConfigEntry<string> OvCorner, OvLayout, PinsCorner, PinsSize, PinsClick, OvOrder, OvSeparator;
         internal static ConfigEntry<bool> PinsEnabled, PinsNotify, PinsAutoUnpin, PinsVariants, PinsTree, PinsFuel;
         internal static ConfigEntry<string> PinsPadButton;
         internal static ConfigEntry<string> PinsChests;
@@ -284,6 +284,8 @@ namespace GK2Tweaks
             PinsFuel = Config.Bind("Pins", "ShowFuel", true, "Show the fuel a recipe needs from its workbench (e.g. a furnace) as an extra line.");
             PinsCorner = Config.Bind("Pins", "Corner", "TopRight", new ConfigDescription("Screen corner of the pinned list.",
                 new AcceptableValueList<string>("TopLeft", "TopRight", "BottomLeft", "BottomRight")));
+            PinsClick = Config.Bind("Pins", "ClickButton", "Right", new ConfigDescription("Mouse button that pins or unpins on the pin icon. Right avoids pinning by accident while clicking recipes.",
+                new AcceptableValueList<string>("Right", "Left")));
             PinsSize = Config.Bind("Pins", "Size", "Medium", new ConfigDescription("Text and icon size of the pinned list.",
                 new AcceptableValueList<string>("Small", "Medium", "Large", "ExtraLarge")));
 #if MINIMAP

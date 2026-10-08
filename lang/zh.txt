@@ -545,3 +545,4 @@ Support => 支持
 Vanilla+ stays free. If you enjoy the mod, a coffee on Ko-fi is very welcome (opens your browser). => Vanilla+ 永久免费。如果你喜欢这个模组，欢迎在 Ko-fi 请我喝杯咖啡（将打开浏览器）。
 Factory machines can't be moved yet. => 工厂机器暂时无法移动。
 Fix stuck workbenches => 修复卡住的工作台
+Mouse button that pins or unpins on the pin icon. Right avoids pinning by accident while clicking recipes. => 在图钉图标上用于固定或取消固定的鼠标按键。选右键可避免点击配方时误固定。

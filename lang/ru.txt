@@ -545,3 +545,4 @@ Support => Поддержать
 Vanilla+ stays free. If you enjoy the mod, a coffee on Ko-fi is very welcome (opens your browser). => Vanilla+ остаётся бесплатным. Если мод тебе нравится, буду рад кофе на Ko-fi (откроется браузер).
 Factory machines can't be moved yet. => Фабричные машины пока нельзя перемещать.
 Fix stuck workbenches => Починить зависшие верстаки
+Mouse button that pins or unpins on the pin icon. Right avoids pinning by accident while clicking recipes. => Кнопка мыши, которая закрепляет или открепляет по значку булавки. Правая кнопка не даёт закрепить случайно при клике по рецептам.

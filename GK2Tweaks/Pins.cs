@@ -345,6 +345,7 @@ namespace GK2Tweaks
             if (b == null) b = Create(widget.transform as RectTransform);
             if (b == null) return;
             var rt = (RectTransform)b.transform;
+            size *= 0.7f; // kleiner: bei 4K / hoher UI-Skalierung wirkte die Nadel zu gross und verpixelt
             rt.sizeDelta = new Vector2(size, size);
             rt.anchoredPosition = new Vector2(-size * 0.6f - shiftLeft, -size * 0.6f);
             b.transform.SetAsLastSibling();
@@ -443,7 +444,7 @@ namespace GK2Tweaks
             if (image.enabled != show) image.enabled = show;
             // Baumenues (Hof, Stadt) fangen Mausklicks selbst ab, bevor die Nadel sie bekommt:
             // deshalb den Linksklick direkt abfragen, wenn die Maus ueber der sichtbaren Nadel ist.
-            if (show && Input.GetMouseButtonDown(0) && Time.frameCount != lastToggleFrame && OverSelf())
+            if (show && Input.GetMouseButtonDown(ClickIndex) && Time.frameCount != lastToggleFrame && OverSelf())
             {
                 lastToggleFrame = Time.frameCount;
                 lastPollToggle = Time.unscaledTime;
@@ -451,6 +452,7 @@ namespace GK2Tweaks
             }
         }
 
+        private static int ClickIndex => Plugin.PinsClick.Value == "Left" ? 0 : 1;
         private static int lastToggleFrame = -1;
         private static float lastPollToggle = -10f;
 
@@ -468,7 +470,7 @@ namespace GK2Tweaks
 
         public void OnPointerClick(PointerEventData e)
         {
-            if (e.button != PointerEventData.InputButton.Left) return;
+            if (e.button != (ClickIndex == 0 ? PointerEventData.InputButton.Left : PointerEventData.InputButton.Right)) return;
             e.Use();
             // schon beim Druecken ueber die Abfrage oben umgeschaltet: nicht doppelt umschalten
             if (Time.unscaledTime - lastPollToggle < 1.5f) return;
@@ -495,7 +497,7 @@ namespace GK2Tweaks
                 ".....G......",
                 ".....G......",
             };
-            var tex = new Texture2D(12, 12, TextureFormat.RGBA32, false) { filterMode = FilterMode.Point, wrapMode = TextureWrapMode.Clamp };
+            var tex = new Texture2D(12, 12, TextureFormat.RGBA32, false) { filterMode = FilterMode.Bilinear, wrapMode = TextureWrapMode.Clamp };
             for (int y = 0; y < 12; y++)
                 for (int x = 0; x < 12; x++)
                 {

@@ -545,3 +545,4 @@ Support => Soutenir
 Vanilla+ stays free. If you enjoy the mod, a coffee on Ko-fi is very welcome (opens your browser). => Vanilla+ reste gratuit. Si le mod te plaît, un café sur Ko-fi fait très plaisir (ouvre le navigateur).
 Factory machines can't be moved yet. => Les machines d'usine ne peuvent pas encore être déplacées.
 Fix stuck workbenches => Débloquer les établis bloqués
+Mouse button that pins or unpins on the pin icon. Right avoids pinning by accident while clicking recipes. => Bouton de la souris qui épingle ou désépingle sur l'icône d'épingle. Le clic droit évite d'épingler par erreur en cliquant sur les recettes.
