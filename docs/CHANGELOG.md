@@ -3,23 +3,27 @@
 ## 1.7.3 – 2026-10-08 · first stable release
 
 **EN**
+> **⚠ Important – workbench repair changed:** in 1.7.2b the automatic repair also removed **normal waiting crafts** from workbench queues (sorry!). It is now **off by default** and only removes the **one waiting craft at the front** when nothing is running.
+> **Is one of your workbenches still stuck** (F does nothing, it cannot be removed)? Mod menu (F9) → Interface & keys → turn on **"Repair stuck workbench"**, press F at that workbench (or remove it), then turn the setting off again. Nothing is lost – ingredients are only used when a round starts.
+
 - **Stable and Beta:** the installer now lets you choose – **Stable** (tested, recommended, installed straight from the package) or **Beta** (newest pre-release from GitHub, to try new features early; may contain bugs). The channel can be changed later in the mod menu (F9) under "Update channel", and the update check follows it.
 - **Installer:** clearer uninstall – "Remove everything" (Vanilla+ and BepInEx, game back to original) or "Vanilla+ only"; read-only files no longer stop it, leftovers are listed, and a log is written to Documents\GK2 Vanilla+\uninstall.log.
 - **Fix:** the pin icon is smaller and smoother (it looked big and pixelated at 4K).
-- **Fix:** pinning is now done with **right click** by default, so recipes are no longer pinned by accident while clicking. Switch back in the mod menu (Pins → "Mouse button for pinning").
+- **Option:** if recipes get pinned by accident while clicking, you can now pin with **right click** instead (mod menu → Pins → "Mouse button for pinning"). Left click stays the default.
 - **Fix:** Max when crafting counts carefully: ingredients already reserved by other queued crafts and tool durability (e.g. saw) are taken into account, and it never adds an extra round – so no crafts get stuck "waiting" at the workbench any more.
-- **Fix:** repairing already stuck workbenches no longer removes normal queues. It is now **off by default** (mod menu → "Repair stuck workbench") and only takes out the waiting craft at the front when nothing is running. Turn it on only if a workbench does not react (F does nothing, cannot be removed); nothing is lost.
 - **Fix:** battle-safe backups – the last save before a battle is always backed up and never pushed out by autosaves made during the battle (those are marked "in battle" in the backup list).
 - **Fix:** deleted backups no longer leave empty folders behind (Linux/Steam Deck/Mac).
 - Moving factory machines is blocked for now – they lost their output conveyor. Normal conveyors can still be moved.
 
 **DE**
+> **⚠ Wichtig – Werkbank-Reparatur geändert:** In 1.7.2b hat die automatische Reparatur auch **normal wartende Aufträge** aus Warteschlangen entfernt (sorry!). Sie ist jetzt **standardmäßig aus** und nimmt nur noch **den einen wartenden Auftrag ganz vorne** heraus, wenn nichts läuft.
+> **Hängt bei dir noch eine Werkbank** (F ohne Wirkung, nicht abbaubar)? Mod-Menü (F9) → Anzeige & Tasten → **„Hängende Werkbank reparieren“** einschalten, an der Werkbank F drücken (oder sie abbauen), danach die Einstellung wieder ausschalten. Es geht nichts verloren – Zutaten werden erst beim Start eines Durchgangs verbraucht.
+
 - **Stabil und Beta:** Der Installer lässt dich jetzt wählen – **Stabil** (getestet, empfohlen, direkt aus dem Paket) oder **Beta** (neueste Vorabversion von GitHub, zum frühen Ausprobieren neuer Funktionen; kann Fehler enthalten). Den Kanal kannst du später im Mod-Menü (F9) unter „Update-Kanal“ ändern, die Update-Prüfung richtet sich danach.
 - **Installer:** klareres Deinstallieren – „Alles entfernen“ (Vanilla+ und BepInEx, Spiel wieder original) oder „Nur Vanilla+“; schreibgeschützte Dateien stoppen nichts mehr, Reste werden aufgelistet, ein Protokoll liegt unter Dokumente\GK2 Vanilla+\uninstall.log.
 - **Fix:** Die Pin-Nadel ist kleiner und weicher (sie wirkte bei 4K groß und verpixelt).
-- **Fix:** Anpinnen geht jetzt standardmäßig mit **Rechtsklick**, damit Rezepte beim Anklicken nicht mehr versehentlich angepinnt werden. Im Mod-Menü umstellbar (Anpinnen → „Maustaste zum Anpinnen“).
+- **Option:** Wenn Rezepte beim Anklicken versehentlich angepinnt werden, kannst du jetzt mit **Rechtsklick** anpinnen (Mod-Menü → Anpinnen → „Maustaste zum Anpinnen“). Standard bleibt Linksklick.
 - **Fix:** Max beim Herstellen rechnet vorsichtig: Zutaten, die andere Aufträge in der Warteschlange schon brauchen, und die Haltbarkeit von Werkzeug (z. B. Säge) zählen mit, und es kommt kein Extra-Durchgang mehr dazu – so bleibt nichts mehr als „wartet“ an der Werkbank hängen.
-- **Fix:** Die Reparatur bereits hängender Werkbänke entfernt keine normalen Warteschlangen mehr. Sie ist jetzt **standardmäßig aus** (Mod-Menü → „Hängende Werkbank reparieren“) und nimmt nur den wartenden Auftrag ganz vorne heraus, wenn nichts läuft. Nur einschalten, wenn eine Werkbank nicht reagiert (F ohne Wirkung, nicht abbaubar); es geht nichts verloren.
 - **Fix:** Kampf-sichere Backups – der letzte Stand vor einem Kampf wird immer gesichert und nie von Autosaves aus dem Kampf verdrängt (diese sind in der Backup-Liste mit „im Kampf“ markiert).
 - **Fix:** Gelöschte Backups hinterlassen keine leeren Ordner mehr (Linux/Steam Deck/Mac).
 - Fabrik-Maschinen lassen sich vorerst nicht verschieben – sie verloren ihr Ausgabe-Förderband. Normale Förderbänder lassen sich weiter verschieben.

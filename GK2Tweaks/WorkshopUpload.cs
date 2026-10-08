@@ -125,6 +125,7 @@ namespace GK2Tweaks
                     if (line == "**DE**") sb.Append("\n[b]Deutsch[/b]\n");
                     continue;
                 }
+                if (line.StartsWith("> ")) line = line.Substring(2);   // hervorgehobener Hinweis: als normaler Absatz
                 string text = Regex.Replace(line, @"\*\*(.+?)\*\*", "[b]$1[/b]");
                 if (text.StartsWith("- "))
                 {

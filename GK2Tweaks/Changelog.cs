@@ -77,6 +77,7 @@ namespace GK2Tweaks
                 if (low.Contains("rating on the steam workshop") || low.Contains("bewertung im steam workshop")) continue;
 #endif
                 if (line.StartsWith("- ")) line = "•  " + line.Substring(2);
+                else if (line.StartsWith("> ")) line = "<color=#f0b060>" + line.Substring(2) + "</color>";   // hervorgehobener Hinweis
                 target.AppendLine(Bold.Replace(line, "<b>$1</b>"));
             }
             Flush();

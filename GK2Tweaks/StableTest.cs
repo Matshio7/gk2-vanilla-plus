@@ -37,7 +37,9 @@ namespace GK2Tweaks
                 case 5: if (t > 24f) { Shot("stb_pins"); step++; } break;
                 case 6: if (t > 25f) { Try(CloseCraft, "close"); Try(MenuTab, "menu"); step++; } break;
                 case 7: if (t > 28f) { Shot("stb_menu"); step++; } break;
-                case 8: if (t > 29f) { Try(() => Plugin.Instance.Gui.SetMenu(false), "menu close"); L("DONE"); step++; Application.Quit(); } break;
+                case 8: if (t > 29f) { Try(() => { Plugin.Instance.Gui.SetMenu(false); Plugin.Instance.Gui.ShowNews(true); }, "news"); step++; } break;
+                case 9: if (t > 32f) { Shot("stb_news"); L("pin click default: " + Plugin.PinsClick.Value); step++; } break;
+                case 10: if (t > 33f) { L("DONE"); step++; Application.Quit(); } break;
             }
         }
 
