@@ -555,3 +555,4 @@ Beta (pre-release) => Бета (пред. версия)
 Right click => Правый клик
 Left click => Левый клик
 Which versions the update check looks for. Stable = tested releases (recommended). Beta = pre-release for testing, may contain bugs. => Какие версии ищет проверка обновлений. Стабильная = проверенные версии (рекомендуется). Бета = предварительная версия для тестов, возможны ошибки.
+· in battle => · в бою

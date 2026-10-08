@@ -1,6 +1,6 @@
 # Changelog
 
-## 1.7.2 – 2026-10-08 · first stable release
+## 1.7.3 – 2026-10-08 · first stable release
 
 **EN**
 - **Stable and Beta:** the installer now lets you choose – **Stable** (tested, recommended, installed straight from the package) or **Beta** (newest pre-release from GitHub, to try new features early; may contain bugs). The channel can be changed later in the mod menu (F9) under "Update channel", and the update check follows it.
@@ -9,6 +9,8 @@
 - **Fix:** pinning is now done with **right click** by default, so recipes are no longer pinned by accident while clicking. Switch back in the mod menu (Pins → "Mouse button for pinning").
 - **Fix:** Max when crafting counts carefully: ingredients already reserved by other queued crafts and tool durability (e.g. saw) are taken into account, and it never adds an extra round – so no crafts get stuck "waiting" at the workbench any more.
 - **Fix:** repairing already stuck workbenches no longer removes normal queues. It is now **off by default** (mod menu → "Repair stuck workbench") and only takes out the waiting craft at the front when nothing is running. Turn it on only if a workbench does not react (F does nothing, cannot be removed); nothing is lost.
+- **Fix:** battle-safe backups – the last save before a battle is always backed up and never pushed out by autosaves made during the battle (those are marked "in battle" in the backup list).
+- **Fix:** deleted backups no longer leave empty folders behind (Linux/Steam Deck/Mac).
 - Moving factory machines is blocked for now – they lost their output conveyor. Normal conveyors can still be moved.
 
 **DE**
@@ -18,7 +20,25 @@
 - **Fix:** Anpinnen geht jetzt standardmäßig mit **Rechtsklick**, damit Rezepte beim Anklicken nicht mehr versehentlich angepinnt werden. Im Mod-Menü umstellbar (Anpinnen → „Maustaste zum Anpinnen“).
 - **Fix:** Max beim Herstellen rechnet vorsichtig: Zutaten, die andere Aufträge in der Warteschlange schon brauchen, und die Haltbarkeit von Werkzeug (z. B. Säge) zählen mit, und es kommt kein Extra-Durchgang mehr dazu – so bleibt nichts mehr als „wartet“ an der Werkbank hängen.
 - **Fix:** Die Reparatur bereits hängender Werkbänke entfernt keine normalen Warteschlangen mehr. Sie ist jetzt **standardmäßig aus** (Mod-Menü → „Hängende Werkbank reparieren“) und nimmt nur den wartenden Auftrag ganz vorne heraus, wenn nichts läuft. Nur einschalten, wenn eine Werkbank nicht reagiert (F ohne Wirkung, nicht abbaubar); es geht nichts verloren.
+- **Fix:** Kampf-sichere Backups – der letzte Stand vor einem Kampf wird immer gesichert und nie von Autosaves aus dem Kampf verdrängt (diese sind in der Backup-Liste mit „im Kampf“ markiert).
+- **Fix:** Gelöschte Backups hinterlassen keine leeren Ordner mehr (Linux/Steam Deck/Mac).
 - Fabrik-Maschinen lassen sich vorerst nicht verschieben – sie verloren ihr Ausgabe-Förderband. Normale Förderbänder lassen sich weiter verschieben.
+
+## 1.7.2 – 2026-10-07 · Hotfix 1.7.2b
+
+**EN**
+- Quick hotfix (1.7.2b): released fast to help everyone with stuck workbenches, not fully tested yet – please report anything odd.
+- **Fix:** workbenches could stop reacting (F did nothing, couldn't be removed) after crafting with the Max button. Cause: a craft queued with more rounds than ingredients stays "waiting" at the workbench – the game allows this with "+" too, Max made it easy. Affected workbenches now **repair themselves** as soon as you use or remove them – no rebuilding needed, nothing is lost (ingredients are only used when a round starts).
+- **Fix:** Max now counts carefully: ingredients already reserved by other queued crafts and tool durability (e.g. saw) are taken into account, and it never adds an extra round.
+- Moving factory machines is blocked for now – they lost their output conveyor. Normal conveyors can still be moved.
+
+**DE**
+- Schneller Hotfix (1.7.2b): rasch veröffentlicht, damit hängende Werkbänke wieder gehen, noch nicht vollständig getestet – meldet bitte alles Auffällige.
+- **Fix:** Werkbänke konnten nach dem Herstellen mit dem Max-Knopf nicht mehr reagieren (F ohne Wirkung, Abbauen ging nicht). Ursache: Ein Auftrag mit mehr Durchgängen als Zutaten bleibt an der Werkbank als „wartet“ stehen – das geht im Spiel auch mit „+“, mit Max aber leicht. Betroffene Werkbänke **reparieren sich jetzt selbst**, sobald du sie benutzt oder abbaust – kein Neubau nötig, nichts geht verloren (Zutaten werden erst beim Start eines Durchgangs verbraucht).
+- **Fix:** Max rechnet jetzt vorsichtig: Zutaten, die andere Aufträge in der Warteschlange schon brauchen, und die Haltbarkeit von Werkzeug (z. B. Säge) zählen mit, und es kommt kein Extra-Durchgang mehr dazu.
+- Fabrik-Maschinen lassen sich vorerst nicht verschieben – sie verloren ihr Ausgabe-Förderband. Normale Förderbänder lassen sich weiter verschieben.
+
+## 1.7.1 – 2026-10-06
 
 ## 1.7.1 – 2026-10-06
 

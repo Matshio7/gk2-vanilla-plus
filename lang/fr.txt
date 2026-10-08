@@ -555,3 +555,4 @@ Beta (pre-release) => Bêta (préversion)
 Right click => Clic droit
 Left click => Clic gauche
 Which versions the update check looks for. Stable = tested releases (recommended). Beta = pre-release for testing, may contain bugs. => Quelles versions la recherche de mises à jour trouve. Stable = versions testées (recommandé). Bêta = préversion à tester, peut contenir des bogues.
+· in battle => · en combat

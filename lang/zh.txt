@@ -555,3 +555,4 @@ Beta (pre-release) => 测试版（预发布）
 Right click => 右键
 Left click => 左键
 Which versions the update check looks for. Stable = tested releases (recommended). Beta = pre-release for testing, may contain bugs. => 更新检查查找哪些版本。稳定版 = 已测试版本（推荐）。测试版 = 预发布，用于试用，可能有错误。
+· in battle => · 战斗中

@@ -475,6 +475,7 @@ Game's own copy =>
 Backup => 
 (before restore) => 
 · kept => 
+· in battle => 
 Sure? => 
 Restore => 
 Unkeep => 

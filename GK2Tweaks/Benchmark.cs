@@ -115,7 +115,7 @@ namespace GK2Tweaks
                     break;
 
                 case Phase.Warmup:
-                    if (Plugin.BenchMenuShot.Value) { if (Plugin.BenchShotSet.Value == "crafttest") CraftTest.Tour(inPhase); else if (MenuBgSet) MenuBgTour(inPhase); else if (Steam16) Steam16Tour(inPhase); else if (Steam) SteamTour(inPhase); else if (Features) FeatureTour(inPhase); else MenuShot(inPhase); }
+                    if (Plugin.BenchMenuShot.Value) { if (Plugin.BenchShotSet.Value == "crafttest") CraftTest.Tour(inPhase); else if (Plugin.BenchShotSet.Value == "stabletest") StableTest.Tour(inPhase); else if (MenuBgSet) MenuBgTour(inPhase); else if (Steam16) Steam16Tour(inPhase); else if (Steam) SteamTour(inPhase); else if (Features) FeatureTour(inPhase); else MenuShot(inPhase); }
                     if (inPhase >= Plugin.BenchWarmup.Value)
                     {
                         if (Plugin.Instance.Gui.MenuOpen) Plugin.Instance.Gui.SetMenu(false);

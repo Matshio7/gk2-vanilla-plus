@@ -18,6 +18,22 @@ namespace GK2Tweaks
             public DateTime Time;
             public long Bytes;
             public bool Kept;   // vom Spieler behalten: wird nie automatisch geloescht
+            public bool Battle; // Stand stammt aus einem laufenden Kampf (solche Autosaves sind oft kaputt)
+            public string Tag;  // z. B. "v1.8.0" fuer das Backup vor einem Mod-Update
+        }
+
+        private const string BattleMark = "battle.txt";
+        private const string LastState = "last_save.txt";   // je Slot: wurde der zuletzt geschriebene Stand im Kampf gespeichert?
+
+        // 1.7.3: laeuft gerade ein Kampf (Vorbereitung oder aktiv)?
+        internal static bool InBattle()
+        {
+            try
+            {
+                FightingGameController c = UnityEngine.Object.FindFirstObjectByType<FightingGameController>();
+                return c != null && c.CurrentFightState != FightState.Disabled;
+            }
+            catch { return false; }
         }
 
         private const string KeepMark = "keep.txt";
@@ -44,16 +60,26 @@ namespace GK2Tweaks
             int keep = Plugin.BackupCount.Value;
             if (keep <= 0 || slot == null || slot.isDemoSave || string.IsNullOrEmpty(slot.slotName)) return;
             DateTime now = DateTime.Now;
-            if (lastBackup.TryGetValue(slot.slotName, out DateTime last) && (now - last).TotalMinutes < Plugin.BackupMinutes.Value) return;
+            bool battleNow = InBattle();
+            string stateFile = Path.Combine(Path.Combine(Root, slot.slotName), LastState);
+            bool prevBattle = false;
+            try { prevBattle = File.Exists(stateFile) && File.ReadAllText(stateFile).Trim() == "battle"; } catch { }
             try
             {
-                if (Copy(slot.slotName, now.ToString(Stamp)))
+                // Der letzte gute Stand vor einem Kampf wird immer gesichert, auch wenn das letzte Backup noch frisch ist:
+                // Autosaves mitten im Kampf sind oft kaputt (John?, Bug-Thread #12).
+                bool force = battleNow && !prevBattle;
+                bool due = !lastBackup.TryGetValue(slot.slotName, out DateTime last) || (now - last).TotalMinutes >= Plugin.BackupMinutes.Value;
+                if ((force || due) && Copy(slot.slotName, now.ToString(Stamp)))
                 {
+                    if (prevBattle) File.WriteAllText(Path.Combine(Path.Combine(Path.Combine(Root, slot.slotName), now.ToString(Stamp)), BattleMark), "Saved during a battle.");
                     lastBackup[slot.slotName] = now;
                     Prune(slot.slotName, keep);
+                    if (force) Plugin.Log.LogInfo("Backup: last save before the battle kept (" + slot.slotName + ")");
                 }
             }
             catch (Exception e) { Plugin.Log.LogWarning("Backup: " + e.Message); }
+            try { Directory.CreateDirectory(Path.GetDirectoryName(stateFile)); File.WriteAllText(stateFile, battleNow ? "battle" : "ok"); } catch { }
         }
 
         // kopiert <slot>.dat/.info aus dem Spielstand-Ordner in Backups/<slot>/<name>
@@ -74,9 +100,26 @@ namespace GK2Tweaks
         private static void Prune(string slot, int keep)
         {
             string dir = Path.Combine(Root, slot);
+            // leere Reste frueherer Versionen (unter Wine blieben geloeschte Backups als leere Ordner stehen)
+            foreach (string e in Directory.GetDirectories(dir))
+                if (!File.Exists(Path.Combine(e, slot + ".dat")) && Directory.GetFiles(e, "*", SearchOption.AllDirectories).Length == 0) DeleteDir(e);
             var dirs = Directory.GetDirectories(dir).Where(d => !Path.GetFileName(d).EndsWith("_restore") && !IsKept(d)).OrderByDescending(d => d).ToList();
+            // das neueste Backup, das NICHT aus einem Kampf stammt, bleibt immer - egal wie viele Kampf-Backups danach kamen
+            string lastGood = dirs.FirstOrDefault(d => !File.Exists(Path.Combine(d, BattleMark)));
             foreach (string old in dirs.Skip(keep))
-                try { Directory.Delete(old, true); } catch { }
+                if (old != lastGood) DeleteDir(old);
+        }
+
+        // Directory.Delete(rekursiv) scheitert unter Wine/CrossOver am Ordner selbst - erst Dateien, dann Ordner
+        internal static void DeleteDir(string dir)
+        {
+            try
+            {
+                foreach (string f in Directory.GetFiles(dir, "*", SearchOption.AllDirectories)) try { File.SetAttributes(f, FileAttributes.Normal); File.Delete(f); } catch { }
+                foreach (string d in Directory.GetDirectories(dir, "*", SearchOption.AllDirectories).OrderByDescending(x => x.Length)) try { Directory.Delete(d, false); } catch { }
+                Directory.Delete(dir, false);
+            }
+            catch { }
         }
 
         internal static List<Item> List(int max = 12)
@@ -91,9 +134,11 @@ namespace GK2Tweaks
                         string slot = Path.GetFileName(slotDir);
                         string dat = Path.Combine(d, slot + ".dat");
                         if (!File.Exists(dat)) continue;
-                        string n = Path.GetFileName(d).Replace("_restore", "");
-                        DateTime.TryParseExact(n, Stamp, null, System.Globalization.DateTimeStyles.None, out DateTime t);
-                        list.Add(new Item { Slot = slot, Dir = d, Time = t, Bytes = new FileInfo(dat).Length, Kept = IsKept(d) });
+                        string n = Path.GetFileName(d);
+                        string stamp = n.Length >= Stamp.Length ? n.Substring(0, Stamp.Length) : n;
+                        string tag = n.Length > Stamp.Length + 1 && n[Stamp.Length] == '_' && n[Stamp.Length + 1] == 'v' ? n.Substring(Stamp.Length + 1) : null;
+                        DateTime.TryParseExact(stamp, Stamp, null, System.Globalization.DateTimeStyles.None, out DateTime t);
+                        list.Add(new Item { Slot = slot, Dir = d, Time = t, Bytes = new FileInfo(dat).Length, Kept = IsKept(d), Battle = File.Exists(Path.Combine(d, BattleMark)), Tag = tag });
                     }
             }
             catch (Exception e) { Plugin.Log.LogWarning("Backup list: " + e.Message); }
