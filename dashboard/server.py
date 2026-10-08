@@ -8,6 +8,7 @@ Start: python3 server.py   (oder Dashboard-starten.command doppelklicken)
 import json
 import os
 import re
+import sys
 import threading
 import time
 import urllib.parse
@@ -15,7 +16,7 @@ import urllib.request
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 
 ITEM_ID = "3808053878"
-PORT = 8765
+PORT = int(os.environ.get("PORT", "8765"))
 POLL_SECONDS = 300          # alle 5 Minuten
 ROOT = os.path.dirname(os.path.abspath(__file__))
 DATA = os.path.join(ROOT, "data")
@@ -38,14 +39,32 @@ status = {"state": "unknown", "since": None, "checked": None, "error": None, "mi
 
 
 def notify(title, msg):
-    """macOS-Mitteilung mit Ton (Mitteilungszentrale)."""
-    try:
-        import subprocess
-        esc = lambda x: x.replace("\\", "\\\\").replace('"', '\\"')
-        subprocess.run(["osascript", "-e", 'display notification "%s" with title "%s" sound name "Glass"' % (esc(msg), esc(title))],
-                       timeout=10, check=False)
-    except Exception:
-        pass
+    """Benachrichtigung: auf dem Server per ntfy (NTFY_TOPIC) und/oder Discord (DISCORD_WEBHOOK),
+    auf dem Mac zusaetzlich als Mitteilung mit Ton."""
+    topic = os.environ.get("NTFY_TOPIC", "").strip()
+    if topic:
+        try:
+            body = json.dumps({"topic": topic, "title": title, "message": msg, "tags": ["skull"]}).encode()
+            req = urllib.request.Request("https://ntfy.sh/", data=body, headers={"Content-Type": "application/json", **UA})
+            urllib.request.urlopen(req, timeout=10).read()
+        except Exception:
+            pass
+    hook = os.environ.get("DISCORD_WEBHOOK", "").strip()
+    if hook:
+        try:
+            req = urllib.request.Request(hook, data=json.dumps({"content": "**%s**\n%s" % (title, msg)}).encode(),
+                                         headers={"Content-Type": "application/json", **UA})
+            urllib.request.urlopen(req, timeout=10).read()
+        except Exception:
+            pass
+    if sys.platform == "darwin":
+        try:
+            import subprocess
+            esc = lambda x: x.replace("\\", "\\\\").replace('"', '\\"')
+            subprocess.run(["osascript", "-e", 'display notification "%s" with title "%s" sound name "Glass"' % (esc(msg), esc(title))],
+                           timeout=10, check=False)
+        except Exception:
+            pass
 
 
 def check_status():

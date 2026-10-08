@@ -1,0 +1,14 @@
+# GK2 Vanilla+ Workshop-Dashboard auf dem Hetzner-Server (/opt/gk2dash), hinter radar-caddy
+services:
+  dashboard:
+    build: .
+    container_name: gk2-dashboard
+    restart: always
+    env_file: .env          # optional: NTFY_TOPIC=... / DISCORD_WEBHOOK=... fuer Push-Meldungen
+    volumes:
+      - ./data:/app/data
+    networks: [radar]
+    logging: { driver: json-file, options: { max-size: "5m", max-file: "2" } }
+networks:
+  radar:
+    external: true
