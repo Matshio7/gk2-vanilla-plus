@@ -11,6 +11,7 @@
 - **Installer:** clearer uninstall – "Remove everything" (Vanilla+ and BepInEx, game back to original) or "Vanilla+ only"; read-only files no longer stop it, leftovers are listed, and a log is written to Documents\GK2 Vanilla+\uninstall.log.
 - **Fix:** the pin icon is smaller and smoother (it looked big and pixelated at 4K).
 - **Option:** pin with a **key or mouse button** instead of clicking the pin icon (mod menu → Pins → "Pin with"): point at a recipe, order or blueprint and press it – then clicks never pin by accident. Middle and side mouse buttons work too. Left click on the pin stays the default (Esc switches back).
+- **Fix:** "Refund talents & research" no longer refunds the hidden quest talents (sins, days of the week) or talents that trigger something when bought – their quest effects can't be undone cleanly. They now show "Quest talent – can't be refunded".
 - **Fix:** Max when crafting counts carefully: ingredients already reserved by other queued crafts and tool durability (e.g. saw) are taken into account, and it never adds an extra round – so no crafts get stuck "waiting" at the workbench any more.
 - **Fix:** battle-safe backups – the last save before a battle is always backed up and never pushed out by autosaves made during the battle (those are marked "in battle" in the backup list).
 - **Fix:** deleted backups no longer leave empty folders behind (Linux/Steam Deck/Mac).
@@ -26,6 +27,7 @@
 - **Installer:** klareres Deinstallieren – „Alles entfernen“ (Vanilla+ und BepInEx, Spiel wieder original) oder „Nur Vanilla+“; schreibgeschützte Dateien stoppen nichts mehr, Reste werden aufgelistet, ein Protokoll liegt unter Dokumente\GK2 Vanilla+\uninstall.log.
 - **Fix:** Die Pin-Nadel ist kleiner und weicher (sie wirkte bei 4K groß und verpixelt).
 - **Option:** Mit einer **Taste oder Maustaste** statt per Klick auf die Nadel anpinnen (Mod-Menü → Anpinnen → „Anpinnen mit“): Maus auf Rezept, Auftrag oder Bauplan und drücken – dann pinnt ein Klick nie mehr versehentlich. Mittlere und Seitentasten der Maus gehen auch. Standard bleibt der Linksklick auf die Nadel (Esc stellt zurück).
+- **Fix:** „Talente & Forschung zurückerstatten“ erstattet die versteckten Quest-Talente (Sünden, Wochentage) und Talente, die beim Kauf etwas auslösen, nicht mehr – deren Quest-Wirkung lässt sich nicht sauber rückgängig machen. Sie zeigen jetzt „Quest-Talent – nicht erstattbar“.
 - **Fix:** Max beim Herstellen rechnet vorsichtig: Zutaten, die andere Aufträge in der Warteschlange schon brauchen, und die Haltbarkeit von Werkzeug (z. B. Säge) zählen mit, und es kommt kein Extra-Durchgang mehr dazu – so bleibt nichts mehr als „wartet“ an der Werkbank hängen.
 - **Fix:** Kampf-sichere Backups – der letzte Stand vor einem Kampf wird immer gesichert und nie von Autosaves aus dem Kampf verdrängt (diese sind in der Backup-Liste mit „im Kampf“ markiert).
 - **Fix:** Gelöschte Backups hinterlassen keine leeren Ordner mehr (Linux/Steam Deck/Mac).

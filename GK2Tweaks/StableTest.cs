@@ -32,6 +32,10 @@ namespace GK2Tweaks
             e.Value = new BepInEx.Configuration.KeyboardShortcut(KeyCode.Mouse2); bool c = PinButton.KeyMode;
             e.Value = new BepInEx.Configuration.KeyboardShortcut(KeyCode.G); bool d = PinButton.KeyMode;
             e.Value = old;
+            var locked = new System.Collections.Generic.List<string>();
+            foreach (TalentLevelUpDef t in GameBalance.Me.talentLevelUpDefs)
+                if (Respec.QuestLocked(t)) locked.Add(t.id + (t.isHidden ? "[hidden]" : "") + (t.expressionsOnBuy != null && t.expressionsOnBuy.Count > 0 ? "[expr]" : "") + (t.isZombiePerk ? "[zombie]" : ""));
+            L("QUEST TALENTS " + locked.Count + ": " + string.Join(", ", locked.ToArray()));
             L("PIN KEY " + (!a && !b && c && d ? "OK" : "FAIL") + " mouse0=" + a + " empty=" + b + " mouse2=" + c + " G=" + d + " default=" + e.DefaultValue + " names=" + TweaksGui.PinKeyName(KeyCode.Mouse0) + "|" + TweaksGui.PinKeyName(KeyCode.Mouse3));
         }
 

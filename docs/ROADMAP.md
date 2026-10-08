@@ -34,6 +34,8 @@ Umsetzung:
 
 ## 3. Danach
 
+- [ ] **1.8.0: Auffüllen („Top up“, HardWorkingLoner)** – an einer Werkbank/einem Ofen einen Mindestbestand festlegen (z. B. 50 Eisennägel). Liegt im Gebiet weniger, wird automatisch bis zur Grenze nachproduziert; ist genug da, wird der Auftrag übersprungen. Zählung wie bei den Pins (Inventar/Gebiet/überall). Alternative zur Zombie-Lager-Whitelist, auch für Öfen.
+
 - [ ] Fabrik-Maschinen wieder verschiebbar (Förderbänder richtig neu verbinden, gleicher Test).
 - [ ] Alternatives Hauptmenü (Entwurf B, Weiterspielen-Karte).
 - [ ] Wünsche: Truhe aufwerten mit Inhalt, LB/RB +10 / Taschen wechseln (gl7), schnellerer Cursor beim Fabrik-Bau (jureth), Zombies auf der Karte, Zombie löschen, "Wake up" aus GK1 (Krunder), Unterstützer-Liste.

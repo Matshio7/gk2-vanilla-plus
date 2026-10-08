@@ -570,3 +570,5 @@ Press a key or mouse button … (Esc = left click) => Нажмите клави�
 Left click on the pin => Левый клик по булавке
 Middle mouse button => Средняя кнопка мыши
 Mouse button {0} => Кнопка мыши {0}
+Not possible: a quest talent depends on it. => Невозможно: от него зависит квестовый талант.
+Quest talent – can't be refunded => Квестовый талант – возврат невозможен

@@ -53,7 +53,11 @@ namespace GK2Tweaks
             return br != null && br.studiedLevelUps.Contains(def.id);
         }
 
-        internal static bool CanRefund(TalentLevelUpWidget w) => w != null && w.Data?.Def != null && !w.Data.Def.availableAtStart && IsStudied(w);
+        // Versteckte Quest-Talente (z. B. Suenden/Wochentage) und Talente mit Kauf-Effekten (expressionsOnBuy) nicht erstatten:
+        // deren Effekte (Quest-Fortschritt, Flags) laesst sich nicht sauber rueckgaengig machen
+        internal static bool QuestLocked(TalentLevelUpDef d) => d != null && (d.isHidden || (d.expressionsOnBuy != null && d.expressionsOnBuy.Count > 0));
+        internal static bool IsQuestTalent(TalentLevelUpWidget w) => w != null && w.Data?.Def != null && QuestLocked(w.Data.Def) && IsStudied(w);
+        internal static bool CanRefund(TalentLevelUpWidget w) => w != null && w.Data?.Def != null && !w.Data.Def.availableAtStart && !QuestLocked(w.Data.Def) && IsStudied(w);
 
         private static List<TalentLevelUpDef> Cascade(TalentLevelUpDef root, List<string> studied)
         {
@@ -82,6 +86,11 @@ namespace GK2Tweaks
             ZombieWgoData z = def.isZombiePerk ? w.Data.ZombieWgoData : null;
             List<string> studied = z != null ? z.GetTalentBranch(def.talentId).studiedLevelUps : MainGame.Instance.GameSave.talentSystemData.GetTalentBranch(def.talentId).studiedLevelUps;
             List<TalentLevelUpDef> list = Cascade(def, studied);
+            if (list.Any(QuestLocked))
+            {
+                ManualSave.Toast(Labels.T("Geht nicht: Ein Quest-Talent hängt davon ab.", "Not possible: a quest talent depends on it."), 3f);
+                return;
+            }
             string back;
             if (z != null)
             {

@@ -570,3 +570,5 @@ Press a key or mouse button … (Esc = left click) => Appuyez sur une touche ou 
 Left click on the pin => Clic gauche sur l'épingle
 Middle mouse button => Bouton du milieu
 Mouse button {0} => Bouton de souris {0}
+Not possible: a quest talent depends on it. => Impossible : un talent de quête en dépend.
+Quest talent – can't be refunded => Talent de quête – non remboursable

@@ -570,3 +570,5 @@ Press a key or mouse button … (Esc = left click) => 请按一个键或鼠标�
 Left click on the pin => 左键点击图钉
 Middle mouse button => 鼠标中键
 Mouse button {0} => 鼠标按键 {0}
+Not possible: a quest talent depends on it. => 无法退还：有任务天赋依赖于它。
+Quest talent – can't be refunded => 任务天赋 – 无法退还
