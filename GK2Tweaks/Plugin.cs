@@ -66,6 +66,7 @@ namespace GK2Tweaks
         internal static ConfigEntry<string> UpdateChannel, OvCorner, OvLayout, PinsCorner, PinsSize, PinsClick, OvOrder, OvSeparator;
         internal static ConfigEntry<bool> PinsEnabled, PinsNotify, PinsAutoUnpin, PinsVariants, PinsTree, PinsFuel;
         internal static ConfigEntry<string> PinsPadButton;
+        internal static ConfigEntry<KeyboardShortcut> PinsKey;
         internal static ConfigEntry<string> PinsChests;
         internal static ConfigEntry<bool> OvGpuTemp, OvFps, OvLows, OvFrameTime, OvCpu, OvGpu, OvRam, OvVram, OvResolution, OvClock, OvWeekday, OvGameTime;
 #if DEV
@@ -288,6 +289,7 @@ namespace GK2Tweaks
             PinsAutoUnpin = Config.Bind("Pins", "AutoUnpin", true, "Unpin a recipe automatically when you start crafting it.");
             PinsVariants = Config.Bind("Pins", "RecipeVariants", true, "Under a pinned recipe: the workbench and, if the item can be made in several ways, < > to switch between the recipes (only known recipes).");
             PinsTree = Config.Bind("Pins", "IngredientTree", true, "Ingredients you can craft yourself get a + that shows their own ingredients (up to 3 levels).");
+            PinsKey = Config.Bind("Pins", "PinKey", KeyboardShortcut.Empty, "Optional: pin/unpin with a key instead of clicking the pin icon - point the mouse at a recipe, order or blueprint and press the key. While a key is set, clicking the pin icon does nothing (no accidental pins). Empty = click the pin icon as usual.");
             PinsPadButton = Config.Bind("Pins", "ControllerButton", "RT", "Controller: hold this button during normal play to navigate the pinned list (only while no game window is open). Click the field and press any controller button; Esc = off.");
             PinsFuel = Config.Bind("Pins", "ShowFuel", true, "Show the fuel a recipe needs from its workbench (e.g. a furnace) as an extra line.");
             PinsCorner = Config.Bind("Pins", "Corner", "TopRight", new ConfigDescription("Screen corner of the pinned list.",

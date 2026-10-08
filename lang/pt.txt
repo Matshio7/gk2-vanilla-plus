@@ -552,3 +552,5 @@ Right click => Clique direito
 Left click => Clique esquerdo
 Which versions the update check looks for. Stable = tested releases (recommended). Beta = pre-release for testing, may contain bugs. => Que versões a verificação de atualizações procura. Estável = versões testadas (recomendado). Beta = pré-lançamento para testar, pode ter erros.
 · in battle => · em batalha
+Key for pinning => Tecla para fixar
+Optional: pin/unpin with a key instead of clicking the pin icon - point the mouse at a recipe, order or blueprint and press the key. While a key is set, clicking the pin icon does nothing (no accidental pins). Empty = click the pin icon as usual. => Opcional: fixar/soltar com uma tecla em vez de clicar no alfinete – aponte o mouse para uma receita, encomenda ou planta e aperte a tecla. Com uma tecla definida, clicar no alfinete não faz nada (sem fixar por engano). Vazio = clicar no alfinete como antes.

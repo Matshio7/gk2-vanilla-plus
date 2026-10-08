@@ -442,6 +442,16 @@ namespace GK2Tweaks
             if (image == null) return;
             bool show = pinned || alwaysShow || Hovered();
             if (image.enabled != show) image.enabled = show;
+            // 1.7.3: optional mit Taste statt Klick - Maus ueber dem Rezept/Auftrag/Bauplan und Taste druecken
+            if (KeyMode)
+            {
+                if (Plugin.PinsKey.Value.IsDown() && Time.frameCount != lastToggleFrame && Hovered() && image.isActiveAndEnabled)
+                {
+                    lastToggleFrame = Time.frameCount;
+                    DoToggle();
+                }
+                return;
+            }
             // Baumenues (Hof, Stadt) fangen Mausklicks selbst ab, bevor die Nadel sie bekommt:
             // deshalb den Linksklick direkt abfragen, wenn die Maus ueber der sichtbaren Nadel ist.
             if (show && Input.GetMouseButtonDown(ClickIndex) && Time.frameCount != lastToggleFrame && OverSelf())
@@ -454,6 +464,8 @@ namespace GK2Tweaks
 
         // 1.7.3: immer Linksklick - Rechtsklick schliesst im Spiel das Fenster (Option kommt mit 1.8, wenn der Klick abgefangen wird)
         private static int ClickIndex => 0;
+        // Taste gesetzt: Anpinnen per Taste, Klick auf die Nadel tut nichts
+        private static bool KeyMode => Plugin.PinsKey != null && Plugin.PinsKey.Value.MainKey != KeyCode.None;
         private static int lastToggleFrame = -1;
         private static float lastPollToggle = -10f;
 
@@ -472,6 +484,7 @@ namespace GK2Tweaks
         public void OnPointerClick(PointerEventData e)
         {
             if (e.button != (ClickIndex == 0 ? PointerEventData.InputButton.Left : PointerEventData.InputButton.Right)) return;
+            if (KeyMode) return;   // Klick durchlassen: das Spiel waehlt dann einfach das Rezept aus
             e.Use();
             // schon beim Druecken ueber die Abfrage oben umgeschaltet: nicht doppelt umschalten
             if (Time.unscaledTime - lastPollToggle < 1.5f) return;

@@ -686,6 +686,7 @@ namespace GK2Tweaks
                 DrawEntry(Plugin.PinsTree);
                 DrawEntry(Plugin.PinsFuel);
                 DrawEntry(Plugin.PinsPadButton);
+                DrawEntry(Plugin.PinsKey);
                 DrawEntry(Plugin.PinsCorner);
                 DrawEntry(Plugin.PinsSize);
                 if (Pins.List.Count > 0 && Btn(Labels.T("Alle Pins entfernen", "Remove all pins"), buttonStyle, GUILayout.Width(260))) Defer(Pins.ClearAll);

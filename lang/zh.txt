@@ -556,3 +556,5 @@ Right click => 右键
 Left click => 左键
 Which versions the update check looks for. Stable = tested releases (recommended). Beta = pre-release for testing, may contain bugs. => 更新检查查找哪些版本。稳定版 = 已测试版本（推荐）。测试版 = 预发布，用于试用，可能有错误。
 · in battle => · 战斗中
+Key for pinning => 固定按键
+Optional: pin/unpin with a key instead of clicking the pin icon - point the mouse at a recipe, order or blueprint and press the key. While a key is set, clicking the pin icon does nothing (no accidental pins). Empty = click the pin icon as usual. => 可选：用按键代替点击图钉来固定/取消固定 – 将鼠标指向配方、订单或蓝图并按下按键。设置按键后，点击图钉不会有任何作用（避免误固定）。留空 = 照常点击图钉。

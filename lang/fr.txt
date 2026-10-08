@@ -556,3 +556,5 @@ Right click => Clic droit
 Left click => Clic gauche
 Which versions the update check looks for. Stable = tested releases (recommended). Beta = pre-release for testing, may contain bugs. => Quelles versions la recherche de mises à jour trouve. Stable = versions testées (recommandé). Bêta = préversion à tester, peut contenir des bogues.
 · in battle => · en combat
+Key for pinning => Touche pour épingler
+Optional: pin/unpin with a key instead of clicking the pin icon - point the mouse at a recipe, order or blueprint and press the key. While a key is set, clicking the pin icon does nothing (no accidental pins). Empty = click the pin icon as usual. => Optionnel : épingler/détacher avec une touche au lieu de cliquer sur l'épingle – pointe la souris sur une recette, une commande ou un plan et appuie sur la touche. Tant qu'une touche est définie, cliquer sur l'épingle ne fait rien (pas d'épinglage par erreur). Vide = cliquer sur l'épingle comme d'habitude.

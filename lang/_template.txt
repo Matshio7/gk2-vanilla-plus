@@ -121,6 +121,7 @@ HUD line shows =>
 12-hour clock => 
 Leave conversations with Esc/B => 
 Controller: button for pins => 
+Key for pinning => 
 Faster transitions => 
 Clean up memory less often => 
 Workbench & recipe variants => 
@@ -350,10 +351,10 @@ Short message with a sound when a pinned item becomes ready (you have everything
 Unpin a recipe automatically when you start crafting it. => 
 Under a pinned recipe: the workbench and, if the item can be made in several ways, < > to switch between the recipes (only known recipes). => 
 Ingredients you can craft yourself get a + that shows their own ingredients (up to 3 levels). => 
+Optional: pin/unpin with a key instead of clicking the pin icon - point the mouse at a recipe, order or blueprint and press the key. While a key is set, clicking the pin icon does nothing (no accidental pins). Empty = click the pin icon as usual. => 
 Controller: hold this button during normal play to navigate the pinned list (only while no game window is open). Click the field and press any controller button; Esc = off. => 
 Show the fuel a recipe needs from its workbench (e.g. a furnace) as an extra line. => 
 Screen corner of the pinned list. => 
-Mouse button that pins or unpins on the pin icon. Right avoids pinning by accident while clicking recipes. => 
 Text and icon size of the pinned list. => 
 Small map in a screen corner: a section of the game's own world map around you (outdoors; indoors your location on the map). => 
 Screen corner of the minimap. => 

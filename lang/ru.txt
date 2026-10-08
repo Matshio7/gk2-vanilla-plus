@@ -556,3 +556,5 @@ Right click => Правый клик
 Left click => Левый клик
 Which versions the update check looks for. Stable = tested releases (recommended). Beta = pre-release for testing, may contain bugs. => Какие версии ищет проверка обновлений. Стабильная = проверенные версии (рекомендуется). Бета = предварительная версия для тестов, возможны ошибки.
 · in battle => · в бою
+Key for pinning => Клавиша для закрепления
+Optional: pin/unpin with a key instead of clicking the pin icon - point the mouse at a recipe, order or blueprint and press the key. While a key is set, clicking the pin icon does nothing (no accidental pins). Empty = click the pin icon as usual. => Необязательно: закреплять/откреплять клавишей вместо щелчка по булавке – наведи мышь на рецепт, заказ или чертёж и нажми клавишу. Пока клавиша задана, щелчок по булавке ничего не делает (без случайных закреплений). Пусто = щелчок по булавке, как раньше.
