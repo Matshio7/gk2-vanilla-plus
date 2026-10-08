@@ -2,7 +2,7 @@
 
 Stand: 2026-10-08, gelesen aus den Steam-Diskussionen "Feature Requests & Wishes" (13 Beiträge), "Bug Reports" (15 von 17 Beiträgen lesbar, #16 und #17 nicht abrufbar; #17 ist Shadowblade) und dem Thread von Leika. Quelle der Angaben in Klammern.
 
-Status: ✅ erledigt (Version) · 🔧 im Branch `claude/eager-einstein-tzpr7i` fertig, **noch ungetestet** · ❓ vermutlich behoben, Rückmeldung fehlt · ⬜ offen
+Status: ✅ erledigt (Version) · 🔧 in 1.7.3 (Branch `release/1.7.3`), im Spiel getestet, noch nicht veröffentlicht · ❓ vermutlich behoben, Rückmeldung fehlt · ⬜ offen
 
 ## Feature-Wünsche
 
@@ -24,8 +24,8 @@ Status: ✅ erledigt (Version) · 🔧 im Branch `claude/eager-einstein-tzpr7i` 
 | gl7 | Kleine Truhe direkt zur größeren aufwerten (Inhalt wandert mit) | ⬜ |
 | gl7 | Controller: +10 bei Mengen bzw. Ziffern einzeln ändern | ⬜ |
 | gl7 | Controller: Taschen mit Trigger/Bumper wechseln | ⬜ |
-| HardWorkingLoner | Pin-Nadel kleiner (zu groß/verpixelt bei 4K) | 🔧 (30 % kleiner, weicher) |
-| HardWorkingLoner | Pinnen per Rechtsklick statt Linksklick (versehentliche Pins) | 🔧 (Einstellung "Maustaste zum Anpinnen", Standard Rechts) |
+| HardWorkingLoner | Pin-Nadel kleiner (zu groß/verpixelt bei 4K) | 🔧 1.7.3 (30 % kleiner, weicher) |
+| HardWorkingLoner | Pinnen per Rechtsklick statt Linksklick (versehentliche Pins) | 🔧 1.7.3 (Einstellung "Maustaste zum Anpinnen", Standard bleibt Links) |
 | HardWorkingLoner | Pinnen im Tech-Tree | ⬜ (Roadmap 1.8) |
 | jureth | Schnellerer Cursor beim Fabrik-Bau | ⬜ (aus Roadmap, Quelle nicht im Thread) |
 | (Roadmap) | Unterstützer-Liste, Alternatives Hauptmenü, Fabrik-Maschinen verschiebbar | ⬜ |
@@ -43,13 +43,13 @@ Hinweis: Die Quelle von HardWorkingLoners Beitrag steht nicht in den gelesenen T
 | piermaz38 | Manche Werkbänke: F ohne Wirkung (Log ohne Fehler) | 🔧/✅ vermutlich derselbe Hänger wie unten (1.7.2b) |
 | Unlucky_Trefoil | Säge/Tisch nach Zombie-Nutzung hängt, auch ohne BepInEx; Max verschlimmert es | ✅ 1.7.2b (Max vorsichtig); bestehende Hänger: 🔧 Reparatur jetzt optional (Mod-Menü) |
 | Drizz | Holzbank / Spinntisch hängt, nach Deinstallation Ultrawide noch aktiv ("alles deinstalliert?") | 🔧 Installer: Alles entfernen / Nur Vanilla+, Reste werden aufgelistet, Protokoll; Workshop-Abo kündigen entfernt nichts (Roadmap 1.8: Hinweis beim Start) |
-| Shadowblade | Seit 1.7.2b: Warteschlange komplett weg, sobald eine Zutat ausgeht | 🔧 1.7.2 (Reparatur nur vorderster Auftrag, Standard aus) – Ursache war meine 1.7.2b-Reparatur |
-| John? | Autosaves im Kampf sind kaputt und verdrängen gute Backups | ⬜ Roadmap 1.8 (Backups im Kampf nicht zählen) |
-| John? | **Backup-Menü: rechte Knöpfe abgeschnitten/unleserlich** | ⬜ **neu, noch nicht in der Roadmap** |
+| Shadowblade | Seit 1.7.2b: Warteschlange komplett weg, sobald eine Zutat ausgeht | 🔧 1.7.3 (Reparatur nur vorderster Auftrag, Standard aus; im Spiel getestet: Warteschlange bleibt) |
+| John? | Autosaves im Kampf sind kaputt und verdrängen gute Backups | 🔧 1.7.3 (letzter Stand vor dem Kampf wird immer gesichert und nie verdrängt; Kampf-Backups markiert) |
+| John? | Backup-Menü: rechte Knöpfe abgeschnitten/unleserlich | 🔧 1.7.3 (schmalere Beschriftung, Zeilenumbruch; im Spiel geprüft) |
 | demch_5 | "12 Warnungen": Workshop-Loader (Fremd-Mod) hält Vanilla+ zur Freigabe zurück, `GK2 Tweaks` wird nicht geladen | kein Bug; Antwort-Entwurf liegt vor, Zeile für `GK2_WorkshopLoader.trust.txt` nennen. Einzelne Rest-Fehler stammen von "GK2 Framework Integration" anderer Mods |
-| (Steam) | Steam meldet das Item als "wegen Verstoß gegen die Community-Richtlinien entfernt, nur für den Besitzer sichtbar" | ⚠️ **bitte prüfen**: war beim Abruf von außen so zu lesen |
+| (Steam) | Hinweis "wegen Verstoß gegen die Community-Richtlinien entfernt" im Seitenquelltext | ✅ Fehlalarm: verstecktes Standard-Element (`display: none`) auf jeder Workshop-Seite; Steam-API: öffentlich, nicht gesperrt |
 
 ## Offene Fragen an die Nutzer
-- Dilma Rousseff, aserraric: Tritt es mit 1.7.2 noch auf?
+- Dilma Rousseff, aserraric: Tritt es mit 1.7.3 noch auf?
 - Drizz: Hat die Deinstallationsanleitung geholfen? Log erbeten.
 - piermaz38: Antwort auf die Rückfragen (verschobene Bänke, Max aus, Test ohne `winhttp.dll`).

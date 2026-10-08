@@ -13,6 +13,7 @@
 - **Fix:** Max when crafting counts carefully: ingredients already reserved by other queued crafts and tool durability (e.g. saw) are taken into account, and it never adds an extra round – so no crafts get stuck "waiting" at the workbench any more.
 - **Fix:** battle-safe backups – the last save before a battle is always backed up and never pushed out by autosaves made during the battle (those are marked "in battle" in the backup list).
 - **Fix:** deleted backups no longer leave empty folders behind (Linux/Steam Deck/Mac).
+- **Fix:** the buttons in the backup list were cut off – the list fits the window again.
 - Moving factory machines is blocked for now – they lost their output conveyor. Normal conveyors can still be moved.
 
 **DE**
@@ -26,6 +27,7 @@
 - **Fix:** Max beim Herstellen rechnet vorsichtig: Zutaten, die andere Aufträge in der Warteschlange schon brauchen, und die Haltbarkeit von Werkzeug (z. B. Säge) zählen mit, und es kommt kein Extra-Durchgang mehr dazu – so bleibt nichts mehr als „wartet“ an der Werkbank hängen.
 - **Fix:** Kampf-sichere Backups – der letzte Stand vor einem Kampf wird immer gesichert und nie von Autosaves aus dem Kampf verdrängt (diese sind in der Backup-Liste mit „im Kampf“ markiert).
 - **Fix:** Gelöschte Backups hinterlassen keine leeren Ordner mehr (Linux/Steam Deck/Mac).
+- **Fix:** Die Knöpfe in der Backup-Liste waren abgeschnitten – die Liste passt wieder ins Fenster.
 - Fabrik-Maschinen lassen sich vorerst nicht verschieben – sie verloren ihr Ausgabe-Förderband. Normale Förderbänder lassen sich weiter verschieben.
 
 ## 1.7.2 – 2026-10-07 · Hotfix 1.7.2b
