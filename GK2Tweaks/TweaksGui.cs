@@ -994,7 +994,7 @@ namespace GK2Tweaks
                     GUILayout.BeginHorizontal();
                     GUILayout.Space(24);
                     string when = b.Time == default(DateTime) ? System.IO.Path.GetFileName(b.Dir) : b.Time.ToString(fmt);
-                    GUILayout.Label(Labels.T("Backup ", "Backup ") + when + (b.Dir.EndsWith("_restore") ? Labels.T("  (vor Wiederherstellung)", "  (before restore)") : "") + (b.Kept ? Labels.T("  · behalten", "  · kept") : "") + (b.Battle ? Labels.T("  · im Kampf", "  · in battle") : ""), smallStyle, GUILayout.Width(436));
+                    GUILayout.Label(Labels.T("Backup ", "Backup ") + when + (b.Dir.EndsWith("_restore") ? Labels.T("  (vor Wiederherstellung)", "  (before restore)") : "") + (b.Kept ? Labels.T("  · behalten", "  · kept") : "") + (b.Battle ? Labels.T("  · im Kampf", "  · in battle") : ""), smallStyle, GUILayout.Width(330));
                     KeepButton(b);
                     bool confirm = confirmRestore == b;
                     if (Btn(confirm ? Labels.T("Sicher?", "Sure?") : Labels.T("Laden", "Restore"), buttonStyle, GUILayout.Width(110)))
@@ -1012,7 +1012,7 @@ namespace GK2Tweaks
         // Backup behalten / freigeben (behaltene werden nie automatisch geloescht und zaehlen nicht zur Anzahl)
         private void KeepButton(Backups.Item b)
         {
-            if (Btn(b.Kept ? Labels.T("Freigeben", "Unkeep") : Labels.T("Behalten", "Keep"), buttonStyle, GUILayout.Width(120)))
+            if (Btn(b.Kept ? Labels.T("Freigeben", "Unkeep") : Labels.T("Behalten", "Keep"), buttonStyle, GUILayout.Width(110)))
             {
                 Backups.Item kb = b;
                 Defer(() => { Backups.SetKept(kb, !kb.Kept); backupListAt = 0; });
@@ -1057,7 +1057,7 @@ namespace GK2Tweaks
             {
                 GUILayout.BeginHorizontal();
                 string when = b.Time == default(System.DateTime) ? System.IO.Path.GetFileName(b.Dir) : b.Time.ToString(Labels.German ? "dd.MM.yyyy HH:mm" : "yyyy-MM-dd HH:mm");
-                GUILayout.Label(when + "   " + b.Slot + "   " + (b.Bytes / 1048576f).ToString("0.0") + " MB" + (b.Dir.EndsWith("_restore") ? Labels.T("  (vor Wiederherstellung)", "  (before restore)") : "") + (b.Kept ? Labels.T("  · behalten", "  · kept") : "") + (b.Battle ? Labels.T("  · im Kampf", "  · in battle") : ""), labelStyle, GUILayout.Width(460));
+                GUILayout.Label(when + "   " + b.Slot + "   " + (b.Bytes / 1048576f).ToString("0.0") + " MB" + (b.Dir.EndsWith("_restore") ? Labels.T("  (vor Wiederherstellung)", "  (before restore)") : "") + (b.Kept ? Labels.T("  · behalten", "  · kept") : "") + (b.Battle ? Labels.T("  · im Kampf", "  · in battle") : ""), smallStyle, GUILayout.Width(350));
                 KeepButton(b);
                 if (inMenu)
                 {
