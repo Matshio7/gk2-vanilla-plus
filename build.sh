@@ -6,7 +6,7 @@ ROOT="${0:A:h}"; B="$ROOT/_deps"; R="$ROOT/release"
 V=$(sed -nE 's/.*PluginVersion = "([0-9.]+)".*/\1/p' "$ROOT/GK2Tweaks/Plugin.cs")
 export PATH=/usr/local/share/dotnet:$PATH
 (cd "$ROOT/GK2Ultrawide" && dotnet build -c Release --no-restore -v q -nologo | grep -E "error|Build succeeded")
-(cd "$ROOT/GK2Tweaks" && dotnet build -c Release --no-restore -v q -nologo | grep -E "error|Build succeeded")
+(cd "$ROOT/GK2Tweaks" && dotnet build -c Release --no-restore -v q -nologo -p:Version=$V | grep -E "error|Build succeeded")
 # Optionale Bruecke zu "GK2 Mod Framework" (nur Kompilier-Referenz: reference/fw = Framework-Quellcode, MIT, nicht mitgeliefert)
 [ -d "$ROOT/reference/fw" ] || git clone -q --depth 1 https://github.com/AcTePuKc/GK2-Mod-Framework.git "$ROOT/reference/fw"
 (cd "$ROOT/FrameworkRef" && dotnet build -c Release -v q -nologo --source "$HOME/.nuget/packages" | grep -E "error|Build succeeded")
@@ -35,6 +35,10 @@ winText "$ROOT/installer/install.ps1" "$S/installer/install.ps1"
 winText "$ROOT/installer/update.ps1" "$F/BepInEx/GK2VanillaPlus/update.ps1"
 winText "$ROOT/installer/LIESMICH - README.txt" "$S/LIESMICH - README.txt"
 cp "$ROOT/installer/Installieren.bat" "$S/"
+# Logo und Fenstersymbol fuer das Installationsfenster (fehlen sie, zeigt der Installer nur Text)
+mkdir -p "$S/installer/assets"
+cp "$ROOT/docs/logo/GK2-VanillaPlus-Banner.png" "$S/installer/assets/banner.png"
+cp "$ROOT/docs/logo/GK2-VanillaPlus-Icon.png" "$S/installer/assets/icon.png"
 cp "$ROOT/LICENSE.md" "$ROOT/THIRD-PARTY-NOTICES.txt" "$ROOT/docs/CHANGELOG.md" "$S/docs/"
 cp "$B/BepInEx-LICENSE.txt" "$B/UnityDoorstop-LICENSE.txt" "$S/docs/licenses/"
 mkdir -p "$R/dist"; rm -f "$R/dist/$N.zip"
@@ -48,7 +52,7 @@ GAME="$BOTTLE/Program Files (x86)/Steam/steamapps/common/Graveyard Keeper 2"
 if [ -d "$GAME/BepInEx" ]; then mkdir -p "$GAME/BepInEx/GK2VanillaPlus"; cp "$ROOT/workshop/description.bbcode" "$GAME/BepInEx/GK2VanillaPlus/workshop_description.bbcode"; fi
 if [ -d "$BOTTLE" ]; then rm -rf "$BOTTLE/GK2VanillaPlus-Workshop"; cp -R "$R/workshop/GK2-VanillaPlus" "$BOTTLE/GK2VanillaPlus-Workshop"; fi
 # Nexus-Ausgabe: ohne Update-Pruefung und Online-Updater (Nexus erlaubt keine Selbst-Updates)
-(cd "$ROOT/GK2Tweaks" && dotnet build -c Nexus --no-restore -v q -nologo | grep -E "error|Build succeeded")
+(cd "$ROOT/GK2Tweaks" && dotnet build -c Nexus --no-restore -v q -nologo -p:Version=$V | grep -E "error|Build succeeded")
 NX="$R/stage/nexus/$N"; rm -rf "$R/stage/nexus"; mkdir -p "$R/stage/nexus"; cp -R "$S" "$NX"
 cp "$ROOT/GK2Tweaks/bin/Nexus/GK2Tweaks.dll" "$NX/installer/files/BepInEx/plugins/GK2Tweaks/"
 rm -f "$NX/installer/files/BepInEx/GK2VanillaPlus/update.ps1"

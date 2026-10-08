@@ -7,6 +7,7 @@
 > **Is one of your workbenches still stuck** (F does nothing, it cannot be removed)? Mod menu (F9) → Interface & keys → turn on **"Repair stuck workbench"**, press F at that workbench (or remove it), then turn the setting off again. Nothing is lost – ingredients are only used when a round starts.
 
 - **Stable and Beta:** the installer now lets you choose – **Stable** (tested, recommended, installed straight from the package) or **Beta** (newest pre-release from GitHub, to try new features early; may contain bugs). The channel can be changed later in the mod menu (F9) under "Update channel", and the update check follows it.
+- **Installer:** new look with the Vanilla+ logo. It is now really in English on non-German Windows (it always showed German before) and recognises the installed version correctly (it always offered an "update" before).
 - **Installer:** clearer uninstall – "Remove everything" (Vanilla+ and BepInEx, game back to original) or "Vanilla+ only"; read-only files no longer stop it, leftovers are listed, and a log is written to Documents\GK2 Vanilla+\uninstall.log.
 - **Fix:** the pin icon is smaller and smoother (it looked big and pixelated at 4K).
 - **Option:** pin with a **key** instead of clicking the pin icon (mod menu → Pins → "Key for pinning"): point at a recipe, order or blueprint and press the key – then clicks never pin by accident. Clicking stays the default.
@@ -21,6 +22,7 @@
 > **Hängt bei dir noch eine Werkbank** (F ohne Wirkung, nicht abbaubar)? Mod-Menü (F9) → Anzeige & Tasten → **„Hängende Werkbank reparieren“** einschalten, an der Werkbank F drücken (oder sie abbauen), danach die Einstellung wieder ausschalten. Es geht nichts verloren – Zutaten werden erst beim Start eines Durchgangs verbraucht.
 
 - **Stabil und Beta:** Der Installer lässt dich jetzt wählen – **Stabil** (getestet, empfohlen, direkt aus dem Paket) oder **Beta** (neueste Vorabversion von GitHub, zum frühen Ausprobieren neuer Funktionen; kann Fehler enthalten). Den Kanal kannst du später im Mod-Menü (F9) unter „Update-Kanal“ ändern, die Update-Prüfung richtet sich danach.
+- **Installer:** neues Aussehen mit dem Vanilla+-Logo. Auf nicht-deutschem Windows ist er jetzt wirklich englisch (vorher immer deutsch) und erkennt die installierte Version richtig (vorher bot er immer ein „Update“ an).
 - **Installer:** klareres Deinstallieren – „Alles entfernen“ (Vanilla+ und BepInEx, Spiel wieder original) oder „Nur Vanilla+“; schreibgeschützte Dateien stoppen nichts mehr, Reste werden aufgelistet, ein Protokoll liegt unter Dokumente\GK2 Vanilla+\uninstall.log.
 - **Fix:** Die Pin-Nadel ist kleiner und weicher (sie wirkte bei 4K groß und verpixelt).
 - **Option:** Mit einer **Taste** statt per Klick auf die Nadel anpinnen (Mod-Menü → Anpinnen → „Taste zum Anpinnen“): Maus auf Rezept, Auftrag oder Bauplan und Taste drücken – dann pinnt ein Klick nie mehr versehentlich. Standard bleibt der Klick.

@@ -14,7 +14,7 @@ Add-Type -AssemblyName System.Drawing
 $Repo  = 'Matshio7/gk2-vanilla-plus'
 $Title = 'GK2 Vanilla+'
 $De    = (Get-Culture).TwoLetterISOLanguageName -eq 'de'
-function T($de, $en) { if ($De) { $de } else { $en } }
+function T($textDe, $textEn) { if ($script:De) { $textDe } else { $textEn } }   # Parameter nicht $de nennen: PowerShell unterscheidet keine Gross-/Kleinschreibung
 function Msg($text, $buttons = 'OK', $icon = 'Information') { [System.Windows.Forms.MessageBox]::Show($text, $Title, $buttons, $icon) }
 
 function Get-InstalledVersion($dir) {
