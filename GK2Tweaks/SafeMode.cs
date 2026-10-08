@@ -69,6 +69,7 @@ namespace GK2Tweaks
                 case "TierPatch": case "ScreenSettingsPatch": return "Graphics";
                 case "InstantRemovePatch": return "InstantRemove";
                 case "CraftRepairPatch": return "CraftRepair";
+                case "RainScanPatch": return "Rain";
                 case "MoveInputPatch": case "MoveTargetPatch": case "MoveCellsPatch": case "MoveBuildPatch": case "MoveDisablePatch": case "MoveRemoveLabelPatch": return "MoveObjects";
                 case "TradePressPatch": case "TradeCountPatch": return "TradeLikes";
                 case "RespecOverPatch": case "RespecOutPatch": case "RespecTechPatch": return "Respec";
@@ -139,6 +140,7 @@ namespace GK2Tweaks
             F("Pins", () => typeof(UIQuestInfoWindow), "header");
             F("Rain", () => typeof(WeatherComponent), "parameters");
             F("Rain", () => typeof(CPParticleEmission), "defaultValue");
+            M("Rain", () => typeof(WeatherComponent), "Awake");
             M("WeekPlan", () => typeof(UINotificator), "ShowNotification");
             F("WeekPlan", () => typeof(UIHUDWheel), "dayIcons");
             F("ModsButton", () => typeof(UIMainMenuWindow), "gameSettingsButton");
