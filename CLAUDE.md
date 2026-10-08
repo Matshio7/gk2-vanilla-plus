@@ -25,6 +25,28 @@ Mod für Graveyard Keeper 2 (BepInEx 5 / HarmonyX, C#). Autor: Mats ("McFly7", G
 4. GitHub: Commit, Tag `vX.Y.Z`, `gh release create` mit Zip aus `release/dist/`.
 5. Nexus (Mod 138): bestehende Datei "Update", alte archivieren, Version + Mod-Version setzen, Changelog.
 
+## Technische Stolpersteine
+- ImageConversion nur per Reflection (direkte Referenz -> netstandard-2.1-Compilefehler).
+- `OnRenderImage`: `dst` kann null sein -> Größen aus `src` nehmen; Komponente prüft selbst, ob sie noch aktiv sein darf.
+- `Graphics.DrawTexture` (GUI-Shader) verdoppelt Farbe und Alpha: 0.5 = 1x.
+- Kleine Steamworks-Methoden werden vom Mono-JIT inline eingebaut -> Patches greifen nicht, deshalb Transpiler (WorkshopUpload.cs).
+- Labels.cs: drei Dictionaries (Names, TipsDe, Values) – keine doppelten Schlüssel.
+- Spieler-Werkbänke: Aufträge mit mehr Durchgängen als Zutaten bleiben als "wartet" hängen (CraftRepair.cs).
+- `CraftInteractionHandler.assignedCraftComponent` wird erst in `HasInteraction` gesetzt.
+- Shell-Befehle auf dem Mac: einzelne Aufrufe kurz halten (lange Läufe in Hintergrund + Log, z. B. `(nohup ./build.sh > /tmp/gk2build.log 2>&1 &)`).
+
+## Community & Links
+- Steam Workshop 3808053878 (App 4358690), Titel muss mit "GK2 Vanilla+" beginnen.
+- Nexus: Mod 138, Edit: https://www.nexusmods.com/games/graveyardkeeper2/mods/138/edit/files
+- GitHub: Matshio7/gk2-vanilla-plus, Ko-fi: ko-fi.com/mcfly7
+- Fehlermeldungen: Steam-Diskussion "Bug Reports", immer `BepInEx\LogOutput.log` erbitten.
+- Offene Aufgaben: docs/ROADMAP.md.
+
+## Slash-Befehle (.claude/commands)
+- `/build` – bauen + Übersetzungen prüfen
+- `/ingame-test` – Änderung automatisch im Spiel testen (Spielstand wird gesichert/zurückgelegt)
+- `/release X.Y.Z` – Release vorbereiten, stoppt vor dem Veröffentlichen
+
 ## Regeln
 - Pushen/Veröffentlichen nur nach Mats' Go.
 - Keine Dateien endgültig löschen (z. B. Nexus-Archiv) – das macht Mats.
