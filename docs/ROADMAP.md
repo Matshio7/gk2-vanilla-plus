@@ -27,6 +27,7 @@ Umsetzung:
 ## 2b. Offen aus 1.7.2 (Bugs/Feedback)
 
 - [ ] Hängende Werkbänke: sauberes Erkennen statt Opt-in-Reparatur (Spielcode prüfen: warum reagiert F nicht?). 1.7.2b entfernte versehentlich ganze Warteschlangen (Steam-Bericht Shadowblade), seit 1.7.2 final nur noch optional und nur der vorderste Auftrag.
+- [ ] Backup-Menü: rechte Knöpfe sind abgeschnitten/unleserlich (John?, Bug-Thread). Siehe docs/FEEDBACK.md.
 - [ ] Pins im Tech-Tree (Forschung/Talente) – Feedback HardWorkingLoner.
 - [ ] Pin-Nadel mit höher aufgelöster Grafik (jetzt kleiner + weich).
 - [ ] Beta-Kanal: nach erstem Beta-Release (1.8.0b) Installer/Updater unter Windows testen.
