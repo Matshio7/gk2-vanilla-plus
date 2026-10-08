@@ -24,6 +24,13 @@ Umsetzung:
 - [ ] Backups im Kampf (John?, Bug-Thread #12): Autosaves mitten im Kampf sind kaputt und verdrängen die guten. Backups während eines Kampfes nicht zählen/nicht rotieren, letztes Backup vor dem Kampf immer behalten.
 - [ ] Automatischer Test (Dev-Tour wie crafttest): Spielstand laden -> Verschieben, Abbauen, Max, Zurückerstatten -> Test-Slot speichern -> Spiel OHNE Mod starten (doorstop aus) -> Test-Slot laden -> Player.log auf Fehler prüfen.
 
+## 2b. Offen aus 1.7.2 (Bugs/Feedback)
+
+- [ ] Hängende Werkbänke: sauberes Erkennen statt Opt-in-Reparatur (Spielcode prüfen: warum reagiert F nicht?). 1.7.2b entfernte versehentlich ganze Warteschlangen (Steam-Bericht Shadowblade), seit 1.7.2 final nur noch optional und nur der vorderste Auftrag.
+- [ ] Pins im Tech-Tree (Forschung/Talente) – Feedback HardWorkingLoner.
+- [ ] Pin-Nadel mit höher aufgelöster Grafik (jetzt kleiner + weich).
+- [ ] Beta-Kanal: nach erstem Beta-Release (1.8.0b) Installer/Updater unter Windows testen.
+
 ## 3. Danach
 
 - [ ] Fabrik-Maschinen wieder verschiebbar (Förderbänder richtig neu verbinden, gleicher Test).

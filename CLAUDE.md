@@ -23,7 +23,8 @@ Mod für Graveyard Keeper 2 (BepInEx 5 / HarmonyX, C#). Autor: Mats ("McFly7", G
 2. `./build.sh`, Übersetzungen prüfen.
 3. Steam: Uploader im Spiel (Shift+F11) oder Dev-Trigger `BepInEx/GK2VanillaPlus/upload.now`. Titel in `SteamWorkshop/workshop_items.json` muss "GK2 Vanilla+ – Ultrawide, Performance & Quality of Life" sein, sonst überschreibt der Uploader Titel/Beschreibung.
 4. GitHub: Commit, Tag `vX.Y.Z`, `gh release create` mit Zip aus `release/dist/`.
-5. Nexus (Mod 138): bestehende Datei "Update", alte archivieren, Version + Mod-Version setzen, Changelog.
+5. Beta (Vorabversion, z. B. 1.8.0b): in Plugin.cs `BetaNumber = N` und `BetaTag = " Beta N"` setzen (Stabil: 0 / ""), `PluginVersion` = kommende Zahl. GitHub-Tag `vX.Y.Z-beta.N`, `gh release create --prerelease` mit derselben Zip. Kein Steam/Nexus-Upload. Installer/Updater/Mod-Menü holen sie nur im Kanal "Beta"; "Stabil" nutzt `releases/latest` (Pre-releases zählen dort nie).
+6. Nexus (Mod 138): bestehende Datei "Update", alte archivieren, Version + Mod-Version setzen, Changelog.
 
 ## Technische Stolpersteine
 - ImageConversion nur per Reflection (direkte Referenz -> netstandard-2.1-Compilefehler).

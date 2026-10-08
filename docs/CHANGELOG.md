@@ -1,17 +1,23 @@
 # Changelog
 
-## 1.7.2 – 2026-10-07 · Hotfix 1.7.2b
+## 1.7.2 – 2026-10-08 · first stable release
 
 **EN**
-- Quick hotfix (1.7.2b): released fast to help everyone with stuck workbenches, not fully tested yet – please report anything odd.
-- **Fix:** workbenches could stop reacting (F did nothing, couldn't be removed) after crafting with the Max button. Cause: a craft queued with more rounds than ingredients stays "waiting" at the workbench – the game allows this with "+" too, Max made it easy. Affected workbenches now **repair themselves** as soon as you use or remove them – no rebuilding needed, nothing is lost (ingredients are only used when a round starts).
-- **Fix:** Max now counts carefully: ingredients already reserved by other queued crafts and tool durability (e.g. saw) are taken into account, and it never adds an extra round.
+- **Stable and Beta:** the installer now lets you choose – **Stable** (tested, recommended, installed straight from the package) or **Beta** (newest pre-release from GitHub, to try new features early; may contain bugs). The channel can be changed later in the mod menu (F9) under "Update channel", and the update check follows it.
+- **Installer:** clearer uninstall – "Remove everything" (Vanilla+ and BepInEx, game back to original) or "Vanilla+ only"; read-only files no longer stop it, leftovers are listed, and a log is written to Documents\GK2 Vanilla+\uninstall.log.
+- **Fix:** the pin icon is smaller and smoother (it looked big and pixelated at 4K).
+- **Fix:** pinning is now done with **right click** by default, so recipes are no longer pinned by accident while clicking. Switch back in the mod menu (Pins → "Mouse button for pinning").
+- **Fix:** Max when crafting counts carefully: ingredients already reserved by other queued crafts and tool durability (e.g. saw) are taken into account, and it never adds an extra round – so no crafts get stuck "waiting" at the workbench any more.
+- **Fix:** repairing already stuck workbenches no longer removes normal queues. It is now **off by default** (mod menu → "Repair stuck workbench") and only takes out the waiting craft at the front when nothing is running. Turn it on only if a workbench does not react (F does nothing, cannot be removed); nothing is lost.
 - Moving factory machines is blocked for now – they lost their output conveyor. Normal conveyors can still be moved.
 
 **DE**
-- Schneller Hotfix (1.7.2b): rasch veröffentlicht, damit hängende Werkbänke wieder gehen, noch nicht vollständig getestet – meldet bitte alles Auffällige.
-- **Fix:** Werkbänke konnten nach dem Herstellen mit dem Max-Knopf nicht mehr reagieren (F ohne Wirkung, Abbauen ging nicht). Ursache: Ein Auftrag mit mehr Durchgängen als Zutaten bleibt an der Werkbank als „wartet“ stehen – das geht im Spiel auch mit „+“, mit Max aber leicht. Betroffene Werkbänke **reparieren sich jetzt selbst**, sobald du sie benutzt oder abbaust – kein Neubau nötig, nichts geht verloren (Zutaten werden erst beim Start eines Durchgangs verbraucht).
-- **Fix:** Max rechnet jetzt vorsichtig: Zutaten, die andere Aufträge in der Warteschlange schon brauchen, und die Haltbarkeit von Werkzeug (z. B. Säge) zählen mit, und es kommt kein Extra-Durchgang mehr dazu.
+- **Stabil und Beta:** Der Installer lässt dich jetzt wählen – **Stabil** (getestet, empfohlen, direkt aus dem Paket) oder **Beta** (neueste Vorabversion von GitHub, zum frühen Ausprobieren neuer Funktionen; kann Fehler enthalten). Den Kanal kannst du später im Mod-Menü (F9) unter „Update-Kanal“ ändern, die Update-Prüfung richtet sich danach.
+- **Installer:** klareres Deinstallieren – „Alles entfernen“ (Vanilla+ und BepInEx, Spiel wieder original) oder „Nur Vanilla+“; schreibgeschützte Dateien stoppen nichts mehr, Reste werden aufgelistet, ein Protokoll liegt unter Dokumente\GK2 Vanilla+\uninstall.log.
+- **Fix:** Die Pin-Nadel ist kleiner und weicher (sie wirkte bei 4K groß und verpixelt).
+- **Fix:** Anpinnen geht jetzt standardmäßig mit **Rechtsklick**, damit Rezepte beim Anklicken nicht mehr versehentlich angepinnt werden. Im Mod-Menü umstellbar (Anpinnen → „Maustaste zum Anpinnen“).
+- **Fix:** Max beim Herstellen rechnet vorsichtig: Zutaten, die andere Aufträge in der Warteschlange schon brauchen, und die Haltbarkeit von Werkzeug (z. B. Säge) zählen mit, und es kommt kein Extra-Durchgang mehr dazu – so bleibt nichts mehr als „wartet“ an der Werkbank hängen.
+- **Fix:** Die Reparatur bereits hängender Werkbänke entfernt keine normalen Warteschlangen mehr. Sie ist jetzt **standardmäßig aus** (Mod-Menü → „Hängende Werkbank reparieren“) und nimmt nur den wartenden Auftrag ganz vorne heraus, wenn nichts läuft. Nur einschalten, wenn eine Werkbank nicht reagiert (F ohne Wirkung, nicht abbaubar); es geht nichts verloren.
 - Fabrik-Maschinen lassen sich vorerst nicht verschieben – sie verloren ihr Ausgabe-Förderband. Normale Förderbänder lassen sich weiter verschieben.
 
 ## 1.7.1 – 2026-10-06

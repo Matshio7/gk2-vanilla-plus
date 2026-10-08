@@ -721,8 +721,10 @@ namespace GK2Tweaks
                     GUILayout.Label(Labels.T("Noch kein eigenes Bild: im Spiel hier „Aktuelle Ansicht als Menü-Hintergrund“ wählen.", "No picture yet: in game, choose \"Use current view as menu background\" here."), smallStyle);
 
                 DrawEntry(Plugin.GameMenuButton);
+                DrawEntry(Plugin.RepairWorkbenches);
 #if !NEXUS
                 DrawEntry(Plugin.CheckUpdates);
+                DrawEntry(Plugin.UpdateChannel);
 #endif
 
                 Header(Labels.T("Tasten", "Keys"));

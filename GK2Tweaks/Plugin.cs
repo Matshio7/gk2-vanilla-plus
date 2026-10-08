@@ -15,9 +15,12 @@ namespace GK2Tweaks
         public const string Guid = "mats.gk2.tweaks";
         public const string PluginName = "GK2 Tweaks";
         public const string PluginVersion = "1.7.2";
-        // Anzeige (Hauptmenue, Was ist neu, Log). "b" = schneller Hotfix, noch nicht voll getestet. PluginVersion bleibt
+        // Anzeige (Hauptmenue, Was ist neu, Log). Hotfix-Buchstaben (z. B. "b") nur bei schnellen, nicht voll getesteten Hotfixes. PluginVersion bleibt
         // eine reine Zahl - BepInEx, Update-Check und Installer lesen sie als Version.
-        internal const string DisplayVersion = PluginVersion + "b";
+        // Vorab-Versionen (Beta): BetaNumber > 0 und BetaTag " Beta N" setzen; Stabil: 0 und "". GitHub-Tag der Beta: v<Version>-beta.<N>
+        internal const int BetaNumber = 0;
+        internal const string BetaTag = "";
+        internal const string DisplayVersion = PluginVersion + BetaTag;
         internal const string Keep = "Default";
 
         internal static Plugin Instance;
@@ -43,7 +46,7 @@ namespace GK2Tweaks
         internal static ConfigEntry<string> HudClockMode;
         internal static ConfigEntry<int> BackupCount, BackupMinutes, RainAmount, MenuBgBlur, MenuBgDim, MenuBgFog;
         internal static ConfigEntry<string> MenuBg, MenuBgStyle, MenuBgFogTone;
-        internal static ConfigEntry<bool> ShowOverlay, CheckUpdates;
+        internal static ConfigEntry<bool> ShowOverlay, CheckUpdates, RepairWorkbenches;
         internal static ConfigEntry<int> StatsLogSeconds;
         internal static ConfigEntry<string> Language, LastSeenVersion, LastGameVersion;
 #if !NEXUS
@@ -60,7 +63,7 @@ namespace GK2Tweaks
         internal static ConfigEntry<KeyboardShortcut> MinimapKey;
 #endif
         // [Overlay] – FPS-Anzeige
-        internal static ConfigEntry<string> OvCorner, OvLayout, PinsCorner, PinsSize, PinsClick, OvOrder, OvSeparator;
+        internal static ConfigEntry<string> UpdateChannel, OvCorner, OvLayout, PinsCorner, PinsSize, PinsClick, OvOrder, OvSeparator;
         internal static ConfigEntry<bool> PinsEnabled, PinsNotify, PinsAutoUnpin, PinsVariants, PinsTree, PinsFuel;
         internal static ConfigEntry<string> PinsPadButton;
         internal static ConfigEntry<string> PinsChests;
@@ -194,6 +197,11 @@ namespace GK2Tweaks
 #if !NEXUS
             CheckUpdates = Config.Bind("Interface", "CheckForUpdates", true, "Check GitHub once per game start for a new version of GK2 Vanilla+ (only reads the version number, nothing is sent).");
 #endif
+#if !NEXUS
+            UpdateChannel = Config.Bind("Interface", "UpdateChannel", "Stable", new ConfigDescription("Which versions the update check looks for. Stable = tested releases (recommended). Beta = pre-release for testing, may contain bugs.",
+                new AcceptableValueList<string>("Stable", "Beta")));
+#endif
+            RepairWorkbenches = Config.Bind("Fixes", "RepairStuckWorkbenches", false, "Only if a workbench is stuck (F does nothing, cannot be removed): turn this on, then press F at that workbench or remove it - the waiting craft at the front of its queue is taken out (nothing is lost). Turn it off again afterwards.");
             WeekPlanKey = Config.Bind("Interface", "WeekPlanKey", new KeyboardShortcut(KeyCode.F6), "Key for the week plan (what is possible on which weekday).");
             HudKey = Config.Bind("Interface", "HideHudKey", new KeyboardShortcut(KeyCode.F7), "Key to hide/show the game's HUD, e.g. for screenshots. Esc shows it again.");
             WeekPlanNotify = Config.Bind("Comfort", "DailyReminder", true, "Show a notification each morning with what is possible today (only features you have already unlocked).");

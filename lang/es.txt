@@ -546,3 +546,12 @@ Vanilla+ stays free. If you enjoy the mod, a coffee on Ko-fi is very welcome (op
 Factory machines can't be moved yet. => Las máquinas de la fábrica aún no se pueden mover.
 Fix stuck workbenches => Reparar bancos de trabajo bloqueados
 Mouse button that pins or unpins on the pin icon. Right avoids pinning by accident while clicking recipes. => Botón del ratón que fija o suelta con el icono de chincheta. Con el derecho no se fija nada sin querer al hacer clic en recetas.
+Only if a workbench is stuck (F does nothing, cannot be removed): turn this on, then press F at that workbench or remove it - the waiting craft at the front of its queue is taken out (nothing is lost). Turn it off again afterwards. => Solo si un banco de trabajo está bloqueado (F no hace nada, no se puede quitar): actívalo, pulsa F en ese banco o quítalo – se retira el encargo en espera al frente de la cola (no se pierde nada). Desactívalo después.
+Update channel => Canal de actualización
+Mouse button for pinning => Botón del ratón para fijar
+Repair stuck workbench => Reparar banco de trabajo bloqueado
+Stable => Estable
+Beta (pre-release) => Beta (versión previa)
+Right click => Clic derecho
+Left click => Clic izquierdo
+Which versions the update check looks for. Stable = tested releases (recommended). Beta = pre-release for testing, may contain bugs. => Qué versiones busca la comprobación de actualizaciones. Estable = versiones probadas (recomendado). Beta = versión previa para probar, puede tener errores.

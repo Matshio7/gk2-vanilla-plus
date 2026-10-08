@@ -10,14 +10,17 @@ using UnityEngine.Networking;
 
 namespace GK2Tweaks
 {
-    // Update-Pruefung gegen GitHub-Releases (einmal pro Spielstart, abschaltbar).
+    // Update-Pruefung gegen GitHub-Releases (Kanal Stabil oder Beta) (einmal pro Spielstart, abschaltbar).
     // Windows: "Speichern & aktualisieren" startet den mitgelieferten Updater, der nach dem Beenden des Spiels
     // die neue Version herunterlaedt und installiert. Mac/Linux: Button oeffnet die Download-Seite.
     internal static class UpdateCheck
     {
         internal const string Repo = "Matshio7/gk2-vanilla-plus";
-        internal const string ReleasePage = "https://github.com/" + Repo + "/releases/latest";
-        private const string Api = "https://api.github.com/repos/" + Repo + "/releases/latest";
+        private const string Api = "https://api.github.com/repos/" + Repo + "/releases";
+
+        internal static bool Beta => Plugin.UpdateChannel != null && Plugin.UpdateChannel.Value == "Beta";
+        internal static string ReleasePage => "https://github.com/" + Repo + (Beta ? "/releases" : "/releases/latest");
+        internal static string Channel => Beta ? "beta" : "stable";
 
         internal static bool Available;
         internal static string Latest = "";
@@ -26,12 +29,22 @@ namespace GK2Tweaks
         internal static string UpdaterPath => Path.Combine(Path.Combine(Paths.GameRootPath, "BepInEx"), Path.Combine("GK2VanillaPlus", "update.ps1"));
         internal static bool CanAutoUpdate => !WineFix.IsWine && File.Exists(UpdaterPath);
 
+        // Versionsschluessel: 4. Stelle 65534 = stabil, sonst Beta-Nummer (1.8.0-beta.2 < 1.8.0)
+        private static Version Key(string numbers, string beta)
+        {
+            Version v = new Version(numbers);
+            return new Version(v.Major, v.Minor, Math.Max(0, v.Build), string.IsNullOrEmpty(beta) ? 65534 : int.Parse(beta));
+        }
+
+        private static string Show(Version k) => k.Revision == 65534 ? k.Major + "." + k.Minor + "." + k.Build : k.Major + "." + k.Minor + "." + k.Build + " Beta " + k.Revision;
+
         internal static IEnumerator Run()
         {
             if (started || !Plugin.CheckUpdates.Value) yield break;
             started = true;
             yield return new WaitForSecondsRealtime(8f);
-            using (UnityWebRequest req = UnityWebRequest.Get(Api))
+            bool beta = Beta;
+            using (UnityWebRequest req = UnityWebRequest.Get(beta ? Api + "?per_page=20" : Api + "/latest"))
             {
                 req.SetRequestHeader("User-Agent", "GK2VanillaPlus/" + Plugin.PluginVersion);
                 req.SetRequestHeader("Accept", "application/vnd.github+json");
@@ -42,19 +55,27 @@ namespace GK2Tweaks
                     Plugin.Log.LogInfo("Update check: " + req.error);
                     yield break;
                 }
-                Match m = Regex.Match(req.downloadHandler.text, "\"tag_name\"\\s*:\\s*\"v?([0-9]+(?:\\.[0-9]+){1,3})\"");
-                if (!m.Success) yield break;
                 try
                 {
-                    if (new Version(m.Groups[1].Value) > new Version(Plugin.PluginVersion))
+                    // stabil: nur das neueste Release; Beta: das hoechste aus der Liste (auch Pre-releases)
+                    Version best = null;
+                    foreach (Match m in Regex.Matches(req.downloadHandler.text, "\"tag_name\"\\s*:\\s*\"v?([0-9]+(?:\\.[0-9]+){1,3})(?:-beta\\.?([0-9]+))?\""))
                     {
-                        Latest = m.Groups[1].Value;
+                        Version k = Key(m.Groups[1].Value, m.Groups[2].Value);
+                        if (best == null || k > best) best = k;
+                        if (!beta) break;
+                    }
+                    Version mine = Key(Plugin.PluginVersion, Plugin.BetaNumber > 0 ? Plugin.BetaNumber.ToString() : "");
+                    if (best == null) { }
+                    else if (best > mine)
+                    {
+                        Latest = Show(best);
                         Available = true;
                         Plugin.Log.LogInfo("Update available: " + Latest);
                         if (MainGame.Instance == null || MainGame.Instance.gameState != MainGame.GameState.InGame)
                             ManualSave.Toast(string.Format(Labels.T("GK2 Vanilla+ {0} ist verfügbar – F9 zum Aktualisieren", "GK2 Vanilla+ {0} is available – press F9 to update"), Latest), 8f);
                     }
-                    else Plugin.Log.LogInfo("Update check: up to date (" + m.Groups[1].Value + ")");
+                    else Plugin.Log.LogInfo("Update check: up to date (" + Show(best) + ", channel " + Channel + ")");
                 }
                 catch (Exception e) { Plugin.Log.LogInfo("Update check: " + e.Message); }
             }
@@ -75,7 +96,7 @@ namespace GK2Tweaks
             {
                 updating = true;
                 string args = "-NoProfile -ExecutionPolicy Bypass -STA -WindowStyle Hidden -File \"" + UpdaterPath + "\" -GameDir \"" +
-                              Paths.GameRootPath.TrimEnd('\\', '/') + "\" -WaitPid " + Process.GetCurrentProcess().Id;
+                              Paths.GameRootPath.TrimEnd('\\', '/') + "\" -Channel " + Channel + " -WaitPid " + Process.GetCurrentProcess().Id;
                 Process.Start(new ProcessStartInfo("powershell.exe", args) { UseShellExecute = true, WindowStyle = ProcessWindowStyle.Hidden });
                 Plugin.Log.LogInfo("Updater started, quitting game");
                 Application.Quit();

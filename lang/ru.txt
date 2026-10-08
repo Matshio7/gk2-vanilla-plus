@@ -546,3 +546,12 @@ Vanilla+ stays free. If you enjoy the mod, a coffee on Ko-fi is very welcome (op
 Factory machines can't be moved yet. => Фабричные машины пока нельзя перемещать.
 Fix stuck workbenches => Починить зависшие верстаки
 Mouse button that pins or unpins on the pin icon. Right avoids pinning by accident while clicking recipes. => Кнопка мыши, которая закрепляет или открепляет по значку булавки. Правая кнопка не даёт закрепить случайно при клике по рецептам.
+Only if a workbench is stuck (F does nothing, cannot be removed): turn this on, then press F at that workbench or remove it - the waiting craft at the front of its queue is taken out (nothing is lost). Turn it off again afterwards. => Только если верстак завис (F ничего не делает, не убрать): включите, нажмите F у этого верстака или уберите его – ожидающий заказ в начале очереди будет убран (ничего не теряется). Потом выключите.
+Update channel => Канал обновлений
+Mouse button for pinning => Кнопка мыши для закрепления
+Repair stuck workbench => Починить зависший верстак
+Stable => Стабильная
+Beta (pre-release) => Бета (пред. версия)
+Right click => Правый клик
+Left click => Левый клик
+Which versions the update check looks for. Stable = tested releases (recommended). Beta = pre-release for testing, may contain bugs. => Какие версии ищет проверка обновлений. Стабильная = проверенные версии (рекомендуется). Бета = предварительная версия для тестов, возможны ошибки.
