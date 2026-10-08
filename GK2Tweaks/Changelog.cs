@@ -42,6 +42,9 @@ namespace GK2Tweaks
         private static readonly Regex Head = new Regex(@"^##\s+(\d+\.\d+\.\d+)\s*(?:–|-)\s*(\S+)");
         private static readonly Regex Bold = new Regex(@"\*\*(.+?)\*\*");
 
+        // Warnzeichen (mit/ohne Emoji-Variante und folgendem Leerzeichen)
+        private static readonly string[] Warn = { ((char)0x26A0).ToString() + (char)0xFE0F + " ", ((char)0x26A0).ToString() + " ", ((char)0x26A0).ToString() + (char)0xFE0F, ((char)0x26A0).ToString() };
+
         private static List<Entry> Parse(string md)
         {
             var list = new List<Entry>();
@@ -76,6 +79,8 @@ namespace GK2Tweaks
                 // ... und keinen Bewertungshinweis fuer den Steam Workshop
                 if (low.Contains("rating on the steam workshop") || low.Contains("bewertung im steam workshop")) continue;
 #endif
+                // Symbole wie ⚠ kommen im Spiel aus einer Ersatzschrift und werden beim Scrollen nicht abgeschnitten (wandern aus dem Fenster) -> weglassen, die Farbe hebt hervor
+                foreach (string w in Warn) line = line.Replace(w, "");
                 if (line.StartsWith("- ")) line = "•  " + line.Substring(2);
                 else if (line.StartsWith("> ")) line = "<color=#f0b060>" + line.Substring(2) + "</color>";   // hervorgehobener Hinweis
                 target.AppendLine(Bold.Replace(line, "<b>$1</b>"));

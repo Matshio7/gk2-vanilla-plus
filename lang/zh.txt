@@ -558,3 +558,15 @@ Which versions the update check looks for. Stable = tested releases (recommended
 · in battle => · 战斗中
 Key for pinning => 固定按键
 Optional: pin/unpin with a key instead of clicking the pin icon - point the mouse at a recipe, order or blueprint and press the key. While a key is set, clicking the pin icon does nothing (no accidental pins). Empty = click the pin icon as usual. => 可选：用按键代替点击图钉来固定/取消固定 – 将鼠标指向配方、订单或蓝图并按下按键。设置按键后，点击图钉不会有任何作用（避免误固定）。留空 = 照常点击图钉。
+
+# 1.7.3
+3,500+ players! => 3,500+ 名玩家！
+GK2 Vanilla+ is now played by more than 3,500 people. I never expected that.\n\nThank you for your ratings, comments, bug reports and ideas – lots of them are in the mod by now, and more are coming. => GK2 Vanilla+ 现在已有超过 3,500 名玩家在玩。我从没想到会这样。\n\n感谢你们的评分、评论、错误报告和建议——其中很多已经加入了模组，之后还会有更多。
+Pin with => 固定方式
+3,500+ players · thanks! => 3,500+ 名玩家 · 谢谢！
+Internal: the 3,500+ players thank-you banner was shown. => 内部：已显示 3,500+ 玩家感谢横幅。
+How to pin/unpin: Mouse0 (default) = left click on the pin icon. Any other key or mouse button (middle, side buttons): point the mouse at a recipe, order or blueprint and press it - clicking the pin icon then does nothing (no accidental pins). The right mouse button is not possible (it closes the game window). => 如何固定：Mouse0（默认）= 左键点击图钉。任何其他按键或鼠标按键（中键、侧键）：将鼠标指向配方、订单或蓝图并按下——此时点击图钉不会有任何作用（不会误固定）。不能使用鼠标右键（它会关闭游戏窗口）。
+Press a key or mouse button … (Esc = left click) => 请按一个键或鼠标按键 …（Esc = 左键点击）
+Left click on the pin => 左键点击图钉
+Middle mouse button => 鼠标中键
+Mouse button {0} => 鼠标按键 {0}

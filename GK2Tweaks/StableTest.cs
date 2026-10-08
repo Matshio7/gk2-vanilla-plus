@@ -23,6 +23,18 @@ namespace GK2Tweaks
 
         private static void L(string s) => Plugin.Log.LogInfo("[STB] " + s);
         private static void Try(Action a, string what) { try { a(); } catch (Exception e) { Plugin.Log.LogError("[STB] FAIL " + what + ": " + e); } }
+        // Anpinnen: Linksklick bei Mouse0 oder leer, Tasten-Modus bei anderen Tasten/Maustasten
+        private static void PinKeyLogic()
+        {
+            var e = Plugin.PinsKey; var old = e.Value;
+            e.Value = new BepInEx.Configuration.KeyboardShortcut(KeyCode.Mouse0); bool a = PinButton.KeyMode;
+            e.Value = BepInEx.Configuration.KeyboardShortcut.Empty; bool b = PinButton.KeyMode;
+            e.Value = new BepInEx.Configuration.KeyboardShortcut(KeyCode.Mouse2); bool c = PinButton.KeyMode;
+            e.Value = new BepInEx.Configuration.KeyboardShortcut(KeyCode.G); bool d = PinButton.KeyMode;
+            e.Value = old;
+            L("PIN KEY " + (!a && !b && c && d ? "OK" : "FAIL") + " mouse0=" + a + " empty=" + b + " mouse2=" + c + " G=" + d + " default=" + e.DefaultValue + " names=" + TweaksGui.PinKeyName(KeyCode.Mouse0) + "|" + TweaksGui.PinKeyName(KeyCode.Mouse3));
+        }
+
         private static void Shot(string name) { string p = Path.Combine(BepInEx.Paths.BepInExRootPath, "shot_" + name + ".png"); ScreenCapture.CaptureScreenshot(p); L("screenshot " + p); }
 
         internal static void Tour(float t)
@@ -39,7 +51,11 @@ namespace GK2Tweaks
                 case 7: if (t > 28f) { Shot("stb_menu"); step++; } break;
                 case 8: if (t > 29f) { Try(() => { Plugin.Instance.Gui.SetMenu(false); Plugin.Instance.Gui.ShowNews(true); }, "news"); step++; } break;
                 case 9: if (t > 32f) { Shot("stb_news"); step++; } break;
-                case 10: if (t > 33f) { L("DONE"); step++; Application.Quit(); } break;
+                case 10: if (t > 33f) { Try(() => Plugin.Instance.Gui.NewsScrollTo(140f), "news scroll"); step++; } break;
+                case 11: if (t > 35f) { Shot("stb_news_scrolled"); step++; } break;
+                case 12: if (t > 36f) { Try(PinKeyLogic, "pin key"); Try(() => { Plugin.Instance.Gui.ShowNews(false); Plugin.Instance.Gui.ShowCelebration(null); }, "celebration"); step++; } break;
+                case 13: if (t > 39f) { Shot("stb_celebration"); step++; } break;
+                case 14: if (t > 40f) { L("DONE"); step++; Application.Quit(); } break;
             }
         }
 

@@ -558,3 +558,15 @@ Which versions the update check looks for. Stable = tested releases (recommended
 · in battle => · en combate
 Key for pinning => Tecla para fijar
 Optional: pin/unpin with a key instead of clicking the pin icon - point the mouse at a recipe, order or blueprint and press the key. While a key is set, clicking the pin icon does nothing (no accidental pins). Empty = click the pin icon as usual. => Opcional: fijar/soltar con una tecla en vez de pulsar el icono de alfiler – apunta con el ratón a una receta, encargo o plano y pulsa la tecla. Mientras haya una tecla asignada, pulsar el alfiler no hace nada (sin fijados por error). Vacío = pulsar el alfiler como siempre.
+
+# 1.7.3
+3,500+ players! => ¡Más de 3.500 jugadores!
+GK2 Vanilla+ is now played by more than 3,500 people. I never expected that.\n\nThank you for your ratings, comments, bug reports and ideas – lots of them are in the mod by now, and more are coming. => GK2 Vanilla+ ya lo juegan más de 3.500 personas. Nunca lo habría esperado.\n\nGracias por vuestras valoraciones, comentarios, informes de errores e ideas: muchas ya están en el mod, y vendrán más.
+Pin with => Fijar con
+3,500+ players · thanks! => 3.500+ jugadores · ¡gracias!
+Internal: the 3,500+ players thank-you banner was shown. => Interno: se mostró el aviso de agradecimiento por los 3.500+ jugadores.
+How to pin/unpin: Mouse0 (default) = left click on the pin icon. Any other key or mouse button (middle, side buttons): point the mouse at a recipe, order or blueprint and press it - clicking the pin icon then does nothing (no accidental pins). The right mouse button is not possible (it closes the game window). => Cómo fijar: Mouse0 (por defecto) = clic izquierdo en la chincheta. Cualquier otra tecla o botón del ratón (central, laterales): señala una receta, un pedido o un plano y púlsalo; hacer clic en la chincheta no hace nada entonces (sin fijados accidentales). El botón derecho no es posible (cierra la ventana del juego).
+Press a key or mouse button … (Esc = left click) => Pulsa una tecla o un botón del ratón … (Esc = clic izquierdo)
+Left click on the pin => Clic izquierdo en la chincheta
+Middle mouse button => Botón central del ratón
+Mouse button {0} => Botón del ratón {0}

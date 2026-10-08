@@ -558,3 +558,15 @@ Which versions the update check looks for. Stable = tested releases (recommended
 · in battle => · в бою
 Key for pinning => Клавиша для закрепления
 Optional: pin/unpin with a key instead of clicking the pin icon - point the mouse at a recipe, order or blueprint and press the key. While a key is set, clicking the pin icon does nothing (no accidental pins). Empty = click the pin icon as usual. => Необязательно: закреплять/откреплять клавишей вместо щелчка по булавке – наведи мышь на рецепт, заказ или чертёж и нажми клавишу. Пока клавиша задана, щелчок по булавке ничего не делает (без случайных закреплений). Пусто = щелчок по булавке, как раньше.
+
+# 1.7.3
+3,500+ players! => Более 3 500 игроков!
+GK2 Vanilla+ is now played by more than 3,500 people. I never expected that.\n\nThank you for your ratings, comments, bug reports and ideas – lots of them are in the mod by now, and more are coming. => В GK2 Vanilla+ играют уже более 3 500 человек. Я никогда такого не ожидал.\n\nСпасибо за оценки, комментарии, сообщения об ошибках и идеи – многие из них уже в моде, и будут ещё.
+Pin with => Закреплять с помощью
+3,500+ players · thanks! => 3 500+ игроков · спасибо!
+Internal: the 3,500+ players thank-you banner was shown. => Внутреннее: баннер благодарности за 3 500+ игроков был показан.
+How to pin/unpin: Mouse0 (default) = left click on the pin icon. Any other key or mouse button (middle, side buttons): point the mouse at a recipe, order or blueprint and press it - clicking the pin icon then does nothing (no accidental pins). The right mouse button is not possible (it closes the game window). => Как закреплять: Mouse0 (по умолчанию) = левый клик по булавке. Любая другая клавиша или кнопка мыши (средняя, боковые): наведите мышь на рецепт, заказ или чертёж и нажмите её – клик по булавке тогда ничего не делает (без случайных закреплений). Правая кнопка мыши невозможна (она закрывает окно игры).
+Press a key or mouse button … (Esc = left click) => Нажмите клавишу или кнопку мыши … (Esc = левый клик)
+Left click on the pin => Левый клик по булавке
+Middle mouse button => Средняя кнопка мыши
+Mouse button {0} => Кнопка мыши {0}

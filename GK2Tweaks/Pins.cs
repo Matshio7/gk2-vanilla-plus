@@ -464,8 +464,8 @@ namespace GK2Tweaks
 
         // 1.7.3: immer Linksklick - Rechtsklick schliesst im Spiel das Fenster (Option kommt mit 1.8, wenn der Klick abgefangen wird)
         private static int ClickIndex => 0;
-        // Taste gesetzt: Anpinnen per Taste, Klick auf die Nadel tut nichts
-        private static bool KeyMode => Plugin.PinsKey != null && Plugin.PinsKey.Value.MainKey != KeyCode.None;
+        // Andere Taste/Maustaste als die linke gesetzt: Anpinnen per Taste, Klick auf die Nadel tut nichts
+        internal static bool KeyMode => Plugin.PinsKey != null && Plugin.PinsKey.Value.MainKey != KeyCode.None && Plugin.PinsKey.Value.MainKey != KeyCode.Mouse0;
         private static int lastToggleFrame = -1;
         private static float lastPollToggle = -10f;
 

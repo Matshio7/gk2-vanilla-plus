@@ -4,11 +4,13 @@ using UnityEngine;
 
 namespace GK2Tweaks
 {
-    // 1.000+ Spieler: einmalig ein Danke-Banner mit Pixel-Konfetti im Hauptmenue, danach nur noch ein kleiner
+    // Meilenstein (zuletzt 3.500+ Spieler): einmalig ein Danke-Banner mit Pixel-Konfetti im Hauptmenue, danach nur noch ein kleiner
     // Hinweis neben "modded" (siehe ModdedLabelPatch).
     internal sealed partial class TweaksGui
     {
         private const int CelebWindowId = 0x6B31;
+        // Neuer Meilenstein: die Texte hier und in MainMenu.cs aendern (als feste Texte, damit tools/extract_strings.py
+        // sie fuer die Uebersetzungen findet) UND den Config-Schluessel "Celebrated…" in Plugin.cs hochzaehlen -> jeder sieht ihn einmal
         private bool celebOpen;
         private Rect celebWin;
         private Action afterCeleb;
@@ -115,11 +117,11 @@ namespace GK2Tweaks
             }
             if (skinned) GUILayout.Label("GK2 Vanilla+", titleStyle);
             GUILayout.Space(6);
-            GUILayout.Label(Labels.T("1.000+ Spieler!", "1,000+ players!"), celebBigStyle);
+            GUILayout.Label(Labels.T("3.500+ Spieler!", "3,500+ players!"), celebBigStyle);
             GUILayout.Space(6);
             GUILayout.Label(Labels.T(
-                "GK2 Vanilla+ wird inzwischen von über tausend Leuten gespielt. Damit hätte ich nie gerechnet.\n\nDanke für eure Bewertungen, Kommentare und Ideen – viele davon stecken in diesem Update: Zombies umbenennen, Handel mit der passenden Menge, Objekte verschieben, Portugiesisch und mehr.",
-                "GK2 Vanilla+ is now played by more than a thousand people. I never expected that.\n\nThank you for your ratings, comments and ideas – many of them are in this update: renaming zombies, trading the right amount, moving objects, Portuguese and more."),
+                "GK2 Vanilla+ wird inzwischen von über 3.500 Leuten gespielt. Damit hätte ich nie gerechnet.\n\nDanke für eure Bewertungen, Kommentare, Fehlermeldungen und Ideen – ganz viele davon stecken inzwischen im Mod, und es kommen noch mehr.",
+                "GK2 Vanilla+ is now played by more than 3,500 people. I never expected that.\n\nThank you for your ratings, comments, bug reports and ideas – lots of them are in the mod by now, and more are coming."),
                 celebTextStyle);
             GUILayout.Space(4);
             GUILayout.Label("– McFly7", celebTextStyle);

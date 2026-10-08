@@ -36,6 +36,7 @@ namespace GK2Tweaks
         }
 #endif
 
+        internal void NewsScrollTo(float y) => newsScroll.y = y;   // nur fuer Dev-Tests
         internal void ShowNews(bool sinceUpdate)
         {
             newsOpen = true;
@@ -519,9 +520,24 @@ namespace GK2Tweaks
             if (capturingKey != null && Event.current.type == EventType.KeyDown && Event.current.keyCode != KeyCode.None)
             {
                 if (Event.current.keyCode != KeyCode.Escape) capturingKey.Value = new KeyboardShortcut(Event.current.keyCode);
+                else if (capturingKey == Plugin.PinsKey) capturingKey.Value = new KeyboardShortcut(KeyCode.Mouse0);   // Esc = wieder Linksklick
                 else if (capturingKey != Plugin.MenuKey) capturingKey.Value = KeyboardShortcut.Empty;
                 capturingKey = null;
                 Event.current.Use();
+            }
+            // Anpinn-Taste: auch Maustasten erlaubt (links, Mitte, Seitentasten) - rechts nicht, die schliesst im Spiel das Fenster
+            if (capturingKey == Plugin.PinsKey && capturingKey != null)
+            {
+                KeyCode mk = KeyCode.None;
+                if (Event.current.type == EventType.MouseDown)
+                {
+                    int b = Event.current.button;
+                    if (b == 0) mk = KeyCode.Mouse0;
+                    else if (b >= 2 && b <= 6) mk = KeyCode.Mouse0 + b;
+                    Event.current.Use();   // Klick nicht an andere Knoepfe weitergeben
+                }
+                else for (KeyCode k = KeyCode.Mouse3; k <= KeyCode.Mouse6; k++) if (Input.GetKeyDown(k)) { mk = k; break; }
+                if (mk != KeyCode.None) { capturingKey.Value = new KeyboardShortcut(mk); capturingKey = null; }
             }
 
             PadBeginGUI();
@@ -1228,8 +1244,20 @@ namespace GK2Tweaks
 
         private void KeyField(ConfigEntry<KeyboardShortcut> e)
         {
-            string text = capturingKey == e ? Labels.T("Taste drücken … (Esc = keine)", "Press a key … (Esc = none)") : (e.Value.MainKey == KeyCode.None ? Labels.T("– keine –", "– none –") : e.Value.ToString());
+            string text;
+            if (e == Plugin.PinsKey)
+                text = capturingKey == e ? Labels.T("Taste oder Maustaste drücken … (Esc = Linksklick)", "Press a key or mouse button … (Esc = left click)") : PinKeyName(e.Value.MainKey);
+            else
+                text = capturingKey == e ? Labels.T("Taste drücken … (Esc = keine)", "Press a key … (Esc = none)") : (e.Value.MainKey == KeyCode.None ? Labels.T("– keine –", "– none –") : e.Value.ToString());
             if (GUILayout.Button(text, buttonStyle, GUILayout.Width(310))) capturingKey = e;
+        }
+
+        internal static string PinKeyName(KeyCode k)
+        {
+            if (k == KeyCode.None || k == KeyCode.Mouse0) return Labels.T("Linksklick auf die Nadel", "Left click on the pin");
+            if (k == KeyCode.Mouse2) return Labels.T("Mittlere Maustaste", "Middle mouse button");
+            if (k >= KeyCode.Mouse3 && k <= KeyCode.Mouse6) return string.Format(Labels.T("Maustaste {0}", "Mouse button {0}"), (int)(k - KeyCode.Mouse0) + 1);
+            return k.ToString();
         }
 
         private void TextField(ConfigEntryBase e)

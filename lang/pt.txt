@@ -554,3 +554,15 @@ Which versions the update check looks for. Stable = tested releases (recommended
 · in battle => · em batalha
 Key for pinning => Tecla para fixar
 Optional: pin/unpin with a key instead of clicking the pin icon - point the mouse at a recipe, order or blueprint and press the key. While a key is set, clicking the pin icon does nothing (no accidental pins). Empty = click the pin icon as usual. => Opcional: fixar/soltar com uma tecla em vez de clicar no alfinete – aponte o mouse para uma receita, encomenda ou planta e aperte a tecla. Com uma tecla definida, clicar no alfinete não faz nada (sem fixar por engano). Vazio = clicar no alfinete como antes.
+
+# 1.7.3
+3,500+ players! => Mais de 3.500 jogadores!
+GK2 Vanilla+ is now played by more than 3,500 people. I never expected that.\n\nThank you for your ratings, comments, bug reports and ideas – lots of them are in the mod by now, and more are coming. => GK2 Vanilla+ já é jogado por mais de 3.500 pessoas. Nunca imaginei isso.\n\nObrigado pelas avaliações, comentários, relatos de bugs e ideias – muitas delas já estão no mod, e mais estão chegando.
+Pin with => Fixar com
+3,500+ players · thanks! => 3.500+ jogadores · obrigado!
+Internal: the 3,500+ players thank-you banner was shown. => Interno: o banner de agradecimento pelos 3.500+ jogadores foi exibido.
+How to pin/unpin: Mouse0 (default) = left click on the pin icon. Any other key or mouse button (middle, side buttons): point the mouse at a recipe, order or blueprint and press it - clicking the pin icon then does nothing (no accidental pins). The right mouse button is not possible (it closes the game window). => Como fixar: Mouse0 (padrão) = clique esquerdo no alfinete. Qualquer outra tecla ou botão do mouse (meio, botões laterais): aponte para uma receita, pedido ou projeto e pressione – clicar no alfinete então não faz nada (sem fixar por engano). O botão direito não é possível (ele fecha a janela do jogo).
+Press a key or mouse button … (Esc = left click) => Pressione uma tecla ou botão do mouse … (Esc = clique esquerdo)
+Left click on the pin => Clique esquerdo no alfinete
+Middle mouse button => Botão do meio do mouse
+Mouse button {0} => Botão do mouse {0}

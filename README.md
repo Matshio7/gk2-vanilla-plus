@@ -3,7 +3,7 @@
 # GK2 Vanilla+
 
 **Ultrawide, performance & quality of life for Graveyard Keeper 2 – the game stays vanilla.**
-by **McFly7** · [Download](https://github.com/Matshio7/gk2-vanilla-plus/releases/latest)
+by **McFly7** · [Steam Workshop](https://steamcommunity.com/sharedfiles/filedetails/?id=3808053878) · [Download](https://github.com/Matshio7/gk2-vanilla-plus/releases/latest) · [Changelog](docs/CHANGELOG.md)
 
 [![Support me on Ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/mcfly7)
 
@@ -17,51 +17,56 @@ by **McFly7** · [Download](https://github.com/Matshio7/gk2-vanilla-plus/release
 
 ## English
 
-GK2 Vanilla+ improves the PC version of Graveyard Keeper 2 without changing the game itself: no gameplay changes, no game files touched, save games stay compatible with the unmodded game. Uninstall it and the game is exactly as before.
+GK2 Vanilla+ fixes the small annoyances of Graveyard Keeper 2 without changing how it plays: no balance changes, no game files touched, saves stay compatible with the unmodded game. Every feature has its own switch – **All off (vanilla)** turns everything off, then enable just what you want. If another mod does the same job, Vanilla+ steps aside for that part.
 
 ### Features
 
-**Ultrawide**
-- Unlocks 21:9 and 32:9 resolutions (2560×1080, 3440×1440, 3840×1080, 5120×1440, …) that the game hides
-- Fills the sides of the main menu on ultrawide screens with a blurred copy of the menu image
+**Comfort**
+- **Pinning** – recipes, blueprints, town buildings, blockages, quests, town orders and alchemy recipes. A small list shows have/need for every ingredient, the ingredient tree, fuel and recipe variants; craft 2–10× and all amounts scale. Left click the pin – or set your own key or mouse button.
+- **Trade the right amount** – the vendor slider starts at exactly the amount that still gives a thumbs up; "Add liked goods" puts them all in at once.
+- **Max button** when crafting, **rename zombies**, **week plan** (F6) with a spoiler-free daily reminder
+- Day & time in the area box, Esc / B leaves conversations, faster doors & map travel, instant removal
 
-**Performance** – the game has more graphics switches internally than its menu shows. The mod menu (F9) exposes them:
-- Shadows (soft PC shadows or the cheaper console shadows), ambient occlusion (HBAO), point lights, back light, water, clouds, render mode
-- Frame rate cap or VSync with a target FPS (e.g. a locked 60), physics rate, log spam filter
-- Useful on any monitor, especially on laptops, handhelds and Macs
+**Performance**
+- Hidden graphics settings: shadows, ambient occlusion, lights, water, clouds, render mode, physics rate
+- One-click profiles (Steam Deck / Battery, Performance, Quality), FPS cap and VSync, less rain for weak PCs
+- **Benchmark** that tests all graphics tiers and recommends one
+- **FPS display** (F10): FPS, 1% low, CPU, GPU, RAM, VRAM, GPU temp, clock
 
-**Quality of life**
-- Mod menu in the game's own look (F9 or the **Mods** button in the main and pause menu), German and English
-- **Pin recipes**, blueprints and town buildings: have/need list at the screen edge (controller: press both sticks)
-- **What's new** window after each update
-- Pin **quests** and single crafts too; pins are kept per save
-- **Save overview** in the main menu with "Play" and backups per save
-- **Camera**: zoom presets (F5), separate zoom indoors, mouse-wheel zoom
-- **Screenshot key** (F12) in up to 4× resolution without HUD
-- **Readability**: size of the mod displays, high contrast
-- Languages: English, German, French, Spanish, Russian, Chinese – more via a text file
-- **Graphics benchmark**: runs through all tiers, score and recommendation
-- FPS display (F10): pick the corner and what to show – FPS, 1% low, frame time, CPU, GPU, RAM, VRAM, resolution, clock, in-game weekday and time
-- "Save now" button and optional save key, extra autosave timer
-- **Save backups** with restore from the mod menu
-- **Week plan** (F6) and a spoiler-free daily reminder: what is possible on which weekday
-- **Hide HUD** (F7) for clean screenshots
-- Camera zoom, pause when the window is in the background, skip intro logos
-- Update check with one-click update (Windows)
+**Screen**
+- **Ultrawide 21:9 & 32:9** (2560×1080, 3440×1440, 3840×1080, 5120×1440, …) incl. main menu, HUD and full-width rain
+- **Main menu backgrounds** – six Vanilla+ pictures or your own view from your save, with styles, blur and drifting fog
+- OLED black, hide HUD (F7), HUD to center, skip intro logos
+- Camera zoom presets (F5), zoom indoors, mouse wheel; **hi-res screenshots** (F12) up to 4×
+
+**Saves**
+- Save overview in the main menu, **automatic backups** with one-click restore, keep important backups forever, an extra backup when a battle starts, extra autosave
+
+**Controller** – the whole mod menu and the pinned list work with a gamepad. Made for Steam Deck.
+
+**Optional, not fully vanilla (off by default):** move objects, full refund when removing buildings, refund talents & research.
+
+Languages: English, German, French, Spanish, Portuguese, Russian, Chinese – more via a text file.
 
 ### Install (Windows)
 
-1. Download `GK2-VanillaPlus-<version>.zip` from [Releases](https://github.com/Matshio7/gk2-vanilla-plus/releases/latest) and extract it.
+1. **Steam Workshop:** [Subscribe](https://steamcommunity.com/sharedfiles/filedetails/?id=3808053878) and open `<Steam library>\steamapps\workshop\content\4358690\3808053878`.
+   **GitHub:** download `GK2-VanillaPlus-<version>.zip` from [Releases](https://github.com/Matshio7/gk2-vanilla-plus/releases/latest) and extract it.
 2. Run `Installieren.bat`. If SmartScreen warns: *More info* → *Run anyway*.
-3. The game folder is found automatically. Click **Install** and start the game via Steam.
+3. The game folder is found automatically. Choose **Stable** (recommended, tested) or **Beta** (newest features from GitHub, may contain bugs), click **Install** and start the game via Steam.
+4. In game: **F9** or the **Vanilla+** button opens the mod menu.
 
-**Updating:** in game, the mod menu (F9) shows new versions – *Save & update* does the rest. Or run the installer again: *Check online for updates*.
+**Updating:** the mod menu shows new versions – *Save & update* does the rest. Switch between Stable and Beta under *Update channel*.
 
-**Uninstall:** run the installer → *Uninstall* (optionally removes BepInEx too).
+**Uninstall:** run the installer → *Uninstall* → *Remove everything* (incl. BepInEx, game back to original) or *Vanilla+ only*. The mod's backups and screenshots are kept in `Documents\GK2 Vanilla+`.
 
-### macOS (CrossOver) / Linux (Proton, Steam Deck)
+### macOS (CrossOver) / Linux / Steam Deck (Proton)
 
-Copy the contents of `installer/files` into the game folder and set the DLL override `winhttp` to *native, builtin* (CrossOver: Wine configuration → Libraries; Proton: launch option `WINEDLLOVERRIDES="winhttp=n,b" %command%`). The mod menu then also offers a **controller fix** against stutter with PlayStation controllers under Wine.
+Copy the contents of `installer/files` into the game folder and set the DLL override `winhttp` to *native, builtin* (CrossOver: Wine configuration → Libraries; Proton: launch option `WINEDLLOVERRIDES="winhttp=n,b" %command%`). Step-by-step guide in the Steam Workshop Discussions tab.
+
+### Bugs & ideas
+
+Steam Workshop Discussions or [GitHub Issues](https://github.com/Matshio7/gk2-vanilla-plus/issues) – for bugs please attach `BepInEx\LogOutput.log`.
 
 ### Mod packs
 
@@ -75,56 +80,63 @@ See [docs/BUILDING.md](docs/BUILDING.md). The game's own assemblies are not part
 
 ## Deutsch
 
-GK2 Vanilla+ verbessert die PC-Version von Graveyard Keeper 2, ohne das Spiel selbst zu verändern: kein anderes Gameplay, keine Spieldateien angefasst, Spielstände bleiben mit dem Originalspiel kompatibel. Nach dem Deinstallieren ist das Spiel wieder genau wie vorher.
+GK2 Vanilla+ behebt die kleinen Ärgernisse von Graveyard Keeper 2, ohne das Spielgefühl zu ändern: keine Balance-Änderungen, keine Spieldateien angefasst, Spielstände bleiben mit dem Originalspiel kompatibel. Jede Funktion hat einen eigenen Schalter – **Alles aus (Vanilla)** schaltet alles ab, danach nur das einschalten, was du willst. Macht ein anderer Mod dasselbe, hält sich Vanilla+ bei diesem Teil raus.
 
 ### Funktionen
 
-**Ultrawide**
-- Schaltet 21:9- und 32:9-Auflösungen frei (2560×1080, 3440×1440, 3840×1080, 5120×1440, …), die das Spiel versteckt
-- Füllt auf Ultrawide-Bildschirmen die Seiten des Hauptmenüs mit einer unscharfen Kopie des Menübilds
-
-**Leistung** – das Spiel hat intern mehr Grafik-Schalter, als das Menü zeigt. Das Mod-Menü (F9) macht sie zugänglich:
-- Schatten (weiche PC-Schatten oder die sparsameren Konsolen-Schatten), Umgebungsverdeckung (HBAO), Punktlichter, Gegenlicht, Wasser, Wolken, Render-Modus
-- Bildraten-Limit oder VSync mit Ziel-FPS (z. B. stabile 60), Physik-Takt, Filter gegen Log-Spam
-- Hilft auf jedem Monitor, besonders auf Laptops, Handhelds und Macs
-
 **Komfort**
-- Mod-Menü in der Optik des Spiels (F9 oder Button **Mods** im Haupt- und Pausenmenü), Deutsch und Englisch
-- **Rezepte anpinnen**, auch Baupläne und Stadtgebäude: Haben/Brauchen-Liste am Bildschirmrand (Controller: beide Sticks drücken)
-- **„Was ist neu?“** nach jedem Update
-- Auch **Quests** und Einzel-Handwerk anpinnen; Pins bleiben pro Spielstand gespeichert
-- **Spielstand-Übersicht** im Hauptmenü mit „Spielen“ und Backups je Spielstand
-- **Kamera**: Zoom-Stufen (F5), eigener Zoom in Innenräumen, Zoom mit dem Mausrad
-- **Screenshot-Taste** (F12) in bis zu 4-facher Auflösung ohne HUD
-- **Lesbarkeit**: Größe der Mod-Anzeigen, hoher Kontrast
-- Sprachen: Deutsch, Englisch, Französisch, Spanisch, Russisch, Chinesisch – weitere per Textdatei
-- **Grafik-Benchmark**: geht alle Stufen durch, Score und Empfehlung
-- FPS-Anzeige (F10): Ecke und Inhalt wählbar – FPS, 1%-Low, Frametime, CPU, GPU, RAM, VRAM, Auflösung, Uhrzeit, Wochentag und Uhrzeit im Spiel
-- Button „Jetzt speichern“ und optionale Speichern-Taste, zusätzlicher Autosave
-- **Spielstand-Backups** mit Wiederherstellen im Mod-Menü
-- **Wochenplan** (F6) und spoilerfreie Tagesübersicht: was an welchem Wochentag geht
-- **HUD ausblenden** (F7) für saubere Screenshots
-- Kamera-Zoom, Pause im Hintergrund, Intro-Logos überspringen
-- Update-Prüfung mit Ein-Klick-Update (Windows)
+- **Anpinnen** – Rezepte, Baupläne, Stadtgebäude, Blockaden, Quests, Stadtaufträge und Alchemie-Rezepte. Eine kleine Liste zeigt Haben/Brauchen für jede Zutat, den Zutatenbaum, Brennstoff und Rezeptvarianten; 2–10× herstellen und alle Mengen passen sich an. Linksklick auf die Nadel – oder eine eigene Taste bzw. Maustaste.
+- **Passende Menge beim Handeln** – der Regler startet genau bei der Menge, die noch einen Daumen hoch gibt; „Daumen-hoch-Waren einlegen“ legt alle auf einmal hinein.
+- **Max-Knopf** beim Herstellen, **Zombies umbenennen**, **Wochenplan** (F6) mit spoilerfreier Tagesübersicht
+- Tag & Uhrzeit im Gebietsfeld, Esc / B beendet Gespräche, schnellere Türen & Kartenreisen, sofortiges Abbauen
+
+**Leistung**
+- Versteckte Grafikoptionen: Schatten, Umgebungsverdeckung, Lichter, Wasser, Wolken, Render-Modus, Physik-Takt
+- Profile mit einem Klick (Steam Deck / Akku, Leistung, Qualität), FPS-Limit und VSync, weniger Regen für schwache PCs
+- **Benchmark**, der alle Grafikstufen testet und eine empfiehlt
+- **FPS-Anzeige** (F10): FPS, 1%-Low, CPU, GPU, RAM, VRAM, GPU-Temperatur, Uhrzeit
+
+**Bild**
+- **Ultrawide 21:9 & 32:9** (2560×1080, 3440×1440, 3840×1080, 5120×1440, …) inkl. Hauptmenü, HUD und Regen über die volle Breite
+- **Hauptmenü-Hintergründe** – sechs Vanilla+-Bilder oder deine eigene Ansicht aus dem Spielstand, mit Stilen, Unschärfe und Nebel
+- OLED-Schwarz, HUD ausblenden (F7), HUD mittig, Intro-Logos überspringen
+- Zoom-Stufen (F5), Zoom in Innenräumen, Mausrad; **Screenshots** (F12) in bis zu 4-facher Auflösung
+
+**Spielstände**
+- Übersicht im Hauptmenü, **automatische Backups** mit Wiederherstellen per Klick, wichtige Backups dauerhaft behalten, zusätzliches Backup bei Kampfbeginn, zusätzlicher Autosave
+
+**Controller** – das ganze Mod-Menü und die Pin-Liste funktionieren mit dem Gamepad. Gemacht für das Steam Deck.
+
+**Optional, nicht ganz Vanilla (standardmäßig aus):** Objekte verschieben, volle Erstattung beim Abbauen, Talente & Forschung zurückerstatten.
+
+Sprachen: Deutsch, Englisch, Französisch, Spanisch, Portugiesisch, Russisch, Chinesisch – weitere per Textdatei.
 
 ### Installation (Windows)
 
-1. `GK2-VanillaPlus-<Version>.zip` unter [Releases](https://github.com/Matshio7/gk2-vanilla-plus/releases/latest) laden und entpacken.
+1. **Steam Workshop:** [Abonnieren](https://steamcommunity.com/sharedfiles/filedetails/?id=3808053878) und `<Steam-Bibliothek>\steamapps\workshop\content\4358690\3808053878` öffnen.
+   **GitHub:** `GK2-VanillaPlus-<Version>.zip` unter [Releases](https://github.com/Matshio7/gk2-vanilla-plus/releases/latest) laden und entpacken.
 2. `Installieren.bat` starten. Falls SmartScreen warnt: *Weitere Informationen* → *Trotzdem ausführen*.
-3. Der Spielordner wird automatisch gefunden. **Installieren** klicken und das Spiel über Steam starten.
+3. Der Spielordner wird automatisch gefunden. **Stabil** (empfohlen, getestet) oder **Beta** (neueste Funktionen von GitHub, kann Fehler enthalten) wählen, **Installieren** klicken und das Spiel über Steam starten.
+4. Im Spiel: **F9** oder der Knopf **Vanilla+** öffnet das Mod-Menü.
 
-**Aktualisieren:** Im Spiel zeigt das Mod-Menü (F9) neue Versionen an – *Speichern & aktualisieren* erledigt den Rest. Oder den Installer erneut starten: *Online nach Updates suchen*.
+**Aktualisieren:** Das Mod-Menü zeigt neue Versionen an – *Speichern & aktualisieren* erledigt den Rest. Zwischen Stabil und Beta wechselst du unter *Update-Kanal*.
 
-**Deinstallieren:** Installer starten → *Deinstallieren* (auf Wunsch samt BepInEx).
+**Deinstallieren:** Installer starten → *Deinstallieren* → *Alles entfernen* (samt BepInEx, Spiel wieder original) oder *Nur Vanilla+*. Backups und Screenshots des Mods bleiben unter `Dokumente\GK2 Vanilla+` erhalten.
 
-### macOS (CrossOver) / Linux (Proton, Steam Deck)
+### macOS (CrossOver) / Linux / Steam Deck (Proton)
 
-Den Inhalt von `installer/files` in den Spielordner kopieren und die DLL-Überschreibung `winhttp` auf *nativ, builtin* stellen (CrossOver: Wine-Konfiguration → Bibliotheken; Proton: Startoption `WINEDLLOVERRIDES="winhttp=n,b" %command%`). Im Mod-Menü gibt es dann zusätzlich den **Controller-Fix** gegen Ruckler mit PlayStation-Controllern unter Wine.
+Den Inhalt von `installer/files` in den Spielordner kopieren und die DLL-Überschreibung `winhttp` auf *nativ, builtin* stellen (CrossOver: Wine-Konfiguration → Bibliotheken; Proton: Startoption `WINEDLLOVERRIDES="winhttp=n,b" %command%`). Schritt-für-Schritt-Anleitung im Diskussionen-Tab des Steam Workshops.
+
+### Fehler & Ideen
+
+Diskussionen im Steam Workshop oder [GitHub Issues](https://github.com/Matshio7/gk2-vanilla-plus/issues) – bei Fehlern bitte `BepInEx\LogOutput.log` anhängen.
 
 ### Modpacks
 
 GK2 Vanilla+ darf **unverändert** in kostenlose Modpacks aufgenommen werden, mit Namensnennung und Lizenzdatei. Verändern oder Credits entfernen ist nicht erlaubt. Siehe [LICENSE.md](LICENSE.md).
 
 ---
+
+Some features were inspired by "Recipe Pin" (farfars), "Daily Reminder" (MrsKiraSayers), "GK2 Ultrawide Rain Fix" (Dry Bones), "What time is it", "ESC to Leave" (OrionAF), "Instant Transitions" (LeBetoven) and "Talent & Tech Refund" – own implementation.
 
 GK2 Vanilla+ is a fan project, not affiliated with Lazy Bear Games or tinyBuild.

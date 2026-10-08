@@ -10,7 +10,7 @@
 - **Installer:** new look with the Vanilla+ logo. It is now really in English on non-German Windows (it always showed German before) and recognises the installed version correctly (it always offered an "update" before).
 - **Installer:** clearer uninstall – "Remove everything" (Vanilla+ and BepInEx, game back to original) or "Vanilla+ only"; read-only files no longer stop it, leftovers are listed, and a log is written to Documents\GK2 Vanilla+\uninstall.log.
 - **Fix:** the pin icon is smaller and smoother (it looked big and pixelated at 4K).
-- **Option:** pin with a **key** instead of clicking the pin icon (mod menu → Pins → "Key for pinning"): point at a recipe, order or blueprint and press the key – then clicks never pin by accident. Clicking stays the default.
+- **Option:** pin with a **key or mouse button** instead of clicking the pin icon (mod menu → Pins → "Pin with"): point at a recipe, order or blueprint and press it – then clicks never pin by accident. Middle and side mouse buttons work too. Left click on the pin stays the default (Esc switches back).
 - **Fix:** Max when crafting counts carefully: ingredients already reserved by other queued crafts and tool durability (e.g. saw) are taken into account, and it never adds an extra round – so no crafts get stuck "waiting" at the workbench any more.
 - **Fix:** battle-safe backups – the last save before a battle is always backed up and never pushed out by autosaves made during the battle (those are marked "in battle" in the backup list).
 - **Fix:** deleted backups no longer leave empty folders behind (Linux/Steam Deck/Mac).
@@ -25,7 +25,7 @@
 - **Installer:** neues Aussehen mit dem Vanilla+-Logo. Auf nicht-deutschem Windows ist er jetzt wirklich englisch (vorher immer deutsch) und erkennt die installierte Version richtig (vorher bot er immer ein „Update“ an).
 - **Installer:** klareres Deinstallieren – „Alles entfernen“ (Vanilla+ und BepInEx, Spiel wieder original) oder „Nur Vanilla+“; schreibgeschützte Dateien stoppen nichts mehr, Reste werden aufgelistet, ein Protokoll liegt unter Dokumente\GK2 Vanilla+\uninstall.log.
 - **Fix:** Die Pin-Nadel ist kleiner und weicher (sie wirkte bei 4K groß und verpixelt).
-- **Option:** Mit einer **Taste** statt per Klick auf die Nadel anpinnen (Mod-Menü → Anpinnen → „Taste zum Anpinnen“): Maus auf Rezept, Auftrag oder Bauplan und Taste drücken – dann pinnt ein Klick nie mehr versehentlich. Standard bleibt der Klick.
+- **Option:** Mit einer **Taste oder Maustaste** statt per Klick auf die Nadel anpinnen (Mod-Menü → Anpinnen → „Anpinnen mit“): Maus auf Rezept, Auftrag oder Bauplan und drücken – dann pinnt ein Klick nie mehr versehentlich. Mittlere und Seitentasten der Maus gehen auch. Standard bleibt der Linksklick auf die Nadel (Esc stellt zurück).
 - **Fix:** Max beim Herstellen rechnet vorsichtig: Zutaten, die andere Aufträge in der Warteschlange schon brauchen, und die Haltbarkeit von Werkzeug (z. B. Säge) zählen mit, und es kommt kein Extra-Durchgang mehr dazu – so bleibt nichts mehr als „wartet“ an der Werkbank hängen.
 - **Fix:** Kampf-sichere Backups – der letzte Stand vor einem Kampf wird immer gesichert und nie von Autosaves aus dem Kampf verdrängt (diese sind in der Backup-Liste mit „im Kampf“ markiert).
 - **Fix:** Gelöschte Backups hinterlassen keine leeren Ordner mehr (Linux/Steam Deck/Mac).
