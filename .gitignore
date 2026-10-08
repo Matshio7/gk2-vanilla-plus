@@ -17,3 +17,13 @@ reference/
 
 # Rohbilder der Menue-Hintergruende (je ~25 MB)
 docs/menubg_raw/
+_tools/
+
+# Nur lokal: privates Workshop-Dashboard (laeuft auf dem eigenen Server), Werbe-/Galeriebilder, Planungsnotizen
+dashboard/
+__pycache__/
+workshop/screenshots-*/
+workshop/guide/
+docs/nexus/
+docs/logo/*.py
+CLAUDE.local.md

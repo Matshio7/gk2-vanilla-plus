@@ -52,5 +52,5 @@ Mod für Graveyard Keeper 2 (BepInEx 5 / HarmonyX, C#). Autor: Mats ("McFly7", G
 - Pushen/Veröffentlichen nur nach Mats' Go.
 - Keine Dateien endgültig löschen (z. B. Nexus-Archiv) – das macht Mats.
 - Nie Passwörter eingeben oder für Mats einloggen.
-- Interner Patch-Rhythmus (große Updates Montag, Hotfix Donnerstag) nur zur Planung, nie öffentlich nennen.
+- Interne Planungsnotizen stehen in CLAUDE.local.md (nur lokal, nicht im Repo) – nie öffentlich nennen.
 - Spielstände vor Tests sichern und danach unverändert zurücklegen.
