@@ -27,3 +27,6 @@ workshop/guide/
 docs/nexus/
 docs/logo/*.py
 CLAUDE.local.md
+CLAUDE.md
+docs/ROADMAP.md
+docs/FEEDBACK.md
