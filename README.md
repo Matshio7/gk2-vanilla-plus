@@ -44,7 +44,7 @@ GK2 Vanilla+ fixes the small annoyances of Graveyard Keeper 2 without changing h
 
 **Controller** – the whole mod menu and the pinned list work with a gamepad. Made for Steam Deck.
 
-**Optional, not fully vanilla (off by default):** move objects, full refund when removing buildings, refund talents & research.
+**Optional, not fully vanilla (off by default):** move objects, full refund when removing buildings, refund talents & research, movement speed 100–200 %.
 
 Languages: English, German, French, Spanish, Portuguese, Russian, Chinese – more via a text file.
 
@@ -107,7 +107,7 @@ GK2 Vanilla+ behebt die kleinen Ärgernisse von Graveyard Keeper 2, ohne das Spi
 
 **Controller** – das ganze Mod-Menü und die Pin-Liste funktionieren mit dem Gamepad. Gemacht für das Steam Deck.
 
-**Optional, nicht ganz Vanilla (standardmäßig aus):** Objekte verschieben, volle Erstattung beim Abbauen, Talente & Forschung zurückerstatten.
+**Optional, nicht ganz Vanilla (standardmäßig aus):** Objekte verschieben, volle Erstattung beim Abbauen, Talente & Forschung zurückerstatten, Laufgeschwindigkeit 100–200 %.
 
 Sprachen: Deutsch, Englisch, Französisch, Spanisch, Portugiesisch, Russisch, Chinesisch – weitere per Textdatei.
 

@@ -560,11 +560,11 @@ Key for pinning => Клавиша для закрепления
 Optional: pin/unpin with a key instead of clicking the pin icon - point the mouse at a recipe, order or blueprint and press the key. While a key is set, clicking the pin icon does nothing (no accidental pins). Empty = click the pin icon as usual. => Необязательно: закреплять/откреплять клавишей вместо щелчка по булавке – наведи мышь на рецепт, заказ или чертёж и нажми клавишу. Пока клавиша задана, щелчок по булавке ничего не делает (без случайных закреплений). Пусто = щелчок по булавке, как раньше.
 
 # 1.7.3
-3,500+ players! => Более 3 500 игроков!
-GK2 Vanilla+ is now played by more than 3,500 people. I never expected that.\n\nThank you for your ratings, comments, bug reports and ideas – lots of them are in the mod by now, and more are coming. => В GK2 Vanilla+ играют уже более 3 500 человек. Я никогда такого не ожидал.\n\nСпасибо за оценки, комментарии, сообщения об ошибках и идеи – многие из них уже в моде, и будут ещё.
+5,000+ players! => Более 5 000 игроков!
+GK2 Vanilla+ is now played by more than 5,000 people. I never expected that.\n\nThank you for your ratings, comments, bug reports and ideas – lots of them are in the mod by now, and more are coming. => В GK2 Vanilla+ играют уже более 5 000 человек. Я никогда такого не ожидал.\n\nСпасибо за оценки, комментарии, сообщения об ошибках и идеи – многие из них уже в моде, и будут ещё.
 Pin with => Закреплять с помощью
-3,500+ players · thanks! => 3 500+ игроков · спасибо!
-Internal: the 3,500+ players thank-you banner was shown. => Внутреннее: баннер благодарности за 3 500+ игроков был показан.
+5,000+ players · thanks! => 5 000+ игроков · спасибо!
+Internal: the 5,000+ players thank-you banner was shown. => Внутреннее: баннер благодарности за 5 000+ игроков был показан.
 How to pin/unpin: Mouse0 (default) = left click on the pin icon. Any other key or mouse button (middle, side buttons): point the mouse at a recipe, order or blueprint and press it - clicking the pin icon then does nothing (no accidental pins). The right mouse button is not possible (it closes the game window). => Как закреплять: Mouse0 (по умолчанию) = левый клик по булавке. Любая другая клавиша или кнопка мыши (средняя, боковые): наведите мышь на рецепт, заказ или чертёж и нажмите её – клик по булавке тогда ничего не делает (без случайных закреплений). Правая кнопка мыши невозможна (она закрывает окно игры).
 Press a key or mouse button … (Esc = left click) => Нажмите клавишу или кнопку мыши … (Esc = левый клик)
 Left click on the pin => Левый клик по булавке
@@ -572,3 +572,29 @@ Middle mouse button => Средняя кнопка мыши
 Mouse button {0} => Кнопка мыши {0}
 Not possible: a quest talent depends on it. => Невозможно: от него зависит квестовый талант.
 Quest talent – can't be refunded => Квестовый талант – возврат невозможен
+The workbench was waiting for a zombie that is gone – craft completed, it continues. => Верстак ждал зомби, которого больше нет, – изготовление завершено, работа продолжается.
+A finished craft was stuck at the output – completed now. => Готовое изделие застряло на выдаче – теперь завершено.
+Workbench restarted: it was stuck as "running" with nothing running. Nothing is lost. => Верстак перезапущен: он завис в состоянии «работает», хотя ничего не шло. Ничего не потеряно.
+Took the waiting craft "{0}" out ({1}). Nothing is lost. => Ожидающее изделие «{0}» убрано из очереди ({1}). Ничего не потеряно.
+Re-linked the workbench extensions (e.g. tool box) – please press F once more. => Расширения верстака подключены заново (например, ящик с инструментами) – нажмите F ещё раз.
+The workbench had dropped out of the game's crafting – registered again. Nothing is lost. => Верстак выпал из системы изготовления игры – снова зарегистрирован. Ничего не потеряно.
+Workbench check: no blockage found. Details are in the log (LogOutput.log). => Проверка верстака: блокировок не найдено. Подробности в журнале (LogOutput.log).
+Workbench check "{0}": {1}. => Проверка верстака «{0}»: {1}.
+ingredients missing => не хватает ингредиентов
+tool missing => нет инструмента
+tool is worn out => инструмент изношен
+not enough energy => не хватает энергии
+you need a higher talent level for this => для этого нужен более высокий уровень таланта
+fuel missing => нет топлива
+no room for the result => нет места для результата
+an extension is missing (e.g. tool box) => не хватает расширения (например, ящика с инструментами)
+game reports {0} => игра сообщает: {0}
+Normal (100 %) => Обычная (100 %)
+Movement speed (not vanilla) => Скорость передвижения (не ваниль)
+Steam has {0} ready – F9 to update => Steam загрузил {0} – F9 для обновления
+Up to {0} pins – "{1}" was unpinned. => Не больше {0} закреплений – «{1}» откреплено.
+Built: {0} => Построено: {0}
+Only if a workbench is stuck (no progress, F does nothing, cannot be removed): turn this on, then press F at that workbench or remove it. Vanilla+ checks the workbench, fixes known stuck states (e.g. stuck as running, a waiting craft without ingredients at the front, extensions not linked - nothing is lost) and tells you what it found. Details go to the log. Turn it off again afterwards. => Только если верстак завис (нет прогресса, F ничего не делает, нельзя разобрать): включите, затем нажмите F у этого верстака или разберите его. Vanilla+ проверит верстак, устранит известные зависания (например, «работает», хотя ничего не идёт; ожидающее изделие без ингредиентов в начале очереди; неподключённые расширения – ничего не теряется) и сообщит, что нашёл. Подробности пишутся в журнал. Потом снова выключите.
+[Not fully vanilla] Walking speed of your character in percent (100 = normal). The game's own slowdowns (e.g. while aiming a bow) still apply, the walk animation speeds up to match. Only your character, not NPCs or zombies. => [Не совсем ванилла] Скорость ходьбы вашего персонажа в процентах (100 = обычная). Замедления самой игры (например, при прицеливании из лука) продолжают действовать, анимация ходьбы ускоряется соответственно. Только ваш персонаж, не NPC и не зомби.
+Movement speed => Скорость передвижения
+Steam downloaded GK2 Vanilla+ {0} – the game still runs {1}. To update: F9 › "Save & update" (or run Installieren.bat in the Workshop folder). => Steam загрузил GK2 Vanilla+ {0}, а в игре всё ещё работает {1}. Чтобы обновить: F9 › «Сохранить и обновить» (или запустите Installieren.bat в папке Workshop).

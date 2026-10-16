@@ -14,7 +14,7 @@ namespace GK2Tweaks
     {
         public const string Guid = "mats.gk2.tweaks";
         public const string PluginName = "GK2 Tweaks";
-        public const string PluginVersion = "1.7.3";
+        public const string PluginVersion = "1.7.4";
         // Anzeige (Hauptmenue, Was ist neu, Log). Hotfix-Buchstaben (z. B. "b") nur bei schnellen, nicht voll getesteten Hotfixes. PluginVersion bleibt
         // eine reine Zahl - BepInEx, Update-Check und Installer lesen sie als Version.
         // Vorab-Versionen (Beta): BetaNumber > 0 und BetaTag " Beta N" setzen; Stabil: 0 und "". GitHub-Tag der Beta: v<Version>-beta.<N>
@@ -48,6 +48,7 @@ namespace GK2Tweaks
         internal static ConfigEntry<string> MenuBg, MenuBgStyle, MenuBgFogTone;
         internal static ConfigEntry<bool> ShowOverlay, CheckUpdates, RepairWorkbenches;
         internal static ConfigEntry<int> StatsLogSeconds;
+        internal static ConfigEntry<int> MoveSpeed;
         internal static ConfigEntry<string> Language, LastSeenVersion, LastGameVersion;
 #if !NEXUS
         internal static ConfigEntry<int> RatePromptSessions, RatePromptNextAt;
@@ -97,7 +98,7 @@ namespace GK2Tweaks
 
             try { SafeMode.CheckGame(); } catch (Exception e) { Log.LogError("Safe mode check failed: " + e); }
             var harmony = new Harmony(Guid);
-            var patches = new System.Collections.Generic.List<Type> { typeof(TierPatch), typeof(ScreenSettingsPatch), typeof(SaveBlockPatch), typeof(ZoomPatch), typeof(ModdedLabelPatch), typeof(BackupPatch), typeof(MainMenuModsButtonPatch), typeof(PauseModsButtonPatch), typeof(CraftCellPinPatch), typeof(SelectionPinPatch), typeof(QuestPinPatch), typeof(LongNotes), typeof(InstantRemovePatch), typeof(TeleportPatch), typeof(FadeInPatch), typeof(FadeOutPatch), typeof(CleanupPatch), typeof(MoveInputPatch), typeof(MoveTargetPatch), typeof(MoveCellsPatch), typeof(MoveBuildPatch), typeof(MoveDisablePatch), typeof(TradePressPatch), typeof(TradeCountPatch), typeof(ZoneRedrawPatch), typeof(MoveRemoveLabelPatch), typeof(OrderPinPatch), typeof(AlchemyPinPatch), typeof(RespecOverPatch), typeof(RespecOutPatch), typeof(RespecTechPatch), typeof(CraftRepairPatch), typeof(RainScanPatch) };
+            var patches = new System.Collections.Generic.List<Type> { typeof(TierPatch), typeof(ScreenSettingsPatch), typeof(SaveBlockPatch), typeof(ZoomPatch), typeof(ModdedLabelPatch), typeof(BackupPatch), typeof(MainMenuModsButtonPatch), typeof(PauseModsButtonPatch), typeof(CraftCellPinPatch), typeof(SelectionPinPatch), typeof(QuestPinPatch), typeof(LongNotes), typeof(InstantRemovePatch), typeof(TeleportPatch), typeof(FadeInPatch), typeof(FadeOutPatch), typeof(CleanupPatch), typeof(MoveInputPatch), typeof(MoveTargetPatch), typeof(MoveCellsPatch), typeof(MoveBuildPatch), typeof(MoveDisablePatch), typeof(TradePressPatch), typeof(TradeCountPatch), typeof(ZoneRedrawPatch), typeof(MoveRemoveLabelPatch), typeof(OrderPinPatch), typeof(AlchemyPinPatch), typeof(RespecOverPatch), typeof(RespecOutPatch), typeof(RespecTechPatch), typeof(CraftRepairPatch), typeof(RainScanPatch), typeof(TownBuiltPatch), typeof(MoveSpeedPatch) };
 #if DEV
             if (BenchEnabled.Value) patches.Add(typeof(SystemProfiler));
 #endif
@@ -202,7 +203,7 @@ namespace GK2Tweaks
             UpdateChannel = Config.Bind("Interface", "UpdateChannel", "Stable", new ConfigDescription("Which versions the update check looks for. Stable = tested releases (recommended). Beta = pre-release for testing, may contain bugs.",
                 new AcceptableValueList<string>("Stable", "Beta")));
 #endif
-            RepairWorkbenches = Config.Bind("Fixes", "RepairStuckWorkbenches", false, "Only if a workbench is stuck (F does nothing, cannot be removed): turn this on, then press F at that workbench or remove it - the waiting craft at the front of its queue is taken out (nothing is lost). Turn it off again afterwards.");
+            RepairWorkbenches = Config.Bind("Fixes", "RepairStuckWorkbenches", false, "Only if a workbench is stuck (no progress, F does nothing, cannot be removed): turn this on, then press F at that workbench or remove it. Vanilla+ checks the workbench, fixes known stuck states (e.g. stuck as running, a waiting craft without ingredients at the front, extensions not linked - nothing is lost) and tells you what it found. Details go to the log. Turn it off again afterwards.");
             WeekPlanKey = Config.Bind("Interface", "WeekPlanKey", new KeyboardShortcut(KeyCode.F6), "Key for the week plan (what is possible on which weekday).");
             HudKey = Config.Bind("Interface", "HideHudKey", new KeyboardShortcut(KeyCode.F7), "Key to hide/show the game's HUD, e.g. for screenshots. Esc shows it again.");
             WeekPlanNotify = Config.Bind("Comfort", "DailyReminder", true, "Show a notification each morning with what is possible today (only features you have already unlocked).");
@@ -215,8 +216,11 @@ namespace GK2Tweaks
             FullRefund = Config.Bind("Comfort", "FullRefund", false, "[Not fully vanilla] Remove mode: you get the full building costs back instead of only a part. Contents (inventory, fuel) come back as usual.");
             MoveObjects = Config.Bind("Comfort", "MoveObjects", false, "[Not fully vanilla] Remove mode: press the rotate key on an object to pick it up and place it somewhere else. It stays the same object (contents and crafting queue are kept), nothing is used or refunded. Works for workbenches, conveyors and all other buildings: zombie workers are put on the ground, connected extensions stay where they are until you move them too. Esc or right click cancels.");
             TradeLikes = Config.Bind("Comfort", "TradeLikedAmount", true, "Trading with town vendors: the amount slider starts at exactly the amount that still gives happiness (thumbs up), and a button adds all liked goods in the right amount. You still confirm the deal yourself.");
-            Celebrated = Config.Bind("Interface", "Celebrated3500", false, "Internal: the 3,500+ players thank-you banner was shown.");
+            Celebrated = Config.Bind("Interface", "Celebrated5000", false, "Internal: the 5,000+ players thank-you banner was shown.");
             Respec = Config.Bind("Comfort", "Respec", false, "[Not fully vanilla] Refund talents, zombie perks and research. Talents and zombie perks: right click an unlocked node (controller: the button shown below it). Research: click a researched tech and choose Refund. Always asks first; nodes that depend on it are refunded too. Starter nodes and reputation research are never refunded, effects from buying (e.g. items) stay. Changes your save, backups are made automatically.");
+            MoveSpeed = Config.Bind("Comfort", "MoveSpeed", 100, new ConfigDescription(
+                "[Not fully vanilla] Walking speed of your character in percent (100 = normal). The game's own slowdowns (e.g. while aiming a bow) still apply, the walk animation speeds up to match. Only your character, not NPCs or zombies.",
+                new AcceptableValueList<int>(100, 110, 120, 130, 140, 150, 160, 170, 180, 190, 200)));
             CraftMaxButton = Config.Bind("Comfort", "CraftMax", true, "Crafting: a Max button next to the amount sets it to as many as your ingredients allow (inventory and reachable chests, like the game counts). With a controller use the button shown on it.");
             ZombieRename = Config.Bind("Comfort", "ZombieRename", true, "Zombie window: a Rename button next to the name - type your own name or roll a new one at any time.");
             BackupCount = Config.Bind("Backups", "KeepBackups", 5, new ConfigDescription(

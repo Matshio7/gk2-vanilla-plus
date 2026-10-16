@@ -679,6 +679,7 @@ namespace GK2Tweaks
                 DrawEntry(Plugin.MoveObjects);
                 if (Respec.OtherMod) GUILayout.Label(Labels.T("„Talent & Tech Refund“ ist installiert – dessen Funktion wird genutzt.", "\"Talent & Tech Refund\" is installed – its function is used."), smallStyle);
                 DrawEntry(Plugin.Respec);
+                DrawEntry(Plugin.MoveSpeed);
 
                 Header(Labels.T("Kamera", "Camera"));
                 DrawEntry(Plugin.Zoom);

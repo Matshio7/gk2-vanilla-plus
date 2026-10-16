@@ -110,6 +110,7 @@ namespace GK2Tweaks
             { "MoveObjects", new[] { "Objekte verschieben (nicht Vanilla)", "Move objects (not vanilla)" } },
             { "TradeLikedAmount", new[] { "Handel: Daumen-hoch-Menge vorschlagen", "Trade: suggest the thumbs-up amount" } },
             { "Respec", new[] { "Talente & Forschung zurückerstatten (nicht Vanilla)", "Refund talents & research (not vanilla)" } },
+            { "MoveSpeed", new[] { "Laufgeschwindigkeit (nicht Vanilla)", "Movement speed (not vanilla)" } },
             { "CraftMax", new[] { "Herstellen: Max-Knopf", "Crafting: Max button" } },
             { "ZombieRename", new[] { "Zombies umbenennen", "Rename zombies" } },
             { "HudClock", new[] { "Tag & Uhrzeit am HUD", "Day & time on HUD" } },
@@ -200,6 +201,7 @@ namespace GK2Tweaks
             { "FullRefund", "Nicht mehr ganz Vanilla – oft gewünscht, deshalb als Option: Beim Abbauen bekommst du die vollen Baukosten zurück statt nur einen Teil. Inhalt (Inventar, Brennstoff) kommt wie gewohnt zurück." },
             { "MoveObjects", "Nicht mehr ganz Vanilla – oft gewünscht, deshalb als Option: Im Abriss-Modus mit der Dreh-Taste ein Objekt aufnehmen und woanders hinstellen. Es bleibt dasselbe Objekt (Inhalt und Herstell-Warteschlange bleiben), es wird nichts verbraucht oder erstattet. Geht für Werkbänke, Förderbänder und alle anderen Bauten: Zombie-Arbeiter landen auf dem Boden, verbundene Erweiterungen bleiben stehen, bis du sie auch verschiebst. Esc/Rechtsklick bricht ab." },
             { "Respec", "Nicht mehr ganz Vanilla – oft gewünscht, deshalb als Option: Talente, Zombie-Perks und Forschung zurückerstatten. Talente und Zombie-Perks: Rechtsklick auf einen freigeschalteten Knoten (Controller: die Taste, die darunter steht). Forschung: erforschte Technik anklicken → „Zurückerstatten“. Fragt immer vorher; was davon abhängt, wird mit erstattet. Start-Knoten und Ruf-Forschung nie, Effekte beim Kauf (z. B. Gegenstände) bleiben. Verändert den Spielstand – Backups werden automatisch angelegt." },
+            { "MoveSpeed", "Nicht mehr ganz Vanilla – oft gewünscht, deshalb als Option: So schnell läuft deine Figur (100 % = normal). Die Verlangsamungen des Spiels (z. B. beim Zielen mit dem Bogen) gelten weiterhin, die Laufanimation wird passend schneller. Nur deine Figur, keine NPCs oder Zombies." },
             { "CraftMax", "Herstellen: Ein Knopf „Max“ neben der Mengenwahl stellt so viele ein, wie deine Zutaten hergeben (Inventar und erreichbare Truhen, wie das Spiel zählt). Am Controller mit der Taste, die auf dem Knopf steht." },
             { "TradeLikedAmount", "Handel mit Stadt-Händlern: Der Mengen-Regler startet genau bei der Menge, die noch Zufriedenheit (Daumen hoch) bringt, und ein Knopf legt alle passenden Waren in der richtigen Menge in den Handel. Bestätigen musst du den Handel weiterhin selbst." },
             { "ZombieRename", "Im Zombie-Fenster steht neben dem Namen ein „Umbenennen“-Knopf: eigenen Namen eintippen oder neu würfeln – jederzeit." },
@@ -212,9 +214,9 @@ namespace GK2Tweaks
 #if !NEXUS
             { "UpdateChannel", "Welche Versionen die Update-Suche findet. Stabil = getestete Versionen (empfohlen). Beta = Vorabversion zum Testen, kann Fehler enthalten." },
             { "ClickButton", "Maustaste, die am Pin-Symbol anpinnt oder löst. Rechts verhindert versehentliches Anpinnen beim Anklicken von Rezepten." },
-            { "RepairStuckWorkbenches", "Nur wenn eine Werkbank hängt (F ohne Wirkung, nicht abbaubar): einschalten, dann an der Werkbank F drücken oder sie abbauen – der wartende Auftrag ganz vorne wird herausgenommen (nichts geht verloren). Danach wieder ausschalten." },
             { "CheckForUpdates", "Prüft bei jedem Spielstart einmal auf GitHub, ob es eine neue Version gibt. Es wird nur die Versionsnummer gelesen, nichts gesendet." },
 #endif
+            { "RepairStuckWorkbenches", "Nur wenn eine Werkbank hängt (kein Fortschritt, F ohne Wirkung, nicht abbaubar): einschalten, dann an der Werkbank F drücken oder sie abbauen. Vanilla+ prüft die Werkbank, löst bekannte Hänger (z. B. steht auf „läuft“, wartender Auftrag ohne Zutaten ganz vorne, Erweiterung nicht verbunden – nichts geht verloren) und sagt dir, was es gefunden hat. Details stehen im Log. Danach wieder ausschalten." },
             { "WeekPlanKey", "Öffnet den Wochenplan: was an welchem Wochentag möglich ist (nur bereits Freigeschaltetes)." },
             { "HideHudKey", "Blendet die komplette Spiel-Oberfläche aus, z. B. für Screenshots. Esc blendet sie wieder ein." },
             { "DailyReminder", "Jeden Morgen eine Benachrichtigung, was heute möglich ist – nur bereits freigeschaltete Dinge, keine Spoiler." },
@@ -355,6 +357,7 @@ namespace GK2Tweaks
                 if (key == "TargetFps") return i == 0 ? T("Unbegrenzt", "Unlimited") : i + " FPS";
                 if (key == "PhysicsHz") return i == 0 ? T("Standard (50 Hz)", "Default (50 Hz)") : i + " Hz";
                 if (key == "Zoom") return i + " %";
+                if (key == "MoveSpeed") return i <= 100 ? T("Normal (100 %)", "Normal (100 %)") : i + " %";
                 if (key == "MenuBackgroundBlur") return i == 0 ? T("Aus", "Off") : i == 1 ? T("Leicht", "Light") : i == 2 ? T("Mittel", "Medium") : T("Stark", "Strong");
                 if (key == "MenuBackgroundFog") return i == 0 ? T("Aus", "Off") : i == 1 ? T("Leicht", "Light") : i == 2 ? T("Mittel", "Medium") : T("Dicht", "Dense");
                 if (key == "MenuBackgroundDim") return i == 0 ? T("Aus", "Off") : i + " %";

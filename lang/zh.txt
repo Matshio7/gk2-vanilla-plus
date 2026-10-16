@@ -560,11 +560,11 @@ Key for pinning => 固定按键
 Optional: pin/unpin with a key instead of clicking the pin icon - point the mouse at a recipe, order or blueprint and press the key. While a key is set, clicking the pin icon does nothing (no accidental pins). Empty = click the pin icon as usual. => 可选：用按键代替点击图钉来固定/取消固定 – 将鼠标指向配方、订单或蓝图并按下按键。设置按键后，点击图钉不会有任何作用（避免误固定）。留空 = 照常点击图钉。
 
 # 1.7.3
-3,500+ players! => 3,500+ 名玩家！
-GK2 Vanilla+ is now played by more than 3,500 people. I never expected that.\n\nThank you for your ratings, comments, bug reports and ideas – lots of them are in the mod by now, and more are coming. => GK2 Vanilla+ 现在已有超过 3,500 名玩家在玩。我从没想到会这样。\n\n感谢你们的评分、评论、错误报告和建议——其中很多已经加入了模组，之后还会有更多。
+5,000+ players! => 5,000+ 名玩家！
+GK2 Vanilla+ is now played by more than 5,000 people. I never expected that.\n\nThank you for your ratings, comments, bug reports and ideas – lots of them are in the mod by now, and more are coming. => GK2 Vanilla+ 现在已有超过 5,000 名玩家在玩。我从没想到会这样。\n\n感谢你们的评分、评论、错误报告和建议——其中很多已经加入了模组，之后还会有更多。
 Pin with => 固定方式
-3,500+ players · thanks! => 3,500+ 名玩家 · 谢谢！
-Internal: the 3,500+ players thank-you banner was shown. => 内部：已显示 3,500+ 玩家感谢横幅。
+5,000+ players · thanks! => 5,000+ 名玩家 · 谢谢！
+Internal: the 5,000+ players thank-you banner was shown. => 内部：已显示 5,000+ 玩家感谢横幅。
 How to pin/unpin: Mouse0 (default) = left click on the pin icon. Any other key or mouse button (middle, side buttons): point the mouse at a recipe, order or blueprint and press it - clicking the pin icon then does nothing (no accidental pins). The right mouse button is not possible (it closes the game window). => 如何固定：Mouse0（默认）= 左键点击图钉。任何其他按键或鼠标按键（中键、侧键）：将鼠标指向配方、订单或蓝图并按下——此时点击图钉不会有任何作用（不会误固定）。不能使用鼠标右键（它会关闭游戏窗口）。
 Press a key or mouse button … (Esc = left click) => 请按一个键或鼠标按键 …（Esc = 左键点击）
 Left click on the pin => 左键点击图钉
@@ -572,3 +572,29 @@ Middle mouse button => 鼠标中键
 Mouse button {0} => 鼠标按键 {0}
 Not possible: a quest talent depends on it. => 无法退还：有任务天赋依赖于它。
 Quest talent – can't be refunded => 任务天赋 – 无法退还
+The workbench was waiting for a zombie that is gone – craft completed, it continues. => 工作台在等待一个已经不在的僵尸——制作已完成，继续进行。
+A finished craft was stuck at the output – completed now. => 一个已完成的制作卡在了产出环节——现已完成。
+Workbench restarted: it was stuck as "running" with nothing running. Nothing is lost. => 工作台已重新启动：它卡在“进行中”状态，但实际上什么都没在进行。没有任何损失。
+Took the waiting craft "{0}" out ({1}). Nothing is lost. => 已移除等待中的制作“{0}”（{1}）。没有任何损失。
+Re-linked the workbench extensions (e.g. tool box) – please press F once more. => 已重新连接工作台扩展（例如工具箱）——请再按一次 F。
+The workbench had dropped out of the game's crafting – registered again. Nothing is lost. => 工作台已脱离游戏的制作系统——已重新登记。没有任何损失。
+Workbench check: no blockage found. Details are in the log (LogOutput.log). => 工作台检查：未发现阻塞。详情见日志（LogOutput.log）。
+Workbench check "{0}": {1}. => 工作台检查“{0}”：{1}。
+ingredients missing => 缺少材料
+tool missing => 缺少工具
+tool is worn out => 工具已磨损
+not enough energy => 能量不足
+you need a higher talent level for this => 需要更高的天赋等级
+fuel missing => 缺少燃料
+no room for the result => 没有空间放置产物
+an extension is missing (e.g. tool box) => 缺少扩展（例如工具箱）
+game reports {0} => 游戏提示：{0}
+Normal (100 %) => 正常（100%）
+Movement speed (not vanilla) => 移动速度（非原版）
+Steam has {0} ready – F9 to update => Steam 已下载 {0}——按 F9 更新
+Up to {0} pins – "{1}" was unpinned. => 最多 {0} 个固定项——已取消固定“{1}”。
+Built: {0} => 已建成：{0}
+Only if a workbench is stuck (no progress, F does nothing, cannot be removed): turn this on, then press F at that workbench or remove it. Vanilla+ checks the workbench, fixes known stuck states (e.g. stuck as running, a waiting craft without ingredients at the front, extensions not linked - nothing is lost) and tells you what it found. Details go to the log. Turn it off again afterwards. => 仅在工作台卡住时使用（没有进度、按 F 无反应、无法拆除）：开启此项，然后在该工作台按 F 或将其拆除。Vanilla+ 会检查工作台，修复已知的卡住情况（例如卡在“进行中”、队列最前面有缺少材料的等待制作、扩展未连接——不会丢失任何东西），并告诉你发现了什么。详情写入日志。之后请再次关闭。
+[Not fully vanilla] Walking speed of your character in percent (100 = normal). The game's own slowdowns (e.g. while aiming a bow) still apply, the walk animation speeds up to match. Only your character, not NPCs or zombies. => [非完全原版] 你的角色的行走速度（百分比，100 = 正常）。游戏自身的减速（例如用弓瞄准时）仍然有效，行走动画会相应加快。只影响你的角色，不影响 NPC 和僵尸。
+Movement speed => 移动速度
+Steam downloaded GK2 Vanilla+ {0} – the game still runs {1}. To update: F9 › "Save & update" (or run Installieren.bat in the Workshop folder). => Steam 已下载 GK2 Vanilla+ {0}，但游戏中运行的仍是 {1}。更新方法：F9 › “存档并更新”（或在创意工坊文件夹中运行 Installieren.bat）。

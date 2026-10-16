@@ -59,8 +59,114 @@ namespace GK2Tweaks
                 case 11: if (t > 35f) { Shot("stb_news_scrolled"); step++; } break;
                 case 12: if (t > 36f) { Try(PinKeyLogic, "pin key"); Try(() => { Plugin.Instance.Gui.ShowNews(false); Plugin.Instance.Gui.ShowCelebration(null); }, "celebration"); step++; } break;
                 case 13: if (t > 39f) { Shot("stb_celebration"); step++; } break;
-                case 14: if (t > 40f) { L("DONE"); step++; Application.Quit(); } break;
+                // 1.7.4
+                case 14: if (t > 40f) { Try(() => AccessTools.Method(typeof(TweaksGui), "CloseCeleb").Invoke(Plugin.Instance.Gui, null), "close celebration"); Try(MoveSpeedFormula, "move speed"); Try(PinsFull, "pins full"); step++; } break;
+                case 15: if (t > 41f) { Shot("stb_pins_full"); Try(HudFallbackStart, "hud fallback"); step++; } break;
+                case 16: if (t > 43f) { Try(HudFallbackCheck, "hud fallback check"); Try(TownPinStart, "town pin"); step++; } break;
+                case 17: if (t > 49f) { Try(TownPinCheck, "town pin check"); step++; } break;
+                case 18: if (t > 50f) { Try(StuckRunning, "stuck running"); step++; } break;
+                case 19: if (t > 51f) { Shot("stb_repair_toast"); Plugin.Instance.StartCoroutine(WalkTest()); step++; } break;
+                case 20: if (t > 58f) { L("DONE"); step++; Application.Quit(); } break;
             }
+        }
+
+        // ---------- 1.7.4 ----------
+        private static void MoveSpeedFormula()
+        {
+            PlayerPhysicalBody body = MainGame.PlayerController.PhysicalBody;
+            int old = Plugin.MoveSpeed.Value;
+            float b = body.SpeedMultiplier;
+            Plugin.MoveSpeed.Value = 150; float a = MoveSpeed.Scaled(body);
+            Plugin.MoveSpeed.Value = 100; float c = MoveSpeed.Scaled(body);
+            Plugin.MoveSpeed.Value = old;
+            bool ok = MoveSpeed.Hooked == 1 && Mathf.Abs(a - b * 1.5f) < 0.001f && Mathf.Abs(c - b) < 0.001f;
+            L((ok ? "MOVE SPEED OK" : "MOVE SPEED FAIL") + " hooked=" + MoveSpeed.Hooked + " base=" + b + " at150=" + a + " at100=" + c);
+        }
+
+        // echtes Laufen: 1 s nach rechts mit 100 %, 1 s nach links mit 150 % - Strecke vergleichen
+        private static System.Collections.IEnumerator WalkTest()
+        {
+            PlayerPhysicalBody body = MainGame.PlayerController.PhysicalBody;
+            int old = Plugin.MoveSpeed.Value;
+            float[] dist = new float[2];
+            for (int run = 0; run < 2; run++)
+            {
+                Plugin.MoveSpeed.Value = run == 0 ? 100 : 150;
+                Vector2 dir = run == 0 ? Vector2.right : Vector2.left;
+                Vector3 p0 = body.transform.position;
+                float until = Time.realtimeSinceStartup + 1f;
+                while (Time.realtimeSinceStartup < until) { body.MoveByDirection(dir); yield return new WaitForFixedUpdate(); }
+                for (int i = 0; i < 10; i++) yield return new WaitForFixedUpdate();
+                dist[run] = Vector3.Distance(p0, body.transform.position);
+            }
+            Plugin.MoveSpeed.Value = old;
+            float ratio = dist[0] > 0.01f ? dist[1] / dist[0] : 0f;
+            L((ratio > 1.3f && ratio < 1.7f ? "WALK OK" : "WALK CHECK") + " 100%=" + dist[0].ToString("0.00") + " 150%=" + dist[1].ToString("0.00") + " ratio=" + ratio.ToString("0.00"));
+        }
+
+        private static List<Pins.Pin> savedPins;
+        private static string townId;
+
+        private static void PinsFull()
+        {
+            savedPins = new List<Pins.Pin>(Pins.List);
+            Pins.List.Clear();
+            for (int i = 0; i <= Pins.Max; i++) Pins.Toggle(new Pins.Pin { Key = "test:" + i, Title = "Test " + i });
+            bool ok = Pins.List.Count == Pins.Max && Pins.List[0].Key == "test:1" && Pins.List[Pins.Max - 1].Key == "test:" + Pins.Max;
+            L((ok ? "PINS FULL OK" : "PINS FULL FAIL") + " count=" + Pins.List.Count + " first=" + (Pins.List.Count > 0 ? Pins.List[0].Key : "-") + " (saved " + savedPins.Count + " real pins)");
+        }
+
+        private static void TownPinStart()
+        {
+            Pins.List.Clear();
+            HashSet<string> built = Pins.BuiltTownBuildings();
+            L("TOWN BUILT " + built.Count + ": " + string.Join(", ", built.Take(15).ToArray()));
+            townId = built.FirstOrDefault();
+            if (townId == null) { L("TOWN PIN SKIP (nothing built in this save)"); return; }
+            Pins.Toggle(new Pins.Pin { Key = "town:" + townId, Title = Pins.Loc(townId) });
+        }
+
+        private static void TownPinCheck()
+        {
+            if (townId != null) L((!Pins.IsPinned("town:" + townId) ? "TOWN PIN OK " : "TOWN PIN FAIL ") + townId);
+            Pins.List.Clear();
+            if (savedPins != null) Pins.List.AddRange(savedPins);
+            PinButton.RefreshAll();
+            PinStore.Save();
+            L("pins restored: " + Pins.List.Count);
+        }
+
+        private static void HudFallbackStart() { HudClock.TestReset(); HudClock.TestThrow = 1; }
+
+        private static void HudFallbackCheck()
+        {
+            WorldZoneWidget w = GUIElements.Instance != null ? GUIElements.Instance.WorldZoneWidget : null;
+            TMPro.TMP_Text t = w != null ? Traverse.Create(w).Field("worldZoneLabel").GetValue<TMPro.TMP_Text>() : null;
+            string txt = t != null ? t.text ?? "" : "";
+            int i = txt.IndexOf("\n" + HudClock.Mark, StringComparison.Ordinal);
+            string line = i >= 0 ? txt.Substring(i + 1 + HudClock.Mark.Length) : "";
+            bool ok = HudClock.Level == 1 && System.Text.RegularExpressions.Regex.IsMatch(line, "^[0-9][0-9]:[0-9][0-9]</color>");
+            L((ok ? "HUD FALLBACK OK" : "HUD FALLBACK FAIL") + " level=" + HudClock.Level + " line=" + line);
+            HudClock.TestReset();
+        }
+
+        // Zustand wie bei piermaz38: Werkbank steht auf "laeuft", der Auftrag ist aber nicht gestartet -> F loest es
+        private static void StuckRunning()
+        {
+            if (wb == null || def == null) { L("STUCK RUNNING SKIP (no workbench)"); return; }
+            CraftComponent cc = wb.Data.CraftComponent;
+            foreach (var e in cc.CraftElementsQueue.ToList()) cc.RemoveFromQueue(e, true);
+            var data = Data(def);
+            cc.AddToQueue(new CraftElement(def.id, 1, data.CurrentNeedItems, data.ParamsData));
+            cc.Status = CraftComponentStatus.Started;
+            L("stuck before F: status=" + cc.Status + " " + Q());
+            Plugin.RepairWorkbenches.Value = true;
+            Interact();
+            CraftElementBase cur = cc.CurrentCraftElement;
+            bool ok = cc.Status == CraftComponentStatus.QueueDelayed || (cc.Status == CraftComponentStatus.Started && cur != null && cur.IsStarted);
+            L((ok ? "STUCK RUNNING OK" : "STUCK RUNNING FAIL") + " -> status=" + cc.Status + " " + Q());
+            Plugin.RepairWorkbenches.Value = false;
+            foreach (var e in cc.CraftElementsQueue.ToList()) cc.RemoveFromQueue(e, true);
         }
 
         private static void Home()

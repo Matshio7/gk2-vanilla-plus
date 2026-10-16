@@ -21,38 +21,73 @@ if (-not (Test-Path (Join-Path $Payload 'winhttp.dll'))) {
 }
 
 # --- Spielordner automatisch finden (Steam-Bibliotheken) ---
+# Pfade aus der Registry, aus libraryfolders.vdf oder aus dem Textfeld koennen kaputt sein (Anfuehrungszeichen,
+# ungueltige Zeichen, abgestecktes Laufwerk). Join-Path/Test-Path wuerden dann wegen $ErrorActionPreference = 'Stop'
+# den ganzen Installer abbrechen (GitHub #2). Deshalb Pfade nur ueber diese Helfer bauen und pruefen.
+function Get-CleanPath($v) {
+    if (-not $v) { return '' }
+    return (([string]$v) -replace '[\x00-\x1f"]', '').Trim()
+}
+function Join-Safe($a, $b) {
+    try { if (-not $a) { return '' }; return [System.IO.Path]::Combine([string]$a, [string]$b) } catch { return '' }
+}
+function Test-SafePath($p) {
+    try {
+        if (-not $p) { return $false }
+        if (([string]$p).IndexOfAny([System.IO.Path]::GetInvalidPathChars()) -ge 0) { return $false }
+        return [bool](Test-Path -LiteralPath $p -ErrorAction Stop)
+    } catch { return $false }
+}
+function Test-GameDir($dir) { return [bool]($dir -and (Test-SafePath (Join-Safe $dir $ExeName))) }
+
 function Find-Game {
     # Aus dem Steam-Workshop gestartet? <Bibliothek>\steamapps\workshop\content\4358690\<id>\ -> <Bibliothek>\steamapps\common\Graveyard Keeper 2
-    $m = [regex]::Match($Root, '^(.*\\steamapps)\\workshop\\content\\4358690\\', 'IgnoreCase')
-    if ($m.Success) {
-        $g = Join-Path $m.Groups[1].Value 'common\Graveyard Keeper 2'
-        if (Test-Path (Join-Path $g $ExeName)) { return $g }
+    try {
+        $m = [regex]::Match($Root, '^(.*\\steamapps)\\workshop\\content\\4358690\\', 'IgnoreCase')
+        if ($m.Success) {
+            $g = Join-Safe $m.Groups[1].Value 'common\Graveyard Keeper 2'
+            if (Test-GameDir $g) { return $g }
+        }
+    } catch {}
+    # Steam traegt den Installationsort des Spiels (App 4358690) in die Programmliste von Windows ein
+    foreach ($k in 'HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\Steam App 4358690', 'HKLM:\SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\Uninstall\Steam App 4358690') {
+        try {
+            $g = Get-CleanPath (Get-ItemProperty -Path $k -ErrorAction Stop).InstallLocation
+            if (Test-GameDir $g) { return $g }
+        } catch {}
     }
     $steamRoots = @()
     foreach ($k in 'HKCU:\Software\Valve\Steam', 'HKLM:\SOFTWARE\WOW6432Node\Valve\Steam', 'HKLM:\SOFTWARE\Valve\Steam') {
         try {
             $p = Get-ItemProperty -Path $k -ErrorAction Stop
-            if ($p.SteamPath)   { $steamRoots += ($p.SteamPath -replace '/', '\') }
-            if ($p.InstallPath) { $steamRoots += $p.InstallPath }
+            if ($p.SteamPath)   { $steamRoots += (Get-CleanPath ($p.SteamPath -replace '/', '\')) }
+            if ($p.InstallPath) { $steamRoots += (Get-CleanPath $p.InstallPath) }
         } catch {}
     }
     $steamRoots += "${env:ProgramFiles(x86)}\Steam", "$env:ProgramFiles\Steam"
     $libs = @()
-    foreach ($r in ($steamRoots | Select-Object -Unique)) {
+    foreach ($r in ($steamRoots | Where-Object { $_ } | Select-Object -Unique)) {
         $libs += $r
-        $vdf = Join-Path $r 'steamapps\libraryfolders.vdf'
-        if (Test-Path $vdf) {
-            foreach ($m in [regex]::Matches((Get-Content $vdf -Raw), '"path"\s+"([^"]+)"')) { $libs += ($m.Groups[1].Value -replace '\\\\', '\') }
+        try {
+            $vdf = Join-Safe $r 'steamapps\libraryfolders.vdf'
+            if (Test-SafePath $vdf) {
+                foreach ($m in [regex]::Matches((Get-Content -LiteralPath $vdf -Raw -ErrorAction Stop), '"path"\s+"([^"]+)"')) { $libs += (Get-CleanPath ($m.Groups[1].Value -replace '\\\\', '\')) }
+            }
+        } catch {}   # eine kaputte Bibliothek darf die Suche nicht abbrechen
+    }
+    foreach ($l in ($libs | Where-Object { $_ } | Select-Object -Unique)) {
+        $g = Join-Safe $l 'steamapps\common\Graveyard Keeper 2'
+        if (Test-GameDir $g) { return $g }
+    }
+    # Nichts gefunden: neben dem entpackten Ordner nachsehen (C:\Games\GK2-VanillaPlus-x\ -> C:\Games\Graveyard Keeper 2)
+    try {
+        $up = Split-Path -Parent $Root
+        foreach ($c in @((Join-Safe $up 'Graveyard Keeper 2'), (Join-Safe (Split-Path -Parent $up) 'Graveyard Keeper 2'))) {
+            if (Test-GameDir $c) { return $c }
         }
-    }
-    foreach ($l in ($libs | Select-Object -Unique)) {
-        $g = Join-Path $l 'steamapps\common\Graveyard Keeper 2'
-        if (Test-Path (Join-Path $g $ExeName)) { return $g }
-    }
+    } catch {}
     return ''
 }
-
-function Test-GameDir($dir) { return ($dir -and (Test-Path (Join-Path $dir $ExeName))) }
 
 function Test-GameRunning {
     if (Get-Process -Name 'GraveyardKeeper2' -ErrorAction SilentlyContinue) {
@@ -367,14 +402,18 @@ function Set-Status {
     }
     $statusBox.Invalidate()
 }
-$box.Add_TextChanged({ Set-Status })
+$box.Add_TextChanged({
+    # "Als Pfad kopieren" im Explorer fuegt Anfuehrungszeichen ein - entfernen, sonst wird der Ordner nicht erkannt
+    if ($box.Text -match '[\x00-\x1f"]') { $box.Text = Get-CleanPath $box.Text; $box.SelectionStart = $box.Text.Length; return }
+    Set-Status
+})
 $rbStable.Add_CheckedChanged({ Set-Status })
 $rbBeta.Add_CheckedChanged({ Set-Status })
 
 $browse.Add_Click({
     $dlg = New-Object System.Windows.Forms.FolderBrowserDialog
     $dlg.Description = T 'Spielordner von Graveyard Keeper 2 auswählen' 'Select the Graveyard Keeper 2 game folder'
-    if ($box.Text -and (Test-Path $box.Text)) { $dlg.SelectedPath = $box.Text }
+    if (Test-SafePath $box.Text) { $dlg.SelectedPath = $box.Text }
     if ($dlg.ShowDialog() -eq 'OK') { $box.Text = $dlg.SelectedPath }
 })
 

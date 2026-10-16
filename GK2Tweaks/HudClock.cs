@@ -17,6 +17,16 @@ namespace GK2Tweaks
         private static float next;
         private static string lastLine;
         private static bool otherChecked;
+        // Kann die Schrift des Spiels unsere Zeile nicht zeichnen (TMP wirft in SetArraySizes, z. B. Ersatzschrift
+        // ohne Material - SUNA), stufen wir ab: 0 = volle Zeile, 1 = nur Uhrzeit aus Ziffern, 2 = keine Zeile.
+        // Gilt bis die Schrift wechselt (Sprache umgestellt).
+        private static int level;
+        private static TMP_FontAsset failFont;
+        internal static int Level => level;
+#if DEV
+        internal static int TestThrow;   // Dev-Test: die naechsten n Zeichenversuche wie bei SUNA scheitern lassen
+        internal static void TestReset() { level = 0; failFont = null; next = 0f; }
+#endif
 
         // "What time is it" ist zusaetzlich installiert -> keine doppelte Anzeige
         internal static bool OtherMod { get; private set; }
@@ -49,28 +59,61 @@ namespace GK2Tweaks
             next = Time.unscaledTime + 0.25f;
             TMP_Text t = Label(out WorldZoneWidget w);
             if (t == null) return;
+            if (level > 0 && t.font != failFont) level = 0;   // andere Schrift (Sprache gewechselt): neu versuchen
             string cur = t.text ?? "";
             string bas = Strip(cur);
-            string line = Want ? Compose() : null;
+            string line = Want && level < 2 ? Compose(level == 1) : null;
             string target = string.IsNullOrEmpty(line) || string.IsNullOrEmpty(bas) ? bas : bas + "\n" + Mark + line + "</color></size>";
             if (target == cur) return;
-            t.text = target;
-            t.ForceMeshUpdate(true, true);
+            try
+            {
+                t.text = target;
+#if DEV
+                if (TestThrow > 0 && line != null) { TestThrow--; throw new NullReferenceException("dev test (TMP SetArraySizes)"); }
+#endif
+                t.ForceMeshUpdate(true, true);
+            }
+            catch (Exception e)
+            {
+                // Text des Spiels wiederherstellen, sonst wirft TMP bei jedem Neuzeichnen erneut (Dauer-Warnungen im Log)
+                try { t.text = bas; t.ForceMeshUpdate(true, true); } catch { }
+                if (line == null) return;
+                level++;
+                failFont = t.font;
+                next = 0f;
+                Plugin.Log.LogWarning("HUD clock: the game font " + (t.font != null ? "'" + t.font.name + "' " : "") + "could not draw '" + line + "'"
+                    + Missing(t, line) + " (" + e.GetType().Name + ": " + e.Message + ") - "
+                    + (level >= 2 ? "HUD line stays off until the language changes" : "showing the time in digits only"));
+                return;
+            }
             try { UIExtensions.RefreshContentFitter((RectTransform)w.transform); } catch { LayoutRebuilder.ForceRebuildLayoutImmediate((RectTransform)w.transform); }
-            if (lastLine == null && line != null) Plugin.Log.LogInfo("HUD clock: shown in the area name box");
+            if (lastLine == null && line != null) Plugin.Log.LogInfo("HUD clock: shown in the area name box" + (level == 1 ? " (digits only)" : ""));
             lastLine = line;
+        }
+
+        // fuer das Log: Zeichen, die in der Schrift selbst fehlen (TMP sucht sie dann in Ersatzschriften)
+        private static string Missing(TMP_Text t, string line)
+        {
+            try
+            {
+                if (t.font == null || t.font.HasCharacters(line, out System.Collections.Generic.List<char> miss) || miss == null || miss.Count == 0) return "";
+                return ", missing in the font: '" + new string(miss.ToArray()) + "'";
+            }
+            catch { return ""; }
         }
 
         // nach einem Redraw des Spiels sofort wieder anhaengen (kein Flackern)
         internal static void AfterRedraw() { next = 0f; try { Tick(); } catch { } }
 
-        private static string Compose()
+        // digitsOnly: nur "14:10" - fuer Schriften, die unsere Buchstaben nicht zeichnen koennen
+        private static string Compose(bool digitsOnly = false)
         {
             try
             {
                 EnvironmentData env = MainGame.Instance.GameSave.environmentData;
                 int min = Mathf.FloorToInt(Mathf.Repeat(env.TimeOfDay, 1f) * 1440f) / 10 * 10;
                 int h = min / 60, m = min % 60;
+                if (digitsOnly) return h.ToString("00") + ":" + m.ToString("00");
                 string time = Plugin.HudClock12h.Value
                     ? ((h + 11) % 12 + 1) + ":" + m.ToString("00") + (h < 12 ? " AM" : " PM")
                     : h.ToString("00") + ":" + m.ToString("00");

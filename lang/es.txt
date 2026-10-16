@@ -560,11 +560,11 @@ Key for pinning => Tecla para fijar
 Optional: pin/unpin with a key instead of clicking the pin icon - point the mouse at a recipe, order or blueprint and press the key. While a key is set, clicking the pin icon does nothing (no accidental pins). Empty = click the pin icon as usual. => Opcional: fijar/soltar con una tecla en vez de pulsar el icono de alfiler – apunta con el ratón a una receta, encargo o plano y pulsa la tecla. Mientras haya una tecla asignada, pulsar el alfiler no hace nada (sin fijados por error). Vacío = pulsar el alfiler como siempre.
 
 # 1.7.3
-3,500+ players! => ¡Más de 3.500 jugadores!
-GK2 Vanilla+ is now played by more than 3,500 people. I never expected that.\n\nThank you for your ratings, comments, bug reports and ideas – lots of them are in the mod by now, and more are coming. => GK2 Vanilla+ ya lo juegan más de 3.500 personas. Nunca lo habría esperado.\n\nGracias por vuestras valoraciones, comentarios, informes de errores e ideas: muchas ya están en el mod, y vendrán más.
+5,000+ players! => ¡Más de 5.000 jugadores!
+GK2 Vanilla+ is now played by more than 5,000 people. I never expected that.\n\nThank you for your ratings, comments, bug reports and ideas – lots of them are in the mod by now, and more are coming. => GK2 Vanilla+ ya lo juegan más de 5.000 personas. Nunca lo habría esperado.\n\nGracias por vuestras valoraciones, comentarios, informes de errores e ideas: muchas ya están en el mod, y vendrán más.
 Pin with => Fijar con
-3,500+ players · thanks! => 3.500+ jugadores · ¡gracias!
-Internal: the 3,500+ players thank-you banner was shown. => Interno: se mostró el aviso de agradecimiento por los 3.500+ jugadores.
+5,000+ players · thanks! => 5.000+ jugadores · ¡gracias!
+Internal: the 5,000+ players thank-you banner was shown. => Interno: se mostró el aviso de agradecimiento por los 5.000+ jugadores.
 How to pin/unpin: Mouse0 (default) = left click on the pin icon. Any other key or mouse button (middle, side buttons): point the mouse at a recipe, order or blueprint and press it - clicking the pin icon then does nothing (no accidental pins). The right mouse button is not possible (it closes the game window). => Cómo fijar: Mouse0 (por defecto) = clic izquierdo en la chincheta. Cualquier otra tecla o botón del ratón (central, laterales): señala una receta, un pedido o un plano y púlsalo; hacer clic en la chincheta no hace nada entonces (sin fijados accidentales). El botón derecho no es posible (cierra la ventana del juego).
 Press a key or mouse button … (Esc = left click) => Pulsa una tecla o un botón del ratón … (Esc = clic izquierdo)
 Left click on the pin => Clic izquierdo en la chincheta
@@ -572,3 +572,29 @@ Middle mouse button => Botón central del ratón
 Mouse button {0} => Botón del ratón {0}
 Not possible: a quest talent depends on it. => No es posible: un talento de misión depende de él.
 Quest talent – can't be refunded => Talento de misión – no reembolsable
+The workbench was waiting for a zombie that is gone – craft completed, it continues. => El banco de trabajo esperaba a un zombi que ya no está: fabricación completada, sigue adelante.
+A finished craft was stuck at the output – completed now. => Una fabricación terminada estaba atascada en la salida: ya está completada.
+Workbench restarted: it was stuck as "running" with nothing running. Nothing is lost. => Banco de trabajo reiniciado: estaba atascado como «en curso» sin que nada avanzara. No se pierde nada.
+Took the waiting craft "{0}" out ({1}). Nothing is lost. => Se quitó la fabricación en espera «{0}» ({1}). No se pierde nada.
+Re-linked the workbench extensions (e.g. tool box) – please press F once more. => Extensiones del banco conectadas de nuevo (p. ej., la caja de herramientas): pulsa F otra vez.
+The workbench had dropped out of the game's crafting – registered again. Nothing is lost. => El banco de trabajo había quedado fuera de la fabricación del juego: registrado de nuevo. No se pierde nada.
+Workbench check: no blockage found. Details are in the log (LogOutput.log). => Comprobación del banco: no se encontró ningún bloqueo. Detalles en el registro (LogOutput.log).
+Workbench check "{0}": {1}. => Comprobación del banco «{0}»: {1}.
+ingredients missing => faltan ingredientes
+tool missing => falta la herramienta
+tool is worn out => la herramienta está desgastada
+not enough energy => no hay suficiente energía
+you need a higher talent level for this => necesitas un nivel de talento más alto
+fuel missing => falta combustible
+no room for the result => no hay espacio para el resultado
+an extension is missing (e.g. tool box) => falta una extensión (p. ej., la caja de herramientas)
+game reports {0} => el juego indica {0}
+Normal (100 %) => Normal (100 %)
+Movement speed (not vanilla) => Velocidad de movimiento (no vanilla)
+Steam has {0} ready – F9 to update => Steam ya descargó la {0} – F9 para actualizar
+Up to {0} pins – "{1}" was unpinned. => Máximo {0} fijados: se ha quitado «{1}».
+Built: {0} => Construido: {0}
+Only if a workbench is stuck (no progress, F does nothing, cannot be removed): turn this on, then press F at that workbench or remove it. Vanilla+ checks the workbench, fixes known stuck states (e.g. stuck as running, a waiting craft without ingredients at the front, extensions not linked - nothing is lost) and tells you what it found. Details go to the log. Turn it off again afterwards. => Solo si un banco de trabajo está atascado (sin progreso, F no hace nada, no se puede quitar): actívalo y pulsa F en ese banco o quítalo. Vanilla+ revisa el banco, soluciona atascos conocidos (p. ej., atascado como «en curso», una fabricación en espera sin ingredientes al principio de la cola, extensiones sin conectar; no se pierde nada) y te dice lo que encontró. Los detalles van al registro. Desactívalo después.
+[Not fully vanilla] Walking speed of your character in percent (100 = normal). The game's own slowdowns (e.g. while aiming a bow) still apply, the walk animation speeds up to match. Only your character, not NPCs or zombies. => [No del todo vanilla] Velocidad al caminar de tu personaje en porcentaje (100 = normal). Las ralentizaciones del propio juego (p. ej., al apuntar con el arco) siguen aplicándose y la animación de caminar se acelera en consonancia. Solo tu personaje, no los PNJ ni los zombis.
+Movement speed => Velocidad de movimiento
+Steam downloaded GK2 Vanilla+ {0} – the game still runs {1}. To update: F9 › "Save & update" (or run Installieren.bat in the Workshop folder). => Steam descargó GK2 Vanilla+ {0}, pero el juego sigue usando la {1}. Para actualizar: F9 › «Guardar y actualizar» (o ejecuta Installieren.bat en la carpeta del Workshop).

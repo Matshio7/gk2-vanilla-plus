@@ -73,7 +73,8 @@ s = re.sub(r'AKTUALISIEREN\r\n.*?\r\n\r\n', 'AKTUALISIEREN\r\nNeue Version auf N
 s = re.sub(r'UPDATE\r\n.*?\r\n\r\n', 'UPDATE\r\nDownload the new version from Nexus Mods, extract it and run "Installieren.bat" > "Update".\r\nYour settings are kept.\r\n\r\n', s, count=1, flags=re.S)
 open(p, 'w', encoding='utf-8-sig', newline='').write(s)
 PY
-mkdir -p "$R/nexus"; rm -f "$R/nexus/"*.zip
+# nur den alten Build derselben Version ersetzen - aeltere Nexus-Archive bleiben liegen
+mkdir -p "$R/nexus"; rm -f "$R/nexus/$N-Nexus.zip"
 # Nexus: NUR die Dateien zum Entpacken, keine .bat/.ps1 - Skripte im Archiv fuehren zur Quarantaene ("Executables")
 (cd "$NX/installer/files" && zip -qrX "$R/nexus/$N-Nexus.zip" . -x '*.DS_Store')
 rm -rf "$R/stage"

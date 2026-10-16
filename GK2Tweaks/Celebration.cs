@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace GK2Tweaks
 {
-    // Meilenstein (zuletzt 3.500+ Spieler): einmalig ein Danke-Banner mit Pixel-Konfetti im Hauptmenue, danach nur noch ein kleiner
+    // Meilenstein (zuletzt 5.000+ Spieler): einmalig ein Danke-Banner mit Pixel-Konfetti im Hauptmenue, danach nur noch ein kleiner
     // Hinweis neben "modded" (siehe ModdedLabelPatch).
     internal sealed partial class TweaksGui
     {
@@ -117,11 +117,11 @@ namespace GK2Tweaks
             }
             if (skinned) GUILayout.Label("GK2 Vanilla+", titleStyle);
             GUILayout.Space(6);
-            GUILayout.Label(Labels.T("3.500+ Spieler!", "3,500+ players!"), celebBigStyle);
+            GUILayout.Label(Labels.T("5.000+ Spieler!", "5,000+ players!"), celebBigStyle);
             GUILayout.Space(6);
             GUILayout.Label(Labels.T(
-                "GK2 Vanilla+ wird inzwischen von über 3.500 Leuten gespielt. Damit hätte ich nie gerechnet.\n\nDanke für eure Bewertungen, Kommentare, Fehlermeldungen und Ideen – ganz viele davon stecken inzwischen im Mod, und es kommen noch mehr.",
-                "GK2 Vanilla+ is now played by more than 3,500 people. I never expected that.\n\nThank you for your ratings, comments, bug reports and ideas – lots of them are in the mod by now, and more are coming."),
+                "GK2 Vanilla+ wird inzwischen von über 5.000 Leuten gespielt. Damit hätte ich nie gerechnet.\n\nDanke für eure Bewertungen, Kommentare, Fehlermeldungen und Ideen – ganz viele davon stecken inzwischen im Mod, und es kommen noch mehr.",
+                "GK2 Vanilla+ is now played by more than 5,000 people. I never expected that.\n\nThank you for your ratings, comments, bug reports and ideas – lots of them are in the mod by now, and more are coming."),
                 celebTextStyle);
             GUILayout.Space(4);
             GUILayout.Label("– McFly7", celebTextStyle);

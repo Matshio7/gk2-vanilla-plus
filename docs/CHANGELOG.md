@@ -1,5 +1,27 @@
 # Changelog
 
+## 1.7.4 – 2026-10-16
+
+**EN**
+> **Bonus: movement speed is in** – requested by a supporter on Ko-fi. Mod menu (F9) → Gameplay helpers → **"Movement speed (not vanilla)"**: 100–200 % in 10 % steps, 100 % (normal) by default. Only your character – the game's own slowdowns (e.g. aiming a bow) still apply, and the walk animation keeps up.
+
+- **Stuck workbenches – the check goes further:** with **"Repair stuck workbench"** on (mod menu → Interface & keys), pressing F at a workbench (or removing it) now checks it and tells you what it found. It fixes the cases we know: a workbench stuck as "running" with nothing running (no progress bar, but recipes can still be added – thanks piermaz38 and Drizz), a finished craft stuck at the output, a workbench waiting for a zombie that is gone, a workbench that dropped out of the game's crafting, and extensions (tool box …) that are not linked. If it can't fix something (talent level too low, no energy, fuel or room), it tells you that instead. Nothing is lost; details go to BepInEx\LogOutput.log. Turn the setting off again afterwards.
+- **Pins:** town buildings you have built (e.g. Baker II) now unpin themselves – also ones you built before this update (thanks HardWorkingLoner). When the list is full (6 pins), a short note says which pin made room instead of it silently disappearing (thanks EmiLady).
+- **Steam Workshop updates:** Steam downloads new versions into the Workshop folder, but the game keeps running the old one until you update. The main menu now says clearly when Steam has a newer version ready – F9 → "Save & update" (works without internet too).
+- **Fix:** the installer no longer stops with "Illegal characters in path" when a Steam library entry is broken or a library drive is unplugged, and it also finds the game right next to the unpacked folder (e.g. C:\Games\Graveyard Keeper 2) – thanks Do-oF (GitHub #2). Paths pasted with quotes (Explorer "Copy as path") work too.
+- **Fix:** "Day & time on HUD" could fill the log with errors when the game's font can't draw a character (thanks SUNA). The line now falls back to the time in digits – or steps aside – instead of producing errors.
+- **5,000+ players** – thank you! The thank-you banner shows once more.
+
+**DE**
+> **Bonus: Laufgeschwindigkeit ist drin** – gewünscht von einem Unterstützer auf Ko-fi. Mod-Menü (F9) → Spielhilfen → **„Laufgeschwindigkeit (nicht Vanilla)“**: 100–200 % in 10-%-Schritten, standardmäßig 100 % (normal). Nur deine Figur – die Verlangsamungen des Spiels (z. B. Zielen mit dem Bogen) gelten weiter, und die Laufanimation läuft passend mit.
+
+- **Hängende Werkbänke – die Prüfung geht weiter:** Mit **„Hängende Werkbank reparieren“** (Mod-Menü → Anzeige & Tasten) prüft F an einer Werkbank (oder Abbauen) sie jetzt und sagt dir, was los ist. Gelöst werden die Fälle, die wir kennen: Werkbank steht auf „läuft“, obwohl nichts läuft (kein Fortschrittsbalken, Rezepte lassen sich aber anlegen – danke piermaz38 und Drizz), ein fertiger Auftrag hängt bei der Ausgabe, die Werkbank wartet auf einen Zombie, der nicht mehr da ist, die Werkbank ist aus dem Herstell-System des Spiels gefallen, oder Erweiterungen (Werkzeugkiste …) sind nicht verbunden. Kann sie etwas nicht lösen (Talent-Stufe zu niedrig, keine Energie, kein Brennstoff, kein Platz), sagt sie dir das. Es geht nichts verloren; Details stehen in BepInEx\LogOutput.log. Danach die Einstellung wieder ausschalten.
+- **Anpinnen:** Gebaute Stadtgebäude (z. B. Bäcker II) lösen sich jetzt selbst – auch solche, die du vor diesem Update gebaut hast (danke HardWorkingLoner). Ist die Liste voll (6 Pins), sagt ein kurzer Hinweis, welcher Pin Platz gemacht hat, statt dass er still verschwindet (danke EmiLady).
+- **Updates über den Steam Workshop:** Steam lädt neue Versionen in den Workshop-Ordner, im Spiel läuft aber die alte, bis du aktualisierst. Das Hauptmenü sagt jetzt deutlich, wenn Steam eine neuere Version bereitliegen hat – F9 → „Speichern & aktualisieren“ (geht auch ohne Internet).
+- **Fix:** Der Installer bricht nicht mehr mit „Ungültige Zeichen im Pfad“ ab, wenn ein Steam-Bibliothekseintrag kaputt oder ein Bibliotheks-Laufwerk abgesteckt ist, und findet das Spiel auch direkt neben dem entpackten Ordner (z. B. C:\Games\Graveyard Keeper 2) – danke Do-oF (GitHub #2). Pfade mit Anführungszeichen („Als Pfad kopieren“ im Explorer) gehen jetzt auch.
+- **Fix:** „Tag & Uhrzeit am HUD“ konnte das Log mit Fehlern füllen, wenn die Schrift des Spiels ein Zeichen nicht zeichnen kann (danke SUNA). Die Zeile zeigt dann die Uhrzeit in Ziffern – oder hält sich raus – statt Fehler zu erzeugen.
+- **5.000+ Spieler** – danke! Das Danke-Banner erscheint noch einmal.
+
 ## 1.7.3 – 2026-10-08 · first stable release
 
 **EN**
@@ -49,8 +71,6 @@
 - **Fix:** Werkbänke konnten nach dem Herstellen mit dem Max-Knopf nicht mehr reagieren (F ohne Wirkung, Abbauen ging nicht). Ursache: Ein Auftrag mit mehr Durchgängen als Zutaten bleibt an der Werkbank als „wartet“ stehen – das geht im Spiel auch mit „+“, mit Max aber leicht. Betroffene Werkbänke **reparieren sich jetzt selbst**, sobald du sie benutzt oder abbaust – kein Neubau nötig, nichts geht verloren (Zutaten werden erst beim Start eines Durchgangs verbraucht).
 - **Fix:** Max rechnet jetzt vorsichtig: Zutaten, die andere Aufträge in der Warteschlange schon brauchen, und die Haltbarkeit von Werkzeug (z. B. Säge) zählen mit, und es kommt kein Extra-Durchgang mehr dazu.
 - Fabrik-Maschinen lassen sich vorerst nicht verschieben – sie verloren ihr Ausgabe-Förderband. Normale Förderbänder lassen sich weiter verschieben.
-
-## 1.7.1 – 2026-10-06
 
 ## 1.7.1 – 2026-10-06
 
