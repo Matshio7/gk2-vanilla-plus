@@ -598,3 +598,13 @@ Only if a workbench is stuck (no progress, F does nothing, cannot be removed): t
 [Not fully vanilla] Walking speed of your character in percent (100 = normal). The game's own slowdowns (e.g. while aiming a bow) still apply, the walk animation speeds up to match. Only your character, not NPCs or zombies. => [Не совсем ванилла] Скорость ходьбы вашего персонажа в процентах (100 = обычная). Замедления самой игры (например, при прицеливании из лука) продолжают действовать, анимация ходьбы ускоряется соответственно. Только ваш персонаж, не NPC и не зомби.
 Movement speed => Скорость передвижения
 Steam downloaded GK2 Vanilla+ {0} – the game still runs {1}. To update: F9 › "Save & update" (or run Installieren.bat in the Workshop folder). => Steam загрузил GK2 Vanilla+ {0}, а в игре всё ещё работает {1}. Чтобы обновить: F9 › «Сохранить и обновить» (или запустите Installieren.bat в папке Workshop).
+Safe start (crash guard) => Безопасный запуск (защита от сбоев)
+Crash guard (safe start): if the game did not reach the main menu last time with Vanilla+ active (e.g. a black screen after a game update), the next start runs once without Vanilla+ (no patches or features, only this menu with F9) and tells you so. The start after that is normal again. Holding Left Shift while the game starts does the same once. Off = no guard. => Защита от сбоев (безопасный запуск): если в прошлый раз игра с активным Vanilla+ не дошла до главного меню (например, чёрный экран после обновления игры), следующий запуск один раз проходит без Vanilla+ (без патчей и функций, только это меню по F9), и вы получите уведомление. Следующий запуск снова обычный. Удержание левого Shift при запуске игры делает то же самое один раз. Выкл. = без защиты.
+Safe start (Left Shift held): Vanilla+ is fully off this once. Just restart to turn it back on. => Безопасный запуск (удерживался левый Shift): Vanilla+ на этот раз полностью отключён. Просто перезапустите игру, чтобы снова включить его.
+Safe start: last time the game did not reach the main menu – Vanilla+ is fully off this once. If all is well, just restart. => Безопасный запуск: в прошлый раз игра не дошла до главного меню – поэтому Vanilla+ на этот раз полностью отключён. Если всё в порядке, просто перезапустите игру.
+Vanilla+: The game can now move placed objects by itself, so Vanilla+ "Move objects" stays off. => Vanilla+: Игра теперь сама умеет перемещать размещённые объекты, поэтому «Перемещение объектов» Vanilla+ остаётся выключенным.
+Mod menu & displays => Меню мода и индикаторы
+Hotkeys => Горячие клавиши
+Notice windows (news, rating) => Окна уведомлений (новое, оценка)
+Interface for other mods => Интерфейс для других модов
+FPS log => Журнал FPS

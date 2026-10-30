@@ -13,6 +13,7 @@ This can't be moved. =>
 This can't be moved right now. => 
 Factory machines can't be moved yet. => 
 Moving failed. => 
+Vanilla+: The game can now move placed objects by itself, so Vanilla+ "Move objects" stays off. => 
 Remove & move => 
 5,000+ players! => 
 GK2 Vanilla+ is now played by more than 5,000 people. I never expected that.\n\nThank you for your ratings, comments, bug reports and ideas – lots of them are in the mod by now, and more are coming. => 
@@ -153,6 +154,7 @@ Check for updates =>
 Update channel => 
 Mouse button for pinning => 
 Repair stuck workbench => 
+Safe start (crash guard) => 
 Language => 
 Position => 
 Separator => 
@@ -351,6 +353,7 @@ Key for a screenshot (saved to BepInEx/GK2VanillaPlus/Screenshots). =>
 Resolution multiplier: 2 = twice the screen resolution in each direction (e.g. 3840x2160 from 1920x1080). => 
 Hide the game HUD and the mod displays for the screenshot. => 
 Show the FPS display (toggle with F10). Position and contents: section [Overlay]. => 
+Crash guard (safe start): if the game did not reach the main menu last time with Vanilla+ active (e.g. a black screen after a game update), the next start runs once without Vanilla+ (no patches or features, only this menu with F9) and tells you so. The start after that is normal again. Holding Left Shift while the game starts does the same once. Off = no guard. => 
 Language of the mod menu. Auto = game language (if a translation exists, otherwise English). Translations: BepInEx/GK2VanillaPlus/lang. => 
 Internal: mod version whose changelog was last shown (the 'What's new' window appears once after an update). => 
 Screen corner of the FPS display. => 
@@ -441,6 +444,13 @@ Main menu background =>
 Refund talents & research => 
 Fix stuck workbenches => 
 Movement speed => 
+Mod menu & displays => 
+Hotkeys => 
+Notice windows (news, rating) => 
+Interface for other mods => 
+FPS log => 
+Safe start (Left Shift held): Vanilla+ is fully off this once. Just restart to turn it back on. => 
+Safe start: last time the game did not reach the main menu – Vanilla+ is fully off this once. If all is well, just restart. => 
 What's new? => 
 Enjoying the mod? => 
 Active: => 

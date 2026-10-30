@@ -278,13 +278,13 @@ namespace GK2Tweaks
     [HarmonyPatch(typeof(TalentLevelUpWidget), "OnOver")]
     internal static class RespecOverPatch
     {
-        private static void Postfix(TalentLevelUpWidget __instance) => Respec.Hovered = __instance;
+        private static void Postfix(TalentLevelUpWidget __instance) { try { Respec.Hovered = __instance; } catch { } }
     }
 
     [HarmonyPatch(typeof(TalentLevelUpWidget), "OnOut")]
     internal static class RespecOutPatch
     {
-        private static void Postfix(TalentLevelUpWidget __instance) { if (Respec.Hovered == __instance) Respec.Hovered = null; }
+        private static void Postfix(TalentLevelUpWidget __instance) { try { if (Respec.Hovered == __instance) Respec.Hovered = null; } catch { } }
     }
 
     // Erforschte Technik anklicken: im Fenster des Spiels zusaetzlich "Zurückerstatten"

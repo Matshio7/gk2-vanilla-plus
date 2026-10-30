@@ -1,3 +1,4 @@
+using System;
 using HarmonyLib;
 using UnityEngine;
 
@@ -49,31 +50,49 @@ namespace GK2Tweaks
             }
         }
 
+        // Laeuft jeden Frame auf der Kamera des Spiels: das Bild (src -> dst) wird immer zuerst durchgereicht,
+        // und GL-Matrix/aktives RenderTexture werden in jedem Fall zurueckgesetzt (finally). Sonst zeichnen
+        // UI und andere Kameras nach einem Fehler ins falsche Ziel (schwarzes/verzerrtes Bild).
         private void OnRenderImage(RenderTexture src, RenderTexture dst)
         {
             Graphics.Blit(src, dst);
-            int W = src.width, H = src.height;
-            float imgW = H * 16f / 9f;
-            float x0 = (W - imgW) / 2f;
-            if (x0 < 4f) return;
-            EnsureChain(W, H);
-            Graphics.Blit(src, chain[0]);
-            for (int i = 1; i < chain.Length; i++) Graphics.Blit(chain[i - 1], chain[i]);
-            RenderTexture blur = chain[chain.Length - 1];
-
+            if (src == null) return;
             RenderTexture prev = RenderTexture.active;
-            RenderTexture.active = dst;
-            GL.PushMatrix();
-            GL.LoadPixelMatrix(0, W, H, 0);
-            float u0 = x0 / W, uw = imgW / W * 0.4f;
-            var tint = new Color(0.36f, 0.36f, 0.4f, 0.5f);
-            // gespiegelt: die Bildkante setzt sich nach aussen fort
-            Graphics.DrawTexture(new Rect(0, 0, x0, H), blur, new Rect(u0 + uw, 0, -uw, 1), 0, 0, 0, 0, tint);
-            Graphics.DrawTexture(new Rect(W - x0, 0, x0, H), blur, new Rect(1 - u0, 0, -uw, 1), 0, 0, 0, 0, tint);
-            Graphics.DrawTexture(new Rect(0, 0, x0, H), grad);
-            Graphics.DrawTexture(new Rect(W - x0, 0, x0, H), grad, new Rect(1, 0, -1, 1), 0, 0, 0, 0);
-            GL.PopMatrix();
-            RenderTexture.active = prev;
+            bool pushed = false;
+            try
+            {
+                int W = src.width, H = src.height;
+                float imgW = H * 16f / 9f;
+                float x0 = (W - imgW) / 2f;
+                if (x0 < 4f) return;
+                EnsureChain(W, H);
+                Graphics.Blit(src, chain[0]);
+                for (int i = 1; i < chain.Length; i++) Graphics.Blit(chain[i - 1], chain[i]);
+                RenderTexture blur = chain[chain.Length - 1];
+
+                RenderTexture.active = dst;
+                GL.PushMatrix();
+                pushed = true;
+                GL.LoadPixelMatrix(0, W, H, 0);
+                float u0 = x0 / W, uw = imgW / W * 0.4f;
+                var tint = new Color(0.36f, 0.36f, 0.4f, 0.5f);
+                // gespiegelt: die Bildkante setzt sich nach aussen fort
+                Graphics.DrawTexture(new Rect(0, 0, x0, H), blur, new Rect(u0 + uw, 0, -uw, 1), 0, 0, 0, 0, tint);
+                Graphics.DrawTexture(new Rect(W - x0, 0, x0, H), blur, new Rect(1 - u0, 0, -uw, 1), 0, 0, 0, 0, tint);
+                Graphics.DrawTexture(new Rect(0, 0, x0, H), grad);
+                Graphics.DrawTexture(new Rect(W - x0, 0, x0, H), grad, new Rect(1, 0, -1, 1), 0, 0, 0, 0);
+            }
+            catch (Exception e)
+            {
+                // Komponente aus; Tick schaltet sie nicht wieder ein, sobald die Funktion abgeschaltet ist
+                SafeMode.Fail("Ultrawide", e);
+                enabled = false;
+            }
+            finally
+            {
+                if (pushed) GL.PopMatrix();
+                RenderTexture.active = prev;
+            }
         }
 
         private void Release()
@@ -90,21 +109,27 @@ namespace GK2Tweaks
     [HarmonyPatch(typeof(UIMainMenuInfoPanel), "Draw")]
     internal static class ModdedLabelPatch
     {
+        // Laeuft bei jedem Neuzeichnen der Info-Leiste im Hauptmenue: darf nie werfen
         private static void Postfix(UIMainMenuInfoPanel __instance)
         {
-            if (!Plugin.MenuModdedLabel.Value) return;
-            Traverse text = Traverse.Create(__instance).Field("versionLabel").Property("text");
-            string t = text.GetValue<string>();
-            if (t == null || t.Contains("modded")) return;
-            string add = "  <color=#8fd18f>· modded · GK2 Vanilla+ " + Plugin.DisplayVersion + " by McFly7</color>";
-            if (Plugin.Celebrated.Value) add += "  <color=#e8c56a>· " + Labels.T("5.000+ Spieler · danke!", "5,000+ players · thanks!") + "</color>";
+            try
+            {
+                if (__instance == null || !SafeMode.On("MenuInfo") || !Plugin.MenuModdedLabel.Value) return;
+                Traverse text = Traverse.Create(__instance).Field("versionLabel").Property("text");
+                // GetValue() as string statt GetValue<string>(): wirft nicht, falls sich der Typ geaendert hat
+                string t = text.GetValue() as string;
+                if (t == null || t.Contains("modded")) return;
+                string add = "  <color=#8fd18f>· modded · GK2 Vanilla+ " + Plugin.DisplayVersion + " by McFly7</color>";
+                if (Plugin.Celebrated.Value) add += "  <color=#e8c56a>· " + Labels.T("5.000+ Spieler · danke!", "5,000+ players · thanks!") + "</color>";
 #if !NEXUS
-            if (UpdateCheck.WorkshopVersion != "")
-                add += "  <color=#ff9f5a>· " + string.Format(Labels.T("Steam hat {0} geladen – F9 zum Aktualisieren", "Steam has {0} ready – F9 to update"), UpdateCheck.WorkshopVersion) + "</color>";
-            else
+                if (UpdateCheck.WorkshopVersion != "")
+                    add += "  <color=#ff9f5a>· " + string.Format(Labels.T("Steam hat {0} geladen – F9 zum Aktualisieren", "Steam has {0} ready – F9 to update"), UpdateCheck.WorkshopVersion) + "</color>";
+                else
 #endif
-            if (UpdateCheck.Available) add += "  <color=#ffd27f>· Update " + UpdateCheck.Latest + " (F9)</color>";
-            text.SetValue(t + add);
+                if (UpdateCheck.Available) add += "  <color=#ffd27f>· Update " + UpdateCheck.Latest + " (F9)</color>";
+                text.SetValue(t + add);
+            }
+            catch (Exception e) { SafeMode.Fail("MenuInfo", e); }
         }
     }
 }

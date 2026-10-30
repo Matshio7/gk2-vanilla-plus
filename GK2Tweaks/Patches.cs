@@ -1,4 +1,5 @@
 using System;
+using System.Runtime.CompilerServices;
 using HarmonyLib;
 
 namespace GK2Tweaks
@@ -7,12 +8,28 @@ namespace GK2Tweaks
     [HarmonyPatch(typeof(GraphicsTierConfig), nameof(GraphicsTierConfig.ApplyTier))]
     internal static class TierPatch
     {
+        // Laeuft beim Start (Grafikstufe anwenden): darf nie werfen, sonst bricht die Init des Spiels ab.
+        // Bei einem Fehler bleibt der Eintrag des Spiels unveraendert.
         private static void Postfix(ref PlatformFeatureEntry __result)
         {
-            if (__result == null || !Overrides.Any() || GraphicsBench.SuppressOverrides) return;
-            PlatformFeatureEntry e = __result.Clone();
+            try
+            {
+                if (__result == null || !SafeMode.On("Graphics") || !Overrides.Any() || GraphicsBench.SuppressOverrides) return;
+                PlatformFeatureEntry e = Build(__result);
+                if (e != null) __result = e;
+            }
+            catch (Exception ex) { SafeMode.Fail("Graphics", ex); }
+        }
+
+        // Eigene Methode: fehlt Clone() oder ein Feld nach einem Spiel-Update, wirft schon das JIT-Kompilieren -
+        // das landet so im try oben statt ausserhalb.
+        [MethodImpl(MethodImplOptions.NoInlining)]
+        private static PlatformFeatureEntry Build(PlatformFeatureEntry src)
+        {
+            PlatformFeatureEntry e = src.Clone();
+            if (e == null) return null;
             Overrides.Apply(e);
-            __result = e;
+            return e;
         }
     }
 
@@ -20,7 +37,15 @@ namespace GK2Tweaks
     [HarmonyPatch(typeof(GameSettings), nameof(GameSettings.ApplyScreenSettings))]
     internal static class ScreenSettingsPatch
     {
-        private static void Postfix() { if (GraphicsBench.Running) GraphicsBench.Unlock(); else Plugin.ApplyPacing(); }
+        private static void Postfix()
+        {
+            try
+            {
+                if (!SafeMode.On("Graphics")) return;
+                if (GraphicsBench.Running) GraphicsBench.Unlock(); else Plugin.ApplyPacing();
+            }
+            catch (Exception e) { SafeMode.Fail("Graphics", e); }
+        }
     }
 
     // Nur im Messmodus: Spielstand wird nie geschrieben.

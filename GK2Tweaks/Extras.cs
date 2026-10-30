@@ -174,9 +174,11 @@ namespace GK2Tweaks
     internal static class BackupPatch
     {
         [HarmonyPriority(Priority.First)]
+        // Ein Fehler beim Backup darf das Speichern des Spiels nie verhindern
         private static void Prefix(SaveSlotData slotData)
         {
-            if (!Plugin.BenchOn) Backups.BeforeSave(slotData);
+            try { if (!Plugin.BenchOn && SafeMode.On("Saves")) Backups.BeforeSave(slotData); }
+            catch (Exception e) { SafeMode.Fail("Saves", e); }
         }
     }
 

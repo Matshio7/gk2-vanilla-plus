@@ -598,3 +598,13 @@ Only if a workbench is stuck (no progress, F does nothing, cannot be removed): t
 [Not fully vanilla] Walking speed of your character in percent (100 = normal). The game's own slowdowns (e.g. while aiming a bow) still apply, the walk animation speeds up to match. Only your character, not NPCs or zombies. => [非完全原版] 你的角色的行走速度（百分比，100 = 正常）。游戏自身的减速（例如用弓瞄准时）仍然有效，行走动画会相应加快。只影响你的角色，不影响 NPC 和僵尸。
 Movement speed => 移动速度
 Steam downloaded GK2 Vanilla+ {0} – the game still runs {1}. To update: F9 › "Save & update" (or run Installieren.bat in the Workshop folder). => Steam 已下载 GK2 Vanilla+ {0}，但游戏中运行的仍是 {1}。更新方法：F9 › “存档并更新”（或在创意工坊文件夹中运行 Installieren.bat）。
+Safe start (crash guard) => 安全启动（崩溃保护）
+Crash guard (safe start): if the game did not reach the main menu last time with Vanilla+ active (e.g. a black screen after a game update), the next start runs once without Vanilla+ (no patches or features, only this menu with F9) and tells you so. The start after that is normal again. Holding Left Shift while the game starts does the same once. Off = no guard. => 崩溃保护（安全启动）：如果上次启用 Vanilla+ 时游戏没能进入主菜单（例如游戏更新后黑屏），下次启动会临时不加载 Vanilla+ 运行一次（没有补丁和功能，只有按 F9 打开的本菜单），并提示你。再下一次启动恢复正常。启动游戏时按住左 Shift 键也会临时这样启动一次。关闭 = 不保护。
+Safe start (Left Shift held): Vanilla+ is fully off this once. Just restart to turn it back on. => 安全启动（按住了左 Shift 键）：本次 Vanilla+ 已完全关闭。重新启动游戏即可恢复。
+Safe start: last time the game did not reach the main menu – Vanilla+ is fully off this once. If all is well, just restart. => 安全启动：上次游戏没能进入主菜单 – 因此本次 Vanilla+ 已完全关闭。如果一切正常，重新启动游戏即可。
+Vanilla+: The game can now move placed objects by itself, so Vanilla+ "Move objects" stays off. => Vanilla+：游戏现在可以自行移动已放置的物体，因此 Vanilla+ 的“移动物体”保持关闭。
+Mod menu & displays => 模组菜单与显示
+Hotkeys => 快捷键
+Notice windows (news, rating) => 提示窗口（更新内容、评分）
+Interface for other mods => 供其他模组使用的接口
+FPS log => FPS 日志

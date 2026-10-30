@@ -11,9 +11,14 @@ namespace GK2Tweaks
     {
         private static void Postfix(CameraSystem __instance, IntVector2 res)
         {
-            // Hauptmenue, Ladebildschirm usw. immer mit 100 % - das Menuebild ist auf diese Groesse gebaut
-            if (MainGame.Instance == null || MainGame.Instance.gameState != MainGame.GameState.InGame) return;
-            CameraZoom.Apply(__instance, res.y, CameraZoom.Current);
+            try
+            {
+                if (!SafeMode.On("Zoom")) return;
+                // Hauptmenue, Ladebildschirm usw. immer mit 100 % - das Menuebild ist auf diese Groesse gebaut
+                if (MainGame.Instance == null || MainGame.Instance.gameState != MainGame.GameState.InGame) return;
+                CameraZoom.Apply(__instance, res.y, CameraZoom.Current);
+            }
+            catch (Exception e) { SafeMode.Fail("Zoom", e); }
         }
 
         private static int lastState = -1;

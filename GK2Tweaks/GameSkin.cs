@@ -81,12 +81,19 @@ namespace GK2Tweaks
             var rt = RenderTexture.GetTemporary(s.texture.width, s.texture.height, 0, RenderTextureFormat.ARGB32, RenderTextureReadWrite.sRGB);
             Graphics.Blit(s.texture, rt);
             RenderTexture prev = RenderTexture.active;
-            RenderTexture.active = rt;
             var t = new Texture2D((int)r.width, (int)r.height, TextureFormat.RGBA32, false);
-            t.ReadPixels(new Rect(r.x, r.y, r.width, r.height), 0, 0);
-            t.Apply();
-            RenderTexture.active = prev;
-            RenderTexture.ReleaseTemporary(rt);
+            try
+            {
+                RenderTexture.active = rt;
+                t.ReadPixels(new Rect(r.x, r.y, r.width, r.height), 0, 0);
+                t.Apply();
+            }
+            finally
+            {
+                // aktives RenderTexture immer zuruecksetzen (laeuft in OnGUI, sonst zeichnet das Spiel ins falsche Ziel)
+                RenderTexture.active = prev;
+                RenderTexture.ReleaseTemporary(rt);
+            }
             return t;
         }
 

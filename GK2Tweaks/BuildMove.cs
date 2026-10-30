@@ -20,12 +20,123 @@ namespace GK2Tweaks
 
         private static void Untint(Wgo w) { try { if (w != null) w.SetSelectionTint(Color.white, 0f); } catch { } }
 
+        // Spiel-Update 1.011: Das Spiel kann platzierte Objekte jetzt selbst verschieben. Wird das erkannt, bleibt unsere
+        // Funktion still (keine Eingabe, kein Umbenennen, keine Hinweise) - Option und Code bleiben fuer aeltere
+        // Spielversionen erhalten. Erkennung einmalig per Reflection, ohne harte Verweise auf neue Spiel-Typen.
+        private static int native = -1;   // -1 = noch nicht geprueft, 0 = nein, 1 = ja
+        private static bool nativeToastShown;
+        internal static bool GameHasNativeMove
+        {
+            get
+            {
+                if (native < 0)
+                {
+                    string hit = null;
+                    bool failed = false;
+                    try { hit = DetectNativeMove(); }
+                    catch (Exception e)
+                    {
+                        // Fehlt ein hier verwendeter Spiel-Typ, ist der Bau-Modus umgebaut - dann ist unser Verschieben ohnehin
+                        // nicht sicher: lieber aus (ohne den Hinweis "das Spiel kann es selbst", der waere geraten).
+                        failed = true;
+                        Plugin.Log.LogWarning("Move: native move check failed (" + e.GetType().Name + ": " + e.Message + ") - Vanilla+ MoveObjects stays inactive to be safe");
+                    }
+                    native = failed || hit != null ? 1 : 0;
+                    if (failed) nativeToastShown = true;
+                    else if (hit != null) Plugin.Log.LogInfo("Move: the game has its own 'move objects' (" + hit + ") - Vanilla+ MoveObjects stays inactive");
+                    else Plugin.Log.LogInfo("Move: no native 'move objects' found in the game - Vanilla+ MoveObjects available");
+                }
+                return native == 1;
+            }
+        }
+
+        // Eigene Methode: fehlt ein hier verwendeter Typ, scheitert nur dieser Aufruf (Getter faengt das ab).
+        // Rueckgabe = Fundstelle fuer das Log, null = nichts gefunden.
+        // Regeln 1 und 2 sind eng (eigene Zeiger-Klasse mit passender Basis, eigener Bau-Modus). Die Namens-Heuristiken 3 und 4
+        // gelten nur ab Spielversion 1.011 (dort ist das Verschieben laut Patch-Notes im Spiel) - auf aelteren Versionen
+        // koennten sie faelschlich treffen und MoveObjects grundlos abschalten.
+        private static string DetectNativeMove()
+        {
+            System.Reflection.Assembly asm = typeof(BuildController).Assembly;
+            Type[] types;
+            try { types = asm.GetTypes(); }
+            catch (System.Reflection.ReflectionTypeLoadException e) { types = e.Types ?? new Type[0]; }
+
+            // 1. eigene Zeiger-Klasse fuer das Verschieben (Geschwister von RemovePointer/WgoBuildPointer). Typen per Name
+            //    (kein typeof(RemovePointer): fehlt der Typ, soll nicht die ganze Pruefung scheitern).
+            Type removePointer = null;
+            foreach (Type t in types) if (t != null && t.Name == "RemovePointer") { removePointer = t; break; }
+            // Basis = Typ von BuildPointer.PointerObject (Property oder Feld), sonst die Basisklasse von RemovePointer.
+            // Ohne bekannte Basis wird Regel 1 uebersprungen (eine alte Hilfsklasse gleichen Namens darf nicht treffen).
+            Type pointerBase = null;
+            try
+            {
+                System.Reflection.PropertyInfo pp = AccessTools.Property(typeof(BuildPointer), "PointerObject");
+                if (pp != null) pointerBase = pp.PropertyType;
+                else
+                {
+                    System.Reflection.FieldInfo pf = AccessTools.Field(typeof(BuildPointer), "PointerObject");
+                    if (pf != null) pointerBase = pf.FieldType;
+                }
+            }
+            catch { }
+            if ((pointerBase == null || pointerBase == typeof(object)) && removePointer != null) pointerBase = removePointer.BaseType;
+            if (pointerBase != null && pointerBase != typeof(object))
+            {
+                var names = new HashSet<string> { "MovePointer", "BuildMovePointer", "MoveBuildPointer", "WgoMovePointer", "WgoMoveBuildPointer", "MoveWgoPointer" };
+                foreach (Type t in types)
+                {
+                    if (t == null || !t.IsClass || t.IsAbstract || !names.Contains(t.Name)) continue;
+                    if (!pointerBase.IsAssignableFrom(t)) continue;
+                    return "type " + t.FullName;
+                }
+            }
+
+            // 2. eigener Bau-Modus "Move" (bisher gibt es Place, ConveyorPlace, Remove ...)
+            foreach (string n in Enum.GetNames(typeof(BuildingDef.BuildingMode)))
+                if (n.IndexOf("Move", StringComparison.Ordinal) >= 0 && n.IndexOf("Remove", StringComparison.OrdinalIgnoreCase) < 0)
+                    return "BuildingMode." + n;
+
+            if (!Plugin.GameVersionAtLeast(1.011)) return null;
+
+            // 3. BuildData.GetDataForMove... (wie GetDataForBuild/GetDataForRemove)
+            const System.Reflection.BindingFlags all = System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic |
+                System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.DeclaredOnly;
+            foreach (System.Reflection.MethodInfo m in typeof(BuildData).GetMethods(all))
+                if (IsMoveName(m.Name)) return "BuildData." + m.Name;
+
+            // 4. Methoden an BuildController/BuildPointer, die nach "Objekt verschieben" klingen. Bewusst eng: Zeiger-/Kamera-
+            //    Bewegung (MovePointer, OnCursorMoved ...) gab es schon vorher und darf nicht treffen.
+            foreach (Type t in new[] { typeof(BuildController), typeof(BuildPointer) })
+                foreach (System.Reflection.MethodInfo m in t.GetMethods(all))
+                {
+                    string n = m.Name;
+                    if (!IsMoveName(n)) continue;
+                    if (n.IndexOf("Wgo", StringComparison.Ordinal) >= 0 || n.IndexOf("Object", StringComparison.Ordinal) >= 0
+                        || n.IndexOf("Building", StringComparison.Ordinal) >= 0 || n.IndexOf("Placed", StringComparison.Ordinal) >= 0
+                        || n.IndexOf("MoveMode", StringComparison.Ordinal) >= 0 || n.IndexOf("ForMove", StringComparison.Ordinal) >= 0)
+                        return t.Name + "." + n;
+                }
+            return null;
+        }
+
+        // "Move" (Gross-M, also nicht "Remove"), ohne Zeiger/Kamera/Maus-Bewegung
+        private static bool IsMoveName(string n)
+        {
+            if (string.IsNullOrEmpty(n) || n.IndexOf("Move", StringComparison.Ordinal) < 0) return false;
+            string l = n.ToLowerInvariant();
+            return l.IndexOf("remove", StringComparison.Ordinal) < 0 && l.IndexOf("pointer", StringComparison.Ordinal) < 0
+                && l.IndexOf("cursor", StringComparison.Ordinal) < 0 && l.IndexOf("camera", StringComparison.Ordinal) < 0
+                && l.IndexOf("mouse", StringComparison.Ordinal) < 0 && l.IndexOf("player", StringComparison.Ordinal) < 0;
+        }
+
         internal static bool InRemoveMode
         {
             get
             {
                 try
                 {
+                    if (GameHasNativeMove) return false;
                     BuildController bc = BuildController.Instance;
                     return bc != null && bc.IsBuildModeActive && Pointer(bc)?.PointerObject is RemovePointer;
                 }
@@ -80,7 +191,7 @@ namespace GK2Tweaks
         // Prefix BuildController.UpdateBuildModeInput: Aufnehmen (Dreh-Taste im Abriss-Modus) und Abbrechen
         internal static bool Input(BuildController bc)
         {
-            if (!Plugin.MoveObjects.Value) { if (Active) End(); return true; }
+            if (!Plugin.MoveObjects.Value || GameHasNativeMove || !SafeMode.On("MoveObjects")) { if (Active) End(); return true; }
             if (Traverse.Create(bc).Field("isBuildModeInputLocked").GetValue<bool>()) return true;
             BuildPointer bp = Pointer(bc);
             if (bp == null) return true;
@@ -176,11 +287,24 @@ namespace GK2Tweaks
 
         internal static void Tick()
         {
+            if (GameHasNativeMove) { NativeNotice(); backToRemove = false; return; }
             if (!backToRemove) return;
             backToRemove = false;
             BuildController bc = BuildController.Instance;
             if (bc != null && bc.IsBuildModeActive) Switch(bc, BuildData.GetDataForRemove());
             Untint(lastMoved);
+        }
+
+        // einmaliger Hinweis, nur fuer Spieler, die unser Verschieben eingeschaltet haben, und erst im Spiel
+        // (im Hauptmenue wuerde er den Update-/News-Hinweis ueberschreiben)
+        private static void NativeNotice()
+        {
+            if (nativeToastShown || !Plugin.MoveObjects.Value) return;
+            MainGame mg = MainGame.Instance;
+            if (mg == null || mg.gameState != MainGame.GameState.InGame) return;
+            nativeToastShown = true;
+            ManualSave.Toast(Labels.T("Vanilla+: Das Spiel kann platzierte Objekte jetzt selbst verschieben – „Objekte verschieben“ von Vanilla+ bleibt deshalb aus.",
+                "Vanilla+: The game can now move placed objects by itself, so Vanilla+ \"Move objects\" stays off."), 8f);
         }
 
         private static Wgo Relocate(WgoData d, Vector3 pos, string varId, int rot, WgoBuildPointer p)
@@ -278,7 +402,7 @@ namespace GK2Tweaks
         {
             try
             {
-                if (!Plugin.MoveObjects.Value || buildData == null || buildData.BuildingMode != BuildingDef.BuildingMode.Remove) return;
+                if (!Plugin.MoveObjects.Value || BuildMove.GameHasNativeMove || buildData == null || buildData.BuildingMode != BuildingDef.BuildingMode.Remove) return;
                 Traverse.Create(__instance).Property("Name").SetValue(Labels.T("Entfernen & Verschieben", "Remove & move"));
             }
             catch { }
@@ -291,7 +415,7 @@ namespace GK2Tweaks
         private static bool Prefix(BuildController __instance)
         {
             try { return BuildMove.Input(__instance); }
-            catch (Exception e) { Plugin.Log.LogWarning("Move input: " + e.Message); return true; }
+            catch (Exception e) { SafeMode.Fail("MoveObjects", e); return true; }
         }
     }
 
@@ -300,7 +424,7 @@ namespace GK2Tweaks
     {
         private static void Postfix(WgoBuildPointer __instance, Wgo target)
         {
-            try { BuildMove.SetTarget(__instance, target); } catch (Exception e) { Plugin.Log.LogWarning("Move target: " + e.Message); }
+            try { BuildMove.SetTarget(__instance, target); } catch (Exception e) { SafeMode.Fail("MoveObjects", e); }
         }
     }
 
@@ -319,13 +443,13 @@ namespace GK2Tweaks
         private static bool Prefix(BuildPointer __instance, ref bool __result)
         {
             try { return BuildMove.Build(__instance, ref __result); }
-            catch (Exception e) { Plugin.Log.LogWarning("Move build: " + e.Message); return true; }
+            catch (Exception e) { SafeMode.Fail("MoveObjects", e); return true; }
         }
     }
 
     [HarmonyPatch(typeof(BuildController), nameof(BuildController.DisableBuildMode))]
     internal static class MoveDisablePatch
     {
-        private static void Postfix() { BuildMove.OnDisable(); }
+        private static void Postfix() { try { BuildMove.OnDisable(); } catch (Exception e) { SafeMode.Fail("MoveObjects", e); } }
     }
 }

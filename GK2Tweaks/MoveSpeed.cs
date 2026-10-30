@@ -94,9 +94,11 @@ namespace GK2Tweaks
             MethodInfo scaled = AccessTools.Method(typeof(MoveSpeed), nameof(MoveSpeed.Scaled));
             var list = new List<CodeInstruction>(code);
             int n = 0;
+            // Nichts gefunden (oder eigene Methode fehlt): Original-IL unveraendert zurueckgeben
+            if (getter == null || scaled == null) { MoveSpeed.Hooked = 0; Plugin.Log.LogWarning("Move speed: SpeedMultiplier not found - option has no effect (game update?)"); return list; }
             foreach (CodeInstruction ci in list)
             {
-                if (getter == null || !ci.Calls(getter)) continue;
+                if (!ci.Calls(getter)) continue;
                 ci.opcode = OpCodes.Call;   // gleicher Stack: (this) -> float
                 ci.operand = scaled;
                 n++;

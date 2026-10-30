@@ -134,6 +134,6 @@ namespace GK2Tweaks
     [HarmonyLib.HarmonyPatch(typeof(WeatherComponent), "Awake")]
     internal static class RainScanPatch
     {
-        private static void Postfix() { try { Rain.ScanSoon(); } catch { } }
+        private static void Postfix() { try { Rain.ScanSoon(); } catch (System.Exception e) { SafeMode.Fail("Rain", e); } }
     }
 }

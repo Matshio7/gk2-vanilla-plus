@@ -131,6 +131,7 @@ namespace GK2Tweaks
             { "UpdateChannel", new[] { "Update-Kanal", "Update channel" } },
             { "ClickButton", new[] { "Maustaste zum Anpinnen", "Mouse button for pinning" } },
             { "RepairStuckWorkbenches", new[] { "Hängende Werkbank reparieren", "Repair stuck workbench" } },
+            { "SafeStartGuard", new[] { "Sicherer Start (Absturz-Schutz)", "Safe start (crash guard)" } },
             { "Language", new[] { "Sprache", "Language" } },
             { "Corner", new[] { "Position", "Position" } },
             { "Separator", new[] { "Trennzeichen", "Separator" } },
@@ -217,6 +218,7 @@ namespace GK2Tweaks
             { "CheckForUpdates", "Prüft bei jedem Spielstart einmal auf GitHub, ob es eine neue Version gibt. Es wird nur die Versionsnummer gelesen, nichts gesendet." },
 #endif
             { "RepairStuckWorkbenches", "Nur wenn eine Werkbank hängt (kein Fortschritt, F ohne Wirkung, nicht abbaubar): einschalten, dann an der Werkbank F drücken oder sie abbauen. Vanilla+ prüft die Werkbank, löst bekannte Hänger (z. B. steht auf „läuft“, wartender Auftrag ohne Zutaten ganz vorne, Erweiterung nicht verbunden – nichts geht verloren) und sagt dir, was es gefunden hat. Details stehen im Log. Danach wieder ausschalten." },
+            { "SafeStartGuard", "Absturz-Schutz: Kam das Spiel beim letzten Start mit Vanilla+ nicht bis ins Hauptmenü (z. B. schwarzes Bild nach einem Spiel-Update), läuft der nächste Start einmal ohne Vanilla+ (keine Patches oder Funktionen, nur dieses Menü mit F9) und sagt dir Bescheid. Der Start danach ist wieder normal. Linke Umschalttaste beim Spielstart gedrückt halten bewirkt dasselbe einmalig. Aus = kein Schutz." },
             { "WeekPlanKey", "Öffnet den Wochenplan: was an welchem Wochentag möglich ist (nur bereits Freigeschaltetes)." },
             { "HideHudKey", "Blendet die komplette Spiel-Oberfläche aus, z. B. für Screenshots. Esc blendet sie wieder ein." },
             { "DailyReminder", "Jeden Morgen eine Benachrichtigung, was heute möglich ist – nur bereits freigeschaltete Dinge, keine Spoiler." },

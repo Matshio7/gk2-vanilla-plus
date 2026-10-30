@@ -116,15 +116,16 @@ namespace GK2Tweaks
     {
         private static void Postfix(UIItemCountWindow __instance, UIItemCountWindowData data)
         {
-            if (TradeHelper.Prefill <= 0 || data == null || !data.IsForVendor) return;
+            if (TradeHelper.Prefill <= 0 || data == null) return;
             try
             {
+                if (!data.IsForVendor) return;
                 if (((ObjectLinkedToDefinition<ItemDef>)data.Item).id != TradeHelper.PrefillId) return;
                 var slider = Traverse.Create(__instance).Field("slider").GetValue<SmartSlider>();
                 int v = Mathf.Clamp(TradeHelper.Prefill, data.Min, data.Max);
                 AccessTools.Method(typeof(SmartSlider), "SetValue").Invoke(slider, new object[] { v, true });
             }
-            catch (Exception e) { Plugin.Log.LogWarning("Trade prefill: " + e.Message); }
+            catch (Exception e) { SafeMode.Fail("TradeLikes", e); }
         }
     }
 }

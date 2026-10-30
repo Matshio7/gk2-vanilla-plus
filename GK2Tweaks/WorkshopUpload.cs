@@ -15,6 +15,9 @@ namespace GK2Tweaks
     internal static class WorkshopUpload
     {
         internal static string DescriptionFile => Path.Combine(BepInEx.Paths.BepInExRootPath, "GK2VanillaPlus", "workshop_description.bbcode");
+        // Vorschaubild: liegt nicht mehr im hochgeladenen Ordner (das Workshop-Paket enthaelt nur BepInEx/plugins/...,
+        // weil GK2.WorkshopSync den Inhalt ins Spielverzeichnis kopiert), sondern beim Autor neben der Beschreibung
+        internal static string ThumbnailFile => Path.Combine(BepInEx.Paths.BepInExRootPath, "GK2VanillaPlus", "workshop_thumbnail.jpg");
         private static string title, contentFolder;
 
         internal static bool Active => title != null && title.StartsWith("GK2 Vanilla+") && File.Exists(DescriptionFile);
@@ -25,6 +28,8 @@ namespace GK2Tweaks
         {
             try
             {
+                // Nur beim Autor (Beschreibungsdatei vorhanden): fuer alle anderen bleibt der Uploader des Spiels unangetastet
+                if (!File.Exists(DescriptionFile)) return;
                 var target = AccessTools.Method(typeof(SteamWorkshopCreatorService), "SubmitContent");
                 if (target == null) { Plugin.Log.LogWarning("Workshop upload: SubmitContent not found"); return; }
                 h.Patch(target, transpiler: new HarmonyMethod(typeof(WorkshopUpload), nameof(Transpiler)));
@@ -85,6 +90,23 @@ namespace GK2Tweaks
 
         private static bool WSetItemContent(UGCUpdateHandle_t h, string folder) { contentFolder = folder; return SteamUGC.SetItemContent(h, folder); }
 
+        private static bool WSetItemPreview(UGCUpdateHandle_t h, string file)
+        {
+            if (Active)
+            {
+                try
+                {
+                    if ((string.IsNullOrEmpty(file) || !File.Exists(file)) && File.Exists(ThumbnailFile))
+                    {
+                        Plugin.Log.LogInfo("Workshop upload: preview from " + ThumbnailFile);
+                        file = ThumbnailFile;
+                    }
+                }
+                catch (Exception e) { Plugin.Log.LogWarning("Workshop upload: " + e.Message); }
+            }
+            return SteamUGC.SetItemPreview(h, file);
+        }
+
         private static SteamAPICall_t WSubmitItemUpdate(UGCUpdateHandle_t h, string note)
         {
             if (Active)
@@ -99,11 +121,24 @@ namespace GK2Tweaks
             return SteamUGC.SubmitItemUpdate(h, note);
         }
 
-        // Neuester Eintrag aus docs/CHANGELOG.md im hochgeladenen Ordner, als Steam-BBCode
+        // Neuester Eintrag aus dem Changelog als Steam-BBCode: <Ordner>/docs/CHANGELOG.md (alter Paketaufbau),
+        // <Ordner>/BepInEx/plugins/GK2Tweaks/CHANGELOG.md (Workshop-Paket ab Spiel 1.011), sonst der in die DLL eingebettete
         internal static string ChangeNote(string folder)
         {
-            string path = folder != null ? Path.Combine(folder, "docs", "CHANGELOG.md") : null;
-            string md = path != null && File.Exists(path) ? File.ReadAllText(path, Encoding.UTF8) : null;
+            string md = null;
+            if (folder != null)
+                foreach (string path in new[] { Path.Combine(folder, "docs", "CHANGELOG.md"), Path.Combine(folder, "BepInEx", "plugins", "GK2Tweaks", "CHANGELOG.md") })
+                    if (md == null && File.Exists(path)) md = File.ReadAllText(path, Encoding.UTF8);
+            if (md == null)
+            {
+                using (Stream st = typeof(WorkshopUpload).Assembly.GetManifestResourceStream("GK2Tweaks.CHANGELOG.md"))
+                {
+                    if (st != null)
+                    {
+                        using (var r = new StreamReader(st, Encoding.UTF8)) md = r.ReadToEnd();
+                    }
+                }
+            }
             if (md == null) return null;
             var sb = new StringBuilder();
             bool inEntry = false, inList = false;

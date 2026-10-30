@@ -11,9 +11,13 @@ export PATH=/usr/local/share/dotnet:$PATH
 [ -d "$ROOT/reference/fw" ] || git clone -q --depth 1 https://github.com/AcTePuKc/GK2-Mod-Framework.git "$ROOT/reference/fw"
 (cd "$ROOT/FrameworkRef" && dotnet build -c Release -v q -nologo --source "$HOME/.nuget/packages" | grep -E "error|Build succeeded")
 (cd "$ROOT/FrameworkBridge" && dotnet build -c Release -v q -nologo --source "$HOME/.nuget/packages" | grep -E "error|Build succeeded")
-N="GK2-VanillaPlus-$V"; S="$R/stage/$N"; F="$S/installer/files"
-rm -rf "$R/stage"; mkdir -p "$F/BepInEx/plugins/GK2Ultrawide" "$F/BepInEx/plugins/GK2Tweaks" "$F/BepInEx/GK2VanillaPlus" "$S/docs/licenses"
-cp -R "$B/BepInEx/." "$F/"
+N="GK2-VanillaPlus-$V"; S="$R/stage/$N"; F="$S/installer/files"; L="$S/installer/loader"
+rm -rf "$R/stage"; mkdir -p "$F/BepInEx/plugins/GK2Ultrawide" "$F/BepInEx/plugins/GK2Tweaks" "$F/BepInEx/GK2VanillaPlus" "$L" "$S/docs/licenses"
+# Mod-Loader (BepInEx 5.4.23.5 + Doorstop) getrennt in installer/loader - NICHT in installer/files:
+# Der Updater von 1.7.4 und aelter sucht einen Ordner "files" mit winhttp.dll und kopiert ihn komplett mit -Force ins
+# Spiel - das wuerde das BepInEx des Spiels (ab 1.011) ueberschreiben. So bricht er mit "unerwartetes Format" ab.
+# install.ps1/update.ps1 ab 1.7.5 nehmen installer/loader nur, wenn im Spielordner noch kein Loader liegt.
+cp -R "$B/BepInEx/." "$L/"
 cp "$ROOT/GK2Ultrawide/bin/Release/GK2Ultrawide.dll" "$F/BepInEx/plugins/GK2Ultrawide/"
 cp "$ROOT/GK2Tweaks/bin/Release/GK2Tweaks.dll" "$F/BepInEx/plugins/GK2Tweaks/"
 cp "$ROOT/LICENSE.md" "$F/BepInEx/GK2VanillaPlus/LICENSE.md"
@@ -43,14 +47,55 @@ cp "$ROOT/LICENSE.md" "$ROOT/THIRD-PARTY-NOTICES.txt" "$ROOT/docs/CHANGELOG.md" 
 cp "$B/BepInEx-LICENSE.txt" "$B/UnityDoorstop-LICENSE.txt" "$S/docs/licenses/"
 mkdir -p "$R/dist"; rm -f "$R/dist/$N.zip"
 (cd "$R/stage" && zip -qrX "$R/dist/$N.zip" "$N" -x '*.DS_Store')
-# Steam-Workshop-Ordner: gleicher Inhalt wie das ZIP + Thumbnail.jpg (Vorschaubild fuer den Uploader des Spiels)
-rm -rf "$R/workshop"; mkdir -p "$R/workshop"
-cp -R "$S" "$R/workshop/GK2-VanillaPlus"
-cp "$ROOT/workshop/Thumbnail.jpg" "$R/workshop/GK2-VanillaPlus/"
+# Steam-Workshop-Ordner (= Inhalt, den der Uploader hochlaedt): NUR BepInEx/plugins/GK2Tweaks/** und BepInEx/plugins/GK2Ultrawide/**.
+# Seit Spiel-Update 1.011 bringt das Spiel BepInEx selbst mit, und "GK2.WorkshopSync" kopiert abonnierte Items eigenstaendig
+# ins Spielverzeichnis (und entfernt die Dateien beim Abschalten im Mods-Menue wieder). Deshalb im Item:
+#  - keine Loader-Dateien (wuerden den Loader des Spiels bei JEDEM Abonnenten ueberschreiben),
+#  - nichts im Wurzelordner ausser BepInEx/ (Installieren.bat, LICENSE.md, Thumbnail.jpg ... landeten sonst im Spielordner),
+#  - nichts in BepInEx/GK2VanillaPlus: dort liegen Nutzerdaten (Backups, Screenshots, pins.txt, startup.pending, mine.png).
+# Menue-Hintergruende, Lizenz und Changelog liegen im Plugin-Ordner (MenuBackground.cs/WorkshopUpload.cs lesen sie dort);
+# die Uebersetzungsvorlage schreibt der Mod selbst aus der DLL. Kein update.ps1: Updates kommen ueber den Workshop.
+# Aeltere Spielversionen (ohne eigenes BepInEx): GitHub-ZIP mit Installer (installer/loader).
+W="$R/workshop/GK2-VanillaPlus"; WT="$W/BepInEx/plugins/GK2Tweaks"
+rm -rf "$R/workshop"; mkdir -p "$WT/MenuBackground" "$W/BepInEx/plugins/GK2Ultrawide"
+cp "$F/BepInEx/plugins/GK2Tweaks/GK2Tweaks.dll" "$WT/"
+cp "$F/BepInEx/plugins/GK2Ultrawide/GK2Ultrawide.dll" "$W/BepInEx/plugins/GK2Ultrawide/"
+cp "$F"/BepInEx/GK2VanillaPlus/MenuBackground/bg?.jpg "$WT/MenuBackground/"
+cp "$ROOT/LICENSE.md" "$ROOT/THIRD-PARTY-NOTICES.txt" "$ROOT/docs/CHANGELOG.md" "$WT/"
+# Vorschaubild ausserhalb des hochgeladenen Ordners (WorkshopUpload setzt es beim Autor aus BepInEx/GK2VanillaPlus/workshop_thumbnail.jpg)
+cp "$ROOT/workshop/Thumbnail.jpg" "$R/workshop/Thumbnail.jpg"
+# Sicherheitspruefung: im Wurzelordner nur BepInEx/, darunter nur plugins/GK2Tweaks und plugins/GK2Ultrawide,
+# keine Loader-Dateien, genau unsere zwei DLLs, Pflichtdateien vorhanden - sonst Abbruch
+ROOTS=$(cd "$W" && find . -mindepth 1 -maxdepth 1 | sort | tr '\n' ' ')
+UNDER=$(cd "$W" && find ./BepInEx -mindepth 1 -maxdepth 2 | sort | tr '\n' ' ')
+BAD=$(cd "$W" && find . \( -iname 'winhttp.dll' -o -iname 'doorstop_config.ini' -o -iname '.doorstop_version' -o -iname 'doorstop*' \
+  -o -iname '*.ps1' -o -iname '*.bat' -o -iname '0Harmony*.dll' -o -iname 'BepInEx*.dll' -o -iname 'Mono.Cecil*.dll' -o -iname 'MonoMod*.dll' \) -print)
+DLLS=$(cd "$W" && find . -iname '*.dll' | sort | tr '\n' ' ')
+if [ "$ROOTS" != "./BepInEx " ] || [ "$UNDER" != "./BepInEx/plugins ./BepInEx/plugins/GK2Tweaks ./BepInEx/plugins/GK2Ultrawide " ] || [ -n "$BAD" ] \
+   || [ "$DLLS" != "./BepInEx/plugins/GK2Tweaks/GK2Tweaks.dll ./BepInEx/plugins/GK2Ultrawide/GK2Ultrawide.dll " ]; then
+  echo "FEHLER: Workshop-Ordner enthaelt mehr als BepInEx/plugins/GK2Tweaks + GK2Ultrawide oder Loader-/Fremddateien - Abbruch:" >&2
+  echo "Wurzel: $ROOTS" >&2; echo "BepInEx: $UNDER" >&2
+  [ -n "$BAD" ] && echo "$BAD" >&2
+  echo "DLLs: $DLLS" >&2
+  exit 1
+fi
+for f in BepInEx/plugins/GK2Tweaks/GK2Tweaks.dll BepInEx/plugins/GK2Ultrawide/GK2Ultrawide.dll BepInEx/plugins/GK2Tweaks/LICENSE.md \
+         BepInEx/plugins/GK2Tweaks/THIRD-PARTY-NOTICES.txt BepInEx/plugins/GK2Tweaks/CHANGELOG.md BepInEx/plugins/GK2Tweaks/MenuBackground/bg1.jpg; do
+  [ -f "$W/$f" ] || { echo "FEHLER: Workshop-Ordner ohne $f - Abbruch" >&2; exit 1; }
+done
+# GitHub-ZIP: installer/files darf keine Loader-Dateien enthalten (siehe oben, alter Updater)
+if [ -n "$(cd "$F" && find . \( -iname 'winhttp.dll' -o -iname 'doorstop*' -o -iname '.doorstop_version' -o -ipath './BepInEx/core' \) -print)" ]; then
+  echo "FEHLER: installer/files enthaelt Loader-Dateien - Abbruch" >&2; exit 1
+fi
+[ -f "$L/winhttp.dll" ] || { echo "FEHLER: installer/loader ohne winhttp.dll - Abbruch" >&2; exit 1; }
 BOTTLE="$HOME/Library/Application Support/CrossOver/Bottles/Steam/drive_c"
 GAME="$BOTTLE/Program Files (x86)/Steam/steamapps/common/Graveyard Keeper 2"
-if [ -d "$GAME/BepInEx" ]; then mkdir -p "$GAME/BepInEx/GK2VanillaPlus"; cp "$ROOT/workshop/description.bbcode" "$GAME/BepInEx/GK2VanillaPlus/workshop_description.bbcode"; fi
-if [ -d "$BOTTLE" ]; then rm -rf "$BOTTLE/GK2VanillaPlus-Workshop"; cp -R "$R/workshop/GK2-VanillaPlus" "$BOTTLE/GK2VanillaPlus-Workshop"; fi
+if [ -d "$GAME/BepInEx" ]; then
+  mkdir -p "$GAME/BepInEx/GK2VanillaPlus"
+  cp "$ROOT/workshop/description.bbcode" "$GAME/BepInEx/GK2VanillaPlus/workshop_description.bbcode"
+  cp "$ROOT/workshop/Thumbnail.jpg" "$GAME/BepInEx/GK2VanillaPlus/workshop_thumbnail.jpg"
+fi
+if [ -d "$BOTTLE" ]; then rm -rf "$BOTTLE/GK2VanillaPlus-Workshop"; cp -R "$W" "$BOTTLE/GK2VanillaPlus-Workshop"; fi
 # Nexus-Ausgabe: ohne Update-Pruefung und Online-Updater (Nexus erlaubt keine Selbst-Updates)
 (cd "$ROOT/GK2Tweaks" && dotnet build -c Nexus --no-restore -v q -nologo -p:Version=$V | grep -E "error|Build succeeded")
 NX="$R/stage/nexus/$N"; rm -rf "$R/stage/nexus"; mkdir -p "$R/stage/nexus"; cp -R "$S" "$NX"
@@ -75,7 +120,9 @@ open(p, 'w', encoding='utf-8-sig', newline='').write(s)
 PY
 # nur den alten Build derselben Version ersetzen - aeltere Nexus-Archive bleiben liegen
 mkdir -p "$R/nexus"; rm -f "$R/nexus/$N-Nexus.zip"
-# Nexus: NUR die Dateien zum Entpacken, keine .bat/.ps1 - Skripte im Archiv fuehren zur Quarantaene ("Executables")
+# Nexus: NUR die Dateien zum Entpacken, keine .bat/.ps1 - Skripte im Archiv fuehren zur Quarantaene ("Executables").
+# Ohne Mod-Loader (der liegt in installer/loader): "in den Spielordner entpacken" darf das BepInEx des Spiels (ab 1.011)
+# nicht ueberschreiben. Fuer aeltere Spielversionen muss BepInEx 5.4.23.5 vorher installiert sein (Nexus-Beschreibung).
 (cd "$NX/installer/files" && zip -qrX "$R/nexus/$N-Nexus.zip" . -x '*.DS_Store')
 rm -rf "$R/stage"
 echo "$R/dist/$N.zip"

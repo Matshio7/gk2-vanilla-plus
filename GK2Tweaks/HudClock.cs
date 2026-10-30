@@ -134,7 +134,7 @@ namespace GK2Tweaks
     [HarmonyPatch(typeof(WorldZoneWidget), nameof(WorldZoneWidget.Redraw))]
     internal static class ZoneRedrawPatch
     {
-        private static void Postfix() { HudClock.AfterRedraw(); }
+        private static void Postfix() { try { HudClock.AfterRedraw(); } catch (System.Exception e) { SafeMode.Fail("HudClock", e); } }
     }
 
     // Erkennt andere BepInEx-Mods am Namen (fuer Mods mit gleicher Funktion: dann keine doppelte Wirkung)

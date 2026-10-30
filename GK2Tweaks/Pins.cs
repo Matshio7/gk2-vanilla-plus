@@ -499,28 +499,40 @@ namespace GK2Tweaks
             return RectTransformUtility.RectangleContainsScreenPoint(parent, Input.mousePosition, cam);
         }
 
+        // Laeuft jeden Frame fuer jede sichtbare Nadel: ein Fehler schaltet nur diese Nadel ab (statt jeden Frame
+        // das Log zu fluten); nach wiederholten Fehlern schaltet der Sicherheitsmodus das Anpinnen ganz ab.
         private void Update()
         {
             if (image == null) return;
-            bool show = pinned || alwaysShow || Hovered();
-            if (image.enabled != show) image.enabled = show;
-            // 1.7.3: optional mit Taste statt Klick - Maus ueber dem Rezept/Auftrag/Bauplan und Taste druecken
-            if (KeyMode)
+            try
             {
-                if (Plugin.PinsKey.Value.IsDown() && Time.frameCount != lastToggleFrame && Hovered() && image.isActiveAndEnabled)
+                if (!SafeMode.On("Pins")) { if (image.enabled) image.enabled = false; return; }
+                bool show = pinned || alwaysShow || Hovered();
+                if (image.enabled != show) image.enabled = show;
+                // 1.7.3: optional mit Taste statt Klick - Maus ueber dem Rezept/Auftrag/Bauplan und Taste druecken
+                if (KeyMode)
+                {
+                    if (Plugin.PinsKey.Value.IsDown() && Time.frameCount != lastToggleFrame && Hovered() && image.isActiveAndEnabled)
+                    {
+                        lastToggleFrame = Time.frameCount;
+                        DoToggle();
+                    }
+                    return;
+                }
+                // Baumenues (Hof, Stadt) fangen Mausklicks selbst ab, bevor die Nadel sie bekommt:
+                // deshalb den Linksklick direkt abfragen, wenn die Maus ueber der sichtbaren Nadel ist.
+                if (show && Input.GetMouseButtonDown(ClickIndex) && Time.frameCount != lastToggleFrame && OverSelf())
                 {
                     lastToggleFrame = Time.frameCount;
+                    lastPollToggle = Time.unscaledTime;
                     DoToggle();
                 }
-                return;
             }
-            // Baumenues (Hof, Stadt) fangen Mausklicks selbst ab, bevor die Nadel sie bekommt:
-            // deshalb den Linksklick direkt abfragen, wenn die Maus ueber der sichtbaren Nadel ist.
-            if (show && Input.GetMouseButtonDown(ClickIndex) && Time.frameCount != lastToggleFrame && OverSelf())
+            catch (Exception e)
             {
-                lastToggleFrame = Time.frameCount;
-                lastPollToggle = Time.unscaledTime;
-                DoToggle();
+                SafeMode.Fail("Pins", e);
+                try { image.enabled = false; } catch { }
+                enabled = false;
             }
         }
 

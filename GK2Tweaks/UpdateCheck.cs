@@ -27,7 +27,21 @@ namespace GK2Tweaks
         private static bool started, updating;
 
         internal static string UpdaterPath => Path.Combine(Path.Combine(Paths.GameRootPath, "BepInEx"), Path.Combine("GK2VanillaPlus", "update.ps1"));
-        internal static bool CanAutoUpdate => !WineFix.IsWine && File.Exists(UpdaterPath);
+        // Workshop-verwaltet (Spiel 1.011+): Das Spiel ("GK2.WorkshopSync") kopiert das abonnierte Workshop-Item selbst in den
+        // Spielordner und aktualisiert es, wenn Steam es tut. Dann nicht per GitHub-Updater darueberkopieren, sondern auf
+        // einen Neustart verweisen.
+        internal static bool WorkshopManaged;
+        internal static bool CanAutoUpdate => !WineFix.IsWine && !WorkshopManaged && File.Exists(UpdaterPath);
+
+        private static bool HasWorkshopSync()
+        {
+            try
+            {
+                string root = Paths.BepInExRootPath;
+                return Directory.Exists(root) && Directory.GetFiles(root, "*WorkshopSync*", SearchOption.AllDirectories).Length > 0;
+            }
+            catch { return false; }
+        }
 
         // Versionsschluessel: 4. Stelle 65534 = stabil, sonst Beta-Nummer (1.8.0-beta.2 < 1.8.0)
         private static Version Key(string numbers, string beta)
@@ -39,7 +53,8 @@ namespace GK2Tweaks
         private static string Show(Version k) => k.Revision == 65534 ? k.Major + "." + k.Minor + "." + k.Build : k.Major + "." + k.Minor + "." + k.Build + " Beta " + k.Revision;
 
         // Steam-Workshop: Steam laedt neue Versionen nur in den Workshop-Ordner, im Spielordner laeuft die alte weiter,
-        // bis man aktualisiert (F9 > Speichern & aktualisieren oder Installieren.bat). Liegt dort eine neuere Version,
+        // bis man aktualisiert (vor Spiel 1.011: F9 > Speichern & aktualisieren oder Installieren.bat; ab 1.011 kopiert das
+        // Spiel selbst - dann reicht ein Neustart, siehe WorkshopManaged). Liegt dort eine neuere Version,
         // sagen wir das deutlich im Hauptmenue - geht ohne Internet und auch mit abgeschalteter Update-Pruefung.
         internal static string WorkshopVersion = "";
 
@@ -50,10 +65,22 @@ namespace GK2Tweaks
                 string common = Path.GetDirectoryName(Paths.GameRootPath.TrimEnd('\\', '/'));   // ...\steamapps\common
                 string steamapps = Path.GetDirectoryName(common);
                 if (string.IsNullOrEmpty(steamapps)) return;
-                string dll = steamapps;
-                foreach (string part in new[] { "workshop", "content", "4358690", "3808053878", "installer", "files", "BepInEx", "plugins", "GK2Tweaks", "GK2Tweaks.dll" })
-                    dll = Path.Combine(dll, part);
-                if (!File.Exists(dll)) return;
+                // Workshop-Item neu (Spiel 1.011+): BepInEx/plugins/... im Wurzelordner (ohne Loader-Dateien); aeltere Items: installer/files/BepInEx/...
+                string item = steamapps;
+                foreach (string part in new[] { "workshop", "content", "4358690", "3808053878" })
+                    item = Path.Combine(item, part);
+                string dll = null;
+                foreach (string sub in new[] { "", Path.Combine("installer", "files") })
+                {
+                    string p = item;
+                    if (sub.Length > 0) p = Path.Combine(p, sub);
+                    foreach (string part in new[] { "BepInEx", "plugins", "GK2Tweaks", "GK2Tweaks.dll" })
+                        p = Path.Combine(p, part);
+                    if (File.Exists(p)) { dll = p; break; }
+                }
+                if (dll == null) return;
+                WorkshopManaged = HasWorkshopSync();
+                if (WorkshopManaged) Plugin.Log.LogInfo("Steam Workshop item found and the game's Workshop loader (WorkshopSync) is present - updates come through the Workshop");
                 Version w = System.Reflection.AssemblyName.GetAssemblyName(dll).Version;
                 Version mine = new Version(Plugin.PluginVersion);
                 Version w3 = new Version(w.Major, w.Minor, Math.Max(0, w.Build)), mine3 = new Version(mine.Major, mine.Minor, Math.Max(0, mine.Build));
@@ -71,7 +98,10 @@ namespace GK2Tweaks
             started = true;
             CheckWorkshop();
             yield return new WaitForSecondsRealtime(8f);
-            if (WorkshopVersion != "" && (MainGame.Instance == null || MainGame.Instance.gameState != MainGame.GameState.InGame))
+            if (WorkshopVersion != "" && WorkshopManaged && (MainGame.Instance == null || MainGame.Instance.gameState != MainGame.GameState.InGame))
+                ManualSave.Toast(string.Format(Labels.T("Steam hat GK2 Vanilla+ {0} geladen – im Spiel läuft noch {1}. Spiel neu starten: Es installiert Workshop-Updates selbst.",
+                    "Steam downloaded GK2 Vanilla+ {0} – the game still runs {1}. Restart the game: it installs Workshop updates by itself."), WorkshopVersion, Plugin.DisplayVersion), 12f);
+            else if (WorkshopVersion != "" && (MainGame.Instance == null || MainGame.Instance.gameState != MainGame.GameState.InGame))
                 ManualSave.Toast(string.Format(Labels.T("Steam hat GK2 Vanilla+ {0} geladen – im Spiel läuft noch {1}. Zum Aktualisieren: F9 › „Speichern & aktualisieren“ (oder Installieren.bat im Workshop-Ordner starten).",
                     "Steam downloaded GK2 Vanilla+ {0} – the game still runs {1}. To update: F9 › \"Save & update\" (or run Installieren.bat in the Workshop folder)."), WorkshopVersion, Plugin.DisplayVersion), 12f);
             if (!Plugin.CheckUpdates.Value) yield break;
@@ -105,7 +135,10 @@ namespace GK2Tweaks
                         Available = true;
                         Plugin.Log.LogInfo("Update available: " + Latest);
                         if (WorkshopVersion != Latest && (MainGame.Instance == null || MainGame.Instance.gameState != MainGame.GameState.InGame))
-                            ManualSave.Toast(string.Format(Labels.T("GK2 Vanilla+ {0} ist verfügbar – F9 zum Aktualisieren", "GK2 Vanilla+ {0} is available – press F9 to update"), Latest), 8f);
+                            ManualSave.Toast(WorkshopManaged
+                                ? string.Format(Labels.T("GK2 Vanilla+ {0} ist verfügbar – es kommt über den Steam Workshop: Spiel neu starten, sobald Steam es geladen hat.",
+                                    "GK2 Vanilla+ {0} is available – it comes through the Steam Workshop: restart the game once Steam has downloaded it."), Latest)
+                                : string.Format(Labels.T("GK2 Vanilla+ {0} ist verfügbar – F9 zum Aktualisieren", "GK2 Vanilla+ {0} is available – press F9 to update"), Latest), 8f);
                     }
                     else Plugin.Log.LogInfo("Update check: up to date (" + Show(best) + ", channel " + Channel + ")");
                 }
@@ -155,6 +188,7 @@ namespace GK2Tweaks
         internal static bool Available => false;
         internal static string Latest => "";
         internal static bool CanAutoUpdate => false;
+        internal static bool WorkshopManaged => false;
         internal static IEnumerator Run() { yield break; }
         internal static void SaveAndUpdate(bool menuOpen) { }
     }

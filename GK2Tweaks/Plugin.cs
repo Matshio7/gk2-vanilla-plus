@@ -14,7 +14,7 @@ namespace GK2Tweaks
     {
         public const string Guid = "mats.gk2.tweaks";
         public const string PluginName = "GK2 Tweaks";
-        public const string PluginVersion = "1.7.4";
+        public const string PluginVersion = "1.7.5";
         // Anzeige (Hauptmenue, Was ist neu, Log). Hotfix-Buchstaben (z. B. "b") nur bei schnellen, nicht voll getesteten Hotfixes. PluginVersion bleibt
         // eine reine Zahl - BepInEx, Update-Check und Installer lesen sie als Version.
         // Vorab-Versionen (Beta): BetaNumber > 0 und BetaTag " Beta N" setzen; Stabil: 0 und "". GitHub-Tag der Beta: v<Version>-beta.<N>
@@ -46,7 +46,7 @@ namespace GK2Tweaks
         internal static ConfigEntry<string> HudClockMode;
         internal static ConfigEntry<int> BackupCount, BackupMinutes, RainAmount, MenuBgBlur, MenuBgDim, MenuBgFog;
         internal static ConfigEntry<string> MenuBg, MenuBgStyle, MenuBgFogTone;
-        internal static ConfigEntry<bool> ShowOverlay, CheckUpdates, RepairWorkbenches;
+        internal static ConfigEntry<bool> ShowOverlay, CheckUpdates, RepairWorkbenches, SafeStartGuard;
         internal static ConfigEntry<int> StatsLogSeconds;
         internal static ConfigEntry<int> MoveSpeed;
         internal static ConfigEntry<string> Language, LastSeenVersion, LastGameVersion;
@@ -88,29 +88,69 @@ namespace GK2Tweaks
         private Benchmark bench;
 #endif
 
+        // AppDomain-weiter Schluessel gegen doppeltes Laden: gilt auch, wenn dieselbe DLL aus zwei Ordnern
+        // (z. B. Workshop-Kopie) oder von einem zweiten Loader geladen wird - statische Felder waeren dann pro Kopie getrennt.
+        private const string LoadedKey = "mats.gk2.tweaks.loaded";
+
         private void Awake()
         {
+            // Zweite Kopie? Dann bleibt diese komplett inaktiv (vor Instance/Log/BindConfig, damit die erste Kopie unberuehrt bleibt).
+            // Wert = "Version|Pfad": ist die unterdrueckte Kopie neuer als die aktive, gibt es einen deutlichen Fehler im Log.
+            try
+            {
+                string here = AssemblyLocation();
+                object other = AppDomain.CurrentDomain.GetData(LoadedKey);
+                if (other != null)
+                {
+                    string otherText = other as string ?? other.ToString();
+                    Logger.LogWarning("GK2 Tweaks already loaded (" + otherText + "); this copy " + PluginVersion + " stays inactive (" + here + ")");
+                    try
+                    {
+                        int bar = otherText.IndexOf('|');
+                        string otherVersion = bar > 0 ? otherText.Substring(0, bar).Trim() : "";
+                        if (otherVersion.Length > 0 && new Version(PluginVersion) > new Version(otherVersion))
+                            Logger.LogError("GK2 Tweaks: the INACTIVE copy " + PluginVersion + " (" + here + ") is NEWER than the active copy " + otherText +
+                                " - please remove the old copy so the new version runs.");
+                    }
+                    catch { }
+                    enabled = false;
+                    return;
+                }
+                AppDomain.CurrentDomain.SetData(LoadedKey, PluginVersion + "|" + here);
+            }
+            catch (Exception e) { Logger.LogWarning("Duplicate load check failed: " + e.Message); }
+
             Instance = this;
             Log = Logger;
             defaultFixedDeltaTime = Time.fixedDeltaTime;
             Changelog.FreshInstall = !System.IO.File.Exists(Config.ConfigFilePath);
-            BindConfig();
+            // Ohne Einstellungen kann nichts laufen: dann bleibt der Mod komplett inaktiv (Update laeuft nicht),
+            // statt jeden Frame an fehlenden Eintraegen zu scheitern
+            try { BindConfig(); }
+            catch (Exception e)
+            {
+                Log.LogError("Config could not be loaded, Vanilla+ stays inactive: " + e);
+                // Schluessel wieder freigeben: eine zweite Kopie (z. B. von einem anderen Loader) darf es dann versuchen
+                try { AppDomain.CurrentDomain.SetData(LoadedKey, null); } catch { }
+                enabled = false;
+                return;
+            }
+
+            // Sicherer Start: kam das Spiel beim letzten Mal nicht ins Hauptmenue, laeuft dieser Start ohne Patches/Funktionen
+            try { SafeStart.Begin(); } catch (Exception e) { Log.LogError("Safe start check failed: " + e); }
+            if (SafeMode.AllOff) { AwakeVanilla(); return; }
 
             try { SafeMode.CheckGame(); } catch (Exception e) { Log.LogError("Safe mode check failed: " + e); }
             var harmony = new Harmony(Guid);
-            var patches = new System.Collections.Generic.List<Type> { typeof(TierPatch), typeof(ScreenSettingsPatch), typeof(SaveBlockPatch), typeof(ZoomPatch), typeof(ModdedLabelPatch), typeof(BackupPatch), typeof(MainMenuModsButtonPatch), typeof(PauseModsButtonPatch), typeof(CraftCellPinPatch), typeof(SelectionPinPatch), typeof(QuestPinPatch), typeof(LongNotes), typeof(InstantRemovePatch), typeof(TeleportPatch), typeof(FadeInPatch), typeof(FadeOutPatch), typeof(CleanupPatch), typeof(MoveInputPatch), typeof(MoveTargetPatch), typeof(MoveCellsPatch), typeof(MoveBuildPatch), typeof(MoveDisablePatch), typeof(TradePressPatch), typeof(TradeCountPatch), typeof(ZoneRedrawPatch), typeof(MoveRemoveLabelPatch), typeof(OrderPinPatch), typeof(AlchemyPinPatch), typeof(RespecOverPatch), typeof(RespecOutPatch), typeof(RespecTechPatch), typeof(CraftRepairPatch), typeof(RainScanPatch), typeof(TownBuiltPatch), typeof(MoveSpeedPatch) };
+            // Die Typen stecken bewusst in Lambdas (wie in SafeMode.CheckGame): ein typeof(X), das beim JIT scheitert,
+            // trifft so nur diesen einen Eintrag statt das ganze Awake.
+            var patches = new System.Collections.Generic.List<Func<Type>> { () => typeof(TierPatch), () => typeof(ScreenSettingsPatch), () => typeof(SaveBlockPatch), () => typeof(ZoomPatch), () => typeof(ModdedLabelPatch), () => typeof(BackupPatch), () => typeof(MainMenuModsButtonPatch), () => typeof(PauseModsButtonPatch), () => typeof(CraftCellPinPatch), () => typeof(SelectionPinPatch), () => typeof(QuestPinPatch), () => typeof(LongNotes), () => typeof(InstantRemovePatch), () => typeof(TeleportPatch), () => typeof(FadeInPatch), () => typeof(FadeOutPatch), () => typeof(CleanupPatch), () => typeof(MoveInputPatch), () => typeof(MoveTargetPatch), () => typeof(MoveCellsPatch), () => typeof(MoveBuildPatch), () => typeof(MoveDisablePatch), () => typeof(TradePressPatch), () => typeof(TradeCountPatch), () => typeof(ZoneRedrawPatch), () => typeof(MoveRemoveLabelPatch), () => typeof(OrderPinPatch), () => typeof(AlchemyPinPatch), () => typeof(RespecOverPatch), () => typeof(RespecOutPatch), () => typeof(RespecTechPatch), () => typeof(CraftRepairPatch), () => typeof(RainScanPatch), () => typeof(TownBuiltPatch), () => typeof(MoveSpeedPatch) };
 #if DEV
-            if (BenchEnabled.Value) patches.Add(typeof(SystemProfiler));
+            if (BenchEnabled.Value) patches.Add(() => typeof(SystemProfiler));
 #endif
-            foreach (Type t in patches)
-            {
-                string feature = SafeMode.FeatureOf(t);
-                if (!SafeMode.On(feature)) { Log.LogWarning("Patch " + t.Name + " skipped (safe mode: " + feature + ")"); continue; }
-                try { harmony.CreateClassProcessor(t).Patch(); }
-                catch (Exception e) { Log.LogError("Patch " + t.Name + " fehlgeschlagen: " + e.Message); SafeMode.Disable(feature, "patch failed: " + e.Message, false); }
-            }
+            SafeMode.ApplyPatches(harmony, patches);
 
-            if (SafeMode.On("WorkshopUpload")) WorkshopUpload.Apply(harmony);
+            try { if (SafeMode.On("WorkshopUpload")) WorkshopUpload.Apply(harmony); } catch (Exception e) { Log.LogWarning("Workshop upload patch: " + e.Message); }
             ApplyPhysics();
             ApplyLogFilter();
             Application.runInBackground = true;   // Pause im Hintergrund macht BackgroundPause (Controller bleibt erkannt)
@@ -120,16 +160,64 @@ namespace GK2Tweaks
             RatePromptSessions.Value++;
 #endif
             Gui = gameObject.AddComponent<TweaksGui>();
-            gameObject.AddComponent<BackgroundPause>();
-            FrameworkBridgeLoader.TryLoad();
-            Translations.WriteTemplate();
-            StartCoroutine(UpdateCheck.Run());
-            WeekPlan.Init();
+            // Jeder Schritt einzeln abgesichert: ein Fehler (z. B. umbenanntes Spiel-Event nach einem Update) soll nicht den Rest von Awake abbrechen
+            try { gameObject.AddComponent<BackgroundPause>(); } catch (Exception e) { Log.LogWarning("BackgroundPause: " + e.Message); }
+            try { FrameworkBridgeLoader.TryLoad(); } catch (Exception e) { Log.LogWarning("Framework bridge: " + e.Message); }
+            try { Translations.WriteTemplate(); } catch (Exception e) { Log.LogWarning("Translation template: " + e.Message); }
+            try { StartCoroutine(UpdateCheck.Run()); } catch (Exception e) { Log.LogWarning("Update check: " + e.Message); }
+            try { WeekPlan.Init(); } catch (Exception e) { SafeMode.Disable("WeekPlan", "init failed: " + e.Message, false); }
 #if DEV
             if (BenchEnabled.Value) bench = new Benchmark();
             gameObject.AddComponent<DevUpload>();
 #endif
-            Log.LogInfo(PluginName + " " + DisplayVersion + " loaded" + (WineFix.IsWine ? " (Wine/CrossOver)" : ""));
+            Log.LogInfo(PluginName + " " + DisplayVersion + " loaded (game " + Application.version + ")" + (WineFix.IsWine ? " (Wine/CrossOver)" : ""));
+        }
+
+        // Sicherer Start: keine Patches, keine Funktions-Komponenten, keine Aenderungen an Spiel-Einstellungen
+        // (Physik, Log-Filter, runInBackground) - nur das Mod-Menue (F9, inkl. FPS-Anzeige) und das Log.
+        private void AwakeVanilla()
+        {
+            try { Gui = gameObject.AddComponent<TweaksGui>(); } catch (Exception e) { Log.LogError("Mod menu failed: " + e); }
+            Log.LogWarning(PluginName + " " + DisplayVersion + " loaded in SAFE START mode (game " + Application.version + "): no patches, no features, only the mod menu (F9). Restart the game to run Vanilla+ normally.");
+        }
+
+        // Ordner dieser DLL (BepInEx/plugins/GK2Tweaks). Das Workshop-Paket legt die Menue-Hintergruende dort ab.
+        internal static string PluginDir
+        {
+            get
+            {
+                try
+                {
+                    string loc = typeof(Plugin).Assembly.Location;
+                    if (!string.IsNullOrEmpty(loc)) return System.IO.Path.GetDirectoryName(loc);
+                }
+                catch { }
+                return System.IO.Path.Combine(Paths.PluginPath, "GK2Tweaks");
+            }
+        }
+
+        // Spielversion mindestens min? Application.version hat die Form "1.011" (Ziffern nach dem Punkt als Dezimalstellen).
+        // Unbekanntes Format = false (also "aelter") - wer das nutzt, muss damit sicher umgehen.
+        internal static bool GameVersionAtLeast(double min)
+        {
+            try
+            {
+                System.Text.RegularExpressions.Match m = System.Text.RegularExpressions.Regex.Match(Application.version ?? "", @"^\s*(\d+\.\d+)");
+                if (!m.Success) return false;
+                double v = double.Parse(m.Groups[1].Value, NumberStyles.Float, CultureInfo.InvariantCulture);
+                return v >= min - 0.0000001;
+            }
+            catch { return false; }
+        }
+
+        private string AssemblyLocation()
+        {
+            try
+            {
+                string loc = System.Reflection.Assembly.GetExecutingAssembly().Location;
+                return string.IsNullOrEmpty(loc) ? "?" : loc;
+            }
+            catch { return "?"; }
         }
 
         private void BindConfig()
@@ -263,6 +351,7 @@ namespace GK2Tweaks
                 new AcceptableValueList<int>(1, 2, 3, 4)));
             ShotHideHud = Config.Bind("Screenshots", "HideHud", true, "Hide the game HUD and the mod displays for the screenshot.");
             ShowOverlay = Config.Bind("Interface", "ShowOverlay", false, "Show the FPS display (toggle with F10). Position and contents: section [Overlay].");
+            SafeStartGuard = Config.Bind("Interface", "SafeStartGuard", true, "Crash guard (safe start): if the game did not reach the main menu last time with Vanilla+ active (e.g. a black screen after a game update), the next start runs once without Vanilla+ (no patches or features, only this menu with F9) and tells you so. The start after that is normal again. Holding Left Shift while the game starts does the same once. Off = no guard.");
             Language = Config.Bind("Interface", "Language", "Auto", new ConfigDescription(
                 "Language of the mod menu. Auto = game language (if a translation exists, otherwise English). Translations: BepInEx/GK2VanillaPlus/lang.",
                 new AcceptableValueList<string>("Auto", "Deutsch", "English", "Français", "Español", "Português", "Русский", "中文")));
@@ -346,19 +435,41 @@ namespace GK2Tweaks
             }
         }
 
+        // Klein gehalten: Crash-Waechter und Logo-Schnelllauf (stellt die Zeitskala zurueck) muessen jedes Frame laufen.
+        // Der grosse Rest steckt in UpdateCore (eigene Methode, nicht inline): scheitert dessen JIT nach einem Spiel-Update
+        // an einem Typ, wirft erst der Aufruf hier - SafeStart.Tick und SkipLogos laufen trotzdem.
         private void Update()
         {
             float dt = Time.unscaledDeltaTime;
-            if (MenuKey.Value.IsDown()) Gui.ToggleMenu();
-            if (OverlayKey.Value.IsDown()) ShowOverlay.Value = !ShowOverlay.Value;
-            if (SaveKey.Value.MainKey != KeyCode.None && SaveKey.Value.IsDown()) ManualSave.Save(Gui.MenuOpen);
-            if (WeekPlanKey.Value.MainKey != KeyCode.None && WeekPlanKey.Value.IsDown()) Gui.ToggleWeekPlan();
-            if (HudKey.Value.MainKey != KeyCode.None && HudKey.Value.IsDown()) HudToggle.Toggle();
+            try { SafeStart.Tick(); } catch { }
+            SafeMode.Run("SkipLogos", SkipLogosPatch.Tick);
+            if (Gui == null) return;
+            try
+            {
+                if (SafeMode.AllOff) UpdateVanilla(dt);
+                else UpdateCore(dt);
+            }
+            catch (Exception e) { SafeMode.Report("Update", e); }
+        }
+
+        [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.NoInlining)]
+        private void UpdateCore(float dt)
+        {
+            // Tasten: bewusst try/catch statt SafeMode.Run - F9 muss auch nach wiederholten Fehlern weiter funktionieren
+            try
+            {
+                if (MenuKey.Value.IsDown()) Gui.ToggleMenu();
+                if (OverlayKey.Value.IsDown()) ShowOverlay.Value = !ShowOverlay.Value;
+                if (SaveKey.Value.MainKey != KeyCode.None && SaveKey.Value.IsDown()) ManualSave.Save(Gui.MenuOpen);
+                if (WeekPlanKey.Value.MainKey != KeyCode.None && WeekPlanKey.Value.IsDown()) Gui.ToggleWeekPlan();
+                if (HudKey.Value.MainKey != KeyCode.None && HudKey.Value.IsDown()) HudToggle.Toggle();
 #if MINIMAP
-            if (MinimapKey.Value.MainKey != KeyCode.None && MinimapKey.Value.IsDown()) MinimapEnabled.Value = !MinimapEnabled.Value;
+                if (MinimapKey.Value.MainKey != KeyCode.None && MinimapKey.Value.IsDown()) MinimapEnabled.Value = !MinimapEnabled.Value;
 #endif
+            }
+            catch (Exception e) { SafeMode.Report("Keys", e); }
             SafeMode.Run("Hud", HudToggle.Tick);
-            GraphicsBench.Tick(dt);
+            SafeMode.Run("Graphics", () => GraphicsBench.Tick(dt));
             SafeMode.Run("Pins", Pins.Tick);
             SafeMode.Run("Pins", BuildPinScan.Tick);
             SafeMode.Run("Oled", Oled.Tick);
@@ -371,24 +482,29 @@ namespace GK2Tweaks
 #if MINIMAP
             SafeMode.Run("Minimap", Minimap.Tick);
 #endif
-            NewsTick();
+            SafeMode.Run("News", NewsTick);
 #if !NEXUS
-            RateTick();
+            SafeMode.Run("News", RateTick);
 #endif
-            Gui.Tick(dt);
-            VanillaPlusApi.Tick();
+            // Mod-Menue: wie Tasten nie abschalten, nur melden
+            try { Gui.Tick(dt); } catch (Exception e) { SafeMode.Report("Gui", e); }
+            SafeMode.Run("Api", VanillaPlusApi.Tick);
 
-            if (StatsLogSeconds.Value > 0)
+            try
             {
-                logStats.Add(dt);
-                float now = Time.realtimeSinceStartup;
-                if (now >= logFlushAt)
+                if (StatsLogSeconds.Value > 0)
                 {
-                    if (logStats.Count > 0) Log.LogInfo("[STATS] " + logStats.Compute().ToLogString());
-                    logStats.Reset();
-                    logFlushAt = now + StatsLogSeconds.Value;
+                    logStats.Add(dt);
+                    float now = Time.realtimeSinceStartup;
+                    if (now >= logFlushAt)
+                    {
+                        if (logStats.Count > 0) Log.LogInfo("[STATS] " + logStats.Compute().ToLogString());
+                        logStats.Reset();
+                        logFlushAt = now + StatsLogSeconds.Value;
+                    }
                 }
             }
+            catch (Exception e) { SafeMode.Report("Stats", e); }
 #if DEV
             bench?.Update(dt);
 #endif
@@ -398,10 +514,21 @@ namespace GK2Tweaks
             SafeMode.Run("Screenshots", HiResShot.Tick);
             SafeMode.Run("Ultrawide", MenuSideFill.Tick);
             SafeMode.Run("MenuBackground", MenuBackground.Tick);
-            SafeMode.Run("SkipLogos", SkipLogosPatch.Tick);
 #if DEV
             UiDump.Tick();
 #endif
+        }
+
+        // Sicherer Start: nur Mod-Menue (F9) und FPS-Anzeige (F10)
+        private void UpdateVanilla(float dt)
+        {
+            try
+            {
+                if (MenuKey.Value.IsDown()) Gui.ToggleMenu();
+                if (OverlayKey.Value.IsDown()) ShowOverlay.Value = !ShowOverlay.Value;
+            }
+            catch (Exception e) { SafeMode.Report("Keys", e); }
+            try { Gui.Tick(dt); } catch (Exception e) { SafeMode.Report("Gui", e); }
         }
 
         private bool newsChecked;

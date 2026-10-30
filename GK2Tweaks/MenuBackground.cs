@@ -80,13 +80,23 @@ namespace GK2Tweaks
                 t = styled;
             }
             catch (Exception e) { SafeMode.Fail("MenuBackground", e); }
-            if (t == null) { Graphics.Blit(src, dst); return; }
-            // "cover": Bild fuellt den ganzen Bildschirm, ueberstehender Teil wird abgeschnitten
-            float sa = (float)src.width / Mathf.Max(1, src.height), ta = (float)t.width / Mathf.Max(1, t.height);
-            Vector2 scale = Vector2.one, offset = Vector2.zero;
-            if (sa > ta) { scale.y = ta / sa; offset.y = (1f - scale.y) / 2f; }
-            else { scale.x = sa / ta; offset.x = (1f - scale.x) / 2f; }
-            Graphics.Blit(t, dst, scale, offset);
+            if (t == null || src == null) { Graphics.Blit(src, dst); return; }
+            try
+            {
+                // "cover": Bild fuellt den ganzen Bildschirm, ueberstehender Teil wird abgeschnitten
+                float sa = (float)src.width / Mathf.Max(1, src.height), ta = (float)t.width / Mathf.Max(1, t.height);
+                Vector2 scale = Vector2.one, offset = Vector2.zero;
+                if (sa > ta) { scale.y = ta / sa; offset.y = (1f - scale.y) / 2f; }
+                else { scale.x = sa / ta; offset.x = (1f - scale.x) / 2f; }
+                Graphics.Blit(t, dst, scale, offset);
+            }
+            catch (Exception e)
+            {
+                // Bild des Spiels durchreichen, damit nie ein leeres/schwarzes Bild bleibt
+                SafeMode.Fail("MenuBackground", e);
+                Graphics.Blit(src, dst);
+                return;
+            }
             try { if (Plugin.MenuBgFog.Value > 0) DrawFog(dst, src.width, src.height); } catch (Exception e) { SafeMode.Fail("MenuBackground", e); }
         }
 
@@ -137,16 +147,26 @@ namespace GK2Tweaks
             if (dark) strength *= 1.5f;
             // Graphics.DrawTexture verdoppelt Farbe und Deckkraft (GUI-Shader) - daher 0.5 = 1x
             float tm = Time.unscaledTime;
+            // GL-Matrix und aktives RenderTexture in jedem Fall zuruecksetzen (finally) - sonst zeichnen UI und
+            // andere Kameras nach einem Fehler ins falsche Ziel
             RenderTexture prev = RenderTexture.active;
-            RenderTexture.active = dst;
-            GL.PushMatrix();
-            GL.LoadPixelMatrix(0, w, h, 0);
-            // Ebene 1: grosse Schwaden, langsam nach rechts; Ebene 2: kleiner, schneller nach links
-            float tiles1 = w / (float)h * 0.9f, tiles2 = w / (float)h * 1.6f;
-            Graphics.DrawTexture(new Rect(0, 0, w, h), fog, new Rect(-tm * 0.006f, tm * 0.0015f, tiles1, 0.9f), 0, 0, 0, 0, new Color(tint.r, tint.g, tint.b, 0.5f * 0.5f * strength));
-            Graphics.DrawTexture(new Rect(0, 0, w, h), fog, new Rect(0.37f + tm * 0.011f, 0.21f - tm * 0.002f, tiles2, 1.6f), 0, 0, 0, 0, new Color(tint.r, tint.g, tint.b, 0.32f * 0.5f * strength));
-            GL.PopMatrix();
-            RenderTexture.active = prev;
+            bool pushed = false;
+            try
+            {
+                RenderTexture.active = dst;
+                GL.PushMatrix();
+                pushed = true;
+                GL.LoadPixelMatrix(0, w, h, 0);
+                // Ebene 1: grosse Schwaden, langsam nach rechts; Ebene 2: kleiner, schneller nach links
+                float tiles1 = w / (float)h * 0.9f, tiles2 = w / (float)h * 1.6f;
+                Graphics.DrawTexture(new Rect(0, 0, w, h), fog, new Rect(-tm * 0.006f, tm * 0.0015f, tiles1, 0.9f), 0, 0, 0, 0, new Color(tint.r, tint.g, tint.b, 0.5f * 0.5f * strength));
+                Graphics.DrawTexture(new Rect(0, 0, w, h), fog, new Rect(0.37f + tm * 0.011f, 0.21f - tm * 0.002f, tiles2, 1.6f), 0, 0, 0, 0, new Color(tint.r, tint.g, tint.b, 0.32f * 0.5f * strength));
+            }
+            finally
+            {
+                if (pushed) GL.PopMatrix();
+                RenderTexture.active = prev;
+            }
         }
 
         private void OnDestroy() { }
@@ -159,8 +179,11 @@ namespace GK2Tweaks
             if (m == "Mine") { if (HasMine) bytes = File.ReadAllBytes(MinePath); }
             else
             {
-                // Motive liegen als bg1.jpg .. bg3.jpg neben mine.png (werden mit der Mod installiert)
-                string p = Path.Combine(Folder, m.ToLowerInvariant() + ".jpg");
+                // Motive bg1.jpg .. bg6.jpg: GitHub-Installer legt sie neben mine.png (BepInEx/GK2VanillaPlus/MenuBackground),
+                // das Workshop-Paket (ab Spiel 1.011) in den Plugin-Ordner (BepInEx/plugins/GK2Tweaks/MenuBackground)
+                string name = m.ToLowerInvariant() + ".jpg";
+                string p = Path.Combine(Folder, name);
+                if (!File.Exists(p)) p = Path.Combine(Path.Combine(Plugin.PluginDir, "MenuBackground"), name);
                 if (File.Exists(p)) bytes = File.ReadAllBytes(p);
             }
             if (bytes == null) { Plugin.Log.LogWarning("Menu background: no image for " + m); return null; }
@@ -205,10 +228,16 @@ namespace GK2Tweaks
                 foreach (var c in chain) RenderTexture.ReleaseTemporary(c);
             }
             var outTex = new Texture2D(W, H, TextureFormat.RGBA32, false) { filterMode = FilterMode.Bilinear, wrapMode = TextureWrapMode.Clamp, hideFlags = HideFlags.HideAndDontSave };
-            RenderTexture.active = full;
-            outTex.ReadPixels(new Rect(0, 0, W, H), 0, 0);
-            RenderTexture.active = prev;
-            RenderTexture.ReleaseTemporary(full);
+            try
+            {
+                RenderTexture.active = full;
+                outTex.ReadPixels(new Rect(0, 0, W, H), 0, 0);
+            }
+            finally
+            {
+                RenderTexture.active = prev;
+                RenderTexture.ReleaseTemporary(full);
+            }
             Color32[] px = outTex.GetPixels32();
             Grade(px, W, H, style, Plugin.MenuBgDim.Value / 100f);
             outTex.SetPixels32(px);

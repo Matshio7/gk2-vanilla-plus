@@ -21,9 +21,10 @@ dem Originalspiel kompatibel. Jede Funktion lässt sich einzeln abschalten
 - Komplett mit dem Controller bedienbar (Steam Deck).
 
 INSTALLATION (Windows)
-1. Steam Workshop: "Abonnieren" und warten, bis Steam es geladen hat.
-   Den Ordner öffnen: <Steam-Bibliothek>\steamapps\workshop\content\4358690\3808053878
-   GitHub: ZIP-Datei komplett entpacken (Rechtsklick > "Alle extrahieren").
+Steam Workshop (ab Spiel-Update 1.011): "Abonnieren" genügt – das Spiel
+installiert und aktualisiert den Mod selbst. Die Schritte unten sind für
+dieses ZIP von GitHub (z. B. für ältere Spielversionen).
+1. ZIP-Datei komplett entpacken (Rechtsklick > "Alle extrahieren").
 2. "Installieren.bat" doppelklicken. Falls Windows warnt ("Der Computer wurde
    durch Windows geschützt"): "Weitere Informationen" > "Trotzdem ausführen".
 3. Der Spielordner wird automatisch gefunden. Falls nicht: "Durchsuchen" und
@@ -35,6 +36,10 @@ INSTALLATION (Windows)
      enthalten. Den Kanal kannst du später im Mod-Menü unter "Update-Kanal"
      ändern.
 5. "Installieren" klicken und das Spiel ganz normal über Steam starten.
+HINWEIS: Seit Spiel-Update 1.011 bringt Graveyard Keeper 2 BepInEx (den
+Mod-Loader) selbst mit. Der Installer fügt dann nur noch den Mod hinzu und
+lässt das BepInEx des Spiels unverändert. Das mitgelieferte BepInEx
+(Ordner "installer/loader") nutzt er nur, wenn im Spielordner keins liegt.
 
 IM SPIEL
 - F9  = Mod-Menü (oder Knopf "Vanilla+" im Haupt- und Pausenmenü)
@@ -49,22 +54,28 @@ IM SPIEL
 AKTUALISIEREN
 Im Spiel zeigt das Mod-Menü (F9) neue Versionen an: "Speichern & aktualisieren".
 Oder "Installieren.bat" starten > "Online nach Updates suchen".
+Steam Workshop (ab 1.011): Steam lädt Updates selbst, danach Spiel neu starten.
 Deine Einstellungen bleiben dabei erhalten.
 
 DEINSTALLIEREN
 "Installieren.bat" starten > "Deinstallieren" und wählen:
-- "Alles entfernen": Vanilla+ und BepInEx (Mod-Loader), das Spiel ist wieder
-  original. Ohne andere Mods ist das die richtige Wahl.
+- "Alles entfernen": Vanilla+ und das BepInEx (Mod-Loader), das der Installer
+  eingerichtet hat. Das BepInEx des Spiels (seit Spiel-Update 1.011) und
+  andere Mods bleiben unangetastet.
 - "Nur Vanilla+": BepInEx und andere Mods bleiben.
 Backups und Screenshots des Mods werden nach Dokumente\GK2 Vanilla+ gerettet,
 dort liegt auch ein Protokoll (uninstall.log). Deine Spielstände bleiben
 spielbar. Steam-Workshop: zusätzlich "Deabonnieren".
 
 MAC (CrossOver) / LINUX / STEAM DECK (Proton)
-Den Inhalt von "installer/files" in den Spielordner kopieren und einmalig die
+Ab Spiel-Update 1.011 (BepInEx ist schon im Spiel): Steam Workshop abonnieren
+oder den Inhalt von "installer/files" in den Spielordner kopieren - fertig.
+Ältere Spielversionen ohne BepInEx: zusätzlich den Inhalt von
+"installer/loader" (BepInEx) in den Spielordner kopieren und einmalig die
 DLL-Überschreibung "winhttp" auf "nativ, builtin" stellen
 (CrossOver: Flasche > Wine-Konfiguration > Bibliotheken;
 Proton: Startoption WINEDLLOVERRIDES="winhttp=n,b" %command%).
+Liegt im Spielordner schon ein BepInEx, "installer/loader" nie darüber kopieren.
 Eine bebilderte Anleitung steht im Steam Workshop im Diskussionen-Tab.
 
 PROBLEME?
@@ -91,9 +102,10 @@ the mod menu).
 - Fully playable with a controller (Steam Deck).
 
 INSTALL (Windows)
-1. Steam Workshop: click "Subscribe" and wait until Steam has downloaded it.
-   Open the folder: <Steam library>\steamapps\workshop\content\4358690\3808053878
-   GitHub: extract the whole ZIP (right click > "Extract All").
+Steam Workshop (since game update 1.011): "Subscribe" is all you need – the
+game installs and updates the mod itself. The steps below are for this ZIP
+from GitHub (e.g. for older game versions).
+1. Extract the whole ZIP (right click > "Extract All").
 2. Double-click "Installieren.bat". If Windows SmartScreen warns:
    "More info" > "Run anyway".
 3. The game folder is found automatically. If not, click "Browse" and pick the
@@ -105,6 +117,10 @@ INSTALL (Windows)
      bugs. You can change the channel later in the mod menu under
      "Update channel".
 5. Click "Install", then start the game normally via Steam.
+NOTE: Since game update 1.011 Graveyard Keeper 2 ships BepInEx (the mod
+loader) itself. The installer then only adds the mod and leaves the game's
+BepInEx unchanged. It uses the bundled BepInEx (folder "installer/loader")
+only when the game folder has none.
 
 IN GAME
 - F9  = mod menu (or the "Vanilla+" button in the main and pause menu)
@@ -119,21 +135,28 @@ IN GAME
 UPDATE
 In game the mod menu (F9) shows new versions: "Save & update".
 Or run "Installieren.bat" > "Check online for updates". Your settings are kept.
+Steam Workshop (since 1.011): Steam downloads updates, then restart the game.
 
 UNINSTALL
 Run "Installieren.bat" > "Uninstall" and choose:
-- "Remove everything": Vanilla+ and BepInEx (mod loader), the game is back to
-  original. Without other mods this is the right choice.
+- "Remove everything": Vanilla+ and the BepInEx (mod loader) the installer
+  set up. The game's own BepInEx (since game update 1.011) and other mods are
+  left untouched.
 - "Vanilla+ only": BepInEx and other mods stay.
 The mod's backups and screenshots are moved to Documents\GK2 Vanilla+, along
 with a log (uninstall.log). Your saves keep working.
 Steam Workshop: also click "Unsubscribe".
 
 MAC (CrossOver) / LINUX / STEAM DECK (Proton)
-Copy the contents of "installer/files" into the game folder and set the DLL
-override "winhttp" to "native, builtin" once
+Since game update 1.011 (BepInEx is already part of the game): subscribe on
+the Steam Workshop or copy the contents of "installer/files" into the game
+folder - done.
+Older game versions without BepInEx: also copy the contents of
+"installer/loader" (BepInEx) into the game folder and set the DLL override
+"winhttp" to "native, builtin" once
 (CrossOver: bottle > Wine configuration > Libraries;
 Proton launch option: WINEDLLOVERRIDES="winhttp=n,b" %command%).
+Never copy "installer/loader" over a BepInEx that is already there.
 A step-by-step guide is pinned in the Steam Workshop Discussions tab.
 
 PROBLEMS?

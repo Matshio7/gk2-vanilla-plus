@@ -11,6 +11,8 @@ namespace GK2Tweaks
     //    Funktion abgeschaltet (statt Fehler zu werfen), der Rest des Mods laeuft weiter.
     // 2. Wirft eine Funktion im laufenden Spiel wiederholt Fehler, wird sie ebenfalls abgeschaltet.
     // 3. Hat sich die Spielversion geaendert, gibt es einen kurzen Hinweis mit dem Ergebnis der Pruefung.
+    // 4. Sicherer Start (SafeStart): kam das Spiel beim letzten Start nicht ins Hauptmenue, ist fuer diesen einen
+    //    Start alles aus (AllOff) - On() liefert dann fuer jede Funktion false, Run() fuehrt nichts aus.
     internal static class SafeMode
     {
         private const int MaxErrors = 5;
@@ -20,6 +22,8 @@ namespace GK2Tweaks
         internal static int DisabledCount => disabled.Count;
         internal static bool NoticePending;
         private static string gameFrom, gameTo;
+        // Sicherer Start: dieser Start laeuft ohne jede Funktion und ohne Patches (nur Mod-Menue und Log)
+        internal static bool AllOff { get; private set; }
 
         // Anzeigenamen (Deutsch, Englisch)
         private static readonly Dictionary<string, string[]> names = new Dictionary<string, string[]>
@@ -52,6 +56,11 @@ namespace GK2Tweaks
             { "CraftMax", new[] { "Herstellen: Max-Knopf", "Crafting: Max button" } },
             { "CraftRepair", new[] { "Hängende Werkbänke lösen", "Fix stuck workbenches" } },
             { "MoveSpeed", new[] { "Laufgeschwindigkeit", "Movement speed" } },
+            { "Gui", new[] { "Mod-Menü & Anzeigen", "Mod menu & displays" } },
+            { "Keys", new[] { "Tastenkürzel", "Hotkeys" } },
+            { "News", new[] { "Hinweisfenster (Neuigkeiten, Bewertung)", "Notice windows (news, rating)" } },
+            { "Api", new[] { "Schnittstelle für andere Mods", "Interface for other mods" } },
+            { "Stats", new[] { "FPS-Protokoll", "FPS log" } },
         };
 
         internal static string Name(string f) => names.TryGetValue(f, out string[] n) ? Labels.T(n[0], n[1]) : f;
@@ -81,11 +90,17 @@ namespace GK2Tweaks
             }
         }
 
-        internal static bool On(string feature) => !disabled.ContainsKey(feature);
+        internal static bool On(string feature) => !AllOff && !disabled.ContainsKey(feature);
+
+        internal static void EnterVanillaStart()
+        {
+            AllOff = true;
+            NoticePending = false;
+        }
 
         internal static void Run(string feature, Action a)
         {
-            if (disabled.ContainsKey(feature)) return;
+            if (AllOff || disabled.ContainsKey(feature)) return;
             try { a(); }
             catch (Exception e) { Fail(feature, e); }
         }
@@ -99,6 +114,23 @@ namespace GK2Tweaks
             if (n >= MaxErrors) Disable(feature, "repeated errors: " + e.Message, true);
         }
 
+        // Fuer Teile, die nie abgeschaltet werden (Tasten, Mod-Menue, FPS-Protokoll, Update-Schleife): nur zaehlen und
+        // loggen - kein Disable, kein Hinweis "wurde abgeschaltet" (der waere falsch, der Code laeuft ja weiter).
+        // Das Log ist gedeckelt, damit ein Fehler in jedem Frame das Log nicht fuellt.
+        private const int MaxReportLogs = 10;
+        internal static void Report(string feature, Exception e)
+        {
+            try
+            {
+                errors.TryGetValue(feature, out int n);
+                errors[feature] = ++n;
+                if (n == 1) Plugin.Log.LogWarning("[" + feature + "] " + e);
+                else if (n <= MaxReportLogs) Plugin.Log.LogWarning("[" + feature + "] " + e.GetType().Name + ": " + e.Message + " (" + n + ")");
+                else if (n == MaxReportLogs + 1) Plugin.Log.LogWarning("[" + feature + "] more errors - not logged any more this session");
+            }
+            catch { }
+        }
+
         internal static void Disable(string feature, string reason, bool notify)
         {
             if (disabled.ContainsKey(feature)) return;
@@ -107,6 +139,42 @@ namespace GK2Tweaks
             if (notify)
                 ManualSave.Toast(string.Format(Labels.T("Vanilla+: „{0}“ wurde abgeschaltet (Fehler, evtl. nach einem Spiel-Update).",
                     "Vanilla+: \"{0}\" was turned off (errors, possibly after a game update)."), Name(feature)), 6f);
+        }
+
+        // ---------- Patches anwenden ----------
+        // Jeder Patch einzeln: die Liste enthaelt Lambdas (() => typeof(X)), damit auch ein Typ, der schon beim
+        // Aufloesen scheitert (TypeLoadException/TypeInitializationException), nur seinen eigenen Eintrag trifft.
+        // Der aeussere try/catch faengt alles ab, was die Schleife selbst abbrechen koennte - die restlichen
+        // Startschritte in Plugin.Awake laufen in jedem Fall weiter.
+        internal static void ApplyPatches(Harmony harmony, List<Func<Type>> patches)
+        {
+            int index = 0, applied = 0, skipped = 0, failed = 0;
+            try
+            {
+                foreach (Func<Type> get in patches)
+                {
+                    index++;
+                    Type t = null;
+                    string feature = null;
+                    try
+                    {
+                        t = get();
+                        feature = FeatureOf(t);
+                        if (!On(feature)) { skipped++; Plugin.Log.LogWarning("Patch " + t.Name + " skipped (safe mode: " + feature + ")"); continue; }
+                        harmony.CreateClassProcessor(t).Patch();
+                        applied++;
+                    }
+                    catch (Exception e)
+                    {
+                        failed++;
+                        string name = t != null ? t.Name : "#" + index;
+                        Plugin.Log.LogError("Patch " + name + " fehlgeschlagen: " + e.GetType().Name + ": " + e.Message);
+                        if (feature != null) Disable(feature, "patch failed: " + e.Message, false);
+                    }
+                }
+            }
+            catch (Exception e) { Plugin.Log.LogError("Patch loop aborted at entry " + index + ": " + e); }
+            Plugin.Log.LogInfo("Patches: " + applied + " applied, " + skipped + " skipped, " + failed + " failed");
         }
 
         // ---------- Pruefung beim Start ----------
@@ -207,6 +275,12 @@ namespace GK2Tweaks
             F("Pins", () => typeof(GameBalance), "craftDefs");
             F("Pins", () => typeof(CraftDefBase), "needItemsFromWgo");
             F("Pins", () => typeof(CraftDefBase), "craftsIn");
+            M("Graphics", () => typeof(PlatformFeatureEntry), "Clone");
+            M("Zoom", () => typeof(CameraSystem), "CalculateOrthographicSize");
+            M("Zoom", () => typeof(CameraSystem), "SetOrthographicSize");
+            F("Zoom", () => typeof(ResolutionConfig), "PixelSize");
+            F("WeekPlan", () => typeof(UIBaseNotification), "displayingTime");
+            F("TradeLikes", () => typeof(UIItemCountWindowData), "IsForVendor");
 
             foreach (Check c in checks)
             {

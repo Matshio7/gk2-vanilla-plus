@@ -1,5 +1,5 @@
 ﻿# GK2 Vanilla+ (Ultrawide + Tweaks) by McFly7 - Installer (Windows PowerShell 5.1, WinForms)
-# Kopiert BepInEx und die Mods in den Spielordner von Graveyard Keeper 2.
+# Kopiert die Mods in den Spielordner von Graveyard Keeper 2 (BepInEx nur, wenn das Spiel noch keins hat).
 $ErrorActionPreference = 'Stop'
 Add-Type -AssemblyName System.Windows.Forms
 Add-Type -AssemblyName System.Drawing
@@ -9,13 +9,24 @@ $Version = '1.2.0'
 $OnlineUpdate = $true   # Nexus-Ausgabe: $false (keine Internetverbindung)
 $ExeName = 'GraveyardKeeper2.exe'
 $Root    = Split-Path -Parent (Split-Path -Parent $MyInvocation.MyCommand.Path)
-$Payload = Join-Path $Root 'installer\files'
 $Assets  = Join-Path $Root 'installer\assets'
 $De      = (Get-Culture).TwoLetterISOLanguageName -eq 'de'
 if ($env:GK2_LANG) { $De = ($env:GK2_LANG -eq 'de') }   # nur zum Testen
 function T($textDe, $textEn) { if ($script:De) { $textDe } else { $textEn } }   # Parameter nicht $de nennen: PowerShell unterscheidet keine Gross-/Kleinschreibung
 
-if (-not (Test-Path (Join-Path $Payload 'winhttp.dll'))) {
+# Paketaufbau erkennen (seit Spiel-Update 1.011 bringt das Spiel BepInEx selbst mit):
+#  a) GitHub-ZIP: installer\files = Mod + Mod-Loader (winhttp.dll, doorstop, BepInEx\core)
+#  b) Workshop:   BepInEx\plugins\GK2Tweaks\GK2Tweaks.dll direkt im Paket, ohne Mod-Loader -> nur der Mod wird installiert
+$Payload = $null
+foreach ($c in @((Join-Path $Root 'installer\files'), $Root)) {
+    if (Test-Path (Join-Path $c 'BepInEx\plugins\GK2Tweaks\GK2Tweaks.dll')) { $Payload = $c; break }
+}
+# Quelle fuer den Mod-Loader: installer\loader (falls vorhanden) oder installer\files (GitHub-ZIP); sonst keine
+$LoaderSrc = $null
+foreach ($c in @((Join-Path $Root 'installer\loader'), (Join-Path $Root 'installer\files'))) {
+    if (Test-Path (Join-Path $c 'winhttp.dll')) { $LoaderSrc = $c; break }
+}
+if (-not $Payload) {
     [System.Windows.Forms.MessageBox]::Show((T "Installationsdateien nicht gefunden.`n`nBitte die ZIP-Datei zuerst komplett entpacken (Rechtsklick > Alle extrahieren) und dann 'Installieren.bat' im entpackten Ordner starten." "Installer files not found.`n`nPlease extract the whole ZIP first (right click > Extract All) and run 'Installieren.bat' from the extracted folder."), 'GK2 Vanilla+', 'OK', 'Error') | Out-Null
     exit 1
 }
@@ -95,6 +106,191 @@ function Test-GameRunning {
         return $true
     }
     return $false
+}
+
+# --- Mod-Loader (BepInEx) ---
+# Seit Spiel-Update 1.011 bringt das Spiel BepInEx selbst mit. Dessen Dateien (winhttp.dll, doorstop, BepInEx\core,
+# BepInEx\config) duerfen wir nie ueberschreiben oder loeschen. Den Loader kopieren wir nur, wenn im Spielordner keiner
+# liegt, und auch dann nur fehlende Dateien (vorhandene werden nie ueberschrieben). In loader-files.txt merken wir uns,
+# welche Dateien von uns stammen, mit SHA256 ("Pfad|Hash"): "Alles entfernen" loescht nur diese, und nur, wenn sie
+# seitdem unveraendert sind (z. B. nicht von Steam durch die Dateien des Spiels ersetzt).
+# Gleicher Code in install.ps1 und update.ps1.
+$ModDirs       = @('BepInEx\plugins\GK2Tweaks', 'BepInEx\plugins\GK2Ultrawide', 'BepInEx\GK2VanillaPlus')
+$LoaderMarker  = 'BepInEx\GK2VanillaPlus\loader-files.txt'
+$LoaderVersion = '5.4.23.5'   # mitgeliefertes BepInEx (installer\loader im GitHub-ZIP)
+# BepInEx-Kern im Spielordner (BepInEx 5 oder 6)?
+function Test-BepInExCore($dir) {
+    foreach ($p in 'BepInEx\core\BepInEx.dll', 'BepInEx\core\BepInEx.Preloader.dll', 'BepInEx\core\BepInEx.Core.dll', 'BepInEx\core\BepInEx.Unity.Mono.Preloader.dll') {
+        try { if (Test-Path -LiteralPath (Join-Path $dir $p)) { return $true } } catch {}
+    }
+    return $false
+}
+function Test-LoaderPresent($dir) {
+    if ((Test-BepInExCore $dir) -or (Test-GameLoader $dir)) { return $true }
+    # version.dll/winmm.dll: andere Doorstop-Namen - unsere winhttp.dll daneben wuerde BepInEx zweimal starten
+    foreach ($p in 'winhttp.dll', 'version.dll', 'winmm.dll', 'doorstop_config.ini') {
+        try { if (Test-Path -LiteralPath (Join-Path $dir $p)) { return $true } } catch {}
+    }
+    return $false
+}
+# BepInEx des Spiels: erkennbar am Workshop-Lader "GK2.WorkshopSync" (Spiel-Update 1.011)
+function Test-GameLoader($dir) {
+    try {
+        $b = Join-Path $dir 'BepInEx'
+        if (-not (Test-Path -LiteralPath $b)) { return $false }
+        return [bool](Get-ChildItem -LiteralPath $b -Recurse -File -Force -Filter '*WorkshopSync*' -ErrorAction SilentlyContinue | Select-Object -First 1)
+    } catch { return $false }
+}
+# Ist das BepInEx im Spielordner genau die Version, die wir mitliefern?
+function Test-OurCoreVersion($dir) {
+    try {
+        $f = Join-Path $dir 'BepInEx\core\BepInEx.dll'
+        if (-not (Test-Path -LiteralPath $f)) { return $false }
+        $m = [regex]::Match([string](Get-Item -LiteralPath $f).VersionInfo.FileVersion, '\d+(\.\d+){1,3}')
+        return ($m.Success -and ([version]$m.Value) -eq ([version]$LoaderVersion))
+    } catch { return $false }
+}
+# Liegt unter BepInEx\patchers etwas, das nicht von uns stammt (z. B. der Lader des Spiels oder anderer Mods)?
+function Test-ForeignPatchers($dir, $entries) {
+    try {
+        $p = Join-Path $dir 'BepInEx\patchers'
+        if (-not (Test-Path -LiteralPath $p)) { return $false }
+        foreach ($fi in @(Get-ChildItem -LiteralPath $p -Recurse -File -Force -ErrorAction SilentlyContinue)) {
+            if (-not (@($entries) -contains (Get-RelPath $dir $fi.FullName))) { return $true }
+        }
+        return $false
+    } catch { return $true }
+}
+# 'none'    = kein Loader
+# 'ours'    = von diesem Installer eingerichtet (loader-files.txt, unsere BepInEx-Version, kein Lader des Spiels, keine fremden Patcher)
+# 'legacy'  = von einem Installer vor 1.7.5 eingerichtet (Mod < 1.7.5 installiert, unsere BepInEx-Version, noch ohne loader-files.txt)
+# 'foreign' = vom Spiel oder von anderswo - wird nie veraendert
+# 'partial' = nur eine Proxy-Datei (winhttp.dll/version.dll/winmm.dll/doorstop_config.ini) ohne BepInEx-Kern: der Mod wird
+#             installiert, laedt aber nicht; der Installer warnt (kein eigener Loader daneben, sonst evtl. zwei Doorstops)
+function Get-LoaderMode($dir) {
+    if (-not (Test-LoaderPresent $dir)) { return 'none' }
+    if (Test-GameLoader $dir) { return 'foreign' }
+    if (-not (Test-BepInExCore $dir)) { return 'partial' }
+    if (-not (Test-OurCoreVersion $dir)) { return 'foreign' }
+    try {
+        if (Test-Path -LiteralPath (Join-Path $dir $LoaderMarker)) {
+            if (Test-ForeignPatchers $dir (Read-LoaderMarker $dir)) { return 'foreign' }
+            return 'ours'
+        }
+        $have = Get-InstalledVersion $dir
+        if ($have -ne $null -and $have -lt [version]'1.7.5' -and -not (Test-ForeignPatchers $dir @())) { return 'legacy' }
+    } catch {}
+    return 'foreign'
+}
+function Get-FileSha($path) {
+    try { return [string](Get-FileHash -LiteralPath $path -Algorithm SHA256 -ErrorAction Stop).Hash } catch { return '' }
+}
+# loader-files.txt lesen: Zeilen "relativer\Pfad|SHA256" (Hash optional); Plugins anderer Mods stehen nie darin.
+# Rueckgabe: @{ Files = relative Pfade; Hashes = Pfad -> SHA256 beim Installieren }
+function Read-LoaderInfo($dir) {
+    $files = New-Object System.Collections.Generic.List[string]
+    $hashes = @{}
+    try {
+        $m = Join-Path $dir $LoaderMarker
+        if (Test-Path -LiteralPath $m) {
+            foreach ($l in @(Get-Content -LiteralPath $m -Encoding UTF8)) {
+                $line = ([string]$l).Trim()
+                if (-not $line -or $line.StartsWith('#')) { continue }
+                $hash = ''
+                $bar = $line.IndexOf('|')
+                if ($bar -ge 0) { $hash = $line.Substring($bar + 1).Trim(); $line = $line.Substring(0, $bar) }
+                $r = $line.Trim().Replace('/', '\').TrimStart('\')
+                if (-not $r -or $r.Contains('..') -or $r.Contains(':')) { continue }
+                if ($r.StartsWith('BepInEx\plugins\', [System.StringComparison]::OrdinalIgnoreCase)) { continue }
+                if (-not $files.Contains($r)) { $files.Add($r) }
+                if ($hash) { $hashes[$r] = $hash }
+            }
+        }
+    } catch {}
+    return @{ Files = $files.ToArray(); Hashes = $hashes }
+}
+# Liste der von uns installierten Loader-Dateien (relative Pfade)
+function Read-LoaderMarker($dir) { return (Read-LoaderInfo $dir).Files }
+# Pfad -> SHA256 beim Installieren (fehlt = unbekannt)
+function Read-LoaderHashes($dir) { return (Read-LoaderInfo $dir).Hashes }
+function Write-LoaderMarker($dir, $entries, $hashes) {
+    $m = Join-Path $dir $LoaderMarker
+    $d = Split-Path -Parent $m
+    if (-not (Test-Path -LiteralPath $d)) { New-Item -ItemType Directory -Force -Path $d | Out-Null }
+    $lines = New-Object System.Collections.Generic.List[string]
+    $lines.Add('# GK2 Vanilla+: BepInEx files placed by the Vanilla+ installer (path|SHA256). "Remove everything" deletes only these, and only if unchanged.')
+    foreach ($e in @($entries)) {
+        if (-not $e) { continue }
+        $h = ''
+        if ($hashes -and $hashes.ContainsKey([string]$e)) { $h = [string]$hashes[[string]$e] }
+        if ($h) { $lines.Add([string]$e + '|' + $h) } else { $lines.Add([string]$e) }
+    }
+    [System.IO.File]::WriteAllLines($m, $lines.ToArray(), (New-Object System.Text.UTF8Encoding($false)))
+}
+# 'legacy': Loader-Dateien, die ein Installer vor 1.7.5 kopiert hat = Dateien aus dem mitgelieferten Loader, die im
+# Spielordner byte-gleich liegen. Geaenderte (z. B. BepInEx.cfg) zaehlen nicht dazu und bleiben beim Entfernen stehen.
+function Get-LegacyLoaderFiles($loaderSrc, $dir) {
+    $files = New-Object System.Collections.Generic.List[string]
+    $hashes = @{}
+    if (-not $loaderSrc) { return @{ Files = $files.ToArray(); Hashes = $hashes } }
+    foreach ($fi in @(Get-ChildItem -LiteralPath $loaderSrc -Recurse -File -Force)) {
+        $rel = Get-RelPath $loaderSrc $fi.FullName
+        if ((Test-ModPath $rel) -or $rel.StartsWith('BepInEx\plugins\', [System.StringComparison]::OrdinalIgnoreCase)) { continue }
+        $dst = Join-Path $dir $rel
+        if (-not (Test-Path -LiteralPath $dst -PathType Leaf)) { continue }
+        $h = Get-FileSha $dst
+        if ($h -and $h -eq (Get-FileSha $fi.FullName)) { $files.Add($rel); $hashes[$rel] = $h }
+    }
+    return @{ Files = $files.ToArray(); Hashes = $hashes }
+}
+function Get-RelPath($base, $full) {
+    $b = [System.IO.Path]::GetFullPath($base).TrimEnd('\') + '\'
+    return [System.IO.Path]::GetFullPath($full).Substring($b.Length)
+}
+function Test-ModPath($rel) {
+    foreach ($p in $ModDirs) { if ($rel.StartsWith($p + '\', [System.StringComparison]::OrdinalIgnoreCase)) { return $true } }
+    return $false
+}
+function Copy-One($src, $dst) {
+    $d = Split-Path -Parent $dst
+    if (-not (Test-Path -LiteralPath $d)) { New-Item -ItemType Directory -Force -Path $d | Out-Null }
+    try { Unblock-File -LiteralPath $src } catch {}
+    Copy-Item -LiteralPath $src -Destination $dst -Force
+}
+# Kopiert immer die Mod-Dateien; vom Loader nur fehlende Dateien und nur bei 'none', 'ours' (Reparatur) oder 'legacy',
+# nie bei 'foreign'/'partial'. Vorhandene Loader-Dateien werden nie ueberschrieben.
+# Rueckgabe: Loader-Modus vor dem Kopieren; 'missing' = weder im Spielordner noch im Paket ein Loader (nichts kopiert)
+function Install-Payload($payload, $loaderSrc, $dir) {
+    if ([System.IO.Path]::GetFullPath($payload).TrimEnd('\') -eq [System.IO.Path]::GetFullPath($dir).TrimEnd('\')) { throw (T 'Das Paket liegt im Spielordner selbst.' 'The package is inside the game folder itself.') }
+    $mode = Get-LoaderMode $dir
+    if ($mode -eq 'none' -and -not $loaderSrc) { return 'missing' }
+    foreach ($fi in @(Get-ChildItem -LiteralPath $payload -Recurse -File -Force)) {
+        $rel = Get-RelPath $payload $fi.FullName
+        if ((Test-ModPath $rel) -and $rel -ne $LoaderMarker) { Copy-One $fi.FullName (Join-Path $dir $rel) }
+    }
+    if ($mode -eq 'foreign' -or $mode -eq 'partial' -or -not $loaderSrc) { return $mode }
+    $placed = New-Object System.Collections.Generic.List[string]
+    $hashes = @{}
+    if ($mode -eq 'ours') {
+        foreach ($r in @(Read-LoaderMarker $dir)) { if (-not $placed.Contains($r)) { $placed.Add($r) } }
+        $old = Read-LoaderHashes $dir
+        foreach ($k in @($old.Keys)) { $hashes[$k] = $old[$k] }
+    }
+    if ($mode -eq 'legacy') {
+        $adopt = Get-LegacyLoaderFiles $loaderSrc $dir
+        foreach ($r in @($adopt.Files)) { if (-not $placed.Contains($r)) { $placed.Add($r) }; $hashes[$r] = $adopt.Hashes[$r] }
+    }
+    foreach ($fi in @(Get-ChildItem -LiteralPath $loaderSrc -Recurse -File -Force)) {
+        $rel = Get-RelPath $loaderSrc $fi.FullName
+        if ((Test-ModPath $rel) -or $rel.StartsWith('BepInEx\plugins\', [System.StringComparison]::OrdinalIgnoreCase)) { continue }
+        $dst = Join-Path $dir $rel
+        if (Test-Path -LiteralPath $dst) { continue }   # vorhandene Datei (auch Einstellungen) nie ueberschreiben
+        Copy-One $fi.FullName $dst
+        if (-not $placed.Contains($rel)) { $placed.Add($rel) }
+        $hashes[$rel] = Get-FileSha $dst
+    }
+    Write-LoaderMarker $dir $placed.ToArray() $hashes
+    return $mode
 }
 
 # --- Aussehen: Farben, Schriften, Bilder ---
@@ -266,8 +462,8 @@ $form.Controls.Add($folder)
 # Statusfeld: farbiger Streifen links (Farbe = Statusfarbe)
 $y += 74
 $statusBox = New-Object System.Windows.Forms.Panel
-$statusBox.SetBounds($Pad, $y, $Inner, 62)
-$status = New-Text '' 20 9 ($Inner - 32) 46 9.5 $false $ColText
+$statusBox.SetBounds($Pad, $y, $Inner, 74)
+$status = New-Text '' 20 9 ($Inner - 32) 58 9.5 $false $ColText
 $statusBox.Controls.Add($status)
 $statusBox.Add_Paint({
     $g = $_.Graphics
@@ -277,7 +473,7 @@ $statusBox.Add_Paint({
 })
 $status.Add_ForeColorChanged({ $statusBox.Invalidate() })
 $form.Controls.Add($statusBox)
-$y += 62
+$y += 74
 
 # Welche Version? Stabil = dieses Paket (offline), Beta = neueste Vorabversion von GitHub
 $rbStable = New-Object System.Windows.Forms.RadioButton
@@ -375,12 +571,17 @@ function Set-Status {
     if (Test-GameDir $box.Text) {
         $have = Get-InstalledVersion $box.Text
         $pkg  = [version]$Version
+        $mode = Get-LoaderMode $box.Text
         $status.ForeColor = $ColOk
         if (Test-Beta) {
             $install.Text = T 'Beta installieren' 'Install beta'
             $haveText = if ($have -eq $null) { T 'noch nicht installiert' 'not installed yet' } else { "$have" }
             $status.ForeColor = $ColWarn
             $status.Text = T "Beta-Version (Vorabversion): wird aus dem Internet geladen (installiert: $haveText). Sie kann Fehler enthalten – bitte vorher Spielstand sichern. Einstellungen bleiben erhalten." "Beta (pre-release): downloaded from the internet (installed: $haveText). It may contain bugs – please back up your saves first. Your settings are kept."
+        } elseif ($mode -eq 'none' -and -not $LoaderSrc) {
+            $install.Text = T 'Installieren' 'Install'
+            $status.ForeColor = $ColBad
+            $status.Text = T "Dieses Paket enthält kein BepInEx (Mod-Loader), und im Spielordner ist keins. Seit Spiel-Update 1.011 bringt das Spiel es mit: bitte das Spiel über Steam aktualisieren oder das komplette Paket von GitHub laden." "This package contains no BepInEx (mod loader) and the game folder has none. Since game update 1.011 the game ships it: please update the game via Steam or download the full package from GitHub."
         } elseif ($have -eq $null) {
             $install.Text = T 'Installieren' 'Install'
             $status.Text = T "Spiel gefunden. Der Mod ist noch nicht installiert." "Game found. The mod is not installed yet."
@@ -394,6 +595,11 @@ function Set-Status {
             $install.Text = T 'Trotzdem installieren' 'Install anyway'
             $status.ForeColor = $ColWarn
             $status.Text = T "Installiert ist eine neuere Version ($have). Dieses Paket ($Version) ist älter." "A newer version ($have) is installed. This package ($Version) is older."
+        }
+        if ($mode -eq 'foreign' -and -not (Test-Beta)) { $status.Text += T "`nVorhandenes BepInEx (z. B. vom Spiel) wird verwendet und nicht verändert." "`nThe existing BepInEx (e.g. the game's own) is used and left unchanged." }
+        if ($mode -eq 'partial' -and -not (Test-Beta)) {
+            $status.ForeColor = $ColWarn
+            $status.Text += T "`nIm Spielordner liegt eine Mod-Loader-Datei (winhttp.dll, version.dll, winmm.dll oder doorstop_config.ini), aber kein BepInEx. Der Mod lädt erst, wenn BepInEx vollständig ist (Spiel in Steam aktualisieren bzw. Dateien prüfen)." "`nThe game folder has a mod loader file (winhttp.dll, version.dll, winmm.dll or doorstop_config.ini) but no BepInEx. The mod only loads once BepInEx is complete (update the game in Steam or verify its files)."
         }
     } else {
         $install.Text = T 'Installieren' 'Install'
@@ -478,15 +684,26 @@ $install.Add_Click({
         return
     }
     try {
-        Get-ChildItem -Path $Payload -Recurse -File -Force | ForEach-Object { try { Unblock-File -Path $_.FullName } catch {} }
-        Copy-Item -Path (Join-Path $Payload '*') -Destination $dir -Recurse -Force
-        Get-ChildItem -Path $Payload -Force -File -Filter '.*' | Copy-Item -Destination $dir -Force
+        # Mod-Dateien immer; BepInEx nur, wenn im Spielordner noch keins liegt (das des Spiels bleibt unveraendert)
+        $mode = Install-Payload $Payload $LoaderSrc $dir
+        if ($mode -eq 'missing') {
+            [System.Windows.Forms.MessageBox]::Show((T "Dieses Paket enthält kein BepInEx (Mod-Loader), und im Spielordner ist auch keins.`n`nSeit Spiel-Update 1.011 bringt Graveyard Keeper 2 BepInEx selbst mit: bitte das Spiel über Steam aktualisieren. Für ältere Spielversionen das komplette Paket von GitHub laden:`nhttps://github.com/Matshio7/gk2-vanilla-plus/releases/latest" "This package contains no BepInEx (mod loader) and the game folder has none either.`n`nSince game update 1.011 Graveyard Keeper 2 ships BepInEx itself: please update the game via Steam. For older game versions download the full package from GitHub:`nhttps://github.com/Matshio7/gk2-vanilla-plus/releases/latest"), 'GK2 Vanilla+', 'OK', 'Warning') | Out-Null
+            Set-Status
+            return
+        }
         # Stabil gewaehlt: Kanal merken, Beta-Markierung entfernen
         if ($OnlineUpdate) { Set-UpdateChannel $dir 'Stable' }
         $mark = Join-Path $dir 'BepInEx\GK2VanillaPlus\installed-tag.txt'
         if (Test-Path $mark) { Remove-Item $mark -Force -ErrorAction SilentlyContinue }
         $msg = T "Fertig! Version $Version ist installiert.`n`nSpiel ganz normal über Steam starten. Im Spiel öffnet F9 das Mod-Menü, F10 die FPS-Anzeige." "Done! Version $Version is installed.`n`nStart the game normally via Steam. In game, F9 opens the mod menu, F10 the FPS display."
-        [System.Windows.Forms.MessageBox]::Show($msg, 'GK2 Vanilla+', 'OK', 'Information') | Out-Null
+        if ($mode -eq 'foreign') { $msg += T "`n`nDas vorhandene BepInEx (z. B. das des Spiels) wurde verwendet und nicht verändert." "`n`nThe existing BepInEx (e.g. the game's own) was used and left unchanged." }
+        $icon = 'Information'
+        if ($mode -eq 'partial') {
+            # Nur eine Proxy-Datei, kein BepInEx-Kern: kein Erfolgstext, der Mod laedt so nicht
+            $icon = 'Warning'
+            $msg = T "Version $Version wurde kopiert, aber im Spielordner fehlt BepInEx: Dort liegt nur eine Mod-Loader-Datei (winhttp.dll, version.dll, winmm.dll oder doorstop_config.ini) ohne den Ordner BepInEx\core. Vanilla+ lädt erst, wenn BepInEx vollständig ist.`n`nSeit Spiel-Update 1.011 bringt das Spiel BepInEx mit: in Steam Rechtsklick auf das Spiel > Eigenschaften > Installierte Dateien > Dateien auf Fehler überprüfen." "Version $Version was copied, but BepInEx is missing in the game folder: there is only a mod loader file (winhttp.dll, version.dll, winmm.dll or doorstop_config.ini) without the BepInEx\core folder. Vanilla+ only loads once BepInEx is complete.`n`nSince game update 1.011 the game ships BepInEx: in Steam right click the game > Properties > Installed Files > Verify integrity of game files."
+        }
+        [System.Windows.Forms.MessageBox]::Show($msg, 'GK2 Vanilla+', 'OK', $icon) | Out-Null
         Set-Status
     } catch {
         [System.Windows.Forms.MessageBox]::Show((T "Fehler beim Kopieren:`n" "Copy failed:`n") + $_.Exception.Message + (T "`n`nTipp: Installieren.bat per Rechtsklick 'Als Administrator ausführen', falls das Spiel unter 'Programme' liegt." "`n`nTip: right click Installieren.bat > 'Run as administrator' if the game is inside 'Program Files'."), 'GK2 Vanilla+', 'OK', 'Error') | Out-Null
@@ -494,7 +711,8 @@ $install.Add_Click({
 })
 
 # Auswahl beim Deinstallieren: 'all' (alles entfernen), 'mods' (nur Vanilla+) oder 'cancel'
-function Ask-Remove($snapshot) {
+# $ownLoader: BepInEx wurde von diesem Installer eingerichtet (loader-files.txt) - nur dann entfernt "Alles entfernen" es
+function Ask-Remove($snapshot, $ownLoader) {
     $f = New-Object System.Windows.Forms.Form
     $f.Text = 'GK2 Vanilla+'
     $f.ClientSize = New-Object System.Drawing.Size(560, 300)
@@ -507,7 +725,8 @@ function Ask-Remove($snapshot) {
     if ($form.Icon) { $f.Icon = $form.Icon }
     $f.Controls.Add((New-Text (T 'Was soll entfernt werden?' 'What should be removed?') 24 18 510 28 13 $true $ColText))
     $f.Controls.Add((New-Text (T 'ALLES ENTFERNEN' 'REMOVE EVERYTHING') 24 60 510 18 8.5 $true $ColGold))
-    $f.Controls.Add((New-Text (T 'Vanilla+ und BepInEx (der Mod-Loader) – das Spiel ist danach wieder original. Ohne andere Mods ist das die richtige Wahl.' 'Vanilla+ and BepInEx (the mod loader) – the game is back to original. Without other mods this is the right choice.') 24 80 510 42 9.5 $false $ColText))
+    $allText = if ($ownLoader) { T 'Vanilla+ und das von diesem Installer eingerichtete BepInEx (Mod-Loader). Dateien anderer Mods bleiben erhalten.' "Vanilla+ and the BepInEx (mod loader) set up by this installer. Other mods' files are kept." } else { T 'Nur Vanilla+. BepInEx bleibt: Es gehört seit Spiel-Update 1.011 zum Spiel bzw. stammt nicht von diesem Installer.' 'Only Vanilla+. BepInEx stays: since game update 1.011 it is part of the game, or it was not installed by this installer.' }
+    $f.Controls.Add((New-Text $allText 24 80 510 42 9.5 $false $ColText))
     $f.Controls.Add((New-Text (T 'NUR VANILLA+' 'VANILLA+ ONLY') 24 130 510 18 8.5 $true $ColGold))
     $f.Controls.Add((New-Text (T 'Entfernt nur diesen Mod. BepInEx und andere Mods bleiben.' 'Removes only this mod. BepInEx and other mods stay.') 24 150 510 24 9.5 $false $ColText))
     $f.Controls.Add((New-Text (T 'Deine Spielstand-Backups und Screenshots des Mods werden in jedem Fall nach Dokumente\GK2 Vanilla+ gerettet.' "The mod's save backups and screenshots are always kept in Documents\GK2 Vanilla+.") 24 184 510 36 8.5 $false $ColMuted))
@@ -539,15 +758,44 @@ function Remove-Tree($path) {
     return -not (Test-Path $path)
 }
 
+# Entfernt leere Unterordner (von innen nach aussen) und zuletzt $root selbst, wenn leer; Dateien bleiben unangetastet
+function Remove-EmptyDirs($root) {
+    if (-not (Test-Path -LiteralPath $root)) { return }
+    $dirs = @(Get-ChildItem -LiteralPath $root -Recurse -Directory -Force -ErrorAction SilentlyContinue | Sort-Object { $_.FullName.Length } -Descending)
+    foreach ($d in $dirs) {
+        try { if (-not (Get-ChildItem -LiteralPath $d.FullName -Force -ErrorAction SilentlyContinue | Select-Object -First 1)) { Remove-Item -LiteralPath $d.FullName -Force -ErrorAction Stop } } catch {}
+    }
+    try { if (-not (Get-ChildItem -LiteralPath $root -Force -ErrorAction SilentlyContinue | Select-Object -First 1)) { Remove-Item -LiteralPath $root -Force -ErrorAction Stop } } catch {}
+}
+
 $uninstall.Add_Click({
     $dir = $box.Text
     if (-not (Test-GameDir $dir)) { Set-Status; return }
     if (Test-GameRunning) { return }
-    $choice = Ask-Remove
+    # 'legacy' (Installer vor 1.7.5) zaehlt als unseres, wenn das Paket den Loader zum Vergleichen mitbringt (GitHub-ZIP)
+    $loaderMode = Get-LoaderMode $dir
+    $own = ($loaderMode -eq 'ours') -or ($loaderMode -eq 'legacy' -and $LoaderSrc)
+    $choice = Ask-Remove $null $own
     if ($choice -eq 'cancel') { return }
     try {
         $log = New-Object System.Collections.Generic.List[string]
         $log.Add("GK2 Vanilla+ uninstall $(Get-Date -Format 'yyyy-MM-dd HH:mm:ss'), mode: $choice, game folder: $dir")
+        # BepInEx nur entfernen, wenn wir es installiert haben (loader-files.txt) - das des Spiels (seit 1.011) bleibt
+        $loaderFiles = @()
+        $loaderHashes = @{}
+        if ($own -and $loaderMode -eq 'legacy') {
+            $adopt = Get-LegacyLoaderFiles $LoaderSrc $dir
+            $loaderFiles = @($adopt.Files); $loaderHashes = $adopt.Hashes
+            $log.Add('BepInEx set up by an installer before 1.7.5: only files identical to the bundled BepInEx ' + $LoaderVersion + ' count as ours')
+        } elseif ($own) {
+            $loaderFiles = @(Read-LoaderMarker $dir); $loaderHashes = Read-LoaderHashes $dir
+        }
+        $keptLoader = $false
+        if (-not $own -and (Test-LoaderPresent $dir)) {
+            $keptLoader = $true
+            $log.Add('kept: BepInEx (not installed by Vanilla+, e.g. part of the game since update 1.011)')
+            if ($choice -eq 'all') { $choice = 'mods' }
+        }
         # Spielstand-Backups und Screenshots des Mods nicht mitloeschen, sondern nach Dokumente\GK2 Vanilla+ retten
         $kept = $null
         foreach ($sub in 'Backups', 'Screenshots') {
@@ -560,15 +808,30 @@ $uninstall.Add_Click({
             }
         }
         $targets = @('BepInEx\plugins\GK2Tweaks', 'BepInEx\plugins\GK2Ultrawide', 'BepInEx\GK2VanillaPlus', 'BepInEx\config\mats.gk2.tweaks.cfg', 'BepInEx\config\mats.gk2.ultrawide.cfg')
-        if ($choice -eq 'all') { $targets += @('BepInEx', 'winhttp.dll', 'doorstop_config.ini', '.doorstop_version') }
+        # BepInEx.cfg nur, wenn wir es angelegt haben (steht dann in loader-files.txt) - eine vorher vorhandene Datei bleibt
+        if ($choice -eq 'all') { $targets += $loaderFiles; $targets += @('BepInEx\cache', 'BepInEx\LogOutput.log') }
         $left = @()
         foreach ($p in $targets) {
             $f = Join-Path $dir $p
             if (-not (Test-Path $f)) { continue }
+            if ($loaderFiles -contains $p) {
+                if (-not (Test-Path $f -PathType Leaf)) { continue }   # aus loader-files.txt nur einzelne Dateien
+                # seit der Installation geaendert (z. B. von Steam durch die Datei des Spiels ersetzt)? Dann bleibt sie
+                if ($loaderHashes.ContainsKey($p) -and $loaderHashes[$p] -and ((Get-FileSha $f) -ne $loaderHashes[$p])) { $log.Add("kept (changed since install): $p"); continue }
+            }
             if (Remove-Tree $f) { $log.Add("removed: $p") } else { $left += $p; $log.Add("LEFT OVER: $p") }
+        }
+        if ($choice -eq 'all') {
+            # leere Ordner (core, config, plugins ...) und BepInEx selbst, wenn leer; Dateien anderer Mods bleiben
+            Remove-EmptyDirs (Join-Path $dir 'BepInEx')
+            if (-not (Test-Path (Join-Path $dir 'BepInEx'))) { $log.Add('removed: BepInEx (empty)') }
+        } elseif ($own) {
+            # "Nur Vanilla+": Liste behalten, damit "Alles entfernen" unser BepInEx spaeter noch erkennt
+            try { Write-LoaderMarker $dir $loaderFiles $loaderHashes; $log.Add("kept: $LoaderMarker") } catch {}
         }
         Set-Status
         $done = if ($left.Count -eq 0) { T 'Entfernt.' 'Removed.' } else { (T "Nicht alles konnte entfernt werden (Datei in Benutzung oder gesperrt?). Übrig:`n" "Not everything could be removed (file in use or locked?). Left over:`n") + ($left -join "`n") + (T "`n`nBitte das Spiel und Steam beenden und noch einmal 'Deinstallieren' wählen." "`n`nPlease quit the game and Steam and click 'Uninstall' again.") }
+        if ($keptLoader) { $done += T "`n`nBepInEx wurde nicht angefasst: Es stammt nicht von diesem Installer (seit Spiel-Update 1.011 gehört es zum Spiel)." "`n`nBepInEx was left untouched: it was not installed by this installer (since game update 1.011 it is part of the game)." }
         if ($kept) { $done += (T "`n`nDeine Spielstand-Backups und Screenshots des Mods wurden aufgehoben:`n" "`n`nThe mod's save backups and screenshots were kept:`n") + $kept }
         # Protokoll in Dokumente\GK2 Vanilla+ (der BepInEx-Ordner ist ja ggf. weg)
         try {
@@ -611,6 +874,6 @@ $box.Text = Find-Game
 if ($env:GK2_SNAPSHOT_DIR) { $box.Text = $env:GK2_SNAPSHOT_DIR }
 if ($env:GK2_SNAPSHOT_BETA) { Select-Channel $true }
 Set-Status
-if ($env:GK2_SNAPSHOT_REMOVE) { $form.Show(); [void](Ask-Remove $env:GK2_SNAPSHOT_REMOVE); $form.Close(); exit 0 }
+if ($env:GK2_SNAPSHOT_REMOVE) { $form.Show(); [void](Ask-Remove $env:GK2_SNAPSHOT_REMOVE ((Test-GameDir $box.Text) -and ((Get-LoaderMode $box.Text) -eq 'ours'))); $form.Close(); exit 0 }
 if ($env:GK2_SNAPSHOT) { Save-Snapshot $form $env:GK2_SNAPSHOT; exit 0 }
 [void]$form.ShowDialog()

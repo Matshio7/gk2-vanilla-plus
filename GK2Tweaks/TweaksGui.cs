@@ -132,9 +132,12 @@ namespace GK2Tweaks
             }
             updateAvailableSnap = UpdateCheck.Available;
             safeNoticeSnap = SafeMode.MenuNotice();
-            InGameTick();
-            PinPadTick();
-            PadTick();
+            safeStartSnap = SafeStart.MenuNotice();
+            // Einzeln abgesichert: ein Fehler (oder ein JIT-Fehler durch geaenderte Spiel-/Rewired-Typen) in einem
+            // Teil soll Esc, Klick-Sperre und FPS-Anzeige darunter nicht mitreissen
+            try { InGameTick(); } catch (Exception e) { SafeMode.Report("Gui", e); }
+            try { PinPadTick(); } catch (Exception e) { SafeMode.Fail("Pins", e); }
+            try { PadTick(); } catch (Exception e) { SafeMode.Report("Gui", e); }
             RunPendingReopen();
             // Esc schliesst immer das oberste Fenster (gleiche Reihenfolge wie B am Controller)
             if (capturingKey == null && Input.GetKeyDown(KeyCode.Escape))
@@ -513,9 +516,58 @@ namespace GK2Tweaks
 #endif
             ;
 
+        private int guiErrors, guiErrorsLogged, pinDrawErrors;
+
+        // Notbremse: zeichnet ein Fenster wiederholt nicht, alle Mod-Fenster schliessen. Sonst bliebe die
+        // unsichtbare Klick-Sperre (SetBlocker) aktiv und das Hauptmenue reagiert auf nichts mehr.
+        private void CloseAllWindows()
+        {
+            try
+            {
+                celebOpen = false;
+                afterCeleb = null;
+                newsOpen = false;
+                weekOpen = false;
+#if !NEXUS
+                rateOpen = false;
+#endif
+                capturingKey = null;
+                SetMenu(false);
+                UpdateEnabled();
+                Plugin.Log.LogWarning("Mod windows closed after repeated drawing errors");
+            }
+            catch { }
+        }
+
         private void OnGUI()
         {
             if (HiResShot.Capturing) return;
+            // Globaler IMGUI-Zustand (Matrix, Scrollbar-Stil) wird in jedem Fall zurueckgesetzt (finally),
+            // sonst zeichnen nach einem Fehler auch andere Mods verzerrt.
+            GUIStyle oldThumb = GUI.skin.verticalScrollbarThumb;
+            Matrix4x4 old = GUI.matrix;
+            try
+            {
+                OnGUIInner();
+                guiErrors = 0;
+            }
+            catch (ExitGUIException) { throw; }   // von Unity gewollter Abbruch des GUI-Durchgangs, kein Fehler
+            catch (Exception e)
+            {
+                if (guiErrorsLogged < MaxGuiErrorLogs) { guiErrorsLogged++; SafeMode.Report("Gui", e); }
+                if (++guiErrors > 3) { guiErrors = 0; CloseAllWindows(); }
+            }
+            finally
+            {
+                GUI.matrix = old;
+                GUI.skin.verticalScrollbarThumb = oldThumb;
+            }
+        }
+
+        private const int MaxGuiErrorLogs = 5;
+
+        private void OnGUIInner()
+        {
             EnsureStyles();
             if (capturingKey != null && Event.current.type == EventType.KeyDown && Event.current.keyCode != KeyCode.None)
             {
@@ -541,17 +593,23 @@ namespace GK2Tweaks
             }
 
             PadBeginGUI();
-            GUIStyle oldThumb = GUI.skin.verticalScrollbarThumb;
             if (skinned) GUI.skin.verticalScrollbarThumb = vthumbStyle;
-            Matrix4x4 old = GUI.matrix;
             float scale = Mathf.Clamp(Screen.height / 1080f, 0.75f, 2.5f);
             if (Plugin.MenuScale.Value > 0) scale *= Plugin.MenuScale.Value / 100f;
             curScale = scale;
             GUI.matrix = Matrix4x4.TRS(Vector3.zero, Quaternion.identity, new Vector3(scale, scale, 1f));
             Rect ov = Rect.zero;
-            if (Plugin.ShowOverlay.Value) ov = DrawOverlay(scale);
-            if (Pins.List.Count > 0 && Plugin.PinsEnabled.Value && WeekPlan.InGame && !HudToggle.Hidden && !BigGameWindowOpen())
-                DrawPins(scale, Plugin.PinsCorner.Value == Plugin.OvCorner.Value ? ov : Rect.zero);
+            // FPS-Anzeige und Pin-Liste einzeln abgesichert: ein Fehler dort soll die Mod-Fenster nicht schliessen
+            try { if (Plugin.ShowOverlay.Value) ov = DrawOverlay(scale); }
+            catch (ExitGUIException) { throw; }
+            catch (Exception e) { if (guiErrorsLogged < MaxGuiErrorLogs) { guiErrorsLogged++; SafeMode.Report("Gui", e); } }
+            try
+            {
+                if (pinDrawErrors < MaxGuiErrorLogs && Pins.List.Count > 0 && Plugin.PinsEnabled.Value && WeekPlan.InGame && !HudToggle.Hidden && !BigGameWindowOpen())
+                    DrawPins(scale, Plugin.PinsCorner.Value == Plugin.OvCorner.Value ? ov : Rect.zero);
+            }
+            catch (ExitGUIException) { throw; }
+            catch (Exception e) { pinDrawErrors++; SafeMode.Fail("Pins", e); }   // nach 5 Fehlern wird die Liste nicht mehr gezeichnet
             if (GraphicsBench.Running)
             {
                 var bm = new GUIContent(GraphicsBench.Status);
@@ -586,8 +644,6 @@ namespace GK2Tweaks
             }
 #endif
             if (celebOpen) { DrawCelebration(scale); GUI.BringWindowToFront(CelebWindowId); }
-            GUI.matrix = old;
-            GUI.skin.verticalScrollbarThumb = oldThumb;
         }
 
         private GUIStyle warnStyle;
@@ -596,13 +652,20 @@ namespace GK2Tweaks
         // asynchrone GitHub-Abfrage genau zwischen dem Layout- und dem Repaint-Event umschlagen, was Unity
         // sonst mit "control count mismatch" quittiert (fehlendes/zusaetzliches GUILayout-Element).
         private bool updateAvailableSnap;
-        private string safeNoticeSnap;
+        private string safeNoticeSnap, safeStartSnap;
 
         private void DrawWindow(int id)
         {
             PadWindowBegin(WindowId);
             if (skinned) GUILayout.Label("GK2 Vanilla+  ·  by McFly7", titleStyle);
-            if (updateAvailableSnap) DrawUpdate();
+            // Sicherer Start: ganz oben, gleicher Stil wie der Hinweis des Sicherheitsmodus
+            string safeStart = safeStartSnap;
+            if (safeStart != null)
+            {
+                if (warnStyle == null) { warnStyle = new GUIStyle(smallStyle) { wordWrap = true }; warnStyle.normal.textColor = new Color(1f, 0.62f, 0.3f); }
+                GUILayout.Label(safeStart, warnStyle);
+            }
+            if (updateAvailableSnap && !SafeMode.AllOff) DrawUpdate();
             GUILayout.Label(fpsText + "     " + SystemInfo.graphicsDeviceVersion, labelStyle);
             GUILayout.Label(Labels.T("Aktiv: ", "Active: ") + Plugin.DescribeFeatures(), smallStyle);
             string safe = safeNoticeSnap;
@@ -739,6 +802,7 @@ namespace GK2Tweaks
 
                 DrawEntry(Plugin.GameMenuButton);
                 DrawEntry(Plugin.RepairWorkbenches);
+                DrawEntry(Plugin.SafeStartGuard);
 #if !NEXUS
                 DrawEntry(Plugin.CheckUpdates);
                 DrawEntry(Plugin.UpdateChannel);
@@ -1109,6 +1173,9 @@ namespace GK2Tweaks
             }
             if (Btn(Labels.T("Download-Seite", "Download page"), buttonStyle, GUILayout.Width(150))) Application.OpenURL(UpdateCheck.ReleasePage);
             GUILayout.EndHorizontal();
+            if (UpdateCheck.WorkshopManaged)
+                GUILayout.Label(Labels.T("Updates kommen über den Steam Workshop: Spiel neu starten, sobald Steam den Mod aktualisiert hat.",
+                    "Updates come through the Steam Workshop: restart the game once Steam has updated the mod."), smallStyle);
         }
 
         private readonly Dictionary<string, float> headerY = new Dictionary<string, float>();

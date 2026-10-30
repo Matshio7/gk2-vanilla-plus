@@ -1,5 +1,33 @@
 # Changelog
 
+## 1.7.5 – 2026-10-30 · Hotfix for game update 1.011
+
+**EN**
+> **Black screen after game update 1.011 – hardened against.** Since 1.011 the game supports ultrawide by itself, and the Vanilla+ ultrawide part was the prime suspect for the stop right after the intro logos. It now checks what the game already does and steps aside – it only adds resolutions when the game still hides them – and it can no longer break the game's start with an error.
+> **Still something off?** Press **F9** – the mod menu shows which features Safe Mode turned off. Please attach **BepInEx\LogOutput.log** in the **Bug Reports** discussion.
+
+- **New: safe start (crash guard):** if the game does not reach the main menu with Vanilla+ active (e.g. a black screen after a game update), the next start runs **once without Vanilla+** (including the ultrawide part) and tells you so – just restart and it is back. Holding **Left Shift** while the game starts does the same once. Mod menu (F9) → Interface & keys → "Safe start (crash guard)", on by default.
+- **No more double loading:** when the game's new mod loader and the installed copy both load Vanilla+, the second copy now stays inactive instead of running everything twice.
+- **Steam Workshop package now contains only the mod itself** (`BepInEx/plugins/...`) – no BepInEx, no loader files, no installer, nothing next to your backups. Since 1.011 the game installs and updates Workshop mods by itself: subscribing is enough, updates arrive after a restart. On older game builds use the GitHub package.
+- **Installer & updater respect the game's own BepInEx:** the installer only adds the mod and never overwrites existing BepInEx files; "Remove everything" only removes BepInEx files the installer set up (and only if they are unchanged), the game's BepInEx and other mods stay. The GitHub package keeps BepInEx in a separate `installer/loader` folder. **Note:** the in-game updater of 1.7.4 and older cannot install this package and asks you to download it manually – that is intended (it would overwrite the game's BepInEx).
+- **"Move objects" steps aside:** the game can move placed objects in build mode by itself now, so Vanilla+ leaves that to the game (it stays available on older game builds).
+- **Intro skip** can no longer hang – after at most 45 seconds the game runs at normal speed again.
+- **More patches hardened:** if a game update changes something, the affected feature switches itself off (Safe Mode) instead of disturbing the game. This now also applies to fades, the HUD clock, rain, trade, remove and move hooks: after repeated errors in one session the feature is turned off for that session with a short notice.
+- The stuck workbench check and the Max button are unchanged.
+
+**DE**
+> **Schwarzer Bildschirm nach Spiel-Update 1.011 – abgesichert.** Seit 1.011 kann das Spiel Ultrawide selbst, und der Ultrawide-Teil von Vanilla+ war der Hauptverdächtige für den Halt direkt nach den Intro-Logos. Er prüft jetzt, was das Spiel schon kann, und hält sich raus – Auflösungen fügt er nur noch hinzu, wenn das Spiel sie weiter ausblendet – und kann den Spielstart nicht mehr mit einem Fehler abbrechen.
+> **Stimmt noch etwas nicht?** **F9** drücken – das Mod-Menü zeigt, welche Funktionen der Sichere Modus abgeschaltet hat. Bitte **BepInEx\LogOutput.log** in der Diskussion **Bug Reports** anhängen.
+
+- **Neu: Sicherer Start (Absturz-Schutz):** Erreicht das Spiel mit aktivem Vanilla+ das Hauptmenü nicht (z. B. schwarzer Bildschirm nach einem Spiel-Update), läuft der nächste Start **einmal ohne Vanilla+** (samt Ultrawide-Teil) und sagt dir das – einfach neu starten, dann ist es wieder da. **Linke Umschalttaste** beim Spielstart gedrückt halten macht dasselbe einmal. Mod-Menü (F9) → Anzeige & Tasten → „Sicherer Start (Absturz-Schutz)“, standardmäßig an.
+- **Kein doppeltes Laden mehr:** Laden der neue Mod-Loader des Spiels und die installierte Kopie Vanilla+ beide, bleibt die zweite Kopie jetzt inaktiv, statt alles doppelt laufen zu lassen.
+- **Das Steam-Workshop-Paket enthält jetzt nur noch den Mod selbst** (`BepInEx/plugins/...`) – kein BepInEx, keine Loader-Dateien, kein Installer, nichts neben deinen Backups. Seit 1.011 installiert und aktualisiert das Spiel Workshop-Mods selbst: Abonnieren genügt, Updates kommen nach einem Neustart. Auf älteren Spielversionen das Paket von GitHub nutzen.
+- **Installer & Updater respektieren das BepInEx des Spiels:** Der Installer fügt nur den Mod hinzu und überschreibt nie vorhandene BepInEx-Dateien; „Alles entfernen“ entfernt nur BepInEx-Dateien, die der Installer eingerichtet hat (und nur, wenn sie unverändert sind), das BepInEx des Spiels und andere Mods bleiben. Das GitHub-Paket hat BepInEx in einem eigenen Ordner `installer/loader`. **Hinweis:** Der Updater im Spiel von 1.7.4 und älter kann dieses Paket nicht installieren und bittet um einen manuellen Download – das ist Absicht (er würde das BepInEx des Spiels überschreiben).
+- **„Objekte verschieben“ hält sich raus:** Das Spiel kann platzierte Objekte im Baumodus jetzt selbst verschieben, also überlässt Vanilla+ das dem Spiel (auf älteren Spielversionen bleibt die Funktion verfügbar).
+- **Intro überspringen** kann nicht mehr hängen bleiben – nach spätestens 45 Sekunden läuft das Spiel wieder mit normaler Geschwindigkeit.
+- **Weitere Patches abgesichert:** Ändert ein Spiel-Update etwas, schaltet sich die betroffene Funktion selbst ab (Sicherer Modus), statt das Spiel zu stören. Das gilt jetzt auch für Überblendungen, die HUD-Uhr, Regen, Handel sowie Abbauen und Verschieben: Nach wiederholten Fehlern in einer Sitzung ist die Funktion für diese Sitzung aus, mit kurzem Hinweis.
+- Die Prüfung hängender Werkbänke und der Max-Knopf sind unverändert.
+
 ## 1.7.4 – 2026-10-16
 
 **EN**

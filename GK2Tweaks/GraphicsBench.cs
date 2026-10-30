@@ -35,7 +35,8 @@ namespace GK2Tweaks
         private static readonly FrameStats stats = new FrameStats();
         private static GraphicsTier originalTier;
 
-        internal static bool CanRun => WeekPlan.InGame && GameSettings.Instance != null;
+        // Nicht im Sicheren Start: dort laufen weder Tick noch die Grafik-Patches, der Benchmark wuerde haengen
+        internal static bool CanRun => !SafeMode.AllOff && WeekPlan.InGame && GameSettings.Instance != null;
 
         internal static void Start()
         {

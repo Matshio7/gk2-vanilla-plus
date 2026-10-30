@@ -180,9 +180,22 @@ namespace GK2Tweaks
             n.displayingTime = seconds;
         }
 
+        // Laeuft fuer jede Meldung des Spiels: darf nie werfen, sonst bleibt die Meldung haengen (Pool-Rueckgabe abgebrochen)
         private static void Prefix(UISimpleTextNotification __instance)
         {
-            if (original.TryGetValue(__instance, out float t)) { __instance.displayingTime = t; original.Remove(__instance); }
+            try
+            {
+                if (__instance == null || original.Count == 0) return;
+                Restore(__instance);
+            }
+            catch (Exception e) { SafeMode.Fail("WeekPlan", e); }
+        }
+
+        // Eigene Methode: fehlt displayingTime nach einem Spiel-Update, wirft das JIT hier - innerhalb des try oben
+        [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.NoInlining)]
+        private static void Restore(UIBaseNotification n)
+        {
+            if (original.TryGetValue(n, out float t)) { n.displayingTime = t; original.Remove(n); }
         }
     }
 }

@@ -247,7 +247,7 @@ namespace GK2Tweaks
         private static void Prefix(CraftInteractionHandler __instance)
         {
             try { CraftRepair.Fix(CraftRepair.WgoOf(__instance), "use"); }
-            catch (Exception e) { Plugin.Log.LogWarning("Craft repair: " + e.Message); }
+            catch (Exception e) { SafeMode.Fail("CraftRepair", e); }
         }
     }
 }

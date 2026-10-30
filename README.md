@@ -50,19 +50,22 @@ Languages: English, German, French, Spanish, Portuguese, Russian, Chinese – mo
 
 ### Install (Windows)
 
-1. **Steam Workshop:** [Subscribe](https://steamcommunity.com/sharedfiles/filedetails/?id=3808053878) and open `<Steam library>\steamapps\workshop\content\4358690\3808053878`.
-   **GitHub:** download `GK2-VanillaPlus-<version>.zip` from [Releases](https://github.com/Matshio7/gk2-vanilla-plus/releases/latest) and extract it.
+**Steam Workshop (game 1.011 or newer):** [Subscribe](https://steamcommunity.com/sharedfiles/filedetails/?id=3808053878) – that's it, the game installs and updates the mod itself. The steps below are for the GitHub zip (e.g. older game builds or manual installs).
+
+1. Download `GK2-VanillaPlus-<version>.zip` from [Releases](https://github.com/Matshio7/gk2-vanilla-plus/releases/latest) and extract it.
 2. Run `Installieren.bat`. If SmartScreen warns: *More info* → *Run anyway*.
 3. The game folder is found automatically. Choose **Stable** (recommended, tested) or **Beta** (newest features from GitHub, may contain bugs), click **Install** and start the game via Steam.
 4. In game: **F9** or the **Vanilla+** button opens the mod menu.
 
+Since game update 1.011 the game ships BepInEx (the mod loader) itself: the installer then only adds the mod and leaves the game's BepInEx unchanged. The Steam Workshop package contains only the mod (`BepInEx/plugins/...`); the GitHub zip still includes BepInEx (`installer/loader`) for older game builds and uses it only when the game folder has none.
+
 **Updating:** the mod menu shows new versions – *Save & update* does the rest. Switch between Stable and Beta under *Update channel*.
 
-**Uninstall:** run the installer → *Uninstall* → *Remove everything* (incl. BepInEx, game back to original) or *Vanilla+ only*. The mod's backups and screenshots are kept in `Documents\GK2 Vanilla+`.
+**Uninstall:** run the installer → *Uninstall* → *Remove everything* (Vanilla+ and the BepInEx the installer set up – the game's own BepInEx and other mods stay) or *Vanilla+ only*. The mod's backups and screenshots are kept in `Documents\GK2 Vanilla+`.
 
 ### macOS (CrossOver) / Linux / Steam Deck (Proton)
 
-Copy the contents of `installer/files` into the game folder and set the DLL override `winhttp` to *native, builtin* (CrossOver: Wine configuration → Libraries; Proton: launch option `WINEDLLOVERRIDES="winhttp=n,b" %command%`). Step-by-step guide in the Steam Workshop Discussions tab.
+Game 1.011 or newer (BepInEx is part of the game): subscribe on the Steam Workshop, or copy the contents of `installer/files` into the game folder. Older game builds without BepInEx: also copy the contents of `installer/loader` (BepInEx) into the game folder and set the DLL override `winhttp` to *native, builtin* (CrossOver: Wine configuration → Libraries; Proton: launch option `WINEDLLOVERRIDES="winhttp=n,b" %command%`). Never copy `installer/loader` over an existing BepInEx. Step-by-step guide in the Steam Workshop Discussions tab.
 
 ### Bugs & ideas
 
@@ -113,19 +116,22 @@ Sprachen: Deutsch, Englisch, Französisch, Spanisch, Portugiesisch, Russisch, Ch
 
 ### Installation (Windows)
 
-1. **Steam Workshop:** [Abonnieren](https://steamcommunity.com/sharedfiles/filedetails/?id=3808053878) und `<Steam-Bibliothek>\steamapps\workshop\content\4358690\3808053878` öffnen.
-   **GitHub:** `GK2-VanillaPlus-<Version>.zip` unter [Releases](https://github.com/Matshio7/gk2-vanilla-plus/releases/latest) laden und entpacken.
+**Steam Workshop (Spiel 1.011 oder neuer):** [Abonnieren](https://steamcommunity.com/sharedfiles/filedetails/?id=3808053878) – fertig, das Spiel installiert und aktualisiert den Mod selbst. Die Schritte unten gelten für das GitHub-Zip (z. B. ältere Spielversionen oder manuelle Installation).
+
+1. `GK2-VanillaPlus-<Version>.zip` unter [Releases](https://github.com/Matshio7/gk2-vanilla-plus/releases/latest) laden und entpacken.
 2. `Installieren.bat` starten. Falls SmartScreen warnt: *Weitere Informationen* → *Trotzdem ausführen*.
 3. Der Spielordner wird automatisch gefunden. **Stabil** (empfohlen, getestet) oder **Beta** (neueste Funktionen von GitHub, kann Fehler enthalten) wählen, **Installieren** klicken und das Spiel über Steam starten.
 4. Im Spiel: **F9** oder der Knopf **Vanilla+** öffnet das Mod-Menü.
 
+Seit Spiel-Update 1.011 bringt das Spiel BepInEx (den Mod-Loader) selbst mit: Der Installer fügt dann nur noch den Mod hinzu und lässt das BepInEx des Spiels unverändert. Das Steam-Workshop-Paket enthält nur den Mod (`BepInEx/plugins/...`); das GitHub-Zip enthält BepInEx (`installer/loader`) weiterhin für ältere Spielversionen und nutzt es nur, wenn im Spielordner keins liegt.
+
 **Aktualisieren:** Das Mod-Menü zeigt neue Versionen an – *Speichern & aktualisieren* erledigt den Rest. Zwischen Stabil und Beta wechselst du unter *Update-Kanal*.
 
-**Deinstallieren:** Installer starten → *Deinstallieren* → *Alles entfernen* (samt BepInEx, Spiel wieder original) oder *Nur Vanilla+*. Backups und Screenshots des Mods bleiben unter `Dokumente\GK2 Vanilla+` erhalten.
+**Deinstallieren:** Installer starten → *Deinstallieren* → *Alles entfernen* (Vanilla+ und das BepInEx, das der Installer eingerichtet hat – das BepInEx des Spiels und andere Mods bleiben) oder *Nur Vanilla+*. Backups und Screenshots des Mods bleiben unter `Dokumente\GK2 Vanilla+` erhalten.
 
 ### macOS (CrossOver) / Linux / Steam Deck (Proton)
 
-Den Inhalt von `installer/files` in den Spielordner kopieren und die DLL-Überschreibung `winhttp` auf *nativ, builtin* stellen (CrossOver: Wine-Konfiguration → Bibliotheken; Proton: Startoption `WINEDLLOVERRIDES="winhttp=n,b" %command%`). Schritt-für-Schritt-Anleitung im Diskussionen-Tab des Steam Workshops.
+Spiel 1.011 oder neuer (BepInEx ist schon im Spiel): im Steam Workshop abonnieren oder den Inhalt von `installer/files` in den Spielordner kopieren. Ältere Spielversionen ohne BepInEx: zusätzlich den Inhalt von `installer/loader` (BepInEx) in den Spielordner kopieren und die DLL-Überschreibung `winhttp` auf *nativ, builtin* stellen (CrossOver: Wine-Konfiguration → Bibliotheken; Proton: Startoption `WINEDLLOVERRIDES="winhttp=n,b" %command%`). `installer/loader` nie über ein vorhandenes BepInEx kopieren. Schritt-für-Schritt-Anleitung im Diskussionen-Tab des Steam Workshops.
 
 ### Fehler & Ideen
 

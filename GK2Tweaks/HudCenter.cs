@@ -43,7 +43,7 @@ namespace GK2Tweaks
             if (g != null)
             {
                 if (g.NpcWidget != null) EdgeShift(g.NpcWidget.transform, pad);
-                var wz = HarmonyLib.Traverse.Create(g).Field("worldZoneWidget").GetValue<Component>();
+                var wz = HarmonyLib.Traverse.Create(g).Field("worldZoneWidget").GetValue() as Component;
                 if (wz != null) EdgeShift(wz.transform, pad);
             }
             if (!logged) { logged = true; Plugin.Log.LogInfo("HUD center: " + changed.Count + " element(s) moved into 16:9 (pad " + pad.ToString("0.000") + ")"); }

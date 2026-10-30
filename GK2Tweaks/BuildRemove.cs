@@ -40,7 +40,7 @@ namespace GK2Tweaks
                 cc.TryFinishCurCraft();
                 __result = true;
             }
-            catch (Exception e) { Plugin.Log.LogWarning("Building removal: " + e.Message); }
+            catch (Exception e) { SafeMode.Fail("InstantRemove", e); }
         }
 
         private static string Id(Item it) => ((ObjectLinkedToDefinition<ItemDef>)it).id;

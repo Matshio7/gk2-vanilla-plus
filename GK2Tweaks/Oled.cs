@@ -87,17 +87,24 @@ namespace GK2Tweaks
                 if (rt != null)
                 {
                     RenderTexture prev = RenderTexture.active;
-                    RenderTexture.active = rt;
                     var tex = new Texture2D(1, 1, TextureFormat.RGBA32, false);
-                    sb.Append(" RT " + rt.width + "x" + rt.height + ":");
-                    foreach (Vector2 p in pts)
+                    try
                     {
-                        tex.ReadPixels(new Rect((int)(p.x * (rt.width - 1)), (int)(p.y * (rt.height - 1)), 1, 1), 0, 0);
-                        Color32 c = tex.GetPixel(0, 0);
-                        sb.Append(" (" + c.r + "," + c.g + "," + c.b + "," + c.a + ")");
+                        RenderTexture.active = rt;
+                        sb.Append(" RT " + rt.width + "x" + rt.height + ":");
+                        foreach (Vector2 p in pts)
+                        {
+                            tex.ReadPixels(new Rect((int)(p.x * (rt.width - 1)), (int)(p.y * (rt.height - 1)), 1, 1), 0, 0);
+                            Color32 c = tex.GetPixel(0, 0);
+                            sb.Append(" (" + c.r + "," + c.g + "," + c.b + "," + c.a + ")");
+                        }
                     }
-                    RenderTexture.active = prev;
-                    Object.Destroy(tex);
+                    finally
+                    {
+                        // aktives RenderTexture immer zuruecksetzen, sonst zeichnet das Spiel ins falsche Ziel
+                        RenderTexture.active = prev;
+                        Object.Destroy(tex);
+                    }
                 }
                 Texture2D scr = ScreenCapture.CaptureScreenshotAsTexture();
                 if (scr != null)
@@ -127,12 +134,16 @@ namespace GK2Tweaks
                     {
                         var tmp = RenderTexture.GetTemporary(lut.width, lut.height, 0, RenderTextureFormat.ARGB32);
                         Graphics.Blit(lut, tmp);
-                        RenderTexture prev2 = RenderTexture.active; RenderTexture.active = tmp;
+                        RenderTexture prev2 = RenderTexture.active;
                         var t1 = new Texture2D(1, 1, TextureFormat.RGBA32, false);
-                        t1.ReadPixels(new Rect(0, 0, 1, 1), 0, 0);
-                        Color32 l0 = t1.GetPixel(0, 0);
-                        sb.Append(" LUT(0,0)=(" + l0.r + "," + l0.g + "," + l0.b + ")");
-                        RenderTexture.active = prev2; RenderTexture.ReleaseTemporary(tmp); Object.Destroy(t1);
+                        try
+                        {
+                            RenderTexture.active = tmp;
+                            t1.ReadPixels(new Rect(0, 0, 1, 1), 0, 0);
+                            Color32 l0 = t1.GetPixel(0, 0);
+                            sb.Append(" LUT(0,0)=(" + l0.r + "," + l0.g + "," + l0.b + ")");
+                        }
+                        finally { RenderTexture.active = prev2; RenderTexture.ReleaseTemporary(tmp); Object.Destroy(t1); }
                     }
                 }
                 sb.Append(" | ambient " + RenderSettings.ambientLight + " fog " + RenderSettings.fog);

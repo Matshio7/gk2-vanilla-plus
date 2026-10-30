@@ -63,12 +63,18 @@ namespace GK2Tweaks
             measuring = false;
             float start = teleportAt;
             bool skipped = cleanupSkipped;
+            // Der Callback des Spiels (Ende der Abblende) laeuft IMMER - auch wenn das Messen wirft,
+            // sonst bliebe der Bildschirm nach Tuer/Kartenreise schwarz.
             return () =>
             {
-                float d = Time.unscaledTime - start;
-                times.Add(d);
-                if (times.Count > 10) times.RemoveAt(0);
-                Plugin.Log.LogInfo("[TRANSITION] " + d.ToString("0.00") + " s" + (Plugin.FasterTransitions.Value && Fast ? " (faster fades" + (skipped ? ", cleanup skipped" : "") + ")" : ""));
+                try
+                {
+                    float d = Time.unscaledTime - start;
+                    times.Add(d);
+                    if (times.Count > 10) times.RemoveAt(0);
+                    Plugin.Log.LogInfo("[TRANSITION] " + d.ToString("0.00") + " s" + (Plugin.FasterTransitions.Value && Fast ? " (faster fades" + (skipped ? ", cleanup skipped" : "") + ")" : ""));
+                }
+                catch { }
                 a?.Invoke();
             };
         }
@@ -112,7 +118,7 @@ namespace GK2Tweaks
     {
         private static void Prefix(ref float fadeTime)
         {
-            try { fadeTime = Transitions.Scale(fadeTime); } catch { }
+            try { fadeTime = Transitions.Scale(fadeTime); } catch (Exception e) { SafeMode.Fail("Transitions", e); }
         }
     }
 
@@ -121,7 +127,7 @@ namespace GK2Tweaks
     {
         private static void Prefix(ref float fadeTime, ref Action onComplete)
         {
-            try { fadeTime = Transitions.Scale(fadeTime); onComplete = Transitions.WrapDone(onComplete); } catch { }
+            try { fadeTime = Transitions.Scale(fadeTime); onComplete = Transitions.WrapDone(onComplete); } catch (Exception e) { SafeMode.Fail("Transitions", e); }
         }
     }
 
@@ -136,7 +142,7 @@ namespace GK2Tweaks
                 __result = UniTask.CompletedTask;
                 return false;
             }
-            catch { return true; }
+            catch (Exception e) { SafeMode.Fail("Transitions", e); return true; }
         }
     }
 }
