@@ -45,16 +45,16 @@
 [img]https://raw.githubusercontent.com/Matshio7/gk2-vanilla-plus/main/docs/nexus/section-4-install.png[/img]
 [list=1]
 [*]Download the main file and open your game folder: Steam → right-click Graveyard Keeper 2 → Manage → [b]Browse local files[/b] (the folder with GraveyardKeeper2.exe).
-[*]Extract the archive [b]directly into that folder[/b] (BepInEx, winhttp.dll and doorstop_config.ini end up next to GraveyardKeeper2.exe).
+[*]Extract the archive [b]directly into that folder[/b] (its BepInEx folder merges with the game's BepInEx folder).
 [*]Start the game and press [b]F9[/b] (or click [b]Mods[/b] in the main menu).
 [/list]
-Includes BepInEx 5.4.23.5, the standard Unity mod loader. Works with mod managers that extract into the game folder.
+Since game update 1.011 the game ships BepInEx (the mod loader) itself, so the archive contains only the mod and never overwrites the game's BepInEx. Works with mod managers that extract into the game folder.
+[b]Older game versions (before 1.011):[/b] install BepInEx 5.4.23.5 first (or use the full package with installer from GitHub).
 
-[b]Linux (Proton) / Steam Deck:[/b] extract as above and add this launch option: [code]WINEDLLOVERRIDES="winhttp=n,b" %command%[/code]
-[b]macOS (CrossOver):[/b] extract into the game folder inside your bottle and set the DLL override [i]winhttp[/i] to [i]Native then Builtin[/i] (bottle → Wine Configuration → Libraries).
+[b]Linux (Proton) / Steam Deck / macOS (CrossOver):[/b] extract as above. Only on game versions before 1.011 with a separately installed BepInEx: add the launch option [code]WINEDLLOVERRIDES="winhttp=n,b" %command%[/code] (CrossOver: DLL override [i]winhttp[/i] to [i]Native then Builtin[/i]).
 Under Linux / macOS the mod menu also offers a [b]controller fix[/b] against stutter with PlayStation controllers.
 
-[b]Uninstall:[/b] delete [i]BepInEx[/i], [i]winhttp.dll[/i], [i]doorstop_config.ini[/i], [i].doorstop_version[/i] and [i]changelog.txt[/i] from the game folder. Save backups and screenshots made by the mod are in [i]BepInEx\GK2VanillaPlus[/i] – copy them somewhere first if you want to keep them. Your normal saves are not touched.
+[b]Uninstall:[/b] delete [i]BepInEx\plugins\GK2Tweaks[/i], [i]BepInEx\plugins\GK2Ultrawide[/i] and [i]BepInEx\GK2VanillaPlus[/i] (the game's BepInEx stays). Save backups and screenshots made by the mod are in [i]BepInEx\GK2VanillaPlus[/i] – copy them somewhere first if you want to keep them. Your normal saves are not touched.
 
 [img]https://raw.githubusercontent.com/Matshio7/gk2-vanilla-plus/main/docs/nexus/section-5-updates.png[/img]
 Hit [b]Track[/b] to get notified about new versions. To update, download the new version and extract it over the old one (overwrite). Your settings are kept.
@@ -110,12 +110,13 @@ Problems? Please post in the Bugs tab and attach [i]<game folder>\BepInEx\LogOut
 [size=4][b]Installation[/b][/size]
 [list=1]
 [*]Hauptdatei laden und den Spielordner öffnen: Steam → Rechtsklick auf Graveyard Keeper 2 → Verwalten → [b]Lokale Dateien durchsuchen[/b] (Ordner mit GraveyardKeeper2.exe).
-[*]Das Archiv [b]direkt in diesen Ordner entpacken[/b] (BepInEx, winhttp.dll und doorstop_config.ini liegen dann neben GraveyardKeeper2.exe).
+[*]Das Archiv [b]direkt in diesen Ordner entpacken[/b] (sein Ordner BepInEx wird mit dem BepInEx-Ordner des Spiels zusammengeführt).
 [*]Spiel starten und [b]F9[/b] drücken (oder [b]Mods[/b] im Hauptmenü).
 [/list]
-[b]Linux (Proton) / Steam Deck:[/b] wie oben entpacken, Startoption [i]WINEDLLOVERRIDES="winhttp=n,b" %command%[/i]. [b]macOS (CrossOver):[/b] in den Spielordner in der Flasche entpacken, DLL-Überschreibung [i]winhttp[/i] auf „Nativ, dann eingebaut“.
+Seit Spiel-Update 1.011 bringt das Spiel BepInEx (den Mod-Loader) selbst mit: Das Archiv enthält nur den Mod und überschreibt das BepInEx des Spiels nie. [b]Ältere Spielversionen (vor 1.011):[/b] vorher BepInEx 5.4.23.5 installieren (oder das komplette Paket mit Installer von GitHub nutzen).
+[b]Linux (Proton) / Steam Deck / macOS (CrossOver):[/b] wie oben entpacken. Nur auf Spielversionen vor 1.011 mit separat installiertem BepInEx: Startoption [i]WINEDLLOVERRIDES="winhttp=n,b" %command%[/i] (CrossOver: DLL-Überschreibung [i]winhttp[/i] auf „Nativ, dann eingebaut“).
 [b]Update:[/b] neue Version laden und über die alte entpacken (überschreiben). Einstellungen bleiben erhalten. Mit [b]Track[/b] wirst du über neue Versionen informiert.
-[b]Deinstallieren:[/b] [i]BepInEx[/i], [i]winhttp.dll[/i], [i]doorstop_config.ini[/i], [i].doorstop_version[/i] und [i]changelog.txt[/i] aus dem Spielordner löschen. Backups und Screenshots des Mods liegen in [i]BepInEx\GK2VanillaPlus[/i] – vorher wegkopieren, falls du sie behalten willst. Deine normalen Spielstände bleiben unberührt.
+[b]Deinstallieren:[/b] [i]BepInEx\plugins\GK2Tweaks[/i], [i]BepInEx\plugins\GK2Ultrawide[/i] und [i]BepInEx\GK2VanillaPlus[/i] löschen (das BepInEx des Spiels bleibt). Backups und Screenshots des Mods liegen in [i]BepInEx\GK2VanillaPlus[/i] – vorher wegkopieren, falls du sie behalten willst. Deine normalen Spielstände bleiben unberührt.
 [b]Diese Nexus-Ausgabe enthält keine Installer-Skripte, hat keine Update-Prüfung und verbindet sich nie mit dem Internet.[/b]
 
 [b]Bekannter Fehler:[/b] Wechselt man bei offenem Menü zwischen Controller und Maus/Tastatur, kann eine Fehlermeldung erscheinen – einfach wegklicken, danach läuft alles normal weiter.

@@ -604,3 +604,7 @@ Hotkeys => Atalhos de teclado
 Notice windows (news, rating) => Janelas de aviso (novidades, avaliação)
 Interface for other mods => Interface para outros mods
 FPS log => Registro de FPS
+Changes to the settings take effect only after restarting the game. => As alterações nas configurações só têm efeito depois de reiniciar o jogo.
+Updates come through the Steam Workshop: restart the game once Steam has updated the mod. => As atualizações chegam pelo Steam Workshop: reinicie o jogo depois que o Steam atualizar o mod.
+Steam downloaded GK2 Vanilla+ {0} – the game still runs {1}. Restart the game: it installs Workshop updates by itself. => O Steam baixou o GK2 Vanilla+ {0}, mas o jogo ainda usa a {1}. Reinicie o jogo: ele instala sozinho as atualizações do Workshop.
+GK2 Vanilla+ {0} is available – it comes through the Steam Workshop: restart the game once Steam has downloaded it. => O GK2 Vanilla+ {0} está disponível – ele chega pelo Steam Workshop: reinicie o jogo depois que o Steam baixá-lo.

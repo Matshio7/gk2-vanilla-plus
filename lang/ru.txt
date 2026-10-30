@@ -608,3 +608,7 @@ Hotkeys => Горячие клавиши
 Notice windows (news, rating) => Окна уведомлений (новое, оценка)
 Interface for other mods => Интерфейс для других модов
 FPS log => Журнал FPS
+Changes to the settings take effect only after restarting the game. => Изменения настроек вступят в силу только после перезапуска игры.
+Updates come through the Steam Workshop: restart the game once Steam has updated the mod. => Обновления приходят через Steam Workshop: перезапустите игру, когда Steam обновит мод.
+Steam downloaded GK2 Vanilla+ {0} – the game still runs {1}. Restart the game: it installs Workshop updates by itself. => Steam загрузил GK2 Vanilla+ {0}, а в игре всё ещё работает {1}. Перезапустите игру: она сама устанавливает обновления из Workshop.
+GK2 Vanilla+ {0} is available – it comes through the Steam Workshop: restart the game once Steam has downloaded it. => Доступна GK2 Vanilla+ {0} – она придёт через Steam Workshop: перезапустите игру, когда Steam её загрузит.
