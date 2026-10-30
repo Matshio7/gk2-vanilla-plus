@@ -52,7 +52,13 @@ namespace GK2Tweaks
             if (p == null) return;
             int i = List.FindIndex(x => x.Key == p.Key);
             if (i >= 0) { List.RemoveAt(i); Changed(); return; }
-            if (List.Count >= Max) List.RemoveAt(0);
+            if (List.Count >= Max)
+            {
+                // Liste voll: der aelteste Pin macht Platz - sagen welcher, statt ihn still zu ersetzen (EmiLady)
+                Pin old = List[0];
+                List.RemoveAt(0);
+                ManualSave.Toast(string.Format(Labels.T("Höchstens {0} Pins – „{1}“ wurde gelöst.", "Up to {0} pins – \"{1}\" was unpinned."), Max, old.Title), 4f);
+            }
             List.Add(p);
             Refresh();
             Changed();
@@ -216,6 +222,7 @@ namespace GK2Tweaks
                 }
             }
             catch { return; }
+            try { CheckTownPins(); } catch (Exception e) { townCheckAt = float.MaxValue; Plugin.Log.LogWarning("Pins: town check off for this session - " + e.Message); }
             // Stadtauftraege: Restmenge nachziehen, erledigte abpinnen
             var done = new List<Pin>();
             try { OrderPins.Update(List, done); } catch (Exception e) { Plugin.Log.LogWarning("Order pins: " + e.Message); }
@@ -301,6 +308,61 @@ namespace GK2Tweaks
             allChests = m;
             allChestsAt = Time.realtimeSinceStartup + 3f;
             return m;
+        }
+
+        // ---------- Stadtgebaeude (z. B. "Baecker II"): gebaute Stufen abpinnen (HardWorkingLoner) ----------
+        // Live ueber TownBuiltPatch, ausserdem alle 5 s ein Abgleich mit der Welt - so verschwinden auch Pins von
+        // Gebaeuden, die vor diesem Update gebaut wurden, und niedrigere Stufen, wenn eine hoehere steht.
+        private static float townCheckAt;
+
+        internal static void OnTownBuilt(string id)
+        {
+            townCheckAt = 0f;
+            Pin p = List.Find(x => x.Key == "town:" + id);
+            if (p == null) return;
+            DropTown(new List<Pin> { p });
+        }
+
+        private static void CheckTownPins()
+        {
+            if (Time.realtimeSinceStartup < townCheckAt) return;
+            townCheckAt = Time.realtimeSinceStartup + 5f;
+            if (!List.Exists(x => x.Key.StartsWith("town:", StringComparison.Ordinal))) return;
+            HashSet<string> built = BuiltTownBuildings();
+            List<Pin> gone = List.FindAll(x => x.Key.StartsWith("town:", StringComparison.Ordinal) && built.Contains(x.Key.Substring(5)));
+            if (gone.Count > 0) DropTown(gone);
+        }
+
+        private static void DropTown(List<Pin> gone)
+        {
+            foreach (Pin p in gone)
+            {
+                List.Remove(p);
+                Plugin.Log.LogInfo("Pins: town building " + p.Key.Substring(5) + " is built - unpinned");
+                if (Plugin.PinsNotify.Value) ManualSave.Toast(string.Format(Labels.T("Gebaut: {0}", "Built: {0}"), p.Title), 4f);
+            }
+            Changed();
+        }
+
+        // alle gebauten Stufen: aktuelle Stufe jedes Bauplatzes plus alle Stufen davor (lvl_up_building_id rueckwaerts)
+        internal static HashSet<string> BuiltTownBuildings()
+        {
+            var built = new HashSet<string>();
+            var prev = new Dictionary<string, string>();
+            foreach (TownBuildingDef d in GameBalance.Me.townBuildingDefs)
+                if (d != null && !string.IsNullOrEmpty(d.lvlUpId) && !prev.ContainsKey(d.lvlUpId)) prev[d.lvlUpId] = d.id;
+            foreach (GameSceneData sc in MainGame.Instance.GameSave.worldData.gameSceneDataList)
+            {
+                if (sc?.wgoDataList == null) continue;
+                foreach (WgoData w in sc.wgoDataList)
+                {
+                    TownBuildingWgoComponent tb = w?.TownBuildingWgoComponent;
+                    if (tb == null || !tb.IsActive || string.IsNullOrEmpty(tb.TownBuildingId)) continue;
+                    for (string id = tb.TownBuildingId; id != null && built.Add(id); )
+                        id = prev.TryGetValue(id, out string before) ? before : null;
+                }
+            }
+            return built;
         }
 
         // nach dem Herstellen automatisch abpinnen
@@ -442,6 +504,16 @@ namespace GK2Tweaks
             if (image == null) return;
             bool show = pinned || alwaysShow || Hovered();
             if (image.enabled != show) image.enabled = show;
+            // 1.7.3: optional mit Taste statt Klick - Maus ueber dem Rezept/Auftrag/Bauplan und Taste druecken
+            if (KeyMode)
+            {
+                if (Plugin.PinsKey.Value.IsDown() && Time.frameCount != lastToggleFrame && Hovered() && image.isActiveAndEnabled)
+                {
+                    lastToggleFrame = Time.frameCount;
+                    DoToggle();
+                }
+                return;
+            }
             // Baumenues (Hof, Stadt) fangen Mausklicks selbst ab, bevor die Nadel sie bekommt:
             // deshalb den Linksklick direkt abfragen, wenn die Maus ueber der sichtbaren Nadel ist.
             if (show && Input.GetMouseButtonDown(ClickIndex) && Time.frameCount != lastToggleFrame && OverSelf())
@@ -452,7 +524,10 @@ namespace GK2Tweaks
             }
         }
 
-        private static int ClickIndex => Plugin.PinsClick.Value == "Left" ? 0 : 1;
+        // 1.7.3: immer Linksklick - Rechtsklick schliesst im Spiel das Fenster (Option kommt mit 1.8, wenn der Klick abgefangen wird)
+        private static int ClickIndex => 0;
+        // Andere Taste/Maustaste als die linke gesetzt: Anpinnen per Taste, Klick auf die Nadel tut nichts
+        internal static bool KeyMode => Plugin.PinsKey != null && Plugin.PinsKey.Value.MainKey != KeyCode.None && Plugin.PinsKey.Value.MainKey != KeyCode.Mouse0;
         private static int lastToggleFrame = -1;
         private static float lastPollToggle = -10f;
 
@@ -471,6 +546,7 @@ namespace GK2Tweaks
         public void OnPointerClick(PointerEventData e)
         {
             if (e.button != (ClickIndex == 0 ? PointerEventData.InputButton.Left : PointerEventData.InputButton.Right)) return;
+            if (KeyMode) return;   // Klick durchlassen: das Spiel waehlt dann einfach das Rezept aus
             e.Use();
             // schon beim Druecken ueber die Abfrage oben umgeschaltet: nicht doppelt umschalten
             if (Time.unscaledTime - lastPollToggle < 1.5f) return;
@@ -775,6 +851,24 @@ namespace GK2Tweaks
             orig();
             if (Key == null) return;
             try { Pins.OnCrafted(Key); } catch (Exception e) { SafeMode.Fail("Pins", e); }
+        }
+    }
+
+    // Stadtgebaeude fertig: der Bau ist ein Sofort-Craft "town_building_craft:<id>" auf dem Bauplatz -> Pin loesen.
+    // Eigener SafeMode-Name (nicht "Pins"): fehlt OnCraftEnd nach einem Spiel-Update, bleiben die Pins an.
+    [HarmonyPatch(typeof(WgoData), nameof(WgoData.OnCraftEnd))]
+    internal static class TownBuiltPatch
+    {
+        private const string Prefix = "town_building_craft:";
+        private static void Postfix(CraftElementBase ce)
+        {
+            try
+            {
+                string id = ce?.CraftId;
+                if (id == null || ce.IsFailed || !id.StartsWith(Prefix, StringComparison.Ordinal) || !Plugin.PinsEnabled.Value || !SafeMode.On("Pins")) return;
+                Pins.OnTownBuilt(id.Substring(Prefix.Length));
+            }
+            catch (Exception e) { Plugin.Log.LogWarning("Pins: town built " + e.Message); }
         }
     }
 }

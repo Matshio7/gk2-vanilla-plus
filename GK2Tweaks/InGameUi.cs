@@ -180,7 +180,12 @@ namespace GK2Tweaks
                 try
                 {
                     TalentLevelUpWidget h = Respec.Hovered;
-                    if (h != null && ((Component)h).gameObject.activeInHierarchy && Respec.CanRefund(h))
+                    if (h != null && ((Component)h).gameObject.activeInHierarchy && Respec.IsQuestTalent(h))
+                    {
+                        respecAnchor = ((Component)h).transform as RectTransform;
+                        respecHint = Labels.T("Quest-Talent – nicht erstattbar", "Quest talent – can't be refunded");
+                    }
+                    else if (h != null && ((Component)h).gameObject.activeInHierarchy && Respec.CanRefund(h))
                     {
                         object win = h.Data.Def.isZombiePerk ? (object)TradeHelper.Cached<UIZombieWorkerWindow>() : TradeHelper.Cached<CharacterWindow>();
                         string pn = LazyInput.IsGamepadActive ? PadExtra.Name(win) : null;

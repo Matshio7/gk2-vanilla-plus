@@ -51,6 +51,7 @@ namespace GK2Tweaks
             { "Respec", new[] { "Talente & Forschung zurückerstatten", "Refund talents & research" } },
             { "CraftMax", new[] { "Herstellen: Max-Knopf", "Crafting: Max button" } },
             { "CraftRepair", new[] { "Hängende Werkbänke lösen", "Fix stuck workbenches" } },
+            { "MoveSpeed", new[] { "Laufgeschwindigkeit", "Movement speed" } },
         };
 
         internal static string Name(string f) => names.TryGetValue(f, out string[] n) ? Labels.T(n[0], n[1]) : f;
@@ -69,6 +70,8 @@ namespace GK2Tweaks
                 case "TierPatch": case "ScreenSettingsPatch": return "Graphics";
                 case "InstantRemovePatch": return "InstantRemove";
                 case "CraftRepairPatch": return "CraftRepair";
+                case "RainScanPatch": return "Rain";
+                case "MoveSpeedPatch": return "MoveSpeed";
                 case "MoveInputPatch": case "MoveTargetPatch": case "MoveCellsPatch": case "MoveBuildPatch": case "MoveDisablePatch": case "MoveRemoveLabelPatch": return "MoveObjects";
                 case "TradePressPatch": case "TradeCountPatch": return "TradeLikes";
                 case "RespecOverPatch": case "RespecOutPatch": case "RespecTechPatch": return "Respec";
@@ -139,6 +142,7 @@ namespace GK2Tweaks
             F("Pins", () => typeof(UIQuestInfoWindow), "header");
             F("Rain", () => typeof(WeatherComponent), "parameters");
             F("Rain", () => typeof(CPParticleEmission), "defaultValue");
+            M("Rain", () => typeof(WeatherComponent), "Awake");
             M("WeekPlan", () => typeof(UINotificator), "ShowNotification");
             F("WeekPlan", () => typeof(UIHUDWheel), "dayIcons");
             F("ModsButton", () => typeof(UIMainMenuWindow), "gameSettingsButton");
@@ -180,6 +184,7 @@ namespace GK2Tweaks
             M("Respec", () => typeof(TechTreePageWidget), "OnTechClicked");
             M("Respec", () => typeof(TechTreePageWidget), "UpdateElements");
             M("CraftMax", () => typeof(UIBaseCraftSelectionWindow), "ChangeCraftCount");
+            M("MoveSpeed", () => typeof(PlayerPhysicalBody), "MoveByDirection");
             M("CraftRepair", () => typeof(CraftInteractionHandler), "Interact");
             F("CraftRepair", () => typeof(WGOInteractionHandlerBase), "assignedWgo");
             M("CraftRepair", () => typeof(CraftComponent), "RemoveFromQueue");

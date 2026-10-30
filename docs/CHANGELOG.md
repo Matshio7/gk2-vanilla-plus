@@ -1,23 +1,75 @@
 # Changelog
 
-## 1.7.2 – 2026-10-08 · first stable release
+## 1.7.4 – 2026-10-16
 
 **EN**
+> **Bonus: movement speed is in** – requested by a supporter on Ko-fi. Mod menu (F9) → Gameplay helpers → **"Movement speed (not vanilla)"**: 100–200 % in 10 % steps, 100 % (normal) by default. Only your character – the game's own slowdowns (e.g. aiming a bow) still apply, and the walk animation keeps up.
+
+- **Stuck workbenches – the check goes further:** with **"Repair stuck workbench"** on (mod menu → Interface & keys), pressing F at a workbench (or removing it) now checks it and tells you what it found. It fixes the cases we know: a workbench stuck as "running" with nothing running (no progress bar, but recipes can still be added – thanks piermaz38 and Drizz), a finished craft stuck at the output, a workbench waiting for a zombie that is gone, a workbench that dropped out of the game's crafting, and extensions (tool box …) that are not linked. If it can't fix something (talent level too low, no energy, fuel or room), it tells you that instead. Nothing is lost; details go to BepInEx\LogOutput.log. Turn the setting off again afterwards.
+- **Pins:** town buildings you have built (e.g. Baker II) now unpin themselves – also ones you built before this update (thanks HardWorkingLoner). When the list is full (6 pins), a short note says which pin made room instead of it silently disappearing (thanks EmiLady).
+- **Steam Workshop updates:** Steam downloads new versions into the Workshop folder, but the game keeps running the old one until you update. The main menu now says clearly when Steam has a newer version ready – F9 → "Save & update" (works without internet too).
+- **Fix:** the installer no longer stops with "Illegal characters in path" when a Steam library entry is broken or a library drive is unplugged, and it also finds the game right next to the unpacked folder (e.g. C:\Games\Graveyard Keeper 2) – thanks Do-oF (GitHub #2). Paths pasted with quotes (Explorer "Copy as path") work too.
+- **Fix:** "Day & time on HUD" could fill the log with errors when the game's font can't draw a character (thanks SUNA). The line now falls back to the time in digits – or steps aside – instead of producing errors.
+- **5,000+ players** – thank you! The thank-you banner shows once more.
+
+**DE**
+> **Bonus: Laufgeschwindigkeit ist drin** – gewünscht von einem Unterstützer auf Ko-fi. Mod-Menü (F9) → Spielhilfen → **„Laufgeschwindigkeit (nicht Vanilla)“**: 100–200 % in 10-%-Schritten, standardmäßig 100 % (normal). Nur deine Figur – die Verlangsamungen des Spiels (z. B. Zielen mit dem Bogen) gelten weiter, und die Laufanimation läuft passend mit.
+
+- **Hängende Werkbänke – die Prüfung geht weiter:** Mit **„Hängende Werkbank reparieren“** (Mod-Menü → Anzeige & Tasten) prüft F an einer Werkbank (oder Abbauen) sie jetzt und sagt dir, was los ist. Gelöst werden die Fälle, die wir kennen: Werkbank steht auf „läuft“, obwohl nichts läuft (kein Fortschrittsbalken, Rezepte lassen sich aber anlegen – danke piermaz38 und Drizz), ein fertiger Auftrag hängt bei der Ausgabe, die Werkbank wartet auf einen Zombie, der nicht mehr da ist, die Werkbank ist aus dem Herstell-System des Spiels gefallen, oder Erweiterungen (Werkzeugkiste …) sind nicht verbunden. Kann sie etwas nicht lösen (Talent-Stufe zu niedrig, keine Energie, kein Brennstoff, kein Platz), sagt sie dir das. Es geht nichts verloren; Details stehen in BepInEx\LogOutput.log. Danach die Einstellung wieder ausschalten.
+- **Anpinnen:** Gebaute Stadtgebäude (z. B. Bäcker II) lösen sich jetzt selbst – auch solche, die du vor diesem Update gebaut hast (danke HardWorkingLoner). Ist die Liste voll (6 Pins), sagt ein kurzer Hinweis, welcher Pin Platz gemacht hat, statt dass er still verschwindet (danke EmiLady).
+- **Updates über den Steam Workshop:** Steam lädt neue Versionen in den Workshop-Ordner, im Spiel läuft aber die alte, bis du aktualisierst. Das Hauptmenü sagt jetzt deutlich, wenn Steam eine neuere Version bereitliegen hat – F9 → „Speichern & aktualisieren“ (geht auch ohne Internet).
+- **Fix:** Der Installer bricht nicht mehr mit „Ungültige Zeichen im Pfad“ ab, wenn ein Steam-Bibliothekseintrag kaputt oder ein Bibliotheks-Laufwerk abgesteckt ist, und findet das Spiel auch direkt neben dem entpackten Ordner (z. B. C:\Games\Graveyard Keeper 2) – danke Do-oF (GitHub #2). Pfade mit Anführungszeichen („Als Pfad kopieren“ im Explorer) gehen jetzt auch.
+- **Fix:** „Tag & Uhrzeit am HUD“ konnte das Log mit Fehlern füllen, wenn die Schrift des Spiels ein Zeichen nicht zeichnen kann (danke SUNA). Die Zeile zeigt dann die Uhrzeit in Ziffern – oder hält sich raus – statt Fehler zu erzeugen.
+- **5.000+ Spieler** – danke! Das Danke-Banner erscheint noch einmal.
+
+## 1.7.3 – 2026-10-08 · first stable release
+
+**EN**
+> **⚠ Important – workbench repair changed:** in 1.7.2b the automatic repair also removed **normal waiting crafts** from workbench queues (sorry!). It is now **off by default** and only removes the **one waiting craft at the front** when nothing is running.
+> **Is one of your workbenches still stuck** (F does nothing, it cannot be removed)? Mod menu (F9) → Interface & keys → turn on **"Repair stuck workbench"**, press F at that workbench (or remove it), then turn the setting off again. Nothing is lost – ingredients are only used when a round starts.
+
 - **Stable and Beta:** the installer now lets you choose – **Stable** (tested, recommended, installed straight from the package) or **Beta** (newest pre-release from GitHub, to try new features early; may contain bugs). The channel can be changed later in the mod menu (F9) under "Update channel", and the update check follows it.
+- **Installer:** new look with the Vanilla+ logo. It is now really in English on non-German Windows (it always showed German before) and recognises the installed version correctly (it always offered an "update" before).
 - **Installer:** clearer uninstall – "Remove everything" (Vanilla+ and BepInEx, game back to original) or "Vanilla+ only"; read-only files no longer stop it, leftovers are listed, and a log is written to Documents\GK2 Vanilla+\uninstall.log.
 - **Fix:** the pin icon is smaller and smoother (it looked big and pixelated at 4K).
-- **Fix:** pinning is now done with **right click** by default, so recipes are no longer pinned by accident while clicking. Switch back in the mod menu (Pins → "Mouse button for pinning").
+- **Option:** pin with a **key or mouse button** instead of clicking the pin icon (mod menu → Pins → "Pin with"): point at a recipe, order or blueprint and press it – then clicks never pin by accident. Middle and side mouse buttons work too. Left click on the pin stays the default (Esc switches back).
+- **Fix:** periodic stutter (a small hitch every second) with "Rain amount" below 100 % or full-width rain on ultrawide – even indoors and after switching back to 100 %. Rain emitters are now only searched after a scene loads instead of every second, and going back to 100 % restores the original rain and stops completely. Thanks to byronlai99 for the precise report (GitHub #1)!
+- **Fix:** "Refund talents & research" no longer refunds the hidden quest talents (sins, days of the week) or talents that trigger something when bought – their quest effects can't be undone cleanly. They now show "Quest talent – can't be refunded".
 - **Fix:** Max when crafting counts carefully: ingredients already reserved by other queued crafts and tool durability (e.g. saw) are taken into account, and it never adds an extra round – so no crafts get stuck "waiting" at the workbench any more.
-- **Fix:** repairing already stuck workbenches no longer removes normal queues. It is now **off by default** (mod menu → "Repair stuck workbench") and only takes out the waiting craft at the front when nothing is running. Turn it on only if a workbench does not react (F does nothing, cannot be removed); nothing is lost.
+- **Fix:** battle-safe backups – the last save before a battle is always backed up and never pushed out by autosaves made during the battle (those are marked "in battle" in the backup list).
+- **Fix:** deleted backups no longer leave empty folders behind (Linux/Steam Deck/Mac).
+- **Fix:** the buttons in the backup list were cut off – the list fits the window again.
 - Moving factory machines is blocked for now – they lost their output conveyor. Normal conveyors can still be moved.
 
 **DE**
+> **⚠ Wichtig – Werkbank-Reparatur geändert:** In 1.7.2b hat die automatische Reparatur auch **normal wartende Aufträge** aus Warteschlangen entfernt (sorry!). Sie ist jetzt **standardmäßig aus** und nimmt nur noch **den einen wartenden Auftrag ganz vorne** heraus, wenn nichts läuft.
+> **Hängt bei dir noch eine Werkbank** (F ohne Wirkung, nicht abbaubar)? Mod-Menü (F9) → Anzeige & Tasten → **„Hängende Werkbank reparieren“** einschalten, an der Werkbank F drücken (oder sie abbauen), danach die Einstellung wieder ausschalten. Es geht nichts verloren – Zutaten werden erst beim Start eines Durchgangs verbraucht.
+
 - **Stabil und Beta:** Der Installer lässt dich jetzt wählen – **Stabil** (getestet, empfohlen, direkt aus dem Paket) oder **Beta** (neueste Vorabversion von GitHub, zum frühen Ausprobieren neuer Funktionen; kann Fehler enthalten). Den Kanal kannst du später im Mod-Menü (F9) unter „Update-Kanal“ ändern, die Update-Prüfung richtet sich danach.
+- **Installer:** neues Aussehen mit dem Vanilla+-Logo. Auf nicht-deutschem Windows ist er jetzt wirklich englisch (vorher immer deutsch) und erkennt die installierte Version richtig (vorher bot er immer ein „Update“ an).
 - **Installer:** klareres Deinstallieren – „Alles entfernen“ (Vanilla+ und BepInEx, Spiel wieder original) oder „Nur Vanilla+“; schreibgeschützte Dateien stoppen nichts mehr, Reste werden aufgelistet, ein Protokoll liegt unter Dokumente\GK2 Vanilla+\uninstall.log.
 - **Fix:** Die Pin-Nadel ist kleiner und weicher (sie wirkte bei 4K groß und verpixelt).
-- **Fix:** Anpinnen geht jetzt standardmäßig mit **Rechtsklick**, damit Rezepte beim Anklicken nicht mehr versehentlich angepinnt werden. Im Mod-Menü umstellbar (Anpinnen → „Maustaste zum Anpinnen“).
+- **Option:** Mit einer **Taste oder Maustaste** statt per Klick auf die Nadel anpinnen (Mod-Menü → Anpinnen → „Anpinnen mit“): Maus auf Rezept, Auftrag oder Bauplan und drücken – dann pinnt ein Klick nie mehr versehentlich. Mittlere und Seitentasten der Maus gehen auch. Standard bleibt der Linksklick auf die Nadel (Esc stellt zurück).
+- **Fix:** regelmäßige Ruckler (jede Sekunde ein kurzes Hängen) bei „Regenmenge“ unter 100 % oder Regen über die ganze Breite auf Ultrawide – auch drinnen und nach dem Zurückstellen auf 100 %. Regen-Emitter werden jetzt nur noch nach einem Szenenwechsel gesucht statt jede Sekunde, und zurück auf 100 % stellt den Original-Regen wieder her und hört ganz auf. Danke an byronlai99 für den genauen Bericht (GitHub #1)!
+- **Fix:** „Talente & Forschung zurückerstatten“ erstattet die versteckten Quest-Talente (Sünden, Wochentage) und Talente, die beim Kauf etwas auslösen, nicht mehr – deren Quest-Wirkung lässt sich nicht sauber rückgängig machen. Sie zeigen jetzt „Quest-Talent – nicht erstattbar“.
 - **Fix:** Max beim Herstellen rechnet vorsichtig: Zutaten, die andere Aufträge in der Warteschlange schon brauchen, und die Haltbarkeit von Werkzeug (z. B. Säge) zählen mit, und es kommt kein Extra-Durchgang mehr dazu – so bleibt nichts mehr als „wartet“ an der Werkbank hängen.
-- **Fix:** Die Reparatur bereits hängender Werkbänke entfernt keine normalen Warteschlangen mehr. Sie ist jetzt **standardmäßig aus** (Mod-Menü → „Hängende Werkbank reparieren“) und nimmt nur den wartenden Auftrag ganz vorne heraus, wenn nichts läuft. Nur einschalten, wenn eine Werkbank nicht reagiert (F ohne Wirkung, nicht abbaubar); es geht nichts verloren.
+- **Fix:** Kampf-sichere Backups – der letzte Stand vor einem Kampf wird immer gesichert und nie von Autosaves aus dem Kampf verdrängt (diese sind in der Backup-Liste mit „im Kampf“ markiert).
+- **Fix:** Gelöschte Backups hinterlassen keine leeren Ordner mehr (Linux/Steam Deck/Mac).
+- **Fix:** Die Knöpfe in der Backup-Liste waren abgeschnitten – die Liste passt wieder ins Fenster.
+- Fabrik-Maschinen lassen sich vorerst nicht verschieben – sie verloren ihr Ausgabe-Förderband. Normale Förderbänder lassen sich weiter verschieben.
+
+## 1.7.2 – 2026-10-07 · Hotfix 1.7.2b
+
+**EN**
+- Quick hotfix (1.7.2b): released fast to help everyone with stuck workbenches, not fully tested yet – please report anything odd.
+- **Fix:** workbenches could stop reacting (F did nothing, couldn't be removed) after crafting with the Max button. Cause: a craft queued with more rounds than ingredients stays "waiting" at the workbench – the game allows this with "+" too, Max made it easy. Affected workbenches now **repair themselves** as soon as you use or remove them – no rebuilding needed, nothing is lost (ingredients are only used when a round starts).
+- **Fix:** Max now counts carefully: ingredients already reserved by other queued crafts and tool durability (e.g. saw) are taken into account, and it never adds an extra round.
+- Moving factory machines is blocked for now – they lost their output conveyor. Normal conveyors can still be moved.
+
+**DE**
+- Schneller Hotfix (1.7.2b): rasch veröffentlicht, damit hängende Werkbänke wieder gehen, noch nicht vollständig getestet – meldet bitte alles Auffällige.
+- **Fix:** Werkbänke konnten nach dem Herstellen mit dem Max-Knopf nicht mehr reagieren (F ohne Wirkung, Abbauen ging nicht). Ursache: Ein Auftrag mit mehr Durchgängen als Zutaten bleibt an der Werkbank als „wartet“ stehen – das geht im Spiel auch mit „+“, mit Max aber leicht. Betroffene Werkbänke **reparieren sich jetzt selbst**, sobald du sie benutzt oder abbaust – kein Neubau nötig, nichts geht verloren (Zutaten werden erst beim Start eines Durchgangs verbraucht).
+- **Fix:** Max rechnet jetzt vorsichtig: Zutaten, die andere Aufträge in der Warteschlange schon brauchen, und die Haltbarkeit von Werkzeug (z. B. Säge) zählen mit, und es kommt kein Extra-Durchgang mehr dazu.
 - Fabrik-Maschinen lassen sich vorerst nicht verschieben – sie verloren ihr Ausgabe-Förderband. Normale Förderbänder lassen sich weiter verschieben.
 
 ## 1.7.1 – 2026-10-06
