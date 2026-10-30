@@ -94,6 +94,12 @@ namespace GK2Ultrawide
     {
         private static bool done;
         private static bool warned;
+        // Breite/Hoehe eines Eintrags: bis Spielversion 1.010 heissen die Properties ListedWidth/ListedHeight, ab 1.011
+        // AppliedWidth/AppliedHeight. Die privaten Felder "width"/"height" gibt es in beiden - deshalb per Reflection.
+        private static FieldInfo widthField, heightField;
+
+        private static int Wid(ResolutionConfig r) { return r == null ? 0 : (int)widthField.GetValue(r); }
+        private static int Hgt(ResolutionConfig r) { return r == null ? 0 : (int)heightField.GetValue(r); }
 
         private static void Postfix()
         {
@@ -132,13 +138,15 @@ namespace GK2Ultrawide
             // Vorab pruefen, ob alles noch existiert, was wir brauchen
             FieldInfo hardField = AccessTools.Field(typeof(ResolutionConfig), "hardcodedResolutions");
             FieldInfo availField = AccessTools.Field(typeof(ResolutionConfig), "availableResolutions");
+            // Ab 1.011 entfernt (das Spiel berechnet die Hauptmenue-Skalierung selbst) - dann setzen wir sie auch nicht.
             FieldInfo scaleField = AccessTools.Field(typeof(ResolutionConfig), "useMainMenuScaleX2");
             MethodInfo pixelSize = AccessTools.Method(typeof(ResolutionConfig), "GetPixelSize", new[] { typeof(int), typeof(int) });
             MethodInfo tryAdd = AccessTools.Method(typeof(ResolutionConfig), "TryAddAvailableResolution", new[] { typeof(ResolutionConfig) });
+            widthField = AccessTools.Field(typeof(ResolutionConfig), "width");
+            heightField = AccessTools.Field(typeof(ResolutionConfig), "height");
+            if (widthField == null || heightField == null || widthField.FieldType != typeof(int) || heightField.FieldType != typeof(int)) { Skipped("width/height"); return; }
             if (hardField == null || !hardField.IsStatic) { Skipped("hardcodedResolutions"); return; }
             if (availField == null || !availField.IsStatic) { Skipped("availableResolutions"); return; }
-            if (scaleField == null) { Skipped("useMainMenuScaleX2"); return; }
-            if (pixelSize == null) { Skipped("GetPixelSize"); return; }
             if (tryAdd == null) { Skipped("TryAddAvailableResolution"); return; }
 
             var hardcoded = hardField.GetValue(null) as List<ResolutionConfig>;
@@ -164,8 +172,9 @@ namespace GK2Ultrawide
             bool native = false;
             foreach (ResolutionConfig r in available)
             {
-                if (r == null || r.ListedHeight <= 0) continue;
-                if ((float)r.ListedWidth / r.ListedHeight > 2f || r.ListedWidth > 5120) { native = true; break; }
+                int rw = Wid(r), rh = Hgt(r);
+                if (r == null || rh <= 0) continue;
+                if ((float)rw / rh > 2f || rw > 5120) { native = true; break; }
             }
 
             if (native)
@@ -210,7 +219,7 @@ namespace GK2Ultrawide
         private static bool Contains(List<ResolutionConfig> list, Vector2Int c)
         {
             foreach (ResolutionConfig r in list)
-                if (r != null && r.ListedWidth == c.x && r.ListedHeight == c.y) return true;
+                if (r != null && Wid(r) == c.x && Hgt(r) == c.y) return true;
             return false;
         }
 
@@ -219,7 +228,7 @@ namespace GK2Ultrawide
         {
             try
             {
-                List<ResolutionConfig> matches = hardcoded.FindAll(r => r != null && r.ListedWidth == c.x && r.ListedHeight == c.y);
+                List<ResolutionConfig> matches = hardcoded.FindAll(r => r != null && Wid(r) == c.x && Hgt(r) == c.y);
                 if (matches.Count > 0)
                 {
                     foreach (ResolutionConfig m in matches) ResolutionConfig.TryAddAvailableResolution(m);
@@ -227,16 +236,19 @@ namespace GK2Ultrawide
                 else
                 {
                     var cfg = new ResolutionConfig(c.x, c.y);
-                    string mode = Plugin.MainMenuScaleX2.Value;
-                    if (mode == "On" || mode == "Off")
+                    if (scaleField != null)
                     {
-                        scaleField.SetValue(cfg, mode == "On");
-                    }
-                    else if (autoScale)
-                    {
-                        object ps = pixelSize.Invoke(null, new object[] { c.x, c.y });
-                        int pix = ps is int ? (int)ps : 0;
-                        if (pix > 0) scaleField.SetValue(cfg, c.y / pix >= 600);
+                        string mode = Plugin.MainMenuScaleX2.Value;
+                        if (mode == "On" || mode == "Off")
+                        {
+                            scaleField.SetValue(cfg, mode == "On");
+                        }
+                        else if (autoScale && pixelSize != null)
+                        {
+                            object ps = pixelSize.Invoke(null, new object[] { c.x, c.y });
+                            int pix = ps is int ? (int)ps : 0;
+                            if (pix > 0) scaleField.SetValue(cfg, c.y / pix >= 600);
+                        }
                     }
                     ResolutionConfig.TryAddAvailableResolution(cfg);
                 }

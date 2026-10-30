@@ -20,6 +20,10 @@ namespace GK2Tweaks
         private static readonly Dictionary<string, string> disabled = new Dictionary<string, string>();
         internal static IEnumerable<string> Disabled => disabled.Keys;
         internal static int DisabledCount => disabled.Count;
+        // Funktionen, die das Spiel inzwischen selbst kann (Objekte verschieben ab 1.011): bleiben aus (keine Patches),
+        // gelten aber nicht als "wegen Spiel-Update abgeschaltet" - kein Hinweis, kein "bitte auf ein Mod-Update warten".
+        private static readonly HashSet<string> retired = new HashSet<string>();
+        private static int ShownCount() { int n = 0; foreach (string f in disabled.Keys) if (!retired.Contains(f)) n++; return n; }
         internal static bool NoticePending;
         private static string gameFrom, gameTo;
         // Sicherer Start: dieser Start laeuft ohne jede Funktion und ohne Patches (nur Mod-Menue und Log)
@@ -282,6 +286,17 @@ namespace GK2Tweaks
             F("WeekPlan", () => typeof(UIBaseNotification), "displayingTime");
             F("TradeLikes", () => typeof(UIItemCountWindowData), "IsForVendor");
 
+            // Ab 1.011 verschiebt das Spiel Objekte selbst (BuildingMode.Move). Die alten Bau-Modus-Felder fuer
+            // "Objekte verschieben" fehlen dann (z. B. RemovePointer.currentRemovingSelection) - das ist kein Fehler:
+            // die Funktion bleibt still aus, ihre Patches entfallen, ohne Hinweis "abgeschaltet".
+            bool nativeMove = false;
+            try { nativeMove = BuildMove.GameHasNativeMove; } catch { }
+            if (nativeMove)
+            {
+                retired.Add("MoveObjects");
+                disabled["MoveObjects"] = "the game moves objects itself";
+            }
+
             foreach (Check c in checks)
             {
                 bool ok;
@@ -308,18 +323,18 @@ namespace GK2Tweaks
         }
 
         // Hinweis nach einem Spiel-Update (erst beim Anzeigen uebersetzen, dann steht die Sprache fest)
-        internal static string UpdateNotice() => disabled.Count == 0
+        internal static string UpdateNotice() => ShownCount() == 0
             ? string.Format(Labels.T("Spiel-Update erkannt ({0} → {1}): Vanilla+ hat alles geprüft, alle Funktionen laufen.",
                 "Game update detected ({0} → {1}): Vanilla+ checked everything, all features work."), gameFrom, gameTo)
             : string.Format(Labels.T("Spiel-Update erkannt ({0} → {1}): Vanilla+ hat {2} Funktion(en) sicherheitshalber abgeschaltet – Details im Mod-Menü.",
-                "Game update detected ({0} → {1}): Vanilla+ turned off {2} feature(s) to be safe – details in the mod menu."), gameFrom, gameTo, disabled.Count);
+                "Game update detected ({0} → {1}): Vanilla+ turned off {2} feature(s) to be safe – details in the mod menu."), gameFrom, gameTo, ShownCount());
 
         // Hinweis im Mod-Menue
         internal static string MenuNotice()
         {
-            if (disabled.Count == 0) return null;
+            if (ShownCount() == 0) return null;
             var list = new List<string>();
-            foreach (string f in disabled.Keys) list.Add(Name(f));
+            foreach (string f in disabled.Keys) if (!retired.Contains(f)) list.Add(Name(f));
             return string.Format(Labels.T("Sicherer Modus: {0} abgeschaltet, weil das Spiel sich geändert hat. Der Rest läuft normal – bitte auf ein Mod-Update warten.",
                 "Safe mode: {0} turned off because the game changed. Everything else works – please wait for a mod update."), string.Join(", ", list));
         }
