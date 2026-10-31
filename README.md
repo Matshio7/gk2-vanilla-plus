@@ -65,7 +65,7 @@ Since game update 1.011 the game ships BepInEx (the mod loader) itself: the inst
 
 ### macOS (CrossOver) / Linux / Steam Deck (Proton)
 
-Game 1.011 or newer (BepInEx is part of the game): subscribe on the Steam Workshop, or copy the contents of `installer/files` into the game folder. Older game builds without BepInEx: also copy the contents of `installer/loader` (BepInEx) into the game folder and set the DLL override `winhttp` to *native, builtin* (CrossOver: Wine configuration → Libraries; Proton: launch option `WINEDLLOVERRIDES="winhttp=n,b" %command%`). Never copy `installer/loader` over an existing BepInEx. Step-by-step guide in the Steam Workshop Discussions tab.
+Game 1.011 or newer (BepInEx is part of the game): subscribe on the Steam Workshop, or copy the contents of `installer/files` into the game folder. Older game builds without BepInEx: also copy the contents of `installer/loader` (BepInEx) into the game folder – never over an existing BepInEx. In both cases BepInEx needs the DLL override `winhttp` set to *native, builtin* (Proton / Steam Deck: launch option `WINEDLLOVERRIDES="winhttp=n,b" %command%`; CrossOver: Wine configuration → Libraries). Step-by-step guide in the Steam Workshop Discussions tab.
 
 ### Bugs & ideas
 
@@ -131,7 +131,7 @@ Seit Spiel-Update 1.011 bringt das Spiel BepInEx (den Mod-Loader) selbst mit: De
 
 ### macOS (CrossOver) / Linux / Steam Deck (Proton)
 
-Spiel 1.011 oder neuer (BepInEx ist schon im Spiel): im Steam Workshop abonnieren oder den Inhalt von `installer/files` in den Spielordner kopieren. Ältere Spielversionen ohne BepInEx: zusätzlich den Inhalt von `installer/loader` (BepInEx) in den Spielordner kopieren und die DLL-Überschreibung `winhttp` auf *nativ, builtin* stellen (CrossOver: Wine-Konfiguration → Bibliotheken; Proton: Startoption `WINEDLLOVERRIDES="winhttp=n,b" %command%`). `installer/loader` nie über ein vorhandenes BepInEx kopieren. Schritt-für-Schritt-Anleitung im Diskussionen-Tab des Steam Workshops.
+Spiel 1.011 oder neuer (BepInEx ist schon im Spiel): im Steam Workshop abonnieren oder den Inhalt von `installer/files` in den Spielordner kopieren. Ältere Spielversionen ohne BepInEx: zusätzlich den Inhalt von `installer/loader` (BepInEx) in den Spielordner kopieren – nie über ein vorhandenes BepInEx. In beiden Fällen braucht BepInEx die DLL-Überschreibung `winhttp` auf *nativ, builtin* (Proton / Steam Deck: Startoption `WINEDLLOVERRIDES="winhttp=n,b" %command%`; CrossOver: Wine-Konfiguration → Bibliotheken). Schritt-für-Schritt-Anleitung im Diskussionen-Tab des Steam Workshops.
 
 ### Fehler & Ideen
 
