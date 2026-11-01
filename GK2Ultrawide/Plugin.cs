@@ -116,10 +116,33 @@ namespace GK2Ultrawide
         private static bool warned;
         // Breite/Hoehe eines Eintrags: bis Spielversion 1.010 heissen die Properties ListedWidth/ListedHeight, ab 1.011
         // AppliedWidth/AppliedHeight. Die privaten Felder "width"/"height" gibt es in beiden - deshalb per Reflection.
+        // Einmal gesucht (EnsureSizeFields), genutzt von Apply() und von PixelScale.AfterInit().
         private static FieldInfo widthField, heightField;
+        private static bool sizeLookupDone, sizeFieldsOk;
 
-        private static int Wid(ResolutionConfig r) { return r == null ? 0 : (int)widthField.GetValue(r); }
-        private static int Hgt(ResolutionConfig r) { return r == null ? 0 : (int)heightField.GetValue(r); }
+        // true = "width"/"height" gefunden (Instanzfelder vom Typ int). Wirft nie, sucht nur beim ersten Aufruf.
+        internal static bool EnsureSizeFields()
+        {
+            if (sizeLookupDone) return sizeFieldsOk;
+            try
+            {
+                FieldInfo wf = AccessTools.Field(typeof(ResolutionConfig), "width");
+                FieldInfo hf = AccessTools.Field(typeof(ResolutionConfig), "height");
+                if (wf != null && hf != null && !wf.IsStatic && !hf.IsStatic && wf.FieldType == typeof(int) && hf.FieldType == typeof(int))
+                {
+                    widthField = wf;
+                    heightField = hf;
+                    sizeFieldsOk = true;
+                }
+            }
+            catch { sizeFieldsOk = false; }
+            finally { sizeLookupDone = true; }
+            return sizeFieldsOk;
+        }
+
+        // Nur nach EnsureSizeFields() == true sinnvoll; ohne Felder (oder fuer null) 0.
+        internal static int Wid(ResolutionConfig r) { return r == null || widthField == null ? 0 : (int)widthField.GetValue(r); }
+        internal static int Hgt(ResolutionConfig r) { return r == null || heightField == null ? 0 : (int)heightField.GetValue(r); }
 
         private static void Postfix()
         {
@@ -138,8 +161,9 @@ namespace GK2Ultrawide
             {
                 Warn("ultrawide unlock failed, game resolutions left unchanged (" + e.GetType().Name + ": " + e.Message + ")");
             }
-            // Pixel-Skalierung (nur aktiv, wenn installiert): Hauptmenue-Flag der Listeneintraege angleichen. Wirft nie.
-            PixelScale.AfterInit();
+            // Pixel-Skalierung (nur aktiv, wenn installiert): Hauptmenue-Flag der Listeneintraege angleichen. Wirft nie;
+            // das zusaetzliche try faengt auch einen Fehler beim JIT-Kompilieren von AfterInit ab (liegt ausserhalb des try oben).
+            try { PixelScale.AfterInit(); } catch { }
         }
 
         private static void Warn(string msg)
@@ -164,9 +188,7 @@ namespace GK2Ultrawide
             FieldInfo scaleField = AccessTools.Field(typeof(ResolutionConfig), "useMainMenuScaleX2");
             MethodInfo pixelSize = AccessTools.Method(typeof(ResolutionConfig), "GetPixelSize", new[] { typeof(int), typeof(int) });
             MethodInfo tryAdd = AccessTools.Method(typeof(ResolutionConfig), "TryAddAvailableResolution", new[] { typeof(ResolutionConfig) });
-            widthField = AccessTools.Field(typeof(ResolutionConfig), "width");
-            heightField = AccessTools.Field(typeof(ResolutionConfig), "height");
-            if (widthField == null || heightField == null || widthField.FieldType != typeof(int) || heightField.FieldType != typeof(int)) { Skipped("width/height"); return; }
+            if (!EnsureSizeFields()) { Skipped("width/height"); return; }
             if (hardField == null || !hardField.IsStatic) { Skipped("hardcodedResolutions"); return; }
             if (availField == null || !availField.IsStatic) { Skipped("availableResolutions"); return; }
             if (tryAdd == null) { Skipped("TryAddAvailableResolution"); return; }
@@ -390,7 +412,8 @@ namespace GK2Ultrawide
             try
             {
                 pixelField = AccessTools.Field(rc, "PixelSize");
-                if (pixelField != null && (!pixelField.IsStatic || pixelField.FieldType != typeof(int))) pixelField = null;
+                // Nur ein beschreibbares statisches int-Feld taugt fuer Ebene C (const/readonly liesse sich nicht setzen)
+                if (pixelField != null && (!pixelField.IsStatic || pixelField.FieldType != typeof(int) || pixelField.IsLiteral || pixelField.IsInitOnly)) pixelField = null;
                 if (pixelField == null)
                 {
                     PropertyInfo p = AccessTools.Property(rc, "PixelSize");
@@ -662,6 +685,8 @@ namespace GK2Ultrawide
         // gewaehlte Skalierung angleichen (gleiche Regel wie im Unlock: logische Hoehe >= 600). Wirft nie.
         // Nur Eintraege, bei denen das Spiel selbst eine andere Skalierung nimmt - wo die Skalierung gleich bleibt,
         // bleibt auch das Hauptmenue-Flag des Spiels. Spielwert unbekannt (Ebene A fehlt) -> Eintrag nicht anfassen.
+        // Ab Spiel 1.011 gibt es useMainMenuScaleX2 nicht mehr (das Spiel rechnet die Hauptmenue-Skalierung selbst):
+        // dann ist das hier ein No-op mit einer Info-Zeile. Breite/Hoehe ueber die Felder width/height (beide Versionen).
         internal static void AfterInit()
         {
             try
@@ -669,12 +694,27 @@ namespace GK2Ultrawide
                 if (!installed) return;
                 int s = Chosen();
                 if (s <= 0 || Plugin.SafeStartActive()) return;
+                FieldInfo scaleField = AccessTools.Field(typeof(ResolutionConfig), "useMainMenuScaleX2");
+                if (scaleField == null)
+                {
+                    Info("Pixel scale: main menu flag sync not needed (no ResolutionConfig.useMainMenuScaleX2, the game scales the main menu itself)");
+                    return;
+                }
+                if (scaleField.IsStatic || scaleField.FieldType != typeof(bool))
+                {
+                    Info("Pixel scale: main menu flag sync skipped (ResolutionConfig.useMainMenuScaleX2 has unexpected type)");
+                    return;
+                }
                 if (Plugin.MainMenuScaleX2 == null || Plugin.MainMenuScaleX2.Value != "Auto") return;
                 FieldInfo availField = AccessTools.Field(typeof(ResolutionConfig), "availableResolutions");
-                FieldInfo scaleField = AccessTools.Field(typeof(ResolutionConfig), "useMainMenuScaleX2");
-                if (availField == null || !availField.IsStatic || scaleField == null || scaleField.IsStatic || scaleField.FieldType != typeof(bool))
+                if (availField == null || !availField.IsStatic)
                 {
-                    Info("Pixel scale: main menu flag sync skipped (missing availableResolutions/useMainMenuScaleX2)");
+                    Info("Pixel scale: main menu flag sync skipped (missing ResolutionConfig.availableResolutions)");
+                    return;
+                }
+                if (!InitAvailableResolutionsPatch.EnsureSizeFields())
+                {
+                    Info("Pixel scale: main menu flag sync skipped (missing ResolutionConfig width/height fields)");
                     return;
                 }
                 var available = availField.GetValue(null) as List<ResolutionConfig>;
@@ -687,14 +727,16 @@ namespace GK2Ultrawide
                 int n = 0;
                 foreach (ResolutionConfig r in available)
                 {
-                    if (r == null || !Fits(r.ListedWidth, r.ListedHeight, s)) continue;
+                    if (r == null) continue;
+                    int rw = InitAvailableResolutionsPatch.Wid(r), rh = InitAvailableResolutionsPatch.Hgt(r);
+                    if (!Fits(rw, rh, s)) continue;
                     int game;
                     bypass = true;
-                    try { game = (int)getPixelSize.Invoke(null, new object[] { r.ListedWidth, r.ListedHeight }); }
+                    try { game = (int)getPixelSize.Invoke(null, new object[] { rw, rh }); }
                     catch (Exception e) { WarnOnce("init-game", "Pixel scale: game scale lookup failed (" + e.GetType().Name + ": " + e.Message + ") - main menu flags left as they are"); return; }
                     finally { bypass = false; }
                     if (game == s) continue;
-                    bool want = r.ListedHeight / s >= 600;
+                    bool want = rh / s >= 600;
                     object cur = scaleField.GetValue(r);
                     if (cur is bool && (bool)cur == want) continue;
                     scaleField.SetValue(r, want);
