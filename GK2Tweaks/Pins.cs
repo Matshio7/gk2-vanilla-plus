@@ -512,7 +512,10 @@ namespace GK2Tweaks
                 // 1.7.3: optional mit Taste statt Klick - Maus ueber dem Rezept/Auftrag/Bauplan und Taste druecken
                 if (KeyMode)
                 {
-                    if (Plugin.PinsKey.Value.IsDown() && Time.frameCount != lastToggleFrame && Hovered() && image.isActiveAndEnabled)
+                    // 1.7.6: nur wenn kein anderes Fenster (z. B. Mengen-Dialog) ueber dem Rezept liegt;
+                    // die Kopf-Nadel des Dialogs nimmt die Taste ueberall im Dialog an
+                    if (Plugin.PinsKey.Value.IsDown() && Time.frameCount != lastToggleFrame && image.isActiveAndEnabled
+                        && ((Hovered() && OnTop()) || InOwnDialog()))
                     {
                         lastToggleFrame = Time.frameCount;
                         DoToggle();
@@ -521,7 +524,8 @@ namespace GK2Tweaks
                 }
                 // Baumenues (Hof, Stadt) fangen Mausklicks selbst ab, bevor die Nadel sie bekommt:
                 // deshalb den Linksklick direkt abfragen, wenn die Maus ueber der sichtbaren Nadel ist.
-                if (show && Input.GetMouseButtonDown(ClickIndex) && Time.frameCount != lastToggleFrame && OverSelf())
+                // 1.7.6: OnTop - Klick in einem Dialog darueber pinnt nicht mehr das verdeckte Rezept darunter
+                if (show && Input.GetMouseButtonDown(ClickIndex) && Time.frameCount != lastToggleFrame && OverSelf() && OnTop())
                 {
                     lastToggleFrame = Time.frameCount;
                     lastPollToggle = Time.unscaledTime;
@@ -548,6 +552,142 @@ namespace GK2Tweaks
             if (canvas == null) canvas = GetComponentInParent<Canvas>();
             Camera cam = canvas != null && canvas.rootCanvas.renderMode != RenderMode.ScreenSpaceOverlay ? canvas.rootCanvas.worldCamera : null;
             return RectTransformUtility.RectangleContainsScreenPoint((RectTransform)transform, Input.mousePosition, cam);
+        }
+
+        // 1.7.6: Verdeckt-Pruefung. Die Abfrage oben testet nur Rechtecke, liegt ein Dialog (Mengenwahl, Rezeptfenster)
+        // ueber dem Raster, haetten sonst auch die verdeckten Nadeln darunter den Klick bekommen - und welche Nadel
+        // zuerst dran ist, ist zufaellig (Update-Reihenfolge). Oberstes UI-Element unter der Maus per EventSystem,
+        // einmal pro Frame und nur in Frames mit Klick/Taste. Nicht ermittelbar -> altes Verhalten.
+        private static int topFrame = -1;
+        private static GameObject topHit;
+        private static bool rayWarned;
+        private static float lastIgnoredLog = -10f;
+        private static readonly List<RaycastResult> hits = new List<RaycastResult>();
+        private Component myWin;
+
+        private static GameObject TopHit()
+        {
+            if (topFrame == Time.frameCount) return topHit;
+            topFrame = Time.frameCount;
+            topHit = null;
+            try
+            {
+                EventSystem es = EventSystem.current;
+                if (es == null) return null;
+                var ped = new PointerEventData(es) { position = Input.mousePosition };
+                hits.Clear();
+                es.RaycastAll(ped, hits);
+                // nur UI-Treffer (RectTransform), Welt-Objekte unter der Maus zaehlen nicht
+                for (int i = 0; i < hits.Count; i++)
+                {
+                    GameObject g = hits[i].gameObject;
+                    if (g != null && g.transform is RectTransform) { topHit = g; break; }
+                }
+                hits.Clear();
+            }
+            catch (Exception e)
+            {
+                topHit = null;
+                WarnOnce(e);
+            }
+            return topHit;
+        }
+
+        private static void WarnOnce(Exception e)
+        {
+            if (rayWarned) return;
+            rayWarned = true;
+            Plugin.Log.LogWarning("Pins: covered-check off - " + e.Message);
+        }
+
+        // Fenster, zu dem ein UI-Element gehoert: naechster Vorfahr mit einer Komponente "...Window"
+        // (UICraftWindow, UICraftSelectionWindow, UIBuildingWindow ...), ohne die Spieltypen zu kennen
+        private static Component WindowOf(Transform t)
+        {
+            for (int i = 0; t != null && i < 64; i++, t = t.parent)
+                foreach (MonoBehaviour mb in t.GetComponents<MonoBehaviour>())
+                    if (mb != null && mb.GetType().Name.EndsWith("Window", StringComparison.Ordinal)) return mb;
+            return null;
+        }
+
+        private Component MyWin()
+        {
+            if (myWin == null) myWin = WindowOf(transform.parent);
+            return myWin;
+        }
+
+        // true = nichts anderes liegt ueber dieser Nadel / diesem Rezept (oder die Pruefung ist nicht moeglich)
+        private bool OnTop()
+        {
+            try
+            {
+                if (LazyInput.IsGamepadActive && Pins.Focused != null) return true;   // Controller-Fokus: keine Maus-Pruefung
+                GameObject top = TopHit();
+                if (top == null) return true;
+                Transform cell = transform.parent;
+                if (cell != null && top.transform.IsChildOf(cell)) return true;       // die Nadel selbst oder ihr Rezept
+                Component tw = WindowOf(top.transform);
+                Component mine = MyWin();
+                if (tw != null && mine != null)
+                {
+                    if (tw == mine) return true;
+                    LogIgnored(tw, top);
+                    return false;
+                }
+                // Fenster nicht bestimmbar: nur ablehnen, wenn ein bekannter Dialog an dieser Stelle darueber liegt
+                if (!DialogCovers()) return true;
+                LogIgnored(tw, top);
+                return false;
+            }
+            catch (Exception e)
+            {
+                WarnOnce(e);
+                return true;
+            }
+        }
+
+        // Herstell-Dialog (Mengenwahl/Rezept) oder Mengen-Fenster offen, diese Nadel gehoert nicht dazu und die Maus ist darin
+        private bool DialogCovers()
+        {
+            if (Covers((Component)CraftMax.Open())) return true;
+            UIItemCountWindow cw = TradeHelper.Cached<UIItemCountWindow>();
+            return cw != null && cw.IsShown && Covers((object)cw as Component);
+        }
+
+        private bool Covers(Component dlg)
+        {
+            if (dlg == null || !dlg.gameObject.activeInHierarchy || transform.IsChildOf(dlg.transform)) return false;
+            var rt = dlg.transform as RectTransform;
+            if (rt == null) return false;
+            Canvas c = dlg.GetComponentInParent<Canvas>();
+            Camera cam = c != null && c.rootCanvas.renderMode != RenderMode.ScreenSpaceOverlay ? c.rootCanvas.worldCamera : null;
+            return RectTransformUtility.RectangleContainsScreenPoint(rt, Input.mousePosition, cam);
+        }
+
+        // Taste "Anpinnen mit" im Herstell-Dialog: die Kopf-Nadel dieses Dialogs nimmt sie ueberall im Dialog an
+        // (nicht nur ueber der Kopfzeile), damit das Rezept des Dialogs gepinnt wird und nicht eines darunter
+        private bool InOwnDialog()
+        {
+            if (!alwaysShow || Key == null || Make == null) return false;
+            try
+            {
+                Component dlg = (Component)CraftMax.Open();
+                if (dlg == null || !transform.IsChildOf(dlg.transform)) return false;
+                GameObject top = TopHit();
+                return top != null && top.transform.IsChildOf(dlg.transform);
+            }
+            catch (Exception e)
+            {
+                WarnOnce(e);
+                return false;
+            }
+        }
+
+        private static void LogIgnored(Component tw, GameObject top)
+        {
+            if (Time.unscaledTime - lastIgnoredLog < 2f) return;
+            lastIgnoredLog = Time.unscaledTime;
+            Plugin.Log.LogInfo("Pin click ignored: covered by " + (tw != null ? tw.GetType().Name : "-") + " / " + (top != null ? top.name : "-"));
         }
 
         private void DoToggle()
@@ -705,6 +845,8 @@ namespace GK2Tweaks
     [HarmonyPatch(typeof(UIBaseCraftSelectionWindow), nameof(UIBaseCraftSelectionWindow.Open))]
     internal static class SelectionPinPatch
     {
+        private static bool headerWarned;
+
         private static void Postfix(UIBaseCraftSelectionWindow __instance, UIBaseCraftSelectionWindowData data)
         {
             if (!SafeMode.On("Pins")) return;
@@ -712,7 +854,12 @@ namespace GK2Tweaks
             {
                 CraftDef def = data?.CraftDefinition;
                 var header = Traverse.Create(__instance).Field("headerLabel").GetValue<TMPro.TextMeshProUGUI>();
-                if (header == null) return;
+                if (header == null)
+                {
+                    // nach Spiel-Updates sichtbar machen, warum die Kopf-Nadel fehlt (einmal pro Sitzung)
+                    if (!headerWarned) { headerWarned = true; Plugin.Log.LogWarning("Pin selection: header not found in " + __instance.GetType().Name); }
+                    return;
+                }
                 Component host = header.transform.parent;
                 Plugin.Log.LogInfo("Pin selection: " + __instance.GetType().Name + " " + (def != null ? def.id + (def.isAuto ? " (auto)" : "") : "-") + " cells " + (data?.CraftItemCellsData?.Count ?? -1));
                 if (def == null || (def.isAuto && (data.CraftItemCellsData == null || data.CraftItemCellsData.Count == 0)))

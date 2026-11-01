@@ -102,6 +102,7 @@ Weekday (in game) => Dia da semana (no jogo)
 Time of day (in game) => Hora (no jogo)
 Extra resolutions => Resoluções extras
 Main menu scaling => Escala do menu principal
+Pixel scale => Escala de pixels
 as graphics tier => conforme nível gráfico
 game setting => configuração do jogo
 Software limit => Limite por software
@@ -164,7 +165,7 @@ Point lights real (Realtime) or simulated (Faked, cheaper). Default = as the gra
 Back light effect. Default = as the graphics tier. => Efeito de contraluz. Padrão = conforme o nível gráfico.
 Water quality. Default = as the graphics tier. => Qualidade da água. Padrão = conforme o nível gráfico.
 Clouds normal or simplified. May apply only after changing area. Default = as the graphics tier. => Nuvens normais ou simplificadas. Pode só valer após mudar de área. Padrão = conforme o nível gráfico.
-Game = setting from the game menu. Limit = software cap at TargetFps. VSync = synced to the refresh rate (60 FPS at 120 Hz = every 2nd refresh). => Jogo = configuração do menu do jogo. Limite = teto por software no FPS alvo. VSync = sincronizado com a taxa de atualização (60 FPS a 120 Hz = a cada 2ª atualização).
+Game = setting from the game menu. Limit = software cap at TargetFps (if VSync is on in the game settings, VSync stays on and the cap follows the refresh rate, e.g. 72 FPS at 144 Hz). VSync = synced to the refresh rate (60 FPS at 120 Hz = every 2nd refresh). => Jogo = configuração do menu do jogo. Limite = teto por software no FPS alvo (se o VSync estiver ligado nas configurações do jogo, ele continua ligado e o teto segue a taxa de atualização, ex.: 72 FPS a 144 Hz). VSync = sincronizado com a taxa de atualização (60 FPS a 120 Hz = a cada 2ª atualização).
 Target FPS for Limit and VSync. 0 = unlimited => FPS alvo para Limite e VSync. 0 = ilimitado
 Prevents screen tearing: keeps VSync on even when an FPS limit is set (the game turns VSync off then). Auto = on for Steam Deck => Evita o tearing (corte na imagem): mantém o VSync ligado mesmo com limite de FPS definido (o jogo desliga o VSync nesse caso). Auto = ligado no Steam Deck
 Physics rate. 0 = game default (50 Hz). 30 = like the Switch version, saves CPU. => Taxa de física. 0 = padrão do jogo (50 Hz). 30 = como na versão de Switch, poupa CPU.
@@ -384,6 +385,8 @@ This can't be moved right now. => Isso não pode ser movido agora.
 Take the zombie off the station first. => Primeiro tire o zumbi da estação.
 Connected to extensions – remove the extensions first. => Ligado a extensões – remova as extensões primeiro.
 Moving failed. => Falha ao mover.
+Graves and zones can't be moved. => Túmulos e zonas não podem ser movidos.
+Moving failed – the object was put back. Save and reload if something looks wrong. => Falha ao mover – o objeto voltou ao lugar. Se algo parecer errado, salve e carregue de novo.
 1,000+ players! => Mais de 1.000 jogadores!
 GK2 Vanilla+ is now played by more than a thousand people. I never expected that.\n\nThank you for your ratings, comments and ideas – many of them are in this update: renaming zombies, trading the right amount, moving objects, Portuguese and more. => GK2 Vanilla+ agora é jogado por mais de mil pessoas. Eu nunca imaginei isso.\n\nObrigado pelas avaliações, comentários e ideias – muitas delas estão nesta atualização: renomear zumbis, negociar a quantidade certa, mover objetos, português e mais.
 You're welcome – let's go! => De nada – vamos lá!
@@ -414,7 +417,7 @@ Graphics & speed => Gráficos e velocidade
 Gameplay helpers => Ajudas de jogo
 Pins => Fixados
 Interface & keys => Interface e teclas
-Prevents screen tearing: keeps VSync on even when an FPS limit is set (the game turns VSync off then). Auto = on for Steam Deck and Linux, off on Windows. => Evita o tearing: mantém a VSync ligada mesmo com limite de FPS (o jogo a desliga nesse caso). Auto = ligado no Steam Deck e Linux, desligado no Windows.
+Prevents screen tearing: keeps VSync on even when an FPS limit is set (the game turns VSync off then). Auto = on for Steam Deck and Linux, and on Windows when VSync is on in the game settings. => Evita o tearing: mantém a VSync ligada mesmo com limite de FPS (o jogo a desliga nesse caso). Auto = ligado no Steam Deck e Linux, e no Windows quando a VSync está ligada nas configurações do jogo.
 [Not fully vanilla] Remove mode: you get the full building costs back instead of only a part. Contents (inventory, fuel) come back as usual. => [Não totalmente vanilla] Modo remover: você recebe de volta o custo total da construção em vez de só uma parte. O conteúdo (inventário, combustível) volta como de costume.
 [Not fully vanilla] Remove mode: press the rotate key on an object to pick it up and place it somewhere else. It stays the same object (contents and crafting queue are kept), nothing is used or refunded. Esc or right click cancels. => [Não totalmente vanilla] Modo remover: aperte a tecla de girar sobre um objeto para pegá-lo e colocá-lo em outro lugar. Continua sendo o mesmo objeto (conteúdo e fila de produção são mantidos), nada é gasto ou devolvido. Esc ou clique direito cancela.
 Trading with town vendors: the amount slider starts at exactly the amount that still gives happiness (thumbs up), and a button adds all liked goods in the right amount. You still confirm the deal yourself. => Comércio com os vendedores da cidade: o controle de quantidade começa exatamente na quantidade que ainda dá felicidade (joinha), e um botão adiciona todos os itens preferidos na quantidade certa. Você continua confirmando a troca.

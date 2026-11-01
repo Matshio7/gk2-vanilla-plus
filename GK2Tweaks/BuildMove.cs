@@ -41,6 +41,14 @@ namespace GK2Tweaks
                         failed = true;
                         Plugin.Log.LogWarning("Move: native move check failed (" + e.GetType().Name + ": " + e.Message + ") - Vanilla+ MoveObjects stays inactive to be safe");
                     }
+                    // 1.7.6: Ab Spielversion 1.011 verschiebt das Spiel selbst - fest aus, auch wenn die Namens-Erkennung
+                    // nichts findet (umbenannte Spiel-Methoden duerfen unser Verschieben nicht neben dem des Spiels einschalten).
+                    if (!failed && hit == null && Plugin.GameVersionAtLeast(1.011))
+                    {
+                        native = 1;
+                        Plugin.Log.LogInfo("Move: game >= 1.011 has native move (not found by name) - Vanilla+ MoveObjects stays inactive");
+                        return true;
+                    }
                     native = failed || hit != null ? 1 : 0;
                     if (failed) nativeToastShown = true;
                     else if (hit != null) Plugin.Log.LogInfo("Move: the game has its own 'move objects' (" + hit + ") - Vanilla+ MoveObjects stays inactive");
@@ -171,15 +179,95 @@ namespace GK2Tweaks
                 case WGODef.InteractionType.TownBuildingPlace: case WGODef.InteractionType.FighterContainer: case WGODef.InteractionType.FightBuilder:
                     return Labels.T("Das lässt sich nicht verschieben.", "This can't be moved.");
             }
+            // 1.7.6: Graeber und Grab-Zonen nicht verschieben (podostro: nach "Entfernen & Verschieben" einer Grab-Zone hing die
+            // Kamera, bis zum Neustart wiederholter Fehler). Erkennung nur ueber Namen, ohne neue Spiel-Typen - lehnt im Zweifel
+            // eher zu viel ab als zu wenig.
+            if (IsGraveOrZone(w, d, def))
+                return Labels.T("Gräber und Zonen lassen sich nicht verschieben.", "Graves and zones can't be moved.");
             return null;
         }
 
+        private static bool IsGraveOrZone(Wgo w, WgoData d, BuildingDef def)
+        {
+            string it = "";
+            try { it = Def(d).interactionType.ToString(); } catch { }
+            // bewusst ohne "Body"/"Corpse": Leichen-Tische und -Lager sollen verschiebbar bleiben
+            if (Has(it, "Grave", "Zone", "Burial")) return true;
+            if (Has(d.GetType().Name, "Grave", "Zone", "Burial")) return true;
+            if (Has(w.GetType().Name, "Grave", "Zone", "Burial")) return true;
+            if (def != null && Has(def.customBuildAreaId, "grave", "zone", "burial")) return true;
+            string id = d.id ?? "";
+            // "graveyard_..." (Zaeune, Deko) bleibt verschiebbar, "grave..." (Grab, Grabstein, Grab-Zone) nicht
+            string idNoYard = id.ToLowerInvariant().Replace("graveyard", "");
+            return Has(idNoYard, "grave", "burial", "zone");
+        }
+
+        private static bool Has(string s, params string[] words)
+        {
+            if (string.IsNullOrEmpty(s)) return false;
+            foreach (string x in words) if (s.IndexOf(x, StringComparison.OrdinalIgnoreCase) >= 0) return true;
+            return false;
+        }
+
+        // Bau-Modus umschalten (Abriss <-> Bau-Zeiger). Scheitert das mittendrin (Eingabe gesperrt, Kamera beim Bau-Zeiger),
+        // verlassen wir den Bau-Modus ueber den normalen Ausgang des Spiels - der gibt Steuerung und Kamera zurueck.
+        // Danach wird weitergeworfen, damit SafeMode den Fehler zaehlt.
         private static void Switch(BuildController bc, BuildData bd)
         {
             WorldZone zone = bc.CurrentWorldZone;
             switching = true;
             try { bc.DisableBuildMode(); bc.EnableBuildMode(bd, zone); }
+            catch (Exception e)
+            {
+                switching = false;
+                Plugin.Log.LogWarning("Move: switching build mode failed (" + e.GetType().Name + ": " + e.Message + ") - leaving build mode");
+                End();
+                backToRemove = false;
+                Untint(lastMoved); lastMoved = null;
+                try { bc.DisableBuildMode(); }
+                catch (Exception e2) { Plugin.Log.LogWarning("Move: leaving build mode failed too: " + e2.GetType().Name + ": " + e2.Message); }
+                throw;
+            }
             finally { switching = false; }
+        }
+
+        // Verschieben abbrechen und, falls gerade verschoben wurde, den Bau-Modus verlassen - damit nie ein Bau-Zeiger mit
+        // unseren Aenderungen (nichts verbrauchen) uebrig bleibt und Steuerung/Kamera wieder beim Spieler sind.
+        // Rueckgabe: true = Bau-Modus wurde verlassen.
+        internal static bool Abort(BuildController bc, string reason)
+        {
+            bool moving = Active || backToRemove;
+            End();
+            backToRemove = false;
+            switching = false;
+            Untint(lastMoved); lastMoved = null;
+            if (!moving) return false;
+            Plugin.Log.LogWarning("Move: aborted (" + reason + ") - leaving build mode");
+            try
+            {
+                if (bc == null) bc = BuildController.Instance;
+                if (bc != null && bc.IsBuildModeActive) { bc.DisableBuildMode(); return true; }
+            }
+            catch (Exception e) { Plugin.Log.LogWarning("Move: leaving build mode failed: " + e.GetType().Name + ": " + e.Message); }
+            return false;
+        }
+
+        // Fuer den catch von MoveBuildPatch: Verschieben beenden, im naechsten Frame zurueck in den Abriss-Modus (Tick) -
+        // oder, falls MoveObjects inzwischen aus ist, Bau-Modus verlassen (Input).
+        internal static void CancelAfterBuildError()
+        {
+            Plugin.Log.LogWarning("Move: placing failed - move cancelled, the object stays where it was");
+            End();
+            backToRemove = true;
+            try { ManualSave.Toast(Labels.T("Verschieben fehlgeschlagen.", "Moving failed."), 3f); } catch { }
+        }
+
+        // Fuer den catch von MoveInputPatch: aufraeumen; das Original nur laufen lassen, wenn der Bau-Modus noch aktiv ist.
+        internal static bool AfterInputError(BuildController bc)
+        {
+            Abort(bc, "error in input");
+            try { return bc == null || bc.IsBuildModeActive; }
+            catch { return true; }
         }
 
         private static void End()
@@ -191,7 +279,13 @@ namespace GK2Tweaks
         // Prefix BuildController.UpdateBuildModeInput: Aufnehmen (Dreh-Taste im Abriss-Modus) und Abbrechen
         internal static bool Input(BuildController bc)
         {
-            if (!Plugin.MoveObjects.Value || GameHasNativeMove || !SafeMode.On("MoveObjects")) { if (Active) End(); return true; }
+            if (!Plugin.MoveObjects.Value || GameHasNativeMove || !SafeMode.On("MoveObjects"))
+            {
+                // 1.7.6: mitten im Verschieben abgeschaltet (F9 oder SafeMode) -> Bau-Modus verlassen statt einen
+                // Gratis-Bau-Zeiger stehen zu lassen. Ohne laufendes Verschieben passiert hier nichts.
+                if (Active || backToRemove) return !Abort(bc, "feature turned off");
+                return true;
+            }
             if (Traverse.Create(bc).Field("isBuildModeInputLocked").GetValue<bool>()) return true;
             BuildPointer bp = Pointer(bc);
             if (bp == null) return true;
@@ -222,7 +316,9 @@ namespace GK2Tweaks
                 return false;
             }
             orig = sel;
-            Plugin.Log.LogInfo("Move: picked " + sel.Id);
+            string pickType = "";
+            try { pickType = " type=" + Def(sel.Data).interactionType + " area=" + (def.customBuildAreaId ?? ""); } catch { }
+            Plugin.Log.LogInfo("Move: picked " + sel.Id + pickType);
             Switch(bc, BuildData.GetDataForBuild(def));
             try { orig.SetSelectionTint(Color.gray, 0.45f); } catch { }
             return false;
@@ -269,9 +365,16 @@ namespace GK2Tweaks
             {
                 WgoPartData part = p.Target.MainWgoPart?.WgoPartData;
                 try { orig.SetSelectionTint(Color.white, 0f); } catch { }
-                lastMoved = Relocate(orig.Data, p.Target.Data.Position, part?.variationId, part != null ? part.rotationIndex : -1, p);
-                LazyAudio.PlayAndForget("build_place");
-                Plugin.Log.LogInfo("Move: placed " + orig.Id);
+                bool rolledBack;
+                lastMoved = Relocate(orig.Data, p.Target.Data.Position, part?.variationId, part != null ? part.rotationIndex : -1, p, out rolledBack);
+                if (rolledBack)
+                    ManualSave.Toast(Labels.T("Verschieben fehlgeschlagen – das Objekt wurde zurückgestellt. Bei Problemen speichern und neu laden.",
+                        "Moving failed – the object was put back. Save and reload if something looks wrong."), 5f);
+                else
+                {
+                    try { LazyAudio.PlayAndForget("build_place"); } catch { }
+                    Plugin.Log.LogInfo("Move: placed " + orig.Id);
+                }
             }
             catch (Exception e) { Plugin.Log.LogWarning("Move: " + e); ManualSave.Toast(Labels.T("Verschieben fehlgeschlagen.", "Moving failed."), 3f); }
             orig = null;
@@ -307,10 +410,19 @@ namespace GK2Tweaks
                 "Vanilla+: The game can now move placed objects by itself, so Vanilla+ \"Move objects\" stays off."), 8f);
         }
 
-        private static Wgo Relocate(WgoData d, Vector3 pos, string varId, int rot, WgoBuildPointer p)
+        // 1.7.6: Nach dem Entfernen aus der Szene wird jeder Schritt einzeln abgesichert, damit AddWgoData immer erreicht
+        // wird. Scheitert das Wiedereinsetzen am neuen Platz, kommt das Objekt an den alten Platz zurueck (rolledBack).
+        // Ein Objekt darf nie ausserhalb der Szene bleiben (sonst greifen Spiel-Systeme jeden Frame ins Leere).
+        private static Wgo Relocate(WgoData d, Vector3 pos, string varId, int rot, WgoBuildPointer p, out bool rolledBack)
         {
+            rolledBack = false;
             GameSave save = MainGame.Instance.GameSave;
             WGODef def = Def(d);
+            // Szene vor jeder Aenderung bestimmen - ohne Szene bleibt alles wie es ist
+            GameScene scene = null;
+            try { scene = Traverse.Create(p).Field("gameScene").GetValue<GameScene>(); } catch { }
+            if (scene == null) scene = MainGame.PlayerController.CurrentGameScene;
+            if (scene == null) throw new InvalidOperationException("no game scene - object left where it was");
 
             // Zombie-Arbeiter: wie beim Abbauen im Spiel als Gegenstand auf den Boden legen
             if (d.CraftableAttachedWorker is ZombieWgoData z)
@@ -339,19 +451,48 @@ namespace GK2Tweaks
             }
 
             bool delayed = save.wgoDelayedEventSystemData.wgoUniqueIds.Contains(d.UniqueId);
-            save.worldData.RemoveWgoDataFromGameScene(d, false);   // Foerderband: trennt dabei seine Verbindungen
-            // was OnRemove rueckgaengig macht wiederherstellen (wie bei einem frisch gebauten Objekt)
+            // alter Platz fuer die Rueckstellung
+            Vector3 oldPos = d.Position;
+            WgoPartData oldPart = d.MainWgoPartData;
+            string oldVar = oldPart != null ? oldPart.variationId : null;
+            int oldRot = oldPart != null ? oldPart.rotationIndex : -1;
+
+            try { save.worldData.RemoveWgoDataFromGameScene(d, false); }   // Foerderband: trennt dabei seine Verbindungen
+            catch (Exception e)
+            {
+                // Halb entfernt? Nicht raten (doppeltes Objekt waere schlimmer) - melden, Speichern & Neuladen raet der Toast.
+                Plugin.Log.LogWarning("Move: removing from the scene failed, object may be half removed - save and reload: " + e);
+                throw;
+            }
+            // was OnRemove rueckgaengig macht wiederherstellen (wie bei einem frisch gebauten Objekt) - jeder Schritt einzeln
             d.isRemovingFromData = false;
             d.gdPointsRegistered = false;
             d.Position = pos;
             if (rot != -1 && d.MainWgoPartData != null) { d.MainWgoPartData.variationId = varId; d.MainWgoPartData.rotationIndex = rot; }
-            if (def.townQuality > 0) save.townSystem.Quality += def.townQuality;
-            if (!string.IsNullOrEmpty(def.npcLifeSimGroup)) save.npcLifeSimulatorData.GetGroupById(def.npcLifeSimGroup)?.AddWgoToGroup(d);
-            if (!string.IsNullOrEmpty(def.attachedScript)) WgoDataScriptsManager.CreateScript(d, def.attachedScript);
-            if (delayed && !save.wgoDelayedEventSystemData.wgoUniqueIds.Contains(d.UniqueId)) save.wgoDelayedEventSystemData.wgoUniqueIds.Add(d.UniqueId);
+            try { if (def.townQuality > 0) save.townSystem.Quality += def.townQuality; }
+            catch (Exception e) { Plugin.Log.LogWarning("Move: town quality " + e.Message); }
+            try { if (!string.IsNullOrEmpty(def.npcLifeSimGroup)) save.npcLifeSimulatorData.GetGroupById(def.npcLifeSimGroup)?.AddWgoToGroup(d); }
+            catch (Exception e) { Plugin.Log.LogWarning("Move: npc group " + e.Message); }
+            try { if (!string.IsNullOrEmpty(def.attachedScript)) WgoDataScriptsManager.CreateScript(d, def.attachedScript); }
+            catch (Exception e) { Plugin.Log.LogWarning("Move: attached script " + def.attachedScript + ": " + e.Message); }
+            try { if (delayed && !save.wgoDelayedEventSystemData.wgoUniqueIds.Contains(d.UniqueId)) save.wgoDelayedEventSystemData.wgoUniqueIds.Add(d.UniqueId); }
+            catch (Exception e) { Plugin.Log.LogWarning("Move: delayed events " + e.Message); }
 
-            GameScene scene = Traverse.Create(p).Field("gameScene").GetValue<GameScene>() ?? MainGame.PlayerController.CurrentGameScene;
-            Wgo wgo = scene.AddWgoData(d);
+            Wgo wgo = null;
+            try { wgo = scene.AddWgoData(d); }
+            catch (Exception e) { Plugin.Log.LogWarning("Move: placing at the new spot failed: " + e); }
+            if (wgo == null)
+            {
+                // Rueckstellung: alter Platz, alte Drehung, nochmal einsetzen
+                rolledBack = true;
+                Plugin.Log.LogWarning("Move: rollback to old place");
+                d.isRemovingFromData = false;
+                d.Position = oldPos;
+                if (oldPart != null && d.MainWgoPartData != null) { d.MainWgoPartData.variationId = oldVar; d.MainWgoPartData.rotationIndex = oldRot; }
+                try { wgo = scene.AddWgoData(d); }
+                catch (Exception e) { Plugin.Log.LogWarning("Move: rollback failed too - save and reload: " + e); }
+                if (wgo == null) Plugin.Log.LogWarning("Move: object could not be put back into the scene - save and reload");
+            }
             try { if (wgo != null) wgo.SetSelectionTint(Color.white, 0f); } catch { }
 
             // Erweiterung auf einen Tisch gesetzt -> wie beim Bauen verbinden
@@ -415,7 +556,12 @@ namespace GK2Tweaks
         private static bool Prefix(BuildController __instance)
         {
             try { return BuildMove.Input(__instance); }
-            catch (Exception e) { SafeMode.Fail("MoveObjects", e); return true; }
+            catch (Exception e)
+            {
+                SafeMode.Fail("MoveObjects", e);
+                // 1.7.6: Verschiebe-Zustand zuruecksetzen, Bau-Modus ggf. verlassen (Steuerung/Kamera zurueck)
+                try { return BuildMove.AfterInputError(__instance); } catch { return true; }
+            }
         }
     }
 
@@ -442,8 +588,19 @@ namespace GK2Tweaks
     {
         private static bool Prefix(BuildPointer __instance, ref bool __result)
         {
+            bool wasActive = BuildMove.Active;
             try { return BuildMove.Build(__instance, ref __result); }
-            catch (Exception e) { SafeMode.Fail("MoveObjects", e); return true; }
+            catch (Exception e)
+            {
+                SafeMode.Fail("MoveObjects", e);
+                // 1.7.6: Lief gerade ein Verschieben, darf das Original NICHT bauen (unser Zeiger verbraucht nichts ->
+                // Gratis-Doppel). Stattdessen abbrechen; das Objekt steht noch am alten Platz.
+                // Den Bau-Modus erst im naechsten Frame wechseln (wie nach normalem Platzieren), nicht mitten in diesem Aufruf.
+                if (!wasActive) return true;
+                try { BuildMove.CancelAfterBuildError(); } catch { }
+                __result = false;
+                return false;
+            }
         }
     }
 

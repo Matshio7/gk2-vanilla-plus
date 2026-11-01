@@ -134,7 +134,13 @@ namespace GK2Tweaks
     [HarmonyPatch(typeof(WorldZoneWidget), nameof(WorldZoneWidget.Redraw))]
     internal static class ZoneRedrawPatch
     {
-        private static void Postfix() { try { HudClock.AfterRedraw(); } catch (System.Exception e) { SafeMode.Fail("HudClock", e); } }
+        // 1.7.6: nur wenn die Funktion nicht von SafeMode abgeschaltet ist (sonst haengte jeder Gebietswechsel die Zeile
+        // wieder an). Reine HUD-Beschriftung - beruehrt weder Kamera noch Welt-Zonen.
+        private static void Postfix()
+        {
+            try { if (SafeMode.On("HudClock")) HudClock.AfterRedraw(); }
+            catch (System.Exception e) { SafeMode.Fail("HudClock", e); }
+        }
     }
 
     // Erkennt andere BepInEx-Mods am Namen (fuer Mods mit gleicher Funktion: dann keine doppelte Wirkung)

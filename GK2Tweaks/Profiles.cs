@@ -42,7 +42,7 @@ namespace GK2Tweaks
                 case "Deck":
                     Set("Lightweight", "Unity_Low", "Off", "Faked", "Off", "Light", "Replaced", "VSync", 0, 30); Plugin.NoTearing.Value = "Auto"; Plugin.LessMemoryCleanup.Value = false; break;
                 case "Performance":
-                    Set("Native", "Unity_Balanced", "Off", "Faked", "On", "Light", "Replaced", "Limit", 60, 0); break;
+                    Set("Native", "Unity_Balanced", "Off", "Faked", "On", "Light", "Replaced", "Limit", 60, 0); Plugin.NoTearing.Value = "Auto"; break;
                 case "Quality":
                     Set("Native", "NGSS_High", "Highest", "Realtime", "On", "High", "Normal", "VSync", 0, 0); break;
                 default:

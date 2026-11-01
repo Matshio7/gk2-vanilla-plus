@@ -156,12 +156,13 @@ namespace GK2Tweaks
             { "GameTime", new[] { "Uhrzeit (im Spiel)", "Time of day (in game)" } },
             { "CustomResolution", new[] { "Zusätzliche Auflösungen", "Extra resolutions" } },
             { "MainMenuScaleX2", new[] { "Hauptmenü-Skalierung", "Main menu scaling" } },
+            { "PixelScale", new[] { "Pixel-Skalierung", "Pixel scale" } },
         };
 
         // Deutsche Tooltips (Englisch = Beschreibung aus der Config)
         private static readonly Dictionary<string, string> TipsDe = new Dictionary<string, string>
         {
-            { "Mode", "Spiel = Einstellung aus dem Spielmenü. Software-Limit = Begrenzung auf Ziel-FPS. VSync = an die Bildwiederholrate gekoppelt (60 FPS bei 120 Hz = jedes 2. Bild)." },
+            { "Mode", "Spiel = Einstellung aus dem Spielmenü. Software-Limit = Begrenzung auf Ziel-FPS (ist im Spiel VSync an, bleibt VSync an und das Limit richtet sich nach der Bildwiederholrate, z. B. 72 FPS bei 144 Hz). VSync = an die Bildwiederholrate gekoppelt (60 FPS bei 120 Hz = jedes 2. Bild)." },
             { "TargetFps", "Ziel-FPS für Software-Limit und VSync. Unbegrenzt = volle Bildwiederholrate." },
             { "RenderMode", "Voll = Welt in voller Auflösung. Pixel = Welt in halber Auflösung, deutlich weniger GPU-Last." },
             { "Shadows", "PC weich = aufwendige PC-Schatten. Einfach/Konsole = einfachere Schatten wie auf PS5/Xbox, spart viel Leistung." },
@@ -187,7 +188,7 @@ namespace GK2Tweaks
             { "Scale", "Auflösungs-Faktor: 2× = doppelte Bildschirmauflösung in jede Richtung (z. B. 3840×2160 aus 1920×1080)." },
             { "HideHud", "Blendet für den Screenshot die Spiel-Oberfläche und die Mod-Anzeigen aus." },
             { "PauseInBackground", "Spiel pausiert, wenn das Fenster nicht im Vordergrund ist (spart Akku und Hitze)." },
-            { "NoTearing", "Verhindert Bildrisse (Tearing): VSync bleibt an, auch wenn ein FPS-Limit gesetzt ist (das Spiel schaltet VSync dann ab). Automatisch = an auf Steam Deck / Linux, aus unter Windows." },
+            { "NoTearing", "Verhindert Bildrisse (Tearing): VSync bleibt an, auch wenn ein FPS-Limit gesetzt ist (das Spiel schaltet VSync dann ab). Automatisch = an auf Steam Deck / Linux und unter Windows, wenn im Spiel VSync an ist." },
             { "HudClock", "Zeigt Tag und Uhrzeit als zweite Zeile in der Gebietsanzeige oben rechts (unter dem Gebietsnamen), im Stil des Spiels." },
             { "HudClockMode", "Was die HUD-Zeile zeigt: Tag und Uhrzeit, Wochentag und Uhrzeit oder nur die Uhrzeit." },
             { "HudClock12h", "Uhrzeit als 12-Stunden-Uhr (5:00 AM) statt 24 Stunden (05:00)." },
@@ -251,6 +252,7 @@ namespace GK2Tweaks
             { "GameTime", "Tageszeit im Spiel, in 10-Minuten-Schritten." },
             { "CustomResolution", "Zusätzliche Auflösung(en), komma-getrennt, z. B. 3840x1080. Wirkt nach Neustart des Spiels." },
             { "MainMenuScaleX2", "Skalierung der Hauptmenü-Szene bei freigeschalteten Auflösungen." },
+            { "PixelScale", "Pixel-Skalierung des Spielbilds. Automatisch = das Spiel entscheidet. 2 = mehr sichtbare Welt und kleinere Oberfläche auf großen/Ultrawide-Bildschirmen (wie mit Vanilla+ vor Spiel-Update 1.011), 3/4 = größer. Werte, die nicht zur Auflösung passen, werden ignoriert. Wirkt nach Neustart des Spiels." },
         };
 
         private static readonly Dictionary<string, string[]> Values = new Dictionary<string, string[]>
@@ -375,6 +377,7 @@ namespace GK2Tweaks
                 return i.ToString();
             }
             string s = value?.ToString() ?? "";
+            if (key == "PixelScale" && s.Length == 1 && char.IsDigit(s[0])) return s + "×";
             return Values.TryGetValue(s, out string[] v) ? T(v[0], v[1]) : s;
         }
 

@@ -12,7 +12,9 @@ Runes =>
 This can't be moved. => 
 This can't be moved right now. => 
 Factory machines can't be moved yet. => 
+Graves and zones can't be moved. => 
 Moving failed. => 
+Moving failed – the object was put back. Save and reload if something looks wrong. => 
 Vanilla+: The game can now move placed objects by itself, so Vanilla+ "Move objects" stays off. => 
 Remove & move => 
 5,000+ players! => 
@@ -178,6 +180,7 @@ Weekday (in game) =>
 Time of day (in game) => 
 Extra resolutions => 
 Main menu scaling => 
+Pixel scale => 
 as graphics tier => 
 game setting => 
 Default (game scene) => 
@@ -294,9 +297,9 @@ Point lights real (Realtime) or simulated (Faked, cheaper). Default = as the gra
 Back light effect. Default = as the graphics tier. => 
 Water quality. Default = as the graphics tier. => 
 Clouds normal or simplified. May apply only after changing area. Default = as the graphics tier. => 
-Game = setting from the game menu. Limit = software cap at TargetFps. VSync = synced to the refresh rate (60 FPS at 120 Hz = every 2nd refresh). => 
+Game = setting from the game menu. Limit = software cap at TargetFps (if VSync is on in the game settings, VSync stays on and the cap follows the refresh rate, e.g. 72 FPS at 144 Hz). VSync = synced to the refresh rate (60 FPS at 120 Hz = every 2nd refresh). => 
 Target FPS for Limit and VSync. 0 = unlimited => 
-Prevents screen tearing: keeps VSync on even when an FPS limit is set (the game turns VSync off then). Auto = on for Steam Deck and Linux, off on Windows. => 
+Prevents screen tearing: keeps VSync on even when an FPS limit is set (the game turns VSync off then). Auto = on for Steam Deck and Linux, and on Windows when VSync is on in the game settings. => 
 Physics rate. 0 = game default (50 Hz). 30 = like the Switch version, saves CPU. => 
 Doors and map travel: shorter fade to black and pause (about a third). Cutscenes and sleeping are not changed. => 
 Doors and map travel: the game cleans up all memory on every door, which takes most of the waiting time. With this on it only happens every 10 minutes or when memory gets tight (always when loading a save). Uses more RAM - not recommended below 16 GB. => 

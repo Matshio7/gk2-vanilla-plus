@@ -37,12 +37,24 @@ namespace GK2Tweaks
     [HarmonyPatch(typeof(GameSettings), nameof(GameSettings.ApplyScreenSettings))]
     internal static class ScreenSettingsPatch
     {
+        private static string lastLog;
+
         private static void Postfix()
         {
             try
             {
+                // Zuerst merken, was das Spiel gerade selbst gewaehlt hat - bevor Vanilla+ etwas aendert.
+                // Damit laesst ApplyPacing VSync nie aus, wenn das Spiel es an hat (Tearing unter Windows, 1.7.6).
+                Plugin.GameVsync = UnityEngine.QualitySettings.vSyncCount;
+                Plugin.GameFps = UnityEngine.Application.targetFrameRate;
                 if (!SafeMode.On("Graphics")) return;
-                if (GraphicsBench.Running) GraphicsBench.Unlock(); else Plugin.ApplyPacing();
+                if (GraphicsBench.Running && GraphicsBench.CanRun) GraphicsBench.Unlock(); else Plugin.ApplyPacing();
+                // Diagnose: nur bei Aenderung loggen, damit das Log nicht volllaeuft
+                string msg = "Screen settings: game vSyncCount " + Plugin.GameVsync + " fps " + Plugin.GameFps
+                    + " -> Vanilla+ vSyncCount " + UnityEngine.QualitySettings.vSyncCount + " fps " + UnityEngine.Application.targetFrameRate
+                    + ", " + UnityEngine.Screen.width + "x" + UnityEngine.Screen.height + " " + UnityEngine.Screen.fullScreenMode
+                    + ", monitor " + Plugin.MonitorHz() + " Hz";
+                if (msg != lastLog) { lastLog = msg; Plugin.Log.LogInfo(msg); }
             }
             catch (Exception e) { SafeMode.Fail("Graphics", e); }
         }

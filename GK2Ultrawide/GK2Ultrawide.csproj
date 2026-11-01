@@ -3,7 +3,7 @@
     <TargetFramework>net472</TargetFramework>
     <AssemblyName>GK2Ultrawide</AssemblyName>
     <LangVersion>latest</LangVersion>
-    <Version>1.0.1</Version>
+    <Version>1.0.2</Version>
     <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
     <ManagedDir Condition="'$(ManagedDir)' == ''">$(MSBuildThisFileDirectory)../_ref/Managed/</ManagedDir>
     <BepInExDir Condition="'$(BepInExDir)' == ''">$(MSBuildThisFileDirectory)../_deps/BepInEx/BepInEx/core/</BepInExDir>

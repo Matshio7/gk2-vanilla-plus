@@ -50,8 +50,10 @@ namespace GK2Tweaks
                 // Nur im freien Spiel: ist ein Spiel-Fenster offen (Inventar, Werkbank, Haendler ... dort ist RT z. B. Reiter
                 // wechseln), bleibt RT beim Spiel. RT muss ausserdem ohne offenes Fenster gedrueckt worden sein.
                 bool uiFree = GameUiFree();
-                if (p != null && PadBind.Down(p, Plugin.PinsPadButton.Value)) rtStartedFree = uiFree;
+                bool down = p != null && PadBind.Down(p, Plugin.PinsPadButton.Value);
+                if (down) rtStartedFree = uiFree;
                 want = p != null && PadBind.Held(p, Plugin.PinsPadButton.Value) && rtStartedFree && uiFree && PinsVisible && !menuOpen && !newsOpen && !weekOpen && !celebOpen && !Renaming;
+                PinPadDiag(p, down, want, uiFree);
             }
             catch { want = false; }
             if (want && !pinPad) { pinPad = true; PlaySound("gui_hover_light"); for (int i = 0; i < 4; i++) ppHeld[i] = true; }
@@ -70,6 +72,67 @@ namespace GK2Tweaks
                 if (p.GetButtonDown(ActRB)) pinCmdRB = true;
             }
             catch { }
+        }
+
+        // Diagnose fuer das Log (RT oeffnet die Liste nicht, RecyclebinHero): Controller-Namen einmal pro Sitzung,
+        // und beim Druck der Pin-Taste, welche Bedingung die Liste verhindert hat (hoechstens ein paar Mal, nur bei Aenderung)
+        private int ppDiagCount;
+        private string ppDiagLast;
+        private bool ppDiagAccepted, ppPadsLogged;
+        private float ppPadsNext;
+
+        private void PinPadDiag(Rewired.Player p, bool down, bool want, bool uiFree)
+        {
+            try
+            {
+                if (p == null) return;
+                if (!ppPadsLogged && Time.unscaledTime >= ppPadsNext)
+                {
+                    ppPadsNext = Time.unscaledTime + 5f;
+                    var names = new System.Collections.Generic.List<string>();
+                    foreach (Rewired.Joystick j in p.controllers.Joysticks) if (j != null) names.Add(PadName(j));
+                    if (names.Count > 0)
+                    {
+                        ppPadsLogged = true;
+                        Plugin.Log.LogInfo("Pins pad: controllers = " + string.Join(", ", names.ToArray()) + "; pin button = " + Plugin.PinsPadButton.Value);
+                    }
+                }
+                if (!down) return;
+                if (want)
+                {
+                    if (!ppDiagAccepted) { ppDiagAccepted = true; Plugin.Log.LogInfo("Pins pad: " + Plugin.PinsPadButton.Value + " press accepted (pin list has focus)"); }
+                    return;
+                }
+                if (ppDiagCount >= 5) return;
+                string why = "button=" + Plugin.PinsPadButton.Value
+                    + " uiFree=" + uiFree
+                    + " startedFree=" + rtStartedFree
+                    + " held=" + PadBind.Held(p, Plugin.PinsPadButton.Value)
+                    + " pins=" + Pins.List.Count
+                    + " pinsOn=" + Plugin.PinsEnabled.Value
+                    + " inGame=" + WeekPlan.InGame
+                    + " hudHidden=" + HudToggle.Hidden
+                    + " bigWindow=" + BigGameWindowOpen()
+                    + " modWindow=" + (menuOpen || newsOpen || weekOpen || celebOpen || Renaming);
+                if (why == ppDiagLast) return;
+                ppDiagLast = why;
+                ppDiagCount++;
+                Plugin.Log.LogInfo("Pins pad: pin button pressed but list not focused: " + why);
+            }
+            catch (Exception e) { if (ppDiagCount < 5) { ppDiagCount = 5; Plugin.Log.LogWarning("Pins pad: diagnostics failed: " + e.Message); } }
+        }
+
+        // Controller-Name per Reflection (Rewired Controller.name wird sonst nirgends benutzt)
+        private static string PadName(object j)
+        {
+            try
+            {
+                System.Reflection.PropertyInfo pi = HarmonyLib.AccessTools.Property(j.GetType(), "name");
+                object v = pi != null ? pi.GetValue(j, null) : null;
+                if (v != null) return v.ToString();
+            }
+            catch { }
+            return j.GetType().Name;
         }
 
         // Fokus-Ziel in der Liste: Kopfzeile eines Pins (row == null) oder aufklappbare Zutat

@@ -85,7 +85,8 @@ namespace GK2Tweaks
             {
                 if (!Rewired.ReInput.isReady) return false;
                 Rewired.Player p = Rewired.ReInput.players.GetPlayer(0);
-                return p != null && p.GetButtonDown(s.Rewired);
+                // ueber PadBind: liest bei RT/LT zusaetzlich die Achse (Xbox-Controller unter Windows melden Trigger als Achse)
+                return p != null && PadBind.ActDown(p, s.Rewired);
             }
             catch { return false; }
         }

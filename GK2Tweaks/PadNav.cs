@@ -50,7 +50,9 @@ namespace GK2Tweaks
             }
             BlockInput();
             if (padWin != PadWindow) { padWin = PadWindow; padFocus = 0; }
-            if ((Input.mousePosition - lastMouse).sqrMagnitude > 16f || Input.GetMouseButtonDown(0)) { padMode = false; padMouseSeen = true; }
+            // auch Rechts-/Mittelklick und Mausrad zaehlen (bei gesperrtem Zeiger aendert sich die Position nicht)
+            if ((Input.mousePosition - lastMouse).sqrMagnitude > 16f || Input.GetMouseButtonDown(0) || Input.GetMouseButtonDown(1)
+                || Input.GetMouseButtonDown(2) || Input.mouseScrollDelta.sqrMagnitude > 0f) { padMode = false; padMouseSeen = true; }
             // Das Spiel versteckt den Zeiger im Controller-Modus und merkt die Maus nicht, solange unser Menue die
             // Eingaben blockiert (gl7) -> bei Mausbewegung selbst einblenden
             if (padMouseSeen && !padMode) { Cursor.visible = true; if (Cursor.lockState != CursorLockMode.None) Cursor.lockState = CursorLockMode.None; }
@@ -76,7 +78,12 @@ namespace GK2Tweaks
                 if (p.GetButtonDown(ActLB)) { padLB = true; any = true; }
                 if (p.GetButtonDown(ActRB)) { padRB = true; any = true; }
                 if (p.GetButtonDown(ActB) || p.GetButtonDown(ActStart)) { any = true; PadClose(); }
-                if (any && !padMode) { padMode = true; padUp = padDown = padLeft = padRight = padA = padLB = padRB = false; } // erster Druck zeigt nur die Auswahl
+                if (any && !padMode)
+                {
+                    padMode = true; padUp = padDown = padLeft = padRight = padA = padLB = padRB = false; // erster Druck zeigt nur die Auswahl
+                    // zurueck zum Controller: Zeiger wieder verstecken (Mausbewegung blendet ihn erneut ein)
+                    if (padMouseSeen) { try { if (LazyInput.IsGamepadActive) { Cursor.visible = false; padMouseSeen = false; } } catch { } }
+                }
             }
             catch { }
         }
@@ -135,6 +142,12 @@ namespace GK2Tweaks
         private void PadBeginGUI()
         {
             if (Event.current.type != EventType.Layout) return;
+            // Zeiger hier noch einmal einblenden: OnGUI laeuft nach allen Update/LateUpdate, das Spiel kann ihn danach
+            // in diesem Frame nicht mehr verstecken (gl7)
+            if (padMouseSeen && !padMode && AnyModWindow)
+            {
+                try { Cursor.visible = true; if (Cursor.lockState != CursorLockMode.None) Cursor.lockState = CursorLockMode.None; } catch { }
+            }
             if (!padMode) { padUp = padDown = padLeft = padRight = padA = padLB = padRB = false; return; }
             int n = Mathf.Max(1, padCount);
             if (padWin == NewsWindowId)

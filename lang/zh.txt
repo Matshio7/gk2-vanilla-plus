@@ -82,6 +82,7 @@ Weekday (in game) => 星期（游戏内）
 Time of day (in game) => 时间（游戏内）
 Extra resolutions => 额外分辨率
 Main menu scaling => 主菜单缩放
+Pixel scale => 像素缩放
 as graphics tier => 跟随画质档位
 game setting => 游戏设置
 Software limit => 软件限制
@@ -131,7 +132,7 @@ Point lights real (Realtime) or simulated (Faked, cheaper). Default = as the gra
 Back light effect. Default = as the graphics tier. => 逆光效果。默认 = 跟随画质档位。
 Water quality. Default = as the graphics tier. => 水面质量。默认 = 跟随画质档位。
 Clouds normal or simplified. May apply only after changing area. Default = as the graphics tier. => 普通或简化的云。可能在切换区域后才生效。默认 = 跟随画质档位。
-Game = setting from the game menu. Limit = software cap at TargetFps. VSync = synced to the refresh rate (60 FPS at 120 Hz = every 2nd refresh). => 游戏 = 使用游戏菜单中的设置。限制 = 用软件把帧率限制在目标 FPS。垂直同步 = 与刷新率同步（120 Hz 下 60 FPS = 每两次刷新一帧）。
+Game = setting from the game menu. Limit = software cap at TargetFps (if VSync is on in the game settings, VSync stays on and the cap follows the refresh rate, e.g. 72 FPS at 144 Hz). VSync = synced to the refresh rate (60 FPS at 120 Hz = every 2nd refresh). => 游戏 = 使用游戏菜单中的设置。限制 = 用软件把帧率限制在目标 FPS（如果游戏设置中开启了垂直同步，则保持垂直同步，上限跟随刷新率，例如 144 Hz 下为 72 FPS）。垂直同步 = 与刷新率同步（120 Hz 下 60 FPS = 每两次刷新一帧）。
 Target FPS for Limit and VSync. 0 = unlimited => 限制与垂直同步的目标 FPS。0 = 无限制
 Physics rate. 0 = game default (50 Hz). 30 = like the Switch version, saves CPU. => 物理频率。0 = 游戏默认（50 Hz）。30 = 与 Switch 版相同，节省 CPU。
 What the game writes to Player.log. Warning or Error suppresses log spam. => 游戏写入 Player.log 的内容。选“警告”或“错误”可减少日志刷屏。
@@ -386,6 +387,8 @@ This can't be moved right now. => 现在无法移动此物体。
 Take the zombie off the station first. => 请先把僵尸从工位上撤下。
 Connected to extensions – remove the extensions first. => 已连接扩展部件——请先拆除扩展部件。
 Moving failed. => 移动失败。
+Graves and zones can't be moved. => 坟墓和区域无法移动。
+Moving failed – the object was put back. Save and reload if something looks wrong. => 移动失败——物体已放回原处。如果有异常，请保存并重新读档。
 1,000+ players! => 玩家突破 1000 人！
 GK2 Vanilla+ is now played by more than a thousand people. I never expected that.\n\nThank you for your ratings, comments and ideas – many of them are in this update: renaming zombies, trading the right amount, moving objects, Portuguese and more. => GK2 Vanilla+ 现在已有一千多人在玩。我从没想到会这样。\n\n感谢大家的评分、评论和建议——其中很多都在这次更新里：给僵尸改名、按合适数量交易、移动物体、葡萄牙语等等。
 You're welcome – let's go! => 不客气——出发吧！
@@ -417,7 +420,7 @@ Graphics & speed => 画面与速度
 Gameplay helpers => 游戏辅助
 Pins => 置顶
 Interface & keys => 界面与按键
-Prevents screen tearing: keeps VSync on even when an FPS limit is set (the game turns VSync off then). Auto = on for Steam Deck and Linux, off on Windows. => 防止画面撕裂：即使设置了帧率上限也保持垂直同步开启（游戏此时会关闭它）。自动 = 在 Steam Deck 和 Linux 上开启，Windows 上关闭。
+Prevents screen tearing: keeps VSync on even when an FPS limit is set (the game turns VSync off then). Auto = on for Steam Deck and Linux, and on Windows when VSync is on in the game settings. => 防止画面撕裂：即使设置了帧率上限也保持垂直同步开启（游戏此时会关闭它）。自动 = 在 Steam Deck 和 Linux 上开启；在 Windows 上，当游戏设置中开启了垂直同步时开启。
 [Not fully vanilla] Remove mode: you get the full building costs back instead of only a part. Contents (inventory, fuel) come back as usual. => [非完全原版] 拆除模式：返还全部建造花费，而不是只返还一部分。物体内的东西（物品、燃料）照常返还。
 [Not fully vanilla] Remove mode: press the rotate key on an object to pick it up and place it somewhere else. It stays the same object (contents and crafting queue are kept), nothing is used or refunded. Esc or right click cancels. => [非完全原版] 拆除模式：对物体按旋转键即可拿起并放到别处。仍是同一个物体（内容物和制作队列保留），不消耗也不返还任何东西。Esc 或右键取消。
 Trading with town vendors: the amount slider starts at exactly the amount that still gives happiness (thumbs up), and a button adds all liked goods in the right amount. You still confirm the deal yourself. => 与城镇商人交易：数量滑块会直接定在仍能带来好感（点赞）的数量上，另有一个按钮可把所有喜欢的货物按合适数量放入交易。交易仍需你自己确认。
