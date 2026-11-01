@@ -88,13 +88,14 @@ namespace GK2Tweaks
         private static readonly int[] stFrame = new int[MaxAct];
         private static bool axisLogged, axisErrLogged;
 
-        private static bool AxisOn(Player p, int a)
+        // Achsenwert der Aktion (0 bei Fehler)
+        private static float AxisVal(Player p, int a)
         {
-            try { return p.GetAxis(a) > 0.6f; }   // etwas ueber der ueblichen Rewired-Schwelle (0.5): meldet Rewired die Taste, kommt sie zuerst
+            try { return p.GetAxis(a); }
             catch (Exception ex)
             {
                 if (!axisErrLogged) { axisErrLogged = true; Plugin.Log.LogWarning("Pad bind: axis read failed: " + ex.Message); }
-                return false;
+                return 0f;
             }
         }
 
@@ -106,7 +107,10 @@ namespace GK2Tweaks
             bool fresh = stFrame[a] != f - 1;   // im letzten Frame nicht abgefragt (z. B. Feld gerade geoeffnet)
             stFrame[a] = f;
             bool btn = p.GetButton(a), bdown = p.GetButtonDown(a);
-            bool ax = AxisOn(p, a);
+            // Schwelle mit Hysterese: an ueber 0.6 (etwas ueber der ueblichen Rewired-Schwelle 0.5 - meldet Rewired die Taste,
+            // kommt sie zuerst), aus erst unter 0.4 - ein Trigger, der um 0.6 pendelt, loest nicht mehrfach aus
+            float av = AxisVal(p, a);
+            bool ax = (stAxis[a] && !fresh) ? av > 0.4f : av > 0.6f;
             bool axEdge = ax && !stAxis[a] && !fresh;   // kein Treffer fuer einen schon gehaltenen Trigger
             stAxis[a] = ax;
             bool active = btn || ax;

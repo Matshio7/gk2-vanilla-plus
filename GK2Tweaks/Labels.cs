@@ -162,7 +162,7 @@ namespace GK2Tweaks
         // Deutsche Tooltips (Englisch = Beschreibung aus der Config)
         private static readonly Dictionary<string, string> TipsDe = new Dictionary<string, string>
         {
-            { "Mode", "Spiel = Einstellung aus dem Spielmenü. Software-Limit = Begrenzung auf Ziel-FPS (ist im Spiel VSync an, bleibt VSync an und das Limit richtet sich nach der Bildwiederholrate, z. B. 72 FPS bei 144 Hz). VSync = an die Bildwiederholrate gekoppelt (60 FPS bei 120 Hz = jedes 2. Bild)." },
+            { "Mode", "Spiel = Einstellung aus dem Spielmenü. Software-Limit = Begrenzung auf Ziel-FPS (bei „Kein Tearing“ = An, oder Automatisch mit VSync im Spiel, bleibt VSync an und das Limit richtet sich nach der Bildwiederholrate, ohne unter das Ziel zu fallen, z. B. 72 FPS bei 144 Hz). VSync = an die Bildwiederholrate gekoppelt (60 FPS bei 120 Hz = jedes 2. Bild)." },
             { "TargetFps", "Ziel-FPS für Software-Limit und VSync. Unbegrenzt = volle Bildwiederholrate." },
             { "RenderMode", "Voll = Welt in voller Auflösung. Pixel = Welt in halber Auflösung, deutlich weniger GPU-Last." },
             { "Shadows", "PC weich = aufwendige PC-Schatten. Einfach/Konsole = einfachere Schatten wie auf PS5/Xbox, spart viel Leistung." },

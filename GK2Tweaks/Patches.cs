@@ -39,14 +39,36 @@ namespace GK2Tweaks
     {
         private static string lastLog;
 
-        private static void Postfix()
+        // vSyncCount vor dem Original merken: so erkennt der Postfix, ob das Spiel ihn ueberhaupt geschrieben hat
+        private static void Prefix(out int __state)
+        {
+            __state = -1;
+            try { __state = UnityEngine.QualitySettings.vSyncCount; } catch (Exception e) { SafeMode.Fail("Graphics", e); }
+        }
+
+        private static void Postfix(int __state)
         {
             try
             {
                 // Zuerst merken, was das Spiel gerade selbst gewaehlt hat - bevor Vanilla+ etwas aendert.
                 // Damit laesst ApplyPacing VSync nie aus, wenn das Spiel es an hat (Tearing unter Windows, 1.7.6).
-                Plugin.GameVsync = UnityEngine.QualitySettings.vSyncCount;
-                Plugin.GameFps = UnityEngine.Application.targetFrameRate;
+                // Steht danach noch genau der Wert, den Vanilla+ zuletzt selbst gesetzt hat (unveraendert seit vorher),
+                // hat das Spiel vSyncCount evtl. gar nicht geschrieben - dann den eigenen Wert NICHT als Spielwahl merken,
+                // sonst bliebe VSync z. B. nach dem VSync-Modus fuer die ganze Sitzung "vom Spiel gewuenscht".
+                int v = UnityEngine.QualitySettings.vSyncCount;
+                bool maybeOwn = __state >= 0 && v == __state && v == Plugin.OwnVsync;
+                if (!maybeOwn)
+                {
+                    Plugin.GameVsync = v;
+                    Plugin.GameFps = UnityEngine.Application.targetFrameRate;
+                }
+                else if (Plugin.GameVsync < 0)
+                {
+                    // noch kein Spielwert bekannt: nur dem gelesenen VSync-Schalter des Spiels glauben
+                    Plugin.GameVsync = (v > 0 && Plugin.GameVsyncSettingOn()) ? v : 0;
+                    Plugin.GameFps = UnityEngine.Application.targetFrameRate;
+                }
+                // sonst: bisherigen Spielwert behalten
                 if (!SafeMode.On("Graphics")) return;
                 if (GraphicsBench.Running && GraphicsBench.CanRun) GraphicsBench.Unlock(); else Plugin.ApplyPacing();
                 // Diagnose: nur bei Aenderung loggen, damit das Log nicht volllaeuft

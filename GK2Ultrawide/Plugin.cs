@@ -292,6 +292,8 @@ namespace GK2Ultrawide
         private static bool hitsLogged;
         private static bool busy;        // Rekursionsschutz Getter-Postfix (B)
         private static bool correcting;  // Rekursionsschutz Ebene C (Kamera-Refresh kann erneut ApplyScreenSettings ausloesen)
+        private static bool bypass;      // Ebene A kurz aus: AfterInit fragt den Spielwert von GetPixelSize ab
+        private static MethodInfo getPixelSize;
         private static readonly HashSet<long> logged = new HashSet<long>();
         private static readonly HashSet<string> warned = new HashSet<string>();
 
@@ -366,6 +368,7 @@ namespace GK2Ultrawide
                 {
                     post = new HarmonyMethod(AccessTools.Method(typeof(PixelScale), nameof(GetPixelSizePostfix)));
                     h.Patch(m, postfix: post);
+                    getPixelSize = m;
                     layerA = true;
                 }
             }
@@ -443,6 +446,7 @@ namespace GK2Ultrawide
         // Positionsparameter __0/__1: die echten Parameternamen sind nicht bekannt.
         private static void GetPixelSizePostfix(int __0, int __1, ref int __result)
         {
+            if (bypass) return;
             try
             {
                 int s = Chosen();
@@ -540,6 +544,9 @@ namespace GK2Ultrawide
             }
             catch { res = null; w = 0; h = 0; }
             if (w <= 0 || h <= 0) { w = Screen.width; h = Screen.height; }
+            // Fenstermodus: nie groesser als das echte Fenster rechnen, sonst koennte ein kleines Fenster
+            // unter 360 logische Pixel Hoehe fallen, obwohl die eingestellte Aufloesung passt
+            else if (Screen.width > 0 && Screen.height > 0) { w = Math.Min(w, Screen.width); h = Math.Min(h, Screen.height); }
         }
 
         private static bool resLookupDone;
@@ -641,6 +648,8 @@ namespace GK2Ultrawide
 
         // Nach InitAvailableResolutions: bei MainMenuScaleX2 = Auto das Hauptmenue-Flag der Listeneintraege an die
         // gewaehlte Skalierung angleichen (gleiche Regel wie im Unlock: logische Hoehe >= 600). Wirft nie.
+        // Nur Eintraege, bei denen das Spiel selbst eine andere Skalierung nimmt - wo die Skalierung gleich bleibt,
+        // bleibt auch das Hauptmenue-Flag des Spiels. Spielwert unbekannt (Ebene A fehlt) -> Eintrag nicht anfassen.
         internal static void AfterInit()
         {
             try
@@ -658,10 +667,21 @@ namespace GK2Ultrawide
                 }
                 var available = availField.GetValue(null) as List<ResolutionConfig>;
                 if (available == null) return;
+                if (getPixelSize == null)
+                {
+                    Info("Pixel scale: main menu flag sync skipped (game scale per resolution unknown, GetPixelSize not patched)");
+                    return;
+                }
                 int n = 0;
                 foreach (ResolutionConfig r in available)
                 {
                     if (r == null || !Fits(r.ListedWidth, r.ListedHeight, s)) continue;
+                    int game;
+                    bypass = true;
+                    try { game = (int)getPixelSize.Invoke(null, new object[] { r.ListedWidth, r.ListedHeight }); }
+                    catch (Exception e) { WarnOnce("init-game", "Pixel scale: game scale lookup failed (" + e.GetType().Name + ": " + e.Message + ") - main menu flags left as they are"); return; }
+                    finally { bypass = false; }
+                    if (game == s) continue;
                     bool want = r.ListedHeight / s >= 600;
                     object cur = scaleField.GetValue(r);
                     if (cur is bool && (bool)cur == want) continue;

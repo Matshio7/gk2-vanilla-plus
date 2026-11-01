@@ -25,8 +25,8 @@ namespace GK2Tweaks
             {
                 case "Deck": return Labels.T("Für Steam Deck, Handhelds und Laptops im Akkubetrieb: halbe Auflösung für die Welt, einfache Schatten, keine Umgebungsverdeckung, VSync ohne Tearing, Physik mit 30 Hz. Für 40 FPS am Deck das Bildraten-Limit im Steam-Schnellmenü (…) nutzen – das stellt auch das Display auf 40 Hz.",
                     "For Steam Deck, handhelds and laptops on battery: world at half resolution, simple shadows, no ambient occlusion, VSync without tearing, physics at 30 Hz. For 40 FPS on the Deck use the frame limit in Steam's quick access menu (…) – it also sets the display to 40 Hz.");
-                case "Performance": return Labels.T("Für schwächere PCs: volle Auflösung, einfachere Schatten und Lichter, keine Umgebungsverdeckung, stabile 60 FPS.",
-                    "For weaker PCs: full resolution, simpler shadows and lights, no ambient occlusion, a steady 60 FPS.");
+                case "Performance": return Labels.T("Für schwächere PCs: volle Auflösung, einfachere Schatten und Lichter, keine Umgebungsverdeckung, stabile 60 FPS (mit VSync im Spiel: ein glatter Teil der Bildwiederholrate, z. B. 72 FPS bei 144 Hz).",
+                    "For weaker PCs: full resolution, simpler shadows and lights, no ambient occlusion, a steady 60 FPS (with VSync on in the game settings: an even split of the refresh rate, e.g. 72 FPS at 144 Hz).");
                 case "Quality": return Labels.T("Alles auf höchster Stufe (weiche PC-Schatten, beste Umgebungsverdeckung, echtes Licht), VSync mit voller Bildwiederholrate.",
                     "Everything at the highest level (soft PC shadows, best ambient occlusion, real lights), VSync at the full refresh rate.");
                 default: return Labels.T("Nimmt alle Grafik- und Bildraten-Eingriffe des Mods zurück – es gilt wieder nur die Grafikstufe aus dem Spielmenü.",

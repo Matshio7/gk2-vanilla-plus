@@ -60,7 +60,9 @@ namespace GK2Tweaks
                 bool focused = Application.isFocused;
                 if (bgPaused)
                 {
-                    if (focused) { Leave("focus poll"); return; }
+                    // Unter Wine/CrossOver/Proton ist isFocused nicht verlaesslich - dort beendet nur das Fokus-Ereignis
+                    // die Pause (wie bis 1.7.5), sonst wuerde jede Pause im naechsten Frame wieder aufgehoben
+                    if (focused && !WineFix.IsWine) { Leave("focus poll"); return; }
                     if (!Plugin.PauseInBackground.Value) { Leave("option turned off"); return; }
 
                     // (3) Spiel hat die Zeitskala waehrend der Pause veraendert -> wieder anhalten
@@ -113,8 +115,13 @@ namespace GK2Tweaks
             // Intro setzt dann nicht mehr zurueck, weil zwischendurch 0 galt
             float restore = bgTimeScale >= 10f ? 1f : bgTimeScale;
             if (Time.timeScale == 0f) Time.timeScale = restore;
-            QualitySettings.vSyncCount = bgVsync; Application.targetFrameRate = bgFps;
-            Plugin.Log.LogInfo("Background pause: resumed (" + reason + "), timeScale " + Time.timeScale + ", targetFrameRate " + Application.targetFrameRate + ", vSyncCount " + QualitySettings.vSyncCount);
+            // Bildrate nur zuruecksetzen, wenn noch die eigene Drosselung (VSync aus, 10 FPS) gilt. Haben Spiel oder
+            // Vanilla+ waehrend der Pause neu angewendet (Bildschirm-Einstellungen, Bildrate), deren Werte behalten
+            // statt alte zurueckzuschreiben.
+            bool throttled = QualitySettings.vSyncCount == 0 && Application.targetFrameRate == 10;
+            if (throttled) { QualitySettings.vSyncCount = bgVsync; Application.targetFrameRate = bgFps; }
+            Plugin.Log.LogInfo("Background pause: resumed (" + reason + "), timeScale " + Time.timeScale + ", targetFrameRate " + Application.targetFrameRate + ", vSyncCount " + QualitySettings.vSyncCount
+                + (throttled ? "" : " (frame rate kept, changed during pause)"));
         }
     }
 }

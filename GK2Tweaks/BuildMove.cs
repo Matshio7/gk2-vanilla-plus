@@ -195,9 +195,10 @@ namespace GK2Tweaks
             if (Has(it, "Grave", "Zone", "Burial")) return true;
             if (Has(d.GetType().Name, "Grave", "Zone", "Burial")) return true;
             if (Has(w.GetType().Name, "Grave", "Zone", "Burial")) return true;
-            if (def != null && Has(def.customBuildAreaId, "grave", "zone", "burial")) return true;
+            // "graveyard_..." (Zaeune, Deko) bleibt verschiebbar, "grave..." (Grab, Grabstein, Grab-Zone) nicht -
+            // gilt fuer die Bau-Flaeche genauso wie fuer die Id
+            if (def != null && Has((def.customBuildAreaId ?? "").ToLowerInvariant().Replace("graveyard", ""), "grave", "zone", "burial")) return true;
             string id = d.id ?? "";
-            // "graveyard_..." (Zaeune, Deko) bleibt verschiebbar, "grave..." (Grab, Grabstein, Grab-Zone) nicht
             string idNoYard = id.ToLowerInvariant().Replace("graveyard", "");
             return Has(idNoYard, "grave", "burial", "zone");
         }
@@ -479,9 +480,13 @@ namespace GK2Tweaks
             catch (Exception e) { Plugin.Log.LogWarning("Move: delayed events " + e.Message); }
 
             Wgo wgo = null;
+            bool addThrew = false;
             try { wgo = scene.AddWgoData(d); }
-            catch (Exception e) { Plugin.Log.LogWarning("Move: placing at the new spot failed: " + e); }
-            if (wgo == null)
+            catch (Exception e) { addThrew = true; Plugin.Log.LogWarning("Move: placing at the new spot failed: " + e); }
+            // Nur nach einer Ausnahme zurueckstellen. null ohne Ausnahme kann ein normales Ergebnis sein (wie in 1.7.5:
+            // alle Folgeschritte pruefen wgo != null) - ein zweites AddWgoData wuerde das Objekt dann doppelt eintragen.
+            if (!addThrew && wgo == null) Plugin.Log.LogInfo("Move: AddWgoData returned null (no rollback)");
+            if (addThrew && wgo == null)
             {
                 // Rueckstellung: alter Platz, alte Drehung, nochmal einsetzen
                 rolledBack = true;

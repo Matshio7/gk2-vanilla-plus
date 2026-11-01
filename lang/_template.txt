@@ -297,7 +297,7 @@ Point lights real (Realtime) or simulated (Faked, cheaper). Default = as the gra
 Back light effect. Default = as the graphics tier. => 
 Water quality. Default = as the graphics tier. => 
 Clouds normal or simplified. May apply only after changing area. Default = as the graphics tier. => 
-Game = setting from the game menu. Limit = software cap at TargetFps (if VSync is on in the game settings, VSync stays on and the cap follows the refresh rate, e.g. 72 FPS at 144 Hz). VSync = synced to the refresh rate (60 FPS at 120 Hz = every 2nd refresh). => 
+Game = setting from the game menu. Limit = software cap at TargetFps (with No tearing On, or Automatic while VSync is on in the game settings, VSync stays on and the cap follows the refresh rate without dropping below the target, e.g. 72 FPS at 144 Hz). VSync = synced to the refresh rate (60 FPS at 120 Hz = every 2nd refresh). => 
 Target FPS for Limit and VSync. 0 = unlimited => 
 Prevents screen tearing: keeps VSync on even when an FPS limit is set (the game turns VSync off then). Auto = on for Steam Deck and Linux, and on Windows when VSync is on in the game settings. => 
 Physics rate. 0 = game default (50 Hz). 30 = like the Switch version, saves CPU. => 
@@ -401,7 +401,7 @@ Performance =>
 Quality => 
 Game default => 
 For Steam Deck, handhelds and laptops on battery: world at half resolution, simple shadows, no ambient occlusion, VSync without tearing, physics at 30 Hz. For 40 FPS on the Deck use the frame limit in Steam's quick access menu (…) – it also sets the display to 40 Hz. => 
-For weaker PCs: full resolution, simpler shadows and lights, no ambient occlusion, a steady 60 FPS. => 
+For weaker PCs: full resolution, simpler shadows and lights, no ambient occlusion, a steady 60 FPS (with VSync on in the game settings: an even split of the refresh rate, e.g. 72 FPS at 144 Hz). => 
 Everything at the highest level (soft PC shadows, best ambient occlusion, real lights), VSync at the full refresh rate. => 
 Removes all graphics and frame rate overrides of the mod – only the graphics tier from the game menu applies. => 
 Profile "{0}" applied. => 

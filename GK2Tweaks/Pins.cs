@@ -622,6 +622,12 @@ namespace GK2Tweaks
             try
             {
                 if (LazyInput.IsGamepadActive && Pins.Focused != null) return true;   // Controller-Fokus: keine Maus-Pruefung
+                // Nur pruefen, solange ein bekannter Herstell- oder Mengen-Dialog offen ist - alle anderen Nadeln
+                // (Baumenues, Stadt, Auftraege, Alchemie ...) verhalten sich genau wie in 1.7.5
+                Component dlg = (Component)CraftMax.Open();
+                UIItemCountWindow cw = TradeHelper.Cached<UIItemCountWindow>();
+                bool countOpen = cw != null && cw.IsShown;
+                if (dlg == null && !countOpen) return true;
                 GameObject top = TopHit();
                 if (top == null) return true;
                 Transform cell = transform.parent;
@@ -631,8 +637,15 @@ namespace GK2Tweaks
                 if (tw != null && mine != null)
                 {
                     if (tw == mine) return true;
-                    LogIgnored(tw, top);
-                    return false;
+                    // anderes Fenster oben: nur ablehnen, wenn es der offene Dialog ist oder ein Dialog die Nadel verdeckt.
+                    // Sonst (z. B. durchsichtiges Overlay eines anderen "...Window") wie bisher annehmen, aber loggen.
+                    if ((object)tw == (object)dlg || (countOpen && (object)tw == (object)cw) || DialogCovers())
+                    {
+                        LogIgnored(tw, top);
+                        return false;
+                    }
+                    LogAccepted(tw, mine);
+                    return true;
                 }
                 // Fenster nicht bestimmbar: nur ablehnen, wenn ein bekannter Dialog an dieser Stelle darueber liegt
                 if (!DialogCovers()) return true;
@@ -674,13 +687,25 @@ namespace GK2Tweaks
                 Component dlg = (Component)CraftMax.Open();
                 if (dlg == null || !transform.IsChildOf(dlg.transform)) return false;
                 GameObject top = TopHit();
-                return top != null && top.transform.IsChildOf(dlg.transform);
+                if (top == null || !top.transform.IsChildOf(dlg.transform)) return false;
+                // eine eigene Nadel unter der Maus (z. B. Zutaten-Zelle im Dialog) hat Vorrang vor der Kopf-Nadel
+                PinButton other = For(top.transform);
+                if (other != null && other != this && other.Key != null && other.transform.IsChildOf(dlg.transform)) return false;
+                return true;
             }
             catch (Exception e)
             {
                 WarnOnce(e);
                 return false;
             }
+        }
+
+        private static bool acceptedLogged;
+        private static void LogAccepted(Component tw, Component mine)
+        {
+            if (acceptedLogged) return;
+            acceptedLogged = true;
+            Plugin.Log.LogInfo("Pin click accepted although top window differs: " + tw.GetType().Name + " vs " + mine.GetType().Name + " (logged once)");
         }
 
         private static void LogIgnored(Component tw, GameObject top)

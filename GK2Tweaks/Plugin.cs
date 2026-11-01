@@ -245,7 +245,7 @@ namespace GK2Tweaks
                 new AcceptableValueList<string>(Keep, "Normal", "Replaced")));
 
             Pacing = Config.Bind("FrameRate", "Mode", "Game", new ConfigDescription(
-                "Game = setting from the game menu. Limit = software cap at TargetFps (if VSync is on in the game settings, VSync stays on and the cap follows the refresh rate, e.g. 72 FPS at 144 Hz). VSync = synced to the refresh rate (60 FPS at 120 Hz = every 2nd refresh).",
+                "Game = setting from the game menu. Limit = software cap at TargetFps (with No tearing On, or Automatic while VSync is on in the game settings, VSync stays on and the cap follows the refresh rate without dropping below the target, e.g. 72 FPS at 144 Hz). VSync = synced to the refresh rate (60 FPS at 120 Hz = every 2nd refresh).",
                 new AcceptableValueList<string>("Game", "Limit", "VSync")));
             TargetFps = Config.Bind("FrameRate", "TargetFps", 60, new ConfigDescription(
                 "Target FPS for Limit and VSync. 0 = unlimited / full refresh rate.",
@@ -596,9 +596,13 @@ namespace GK2Tweaks
         // Was das Spiel zuletzt selbst gesetzt hat (gelesen in ScreenSettingsPatch direkt nach dem Original, -1 = noch unbekannt).
         // Nur dort lesen, nie in ApplyPacing - sonst wuerden die eigenen Werte als "Spielwahl" gemerkt.
         internal static int GameVsync = -1, GameFps = -1;
+        // vSyncCount, den ApplyPacing zuletzt hinterlassen hat (-1 = noch nie). ScreenSettingsPatch erkennt damit,
+        // ob nach ApplyScreenSettings noch der eigene Wert steht (Spiel hat vSyncCount nicht geschrieben).
+        internal static int OwnVsync = -1;
         internal static bool GameWantsVsync => GameVsync > 0 || GameVsyncSettingOn();
 
-        // VSync-Schalter aus dem Spielmenue per Reflection (Name unbekannt): erstes bool-Feld/-Property mit "vsync" im Namen.
+        // VSync-Schalter aus dem Spielmenue per Reflection (Name unbekannt): nur exakte Namen aus einer Liste
+        // (siehe FindGameVsyncMember), damit Hilfsflags wie "vsyncSupported" nicht als Einstellung gelesen werden.
         // Nicht gefunden -> false, dann zaehlt nur vSyncCount wie bisher.
         private static System.Reflection.MemberInfo gameVsyncMember;
         private static bool gameVsyncSearched, gameVsyncErrorLogged;
@@ -632,25 +636,48 @@ namespace GK2Tweaks
             }
         }
 
+        // Erlaubte Namen (ohne Gross-/Kleinschreibung, nach Entfernen von "_", "m_" und Backing-Field-Klammern)
+        private static readonly string[] GameVsyncNames = { "vsync", "isvsync", "vsyncenabled", "isvsyncenabled", "usevsync", "enablevsync", "vsyncon" };
+
+        private static string NormVsyncName(string n)
+        {
+            if (n.StartsWith("<", StringComparison.Ordinal))
+            {
+                int e = n.IndexOf('>');
+                if (e > 1) n = n.Substring(1, e - 1);   // <VSync>k__BackingField -> VSync
+            }
+            if (n.StartsWith("m_", StringComparison.Ordinal)) n = n.Substring(2);
+            return n.TrimStart('_').ToLowerInvariant();
+        }
+
         private static System.Reflection.MemberInfo FindGameVsyncMember()
         {
             const System.Reflection.BindingFlags bf = System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic;
             string other = "";
-            foreach (System.Reflection.FieldInfo f in typeof(GameSettings).GetFields(bf))
-            {
-                if (f.Name.IndexOf("vsync", StringComparison.OrdinalIgnoreCase) < 0) continue;
-                if (f.FieldType == typeof(bool)) return f;
-                other += " " + f.Name + ":" + f.FieldType.Name;
-            }
+            System.Reflection.MemberInfo best = null;
+            bool bestPublic = false;
+            // Properties zuerst (oeffentliche Einstellung vor privatem Hilfsfeld), dann Felder; oeffentlich vor nicht-oeffentlich
             foreach (System.Reflection.PropertyInfo p in typeof(GameSettings).GetProperties(bf))
             {
                 if (p.Name.IndexOf("vsync", StringComparison.OrdinalIgnoreCase) < 0) continue;
-                if (p.PropertyType == typeof(bool) && p.CanRead && p.GetIndexParameters().Length == 0) return p;
-                other += " " + p.Name + ":" + p.PropertyType.Name;
+                bool ok = p.PropertyType == typeof(bool) && p.CanRead && p.GetIndexParameters().Length == 0
+                    && Array.IndexOf(GameVsyncNames, NormVsyncName(p.Name)) >= 0;
+                if (!ok) { other += " " + p.Name + ":" + p.PropertyType.Name; continue; }
+                System.Reflection.MethodInfo g = p.GetGetMethod(true);
+                bool pub = g != null && g.IsPublic;
+                if (best == null || (pub && !bestPublic)) { best = p; bestPublic = pub; }
             }
-            // Diagnose: VSync-Mitglieder mit anderem Typ (z. B. int/enum) nur loggen, nicht auswerten
-            if (other.Length > 0) Log.LogInfo("Game VSync members (not bool, ignored):" + other);
-            return null;
+            foreach (System.Reflection.FieldInfo f in typeof(GameSettings).GetFields(bf))
+            {
+                if (f.Name.IndexOf("vsync", StringComparison.OrdinalIgnoreCase) < 0) continue;
+                bool ok = f.FieldType == typeof(bool) && Array.IndexOf(GameVsyncNames, NormVsyncName(f.Name)) >= 0;
+                if (!ok) { other += " " + f.Name + ":" + f.FieldType.Name; continue; }
+                if (best == null || (f.IsPublic && !bestPublic)) { best = f; bestPublic = f.IsPublic; }
+            }
+            // Diagnose: VSync-Mitglieder, die nicht auf der Liste stehen (anderer Name/Typ), nur loggen, nicht auswerten
+            if (other.Length > 0) Log.LogInfo("Game VSync members (not on the name list or not bool, ignored):" + other);
+            if (best != null) Log.LogInfo("Game VSync member chosen by exact name: " + best.Name + (bestPublic ? " (public)" : " (non-public)"));
+            return best;
         }
 
         // Entscheidung nur bei Aenderung loggen (ApplyScreenSettings laeuft oft)
@@ -671,24 +698,31 @@ namespace GK2Tweaks
                 if (TearFix && QualitySettings.vSyncCount == 0)
                 {
                     int hz0 = MonitorHz(), lim = Application.targetFrameRate;
-                    QualitySettings.vSyncCount = (lim > 0 && hz0 > 0) ? Mathf.Clamp(Mathf.RoundToInt((float)hz0 / lim), 1, 4) : 1;
-                    Application.targetFrameRate = -1;
-                    LogPacing($"Tearing fix: VSync kept on (vSyncCount {QualitySettings.vSyncCount}, monitor {hz0} Hz, game limit {lim})");
+                    // Nur der neue Windows-Weg (Auto, kein Linux): VSync nur behalten, wenn das FPS-Limit des Spiels
+                    // ungefaehr ein Teiler der Bildwiederholrate ist - sonst wuerde das Limit ueberschritten
+                    // (z. B. Limit 45 bei 60 Hz -> 60 FPS, Limit 100 bei 144 Hz -> 144 FPS). Dann gilt das exakte Limit des Spiels.
+                    bool windowsAuto = NoTearing.Value == "Auto" && !IsLinux;
+                    float ratio = (lim > 0 && hz0 > 0) ? (float)hz0 / lim : 0f;
+                    bool divisor = lim <= 0 || hz0 <= 0 || lim >= hz0 || Mathf.Abs(ratio - Mathf.Round(ratio)) < 0.05f;
+                    if (windowsAuto && !divisor)
+                    {
+                        LogPacing($"Tearing fix skipped: game limit {lim} is no even split of {hz0} Hz, keeping the game's exact limit (set No tearing = On to force VSync)");
+                    }
+                    else
+                    {
+                        QualitySettings.vSyncCount = (lim > 0 && hz0 > 0) ? Mathf.Clamp(Mathf.RoundToInt(ratio), 1, 4) : 1;
+                        Application.targetFrameRate = -1;
+                        LogPacing($"Tearing fix: VSync kept on (vSyncCount {QualitySettings.vSyncCount}, monitor {hz0} Hz, game limit {lim})");
+                    }
                 }
-                // Harte Regel: nie unter dem vSyncCount enden, den das Spiel selbst gesetzt hat
-                // (z. B. wenn die Hintergrund-Pause oder der Benchmark einen alten Wert 0 hinterlassen haben)
-                if (GameVsync > 0 && QualitySettings.vSyncCount == 0)
-                {
-                    QualitySettings.vSyncCount = GameVsync;
-                    Application.targetFrameRate = GameFps;
-                    LogPacing($"VSync restored to the game's setting (vSyncCount {GameVsync})");
-                }
+                OwnVsync = QualitySettings.vSyncCount;
                 return;
             }
             int fps = TargetFps.Value;
-            bool gameVsync = GameWantsVsync;
+            bool gameVsync = GameWantsVsync;   // nur fuer die Log-Notiz
             string note = "";
-            if (mode == "Limit" && !TearFix && !gameVsync)
+            // Kein Tearing = Aus gibt wie in 1.7.5 das exakte Software-Limit; Auto enthaelt ueber TearFix schon die VSync-Wahl des Spiels
+            if (mode == "Limit" && !TearFix)
             {
                 QualitySettings.vSyncCount = 0;
                 Application.targetFrameRate = fps > 0 ? fps : -1;
@@ -698,12 +732,18 @@ namespace GK2Tweaks
                 // VSync-Modus, Kein-Tearing, oder Limit bei VSync im Spiel: Obergrenze ueber das VSync-Intervall
                 // (Unity ignoriert targetFrameRate, solange vSyncCount > 0 ist - daher nur Teiler der Bildwiederholrate)
                 int hz = MonitorHz();
-                int interval = (fps > 0 && hz > 0) ? Mathf.Clamp(Mathf.RoundToInt((float)hz / fps), 1, 4) : 1;
+                int interval;
+                if (mode == "Limit")
+                    // Limit: nie unter das Ziel fallen (90 Hz / 60 -> 90 FPS statt 45, 165 Hz / 60 -> 82 statt 55)
+                    interval = (fps > 0 && hz > 0) ? Mathf.Clamp(Mathf.FloorToInt((float)hz / fps + 0.001f), 1, 4) : 1;
+                else
+                    interval = (fps > 0 && hz > 0) ? Mathf.Clamp(Mathf.RoundToInt((float)hz / fps), 1, 4) : 1;
                 QualitySettings.vSyncCount = interval;
                 Application.targetFrameRate = -1;
                 if (mode == "Limit")
-                    note = $" | Limit with {(gameVsync ? "game VSync on" : "no-tearing fix")}: keeping VSync, interval {interval} (~{(hz > 0 ? hz / interval : 0)} FPS)";
+                    note = $" | Limit with {(NoTearing.Value == "On" ? "No tearing = On" : gameVsync ? "game VSync on" : "no-tearing fix")}: keeping VSync, interval {interval} (~{(hz > 0 ? hz / interval : 0)} FPS)";
             }
+            OwnVsync = QualitySettings.vSyncCount;
             // eine Zeile pro Entscheidung, damit die Wiederholungs-Sperre in LogPacing greift
             LogPacing($"Bildrate: {mode}, Ziel {fps}, vSyncCount {QualitySettings.vSyncCount}, targetFrameRate {Application.targetFrameRate}, Monitor {MonitorHz()} Hz, game vSyncCount {GameVsync}{note}");
         }
