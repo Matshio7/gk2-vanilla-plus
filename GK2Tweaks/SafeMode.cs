@@ -60,6 +60,7 @@ namespace GK2Tweaks
             { "CraftMax", new[] { "Herstellen: Max-Knopf", "Crafting: Max button" } },
             { "CraftRepair", new[] { "Hängende Werkbänke lösen", "Fix stuck workbenches" } },
             { "MoveSpeed", new[] { "Laufgeschwindigkeit", "Movement speed" } },
+            { "UiScale", new[] { "HUD & Menüs: Größe", "HUD & menus: size" } },
             { "Gui", new[] { "Mod-Menü & Anzeigen", "Mod menu & displays" } },
             { "Keys", new[] { "Tastenkürzel", "Hotkeys" } },
             { "News", new[] { "Hinweisfenster (Neuigkeiten, Bewertung)", "Notice windows (news, rating)" } },
@@ -85,6 +86,7 @@ namespace GK2Tweaks
                 case "CraftRepairPatch": return "CraftRepair";
                 case "RainScanPatch": return "Rain";
                 case "MoveSpeedPatch": return "MoveSpeed";
+                case "UiScalePatch": return "UiScale";
                 case "MoveInputPatch": case "MoveTargetPatch": case "MoveCellsPatch": case "MoveBuildPatch": case "MoveDisablePatch": case "MoveRemoveLabelPatch": return "MoveObjects";
                 case "TradePressPatch": case "TradeCountPatch": return "TradeLikes";
                 case "RespecOverPatch": case "RespecOutPatch": case "RespecTechPatch": return "Respec";
@@ -295,6 +297,14 @@ namespace GK2Tweaks
             {
                 retired.Add("MoveObjects");
                 disabled["MoveObjects"] = "the game moves objects itself";
+            }
+            // HUD- & Menuegroesse braucht ResolutionConfig.GetUiLayout (ab Spiel 1.011) - vorher still aus, ohne Hinweis
+            bool uiLayout = false;
+            try { uiLayout = HasMethod(typeof(ResolutionConfig), "GetUiLayout"); } catch { }
+            if (!uiLayout)
+            {
+                retired.Add("UiScale");
+                disabled["UiScale"] = "needs game 1.011 or newer";
             }
 
             foreach (Check c in checks)

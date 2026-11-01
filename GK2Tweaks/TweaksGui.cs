@@ -777,6 +777,7 @@ namespace GK2Tweaks
                 DrawEntry(Plugin.Language);
                 DrawEntry(Plugin.MenuScale);
                 DrawEntry(Plugin.HighContrast);
+                if (SafeMode.On("UiScale") || Plugin.GameUiScale.Value != 0) DrawEntry(Plugin.GameUiScale);
                 DrawEntry(Plugin.HudCenter);
                 DrawEntry(Plugin.SkipIntro);
                 DrawEntry(Plugin.MenuExtend);

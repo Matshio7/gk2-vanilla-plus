@@ -77,6 +77,7 @@ namespace GK2Tweaks
             { "MouseWheelZoom", new[] { "Zoom mit Mausrad", "Mouse wheel zoom" } },
             { "SmoothZoom", new[] { "Weicher Zoom", "Smooth zoom" } },
             { "MenuScale", new[] { "Größe der Mod-Anzeigen", "Size of mod displays" } },
+            { "GameUiScale", new[] { "HUD & Menüs: Größe", "HUD & menus: size" } },
             { "HighContrast", new[] { "Hoher Kontrast", "High contrast" } },
             { "OledBlack", new[] { "OLED-Schwarz", "OLED black" } },
             { "WideRain", new[] { "Regen über ganze Breite", "Full-width rain" } },
@@ -156,7 +157,7 @@ namespace GK2Tweaks
             { "GameTime", new[] { "Uhrzeit (im Spiel)", "Time of day (in game)" } },
             { "CustomResolution", new[] { "Zusätzliche Auflösungen", "Extra resolutions" } },
             { "MainMenuScaleX2", new[] { "Hauptmenü-Skalierung", "Main menu scaling" } },
-            { "PixelScale", new[] { "Pixel-Skalierung", "Pixel scale" } },
+            { "ScaleSteps", new[] { "Kleinere Skalierungsstufen", "Smaller scale steps" } },
         };
 
         // Deutsche Tooltips (Englisch = Beschreibung aus der Config)
@@ -180,6 +181,7 @@ namespace GK2Tweaks
             { "MouseWheelZoom", "Stufenlos zoomen mit dem Mausrad – nur beim Herumlaufen, nicht über Menüs. Beim nächsten Start gilt wieder der Kamera-Zoom." },
             { "SmoothZoom", "Weicher Übergang, wenn sich der Zoom ändert." },
             { "MenuScale", "Größe von Mod-Menü, FPS-Anzeige und Pin-Liste. Automatisch = passend zur Bildschirmhöhe." },
+            { "GameUiScale", "Größe von HUD, Menüs und Fenstern des Spiels (ab Spielversion 1.011). „Wie im Spiel“ = so groß wie die Pixel der Spielwelt (bei Ultrawide oft 3×). Passt eine Stufe nicht auf den Bildschirm, passt das Spiel sie nach seinen eigenen Regeln an. Die Spielwelt selbst bleibt gleich – dafür gibt es den Kamera-Zoom." },
             { "RainAmount", "Wie viele Regentropfen gezeichnet werden. Weniger Regen hilft auf schwachen PCs und dem Steam Deck, 0 % schaltet die Partikel ab (das Wetter selbst bleibt)." },
             { "WideRain", "Regen über den ganzen Bildschirm – auf Ultrawide-Monitoren und beim Herauszoomen (das Spiel füllt nur einen 16:9-Bereich)." },
             { "OledBlack", "Reines Schwarz statt Dunkelgrau um die Karte herum (z. B. außerhalb der Kirche oder am Levelrand). Gut für OLED-Bildschirme." },
@@ -252,7 +254,7 @@ namespace GK2Tweaks
             { "GameTime", "Tageszeit im Spiel, in 10-Minuten-Schritten." },
             { "CustomResolution", "Zusätzliche Auflösung(en), komma-getrennt, z. B. 3840x1080. Wirkt nach Neustart des Spiels." },
             { "MainMenuScaleX2", "Skalierung der Hauptmenü-Szene bei freigeschalteten Auflösungen." },
-            { "PixelScale", "Pixel-Skalierung des Spielbilds. Automatisch = das Spiel entscheidet. 2 = mehr sichtbare Welt und kleinere Oberfläche auf großen/Ultrawide-Bildschirmen (wie mit Vanilla+ vor Spiel-Update 1.011), 3/4 = größer. Werte, die nicht zur Auflösung passen, werden ignoriert. Wirkt nach Neustart des Spiels." },
+            { "ScaleSteps", "Ab Spielversion 1.011: setzt bei Ultrawide die kleineren Stufen in die Auflösungsliste des Spiels, z. B. 3440x1440 (x2) oder 5120x1440 (x2)/(x3) – wie das Spiel selbst bei 2560x1440. Auswählen in den Grafik-Einstellungen des Spiels; Welt und HUD sind dann wieder 2×." },
         };
 
         private static readonly Dictionary<string, string[]> Values = new Dictionary<string, string[]>
@@ -369,6 +371,7 @@ namespace GK2Tweaks
                 if (key == "Size") return i + " px";
                 if (key == "InteriorZoom") return i == 0 ? T("wie draußen", "same as outside") : i + " %";
                 if (key == "MenuScale") return i == 0 ? T("Automatisch", "Automatic") : i + " %";
+                if (key == "GameUiScale") return i == 0 ? T("Wie im Spiel", "Like the game") : i + "×";
                 if (key == "Scale") return i + "×";
                 if (key == "AutoSaveMinutes") return i == 0 ? T("Aus", "Off") : T("alle ", "every ") + i + " min";
                 if (key == "KeepBackups") return i == 0 ? T("Aus", "Off") : i.ToString();
@@ -377,7 +380,6 @@ namespace GK2Tweaks
                 return i.ToString();
             }
             string s = value?.ToString() ?? "";
-            if (key == "PixelScale" && s.Length == 1 && char.IsDigit(s[0])) return s + "×";
             return Values.TryGetValue(s, out string[] v) ? T(v[0], v[1]) : s;
         }
 

@@ -80,6 +80,7 @@ Strong =>
 Dense => 
 same as outside => 
 Automatic => 
+Like the game => 
 every => 
 every save => 
 High => 
@@ -102,6 +103,7 @@ Zoom preset key =>
 Mouse wheel zoom => 
 Smooth zoom => 
 Size of mod displays => 
+HUD & menus: size => 
 High contrast => 
 OLED black => 
 Full-width rain => 
@@ -180,7 +182,7 @@ Weekday (in game) =>
 Time of day (in game) => 
 Extra resolutions => 
 Main menu scaling => 
-Pixel scale => 
+Smaller scale steps => 
 as graphics tier => 
 game setting => 
 Default (game scene) => 
@@ -341,6 +343,7 @@ Before the game overwrites a save, the previous save is backed up (BepInEx/GK2Va
 Minimum minutes between two backups of the same slot (avoids a backup on every autosave). => 
 Key for saving the game manually (empty = only the button in the mod menu). => 
 Size of the mod menu, FPS display and pinned list. 0 = automatic (follows the screen height). => 
+Size of the game's HUD, menus and windows (game 1.011 or newer). Like the game = as large as the pixels of the game world (often 3x on ultrawide). If a size does not fit the screen, the game adjusts it by its own rules. The game world itself stays the same - use the camera zoom for that. => 
 Main menu background: the game's animated scene (Scene), one of six Vanilla+ pictures, or your own picture from your save (Mine). => 
 Color style of the main menu picture. => 
 Blur of the main menu picture, so the menu stays in focus. => 

@@ -70,6 +70,7 @@ namespace GK2Tweaks
             Add(Plugin.InteriorZoom, 0);
             Add(Plugin.AutoSaveMinutes, 0);
             Add(Plugin.MoveSpeed, 100);
+            Add(Plugin.GameUiScale, 0);
             return l;
         }
 

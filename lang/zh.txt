@@ -82,7 +82,7 @@ Weekday (in game) => 星期（游戏内）
 Time of day (in game) => 时间（游戏内）
 Extra resolutions => 额外分辨率
 Main menu scaling => 主菜单缩放
-Pixel scale => 像素缩放
+Smaller scale steps => 更小的缩放档位
 as graphics tier => 跟随画质档位
 game setting => 游戏设置
 Software limit => 软件限制
@@ -615,3 +615,6 @@ Changes to the settings take effect only after restarting the game. => 设置的
 Updates come through the Steam Workshop: restart the game once Steam has updated the mod. => 更新通过 Steam 创意工坊提供：Steam 更新模组后重新启动游戏即可。
 Steam downloaded GK2 Vanilla+ {0} – the game still runs {1}. Restart the game: it installs Workshop updates by itself. => Steam 已下载 GK2 Vanilla+ {0}，但游戏中运行的仍是 {1}。请重新启动游戏：游戏会自行安装创意工坊的更新。
 GK2 Vanilla+ {0} is available – it comes through the Steam Workshop: restart the game once Steam has downloaded it. => GK2 Vanilla+ {0} 已发布 – 将通过 Steam 创意工坊提供：Steam 下载完成后重新启动游戏即可。
+HUD & menus: size => HUD 与菜单：大小
+Like the game => 与游戏一致
+Size of the game's HUD, menus and windows (game 1.011 or newer). Like the game = as large as the pixels of the game world (often 3x on ultrawide). If a size does not fit the screen, the game adjusts it by its own rules. The game world itself stays the same - use the camera zoom for that. => 游戏 HUD、菜单和窗口的大小（游戏 1.011 或更新版本）。与游戏一致 = 与游戏世界的像素一样大（超宽屏常为 3x）。如果某个大小放不下屏幕，游戏会按自己的规则调整。游戏世界本身不变——如需调整请使用镜头缩放。

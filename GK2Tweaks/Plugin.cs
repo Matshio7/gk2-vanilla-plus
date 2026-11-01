@@ -49,6 +49,7 @@ namespace GK2Tweaks
         internal static ConfigEntry<bool> ShowOverlay, CheckUpdates, RepairWorkbenches, SafeStartGuard;
         internal static ConfigEntry<int> StatsLogSeconds;
         internal static ConfigEntry<int> MoveSpeed;
+        internal static ConfigEntry<int> GameUiScale;
         internal static ConfigEntry<string> Language, LastSeenVersion, LastGameVersion;
 #if !NEXUS
         internal static ConfigEntry<int> RatePromptSessions, RatePromptNextAt;
@@ -144,7 +145,7 @@ namespace GK2Tweaks
             var harmony = new Harmony(Guid);
             // Die Typen stecken bewusst in Lambdas (wie in SafeMode.CheckGame): ein typeof(X), das beim JIT scheitert,
             // trifft so nur diesen einen Eintrag statt das ganze Awake.
-            var patches = new System.Collections.Generic.List<Func<Type>> { () => typeof(TierPatch), () => typeof(ScreenSettingsPatch), () => typeof(SaveBlockPatch), () => typeof(ZoomPatch), () => typeof(ModdedLabelPatch), () => typeof(BackupPatch), () => typeof(MainMenuModsButtonPatch), () => typeof(PauseModsButtonPatch), () => typeof(CraftCellPinPatch), () => typeof(SelectionPinPatch), () => typeof(QuestPinPatch), () => typeof(LongNotes), () => typeof(InstantRemovePatch), () => typeof(TeleportPatch), () => typeof(FadeInPatch), () => typeof(FadeOutPatch), () => typeof(CleanupPatch), () => typeof(MoveInputPatch), () => typeof(MoveTargetPatch), () => typeof(MoveCellsPatch), () => typeof(MoveBuildPatch), () => typeof(MoveDisablePatch), () => typeof(TradePressPatch), () => typeof(TradeCountPatch), () => typeof(ZoneRedrawPatch), () => typeof(MoveRemoveLabelPatch), () => typeof(OrderPinPatch), () => typeof(AlchemyPinPatch), () => typeof(RespecOverPatch), () => typeof(RespecOutPatch), () => typeof(RespecTechPatch), () => typeof(CraftRepairPatch), () => typeof(RainScanPatch), () => typeof(TownBuiltPatch), () => typeof(MoveSpeedPatch) };
+            var patches = new System.Collections.Generic.List<Func<Type>> { () => typeof(TierPatch), () => typeof(ScreenSettingsPatch), () => typeof(SaveBlockPatch), () => typeof(ZoomPatch), () => typeof(ModdedLabelPatch), () => typeof(BackupPatch), () => typeof(MainMenuModsButtonPatch), () => typeof(PauseModsButtonPatch), () => typeof(CraftCellPinPatch), () => typeof(SelectionPinPatch), () => typeof(QuestPinPatch), () => typeof(LongNotes), () => typeof(InstantRemovePatch), () => typeof(TeleportPatch), () => typeof(FadeInPatch), () => typeof(FadeOutPatch), () => typeof(CleanupPatch), () => typeof(MoveInputPatch), () => typeof(MoveTargetPatch), () => typeof(MoveCellsPatch), () => typeof(MoveBuildPatch), () => typeof(MoveDisablePatch), () => typeof(TradePressPatch), () => typeof(TradeCountPatch), () => typeof(ZoneRedrawPatch), () => typeof(MoveRemoveLabelPatch), () => typeof(OrderPinPatch), () => typeof(AlchemyPinPatch), () => typeof(RespecOverPatch), () => typeof(RespecOutPatch), () => typeof(RespecTechPatch), () => typeof(CraftRepairPatch), () => typeof(RainScanPatch), () => typeof(TownBuiltPatch), () => typeof(MoveSpeedPatch), () => typeof(UiScalePatch) };
 #if DEV
             if (BenchEnabled.Value) patches.Add(() => typeof(SystemProfiler));
 #endif
@@ -321,6 +322,9 @@ namespace GK2Tweaks
             MenuScale = Config.Bind("Interface", "MenuScale", 0, new ConfigDescription(
                 "Size of the mod menu, FPS display and pinned list. 0 = automatic (follows the screen height).",
                 new AcceptableValueList<int>(0, 80, 90, 100, 110, 125, 150, 175, 200)));
+            GameUiScale = Config.Bind("Interface", "GameUiScale", 0, new ConfigDescription(
+                "Size of the game's HUD, menus and windows (game 1.011 or newer). Like the game = as large as the pixels of the game world (often 3x on ultrawide). If a size does not fit the screen, the game adjusts it by its own rules. The game world itself stays the same - use the camera zoom for that.",
+                new AcceptableValueList<int>(0, 2, 3, 4)));
             MenuBg = Config.Bind("Interface", "MenuBackground", "Scene", new ConfigDescription(
                 "Main menu background: the game's animated scene (Scene), one of six Vanilla+ pictures, or your own picture from your save (Mine).",
                 new AcceptableValueList<string>("Scene", "Bg1", "Bg2", "Bg3", "Bg4", "Bg5", "Bg6", "Mine")));
@@ -432,6 +436,7 @@ namespace GK2Tweaks
                 case "Pins": PinButton.RefreshAll(); break;
                 case "Camera": CameraZoom.OnSettingsChanged(); break;
                 case "Comfort": CameraZoom.OnSettingsChanged(); Application.runInBackground = true; ModsButton.ApplyVisibility(); break;
+                case "Interface": if (e.ChangedSetting == GameUiScale) UiScale.Apply(); break;
             }
         }
 
@@ -601,8 +606,10 @@ namespace GK2Tweaks
         internal static int OwnVsync = -1;
         internal static bool GameWantsVsync => GameVsync > 0 || GameVsyncSettingOn();
 
-        // VSync-Schalter aus dem Spielmenue per Reflection (Name unbekannt): nur exakte Namen aus einer Liste
+        // VSync-Schalter aus dem Spielmenue per Reflection: nur exakte Namen aus einer Liste
         // (siehe FindGameVsyncMember), damit Hilfsflags wie "vsyncSupported" nicht als Einstellung gelesen werden.
+        // Spiel 1.011: das Enum GameSettings.vsyncMode (VSyncMode { Disabled, Enabled }) - das Spiel schaltet vSyncCount
+        // selbst auf 0, wenn sein FPS-Limit unter der Bildwiederholrate liegt, daher reicht vSyncCount allein nicht.
         // Nicht gefunden -> false, dann zaehlt nur vSyncCount wie bisher.
         private static System.Reflection.MemberInfo gameVsyncMember;
         private static bool gameVsyncSearched, gameVsyncErrorLogged;
@@ -626,7 +633,9 @@ namespace GK2Tweaks
                 if (f != null) v = f.GetValue(gs);
                 System.Reflection.PropertyInfo p = gameVsyncMember as System.Reflection.PropertyInfo;
                 if (p != null) v = p.GetValue(gs, null);
-                return v is bool && (bool)v;
+                if (v is bool) return (bool)v;
+                if (v is Enum) { string n = v.ToString(); return n == "Enabled" || n == "On"; }
+                return false;
             }
             catch (Exception ex)
             {
@@ -667,13 +676,17 @@ namespace GK2Tweaks
                 bool pub = g != null && g.IsPublic;
                 if (best == null || (pub && !bestPublic)) { best = p; bestPublic = pub; }
             }
+            System.Reflection.FieldInfo enumField = null;
             foreach (System.Reflection.FieldInfo f in typeof(GameSettings).GetFields(bf))
             {
                 if (f.Name.IndexOf("vsync", StringComparison.OrdinalIgnoreCase) < 0) continue;
                 bool ok = f.FieldType == typeof(bool) && Array.IndexOf(GameVsyncNames, NormVsyncName(f.Name)) >= 0;
+                // Spiel 1.011: Enum vsyncMode mit Wert "Enabled" - nur genommen, wenn es kein passendes bool gibt
+                if (!ok && f.FieldType.IsEnum && NormVsyncName(f.Name) == "vsyncmode" && Enum.IsDefined(f.FieldType, "Enabled")) { if (enumField == null) enumField = f; continue; }
                 if (!ok) { other += " " + f.Name + ":" + f.FieldType.Name; continue; }
                 if (best == null || (f.IsPublic && !bestPublic)) { best = f; bestPublic = f.IsPublic; }
             }
+            if (best == null && enumField != null) { best = enumField; bestPublic = enumField.IsPublic; }
             // Diagnose: VSync-Mitglieder, die nicht auf der Liste stehen (anderer Name/Typ), nur loggen, nicht auswerten
             if (other.Length > 0) Log.LogInfo("Game VSync members (not on the name list or not bool, ignored):" + other);
             if (best != null) Log.LogInfo("Game VSync member chosen by exact name: " + best.Name + (bestPublic ? " (public)" : " (non-public)"));

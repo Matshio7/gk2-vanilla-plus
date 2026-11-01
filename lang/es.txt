@@ -82,7 +82,7 @@ Weekday (in game) => Día de la semana (en el juego)
 Time of day (in game) => Hora (en el juego)
 Extra resolutions => Resoluciones adicionales
 Main menu scaling => Escala del menú principal
-Pixel scale => Escala de píxeles
+Smaller scale steps => Escalas más pequeñas
 as graphics tier => según el nivel gráfico
 game setting => ajuste del juego
 Software limit => Límite por software
@@ -615,3 +615,6 @@ Changes to the settings take effect only after restarting the game. => Los cambi
 Updates come through the Steam Workshop: restart the game once Steam has updated the mod. => Las actualizaciones llegan a través del Steam Workshop: reinicia el juego cuando Steam haya actualizado el mod.
 Steam downloaded GK2 Vanilla+ {0} – the game still runs {1}. Restart the game: it installs Workshop updates by itself. => Steam descargó GK2 Vanilla+ {0}, pero el juego sigue usando la {1}. Reinicia el juego: instala por sí mismo las actualizaciones del Workshop.
 GK2 Vanilla+ {0} is available – it comes through the Steam Workshop: restart the game once Steam has downloaded it. => GK2 Vanilla+ {0} está disponible – llega a través del Steam Workshop: reinicia el juego cuando Steam lo haya descargado.
+HUD & menus: size => HUD y menús: tamaño
+Like the game => Como el juego
+Size of the game's HUD, menus and windows (game 1.011 or newer). Like the game = as large as the pixels of the game world (often 3x on ultrawide). If a size does not fit the screen, the game adjusts it by its own rules. The game world itself stays the same - use the camera zoom for that. => Tamaño del HUD, los menús y las ventanas del juego (juego 1.011 o posterior). Como el juego = tan grande como los píxeles del mundo del juego (a menudo 3x en ultrapanorámico). Si un tamaño no cabe en la pantalla, el juego lo ajusta según sus propias reglas. El mundo del juego no cambia; para eso usa el zoom de cámara.

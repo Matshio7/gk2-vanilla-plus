@@ -34,9 +34,9 @@ GK2 Vanilla+ fixes the small annoyances of Graveyard Keeper 2 without changing h
 - **FPS display** (F10): FPS, 1% low, CPU, GPU, RAM, VRAM, GPU temp, clock
 
 **Screen**
-- **Ultrawide 21:9 & 32:9** (2560×1080, 3440×1440, 3840×1080, 5120×1440, …) incl. main menu, HUD and full-width rain; optional pixel scale (2 = the wider view from before game update 1.011)
+- **Ultrawide 21:9 & 32:9** (2560×1080, 3440×1440, 3840×1080, 5120×1440, …) incl. main menu, HUD and full-width rain; from game 1.011 smaller scale steps such as 3440×1440 (x2)
 - **Main menu backgrounds** – six Vanilla+ pictures or your own view from your save, with styles, blur and drifting fog
-- OLED black, hide HUD (F7), HUD to center, skip intro logos
+- OLED black, hide HUD (F7), HUD to center, **HUD & menu size** (game 1.011+), skip intro logos
 - Camera zoom presets (F5), zoom indoors, mouse wheel; **hi-res screenshots** (F12) up to 4×
 
 **Saves**
@@ -100,9 +100,9 @@ GK2 Vanilla+ behebt die kleinen Ärgernisse von Graveyard Keeper 2, ohne das Spi
 - **FPS-Anzeige** (F10): FPS, 1%-Low, CPU, GPU, RAM, VRAM, GPU-Temperatur, Uhrzeit
 
 **Bild**
-- **Ultrawide 21:9 & 32:9** (2560×1080, 3440×1440, 3840×1080, 5120×1440, …) inkl. Hauptmenü, HUD und Regen über die volle Breite; optionale Pixel-Skalierung (2 = die weitere Sicht von vor Spiel-Update 1.011)
+- **Ultrawide 21:9 & 32:9** (2560×1080, 3440×1440, 3840×1080, 5120×1440, …) inkl. Hauptmenü, HUD und Regen über die volle Breite; ab Spiel 1.011 kleinere Stufen wie 3440×1440 (x2)
 - **Hauptmenü-Hintergründe** – sechs Vanilla+-Bilder oder deine eigene Ansicht aus dem Spielstand, mit Stilen, Unschärfe und Nebel
-- OLED-Schwarz, HUD ausblenden (F7), HUD mittig, Intro-Logos überspringen
+- OLED-Schwarz, HUD ausblenden (F7), HUD mittig, **HUD- & Menügröße** (ab Spiel 1.011), Intro-Logos überspringen
 - Zoom-Stufen (F5), Zoom in Innenräumen, Mausrad; **Screenshots** (F12) in bis zu 4-facher Auflösung
 
 **Spielstände**

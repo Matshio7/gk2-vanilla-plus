@@ -66,7 +66,14 @@ namespace GK2Tweaks
                 case 17: if (t > 49f) { Try(TownPinCheck, "town pin check"); step++; } break;
                 case 18: if (t > 50f) { Try(StuckRunning, "stuck running"); step++; } break;
                 case 19: if (t > 51f) { Shot("stb_repair_toast"); Plugin.Instance.StartCoroutine(WalkTest()); step++; } break;
-                case 20: if (t > 58f) { L("DONE"); step++; Application.Quit(); } break;
+                // 1.7.6
+                case 20: if (t > 58f) { Try(UiScaleLayout, "ui scale layout"); step++; } break;
+                case 21: if (t > 60f) { Try(UiScaleLive, "ui scale live"); step++; } break;
+                case 22: if (t > 62f) { Shot("stb_uiscale"); Try(UiScaleRestore, "ui scale restore"); Try(ScaleStepsList, "scale steps"); step++; } break;
+                case 23: if (t > 64f) { Try(VsyncPerfStart, "vsync perf start"); step++; } break;
+                case 24: if (t > 66f) { Try(() => VsyncPerfCheck("game unlimited"), "vsync perf unlimited"); Try(VsyncGame60, "vsync game 60"); step++; } break;
+                case 25: if (t > 68f) { Try(() => VsyncPerfCheck("game 60 fps"), "vsync perf 60"); Try(VsyncRestore, "vsync restore"); step++; } break;
+                case 26: if (t > 70f) { L("DONE"); step++; Application.Quit(); } break;
             }
         }
 
@@ -315,6 +322,96 @@ namespace GK2Tweaks
             gui.SetMenu(true);
             AccessTools.Method(typeof(TweaksGui), "SetTab").Invoke(gui, new object[] { 4 });
             Traverse.Create(gui).Field("scroll").SetValue(new Vector2(0, 1400));
+        }
+
+        // ---------- 1.7.6 ----------
+        private static int uiOld = -1;
+
+        // Spielformel mit unserer Vorgabe. Erwartet: 3440x1440 (Welt 3x) und 5120x1440 (Welt 4x):
+        // Spiel 3 Big / 4 Small, 2x 2/2 Big, 3x 3/3 Big, 4x 4 Small / 4 Small
+        private static void UiScaleLayout()
+        {
+            uiOld = Plugin.GameUiScale.Value;
+            var sb = new System.Text.StringBuilder();
+            bool ok = true;
+            int[][] expect = { new[] { 0, 3, 4 }, new[] { 2, 2, 2 }, new[] { 3, 3, 3 }, new[] { 4, 4, 4 } };
+            foreach (int[] e in expect)
+            {
+                Plugin.GameUiScale.Value = e[0];
+                ResolutionConfig.GetUiLayout(3440, 1440, 3, out int a, out UIWindowSizeType ta);
+                ResolutionConfig.GetUiLayout(5120, 1440, 4, out int b, out UIWindowSizeType tb);
+                sb.Append(" [" + e[0] + ": " + a + ta + " / " + b + tb + "]");
+                if (a != e[1] || b != e[2]) ok = false;
+            }
+            L("UI SCALE LAYOUT " + (ok ? "OK" : "FAIL") + sb);
+        }
+
+        // Live: Stufe 2 setzen (SettingChanged -> UiScale.Apply -> NotifyResolutionChanged) und Canvas-Faktor des Spiels pruefen
+        private static void UiScaleLive()
+        {
+            Plugin.GameUiScale.Value = 2;
+            float f = ResolutionConfig.GetUiScaleFactor();
+            float canvas = -1f;
+            var ge = UnityEngine.Object.FindObjectOfType<GUIElements>();
+            if (ge != null) canvas = Traverse.Create(ge).Field("canvasScaler").Property("scaleFactor").GetValue<float>();
+            L("UI SCALE LIVE res=" + Screen.width + "x" + Screen.height + " world=" + ResolutionConfig.PixelSize + "x ui=" + f + "x canvas=" + canvas + "x " + (Math.Abs(f - canvas) < 0.01f ? "OK" : "FAIL"));
+        }
+
+        private static void UiScaleRestore()
+        {
+            Plugin.GameUiScale.Value = uiOld < 0 ? 0 : uiOld;
+            L("ui scale restored to " + Plugin.GameUiScale.Value + " (ui " + ResolutionConfig.GetUiScaleFactor() + "x)");
+        }
+
+        // 1.7.6 Tearing: Profil "Leistung" mit VSync im Spiel an. Die Spielwerte werden nur im Speicher geaendert und vor dem
+        // Ende zurueckgesetzt (die Config stellt das Test-Skript wieder her). Erwartet: VSync bleibt an, Intervall = Hz / 60 abgerundet.
+        private static VSyncMode vsOld;
+        private static TargetFrameRate fpsOld;
+        private static bool vsSaved;
+
+        private static void VsyncPerfStart()
+        {
+            GameSettings gs = GameSettings.Instance;
+            vsOld = gs.vsyncMode; fpsOld = gs.targetFrameRate; vsSaved = true;
+            gs.vsyncMode = VSyncMode.Enabled; gs.targetFrameRate = TargetFrameRate.Unlimited;
+            gs.ApplyScreenSettings();
+            Profiles.Apply("Performance");
+            L("VSYNC PERF start: game " + vsOld + "/" + fpsOld + " -> Enabled/Unlimited, profile Performance");
+        }
+
+        private static void VsyncPerfCheck(string what)
+        {
+            int hz = Plugin.MonitorHz(), vs = QualitySettings.vSyncCount, fps = Application.targetFrameRate;
+            int expect = hz > 0 ? Mathf.Clamp(Mathf.FloorToInt((float)hz / 60 + 0.001f), 1, 4) : 1;
+            bool ok = Plugin.TearFix && vs == expect && fps == -1;
+            L("VSYNC PERF " + what + " " + (ok ? "OK" : "FAIL") + ": monitor " + hz + " Hz, game vSyncCount " + Plugin.GameVsync + " fps " + Plugin.GameFps
+                + ", game setting on " + Plugin.GameVsyncSettingOn() + ", TearFix " + Plugin.TearFix + " -> vSyncCount " + vs + " (expect " + expect + "), targetFrameRate " + fps
+                + ", Vanilla+ " + Plugin.Pacing.Value + " " + Plugin.TargetFps.Value + ", No tearing " + Plugin.NoTearing.Value);
+        }
+
+        // Spiel-Limit 60 FPS: das Spiel selbst schaltet vSyncCount dann auf 0 (Limit unter der Bildwiederholrate)
+        private static void VsyncGame60()
+        {
+            GameSettings gs = GameSettings.Instance;
+            gs.targetFrameRate = TargetFrameRate.Fps60;
+            gs.ApplyScreenSettings();
+        }
+
+        private static void VsyncRestore()
+        {
+            if (!vsSaved) return;
+            GameSettings gs = GameSettings.Instance;
+            gs.vsyncMode = vsOld; gs.targetFrameRate = fpsOld;
+            gs.ApplyScreenSettings();
+            L("vsync restored: game " + gs.vsyncMode + "/" + gs.targetFrameRate + ", vSyncCount " + QualitySettings.vSyncCount + ", targetFrameRate " + Application.targetFrameRate);
+        }
+
+        // GK2 Ultrawide 1.0.2: kleinere Stufen fuer Ultrawide in der Aufloesungsliste
+        private static void ScaleStepsList()
+        {
+            string[] names = ResolutionConfig.GetResolutionsStringArray();
+            bool any = names.Any(n => n.EndsWith("(x2)") && n.Contains("x1080") || n.EndsWith("(x2)") && n.Contains("x1440") && !n.StartsWith("2560x"));
+            L("SCALE STEPS " + (any ? "OK" : "NONE") + " list=" + string.Join(", ", names));
         }
     }
 }
