@@ -96,7 +96,9 @@ namespace GK2Tweaks
             {
                 try
                 {
-                    if ((string.IsNullOrEmpty(file) || !File.Exists(file)) && File.Exists(ThumbnailFile))
+                    // Immer unser Bild: ab Spiel 1.011 legt der Uploader ohne Thumbnail.* im Ordner selbst ein schwarzes
+                    // 256x256-Thumbnail.png an (EnsureThumbnail) und wuerde das als Vorschaubild setzen.
+                    if (File.Exists(ThumbnailFile))
                     {
                         Plugin.Log.LogInfo("Workshop upload: preview from " + ThumbnailFile);
                         file = ThumbnailFile;

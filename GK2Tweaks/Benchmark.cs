@@ -222,7 +222,7 @@ namespace GK2Tweaks
                 gs.graphicsTier = baseTier.Value;
                 gs.ApplyGraphicsTier(applySave: !keepSnapshots);
             }
-            if (gs != null && baseRes != null && (gs.resolutionConfig == null || gs.resolutionConfig.ListedWidth != baseRes.ListedWidth || gs.resolutionConfig.ListedHeight != baseRes.ListedHeight))
+            if (gs != null && baseRes != null && (gs.resolutionConfig == null || gs.resolutionConfig.AppliedWidth != baseRes.AppliedWidth || gs.resolutionConfig.AppliedHeight != baseRes.AppliedHeight))
             {
                 gs.resolutionConfig = baseRes.Copy();
                 gs.ApplyGraphicSettings(applySave: !keepSnapshots);
