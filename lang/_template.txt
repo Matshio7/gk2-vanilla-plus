@@ -80,7 +80,6 @@ Strong =>
 Dense => 
 same as outside => 
 Automatic => 
-Like the game => 
 every => 
 every save => 
 High => 
@@ -550,6 +549,9 @@ Press a key … (Esc = none) =>
 Left click on the pin => 
 Middle mouse button => 
 Mouse button {0} => 
+Like the game ({0}×) => 
+Like the game => 
+{0}× – too big, {1}× => 
 Steam downloaded GK2 Vanilla+ {0} – the game still runs {1}. Restart the game: it installs Workshop updates by itself. => 
 Steam downloaded GK2 Vanilla+ {0} – the game still runs {1}. To update: F9 › "Save & update" (or run Installieren.bat in the Workshop folder). => 
 GK2 Vanilla+ {0} is available – it comes through the Steam Workshop: restart the game once Steam has downloaded it. => 

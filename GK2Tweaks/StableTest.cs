@@ -69,11 +69,13 @@ namespace GK2Tweaks
                 // 1.7.6
                 case 20: if (t > 58f) { Try(UiScaleLayout, "ui scale layout"); step++; } break;
                 case 21: if (t > 60f) { Try(UiScaleLive, "ui scale live"); step++; } break;
-                case 22: if (t > 62f) { Shot("stb_uiscale"); Try(UiScaleRestore, "ui scale restore"); Try(ScaleStepsList, "scale steps"); step++; } break;
-                case 23: if (t > 64f) { Try(VsyncPerfStart, "vsync perf start"); step++; } break;
-                case 24: if (t > 66f) { Try(() => VsyncPerfCheck("game unlimited"), "vsync perf unlimited"); Try(VsyncGame60, "vsync game 60"); step++; } break;
-                case 25: if (t > 68f) { Try(() => VsyncPerfCheck("game 60 fps"), "vsync perf 60"); Try(VsyncRestore, "vsync restore"); step++; } break;
-                case 26: if (t > 70f) { L("DONE"); step++; Application.Quit(); } break;
+                // Bild und Zuruecksetzen in getrennten Frames: das Spiel wendet die UI-Groesse sofort an, das Bild entsteht erst am Frame-Ende
+                case 22: if (t > 62f) { Shot("stb_uiscale"); step++; } break;
+                case 23: if (t > 63f) { Try(UiScaleRestore, "ui scale restore"); Try(ScaleStepsList, "scale steps"); step++; } break;
+                case 24: if (t > 64f) { Try(VsyncPerfStart, "vsync perf start"); step++; } break;
+                case 25: if (t > 66f) { Try(() => VsyncPerfCheck("game unlimited"), "vsync perf unlimited"); Try(VsyncGame60, "vsync game 60"); step++; } break;
+                case 26: if (t > 68f) { Try(() => VsyncPerfCheck("game 60 fps"), "vsync perf 60"); Try(VsyncRestore, "vsync restore"); step++; } break;
+                case 27: if (t > 70f) { L("DONE"); step++; Application.Quit(); } break;
             }
         }
 
@@ -334,7 +336,7 @@ namespace GK2Tweaks
             uiOld = Plugin.GameUiScale.Value;
             var sb = new System.Text.StringBuilder();
             bool ok = true;
-            int[][] expect = { new[] { 0, 3, 4 }, new[] { 2, 2, 2 }, new[] { 3, 3, 3 }, new[] { 4, 4, 4 } };
+            int[][] expect = { new[] { 0, 3, 4 }, new[] { 1, 1, 1 }, new[] { 2, 2, 2 }, new[] { 3, 3, 3 }, new[] { 4, 4, 4 } };
             foreach (int[] e in expect)
             {
                 Plugin.GameUiScale.Value = e[0];
@@ -346,15 +348,17 @@ namespace GK2Tweaks
             L("UI SCALE LAYOUT " + (ok ? "OK" : "FAIL") + sb);
         }
 
-        // Live: Stufe 2 setzen (SettingChanged -> UiScale.Apply -> NotifyResolutionChanged) und Canvas-Faktor des Spiels pruefen
+        // Live: Stufe 1 setzen (SettingChanged -> UiScale.Apply -> NotifyResolutionChanged) und Canvas-Faktor des Spiels pruefen
         private static void UiScaleLive()
         {
-            Plugin.GameUiScale.Value = 2;
+            float before = ResolutionConfig.GetUiScaleFactor();
+            Plugin.GameUiScale.Value = 1;
+            L("UI SCALE MENU TEXT 1: " + UiScale.ValueText(1) + " | before " + before + "x");
             float f = ResolutionConfig.GetUiScaleFactor();
             float canvas = -1f;
             var ge = UnityEngine.Object.FindObjectOfType<GUIElements>();
             if (ge != null) canvas = Traverse.Create(ge).Field("canvasScaler").Property("scaleFactor").GetValue<float>();
-            L("UI SCALE LIVE res=" + Screen.width + "x" + Screen.height + " world=" + ResolutionConfig.PixelSize + "x ui=" + f + "x canvas=" + canvas + "x " + (Math.Abs(f - canvas) < 0.01f ? "OK" : "FAIL"));
+            L("UI SCALE LIVE res=" + Screen.width + "x" + Screen.height + " world=" + ResolutionConfig.PixelSize + "x ui=" + f + "x canvas=" + canvas + "x " + (Math.Abs(f - canvas) < 0.01f && Math.Abs(f - 1f) < 0.01f ? "OK" : "FAIL"));
         }
 
         private static void UiScaleRestore()

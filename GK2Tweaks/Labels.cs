@@ -371,7 +371,7 @@ namespace GK2Tweaks
                 if (key == "Size") return i + " px";
                 if (key == "InteriorZoom") return i == 0 ? T("wie draußen", "same as outside") : i + " %";
                 if (key == "MenuScale") return i == 0 ? T("Automatisch", "Automatic") : i + " %";
-                if (key == "GameUiScale") return i == 0 ? T("Wie im Spiel", "Like the game") : i + "×";
+                if (key == "GameUiScale") return UiScale.ValueText(i);
                 if (key == "Scale") return i + "×";
                 if (key == "AutoSaveMinutes") return i == 0 ? T("Aus", "Off") : T("alle ", "every ") + i + " min";
                 if (key == "KeepBackups") return i == 0 ? T("Aus", "Off") : i.ToString();

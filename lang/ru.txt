@@ -617,4 +617,6 @@ Steam downloaded GK2 Vanilla+ {0} – the game still runs {1}. Restart the game:
 GK2 Vanilla+ {0} is available – it comes through the Steam Workshop: restart the game once Steam has downloaded it. => Доступна GK2 Vanilla+ {0} – она придёт через Steam Workshop: перезапустите игру, когда Steam её загрузит.
 HUD & menus: size => HUD и меню: размер
 Like the game => Как в игре
+Like the game ({0}×) => Как в игре ({0}×)
+{0}× – too big, {1}× => {0}× – не помещается, {1}×
 Size of the game's HUD, menus and windows (game 1.011 or newer). Like the game = as large as the pixels of the game world (often 3x on ultrawide). If a size does not fit the screen, the game adjusts it by its own rules. The game world itself stays the same - use the camera zoom for that. => Размер HUD, меню и окон игры (игра 1.011 или новее). «Как в игре» = такой же, как пиксели игрового мира (на ультрашироких экранах часто 3x). Если размер не помещается на экран, игра подстраивает его по своим правилам. Сам игровой мир не меняется – для этого используйте масштаб камеры.

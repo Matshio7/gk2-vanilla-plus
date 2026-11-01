@@ -324,7 +324,7 @@ namespace GK2Tweaks
                 new AcceptableValueList<int>(0, 80, 90, 100, 110, 125, 150, 175, 200)));
             GameUiScale = Config.Bind("Interface", "GameUiScale", 0, new ConfigDescription(
                 "Size of the game's HUD, menus and windows (game 1.011 or newer). Like the game = as large as the pixels of the game world (often 3x on ultrawide). If a size does not fit the screen, the game adjusts it by its own rules. The game world itself stays the same - use the camera zoom for that.",
-                new AcceptableValueList<int>(0, 2, 3, 4)));
+                new AcceptableValueList<int>(0, 1, 2, 3, 4)));
             MenuBg = Config.Bind("Interface", "MenuBackground", "Scene", new ConfigDescription(
                 "Main menu background: the game's animated scene (Scene), one of six Vanilla+ pictures, or your own picture from your save (Mine).",
                 new AcceptableValueList<string>("Scene", "Bg1", "Bg2", "Bg3", "Bg4", "Bg5", "Bg6", "Mine")));
