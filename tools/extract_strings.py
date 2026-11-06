@@ -38,8 +38,9 @@ def collect():
             add(m.group(2))
         for m in re.finditer(r"\bEn\s*=\s*" + LIT, text):
             add(m.group(1))
-        if fn == "Plugin.cs":
-            for m in re.finditer(r"Config\.Bind\(\s*" + LIT + r"\s*,\s*" + LIT + r"\s*,[^;]*?,\s*(?:new ConfigDescription\(\s*)?" + LIT, text, flags=re.S):
+        # Config-Beschreibungen (Tooltips): Plugin.cs und seit 1.7.7 auch BindConfig(ConfigFile cfg) in Funktionsklassen
+        if fn == "Plugin.cs" or re.search(r"\bcfg\.Bind\(", text):
+            for m in re.finditer(r"\b(?:Config|cfg)\.Bind\(\s*" + LIT + r"\s*,\s*" + LIT + r"\s*,[^;]*?,\s*(?:new ConfigDescription\(\s*)?" + LIT, text, flags=re.S):
                 if m.group(1) == "Benchmark":
                     continue
                 add(unesc(m.group(3)).split(" / ")[0])

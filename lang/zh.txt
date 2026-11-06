@@ -620,3 +620,36 @@ Like the game => 与游戏一致
 Like the game ({0}×) => 与游戏一致（{0}×）
 {0}× – too big, {1}× => {0}× – 太大，{1}×
 Size of the game's HUD, menus and windows (game 1.011 or newer). Like the game = as large as the pixels of the game world (often 3x on ultrawide). If a size does not fit the screen, the game adjusts it by its own rules. The game world itself stays the same - use the camera zoom for that. => 游戏 HUD、菜单和窗口的大小（游戏 1.011 或更新版本）。与游戏一致 = 与游戏世界的像素一样大（超宽屏常为 3x）。如果某个大小放不下屏幕，游戏会按自己的规则调整。游戏世界本身不变——如需调整请使用镜头缩放。
+
+# 1.7.7
+Saved after the battle => 已在战斗后存档
+Saving after the battle failed. => 战斗后存档失败。
+No saving during a battle: saves the game makes while a battle is running (often broken) are skipped, and Vanilla+ saves once right after the battle instead. If you quit during a battle, the save from before the battle is kept. => 战斗中不存档：游戏在战斗进行时进行的存档（常常损坏）会被跳过，Vanilla+ 会在战斗结束后立即存档一次。如果在战斗中退出游戏，将保留战斗开始前的存档。
+Repeat work (not vanilla) => 重复工作（非原版）
+Repeat work key => 重复工作按键
+No saving in battle => 战斗中不存档
+Quest pins: required items => 固定的任务：所需物品
+Not possible during a battle – Vanilla+ saves right after it. => 战斗中无法存档 – Vanilla+ 会在战斗结束后立即存档。
+Not saved during the battle – Vanilla+ saves right after it. => 战斗中未存档 – Vanilla+ 会在战斗结束后立即存档。
+Money => 金钱
+Quest pins also list the items (and money) the current quest step asks for, with have/need counts like recipe pins. Experimental: read from the game's quest data; if it can't be read, quest pins show only the task text as before. => 固定的任务也会列出当前步骤所需的物品（和金钱），并像配方一样显示拥有/需要数量。实验性：从游戏的任务数据中读取；如果无法读取，固定的任务仍只显示任务文本。
+turned off => 已关闭
+error => 错误
+Not during a battle. => 战斗中不可用。
+Repeat work is not possible while "Repair stuck workbench" is on. => 开启“修复卡住的工作台”时无法使用重复工作。
+Repeat work: stand at a workbench with queued crafts. => 重复工作：请站在有排队订单的工作台旁。
+Repeat work on – walk away or press the key again to stop. => 重复工作已开启 – 走开或再次按键即可停止。
+battle => 战斗
+Repeat work: here F opens the craft window – not supported at this workbench. => 重复工作：在这里 F 会打开制作窗口 – 此工作台不支持。
+a window opened => 打开了窗口
+workbench gone => 工作台不见了
+you moved => 你走开了
+queue finished => 队列已完成
+nothing happened => 没有效果
+limit reached => 已达上限
+not reachable => 无法到达
+Repeat work off. => 重复工作已关闭。
+Repeat work off ({0}). => 重复工作已关闭（{0}）。
+Repeat work (not vanilla): press the Repeat work key once at a workbench you work at yourself; Vanilla+ then presses F for you whenever the next queued craft is ready to start, until the queue is empty, you walk away, a Vanilla+ or craft window opens or a battle starts. It waits while another menu is open or the game is paused. Off by default. => 重复工作（非原版）：在你亲自操作的工作台旁按一次重复工作键；之后每当队列中的下一个订单可以开始时，Vanilla+ 会替你按 F，直到队列为空、你走开、打开 Vanilla+ 或制作窗口，或战斗开始。打开其他菜单或游戏暂停时会等待。默认关闭。
+Key that starts/stops Repeat work at the workbench you stand at (empty = feature unusable). => 在你所站的工作台启动/停止重复工作的按键（留空 = 无法使用此功能）。
+Repeat work => 重复工作

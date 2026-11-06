@@ -71,6 +71,9 @@ namespace GK2Tweaks
             Add(Plugin.AutoSaveMinutes, 0);
             Add(Plugin.MoveSpeed, 100);
             Add(Plugin.GameUiScale, 0);
+            Add(BattleSave.Enabled, false);
+            Add(QuestPins.Enabled, false);
+            Add(RepeatWork.Enabled, false);
             return l;
         }
 

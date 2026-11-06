@@ -36,6 +36,28 @@ namespace GK2Tweaks
             catch { return false; }
         }
 
+        // 1.7.7: fuer Aufrufer, die jeden Frame fragen (BattleSave.Tick, RepeatWork) - sucht hoechstens alle 0,5 s.
+        // Fuer die Entscheidung bei einem einzelnen Save-Aufruf weiter InBattle() nehmen.
+        private static float battleAt = -1f;
+        private static bool battleVal;
+        internal static bool InBattleCached()
+        {
+            float t = Time.realtimeSinceStartup;
+            if (battleAt < 0f || t >= battleAt) { battleAt = t + 0.5f; battleVal = InBattle(); }
+            return battleVal;
+        }
+
+        // Fuers Log: aktueller Kampfzustand ("-" ohne Kampf-Controller)
+        internal static string FightStateText()
+        {
+            try
+            {
+                FightingGameController c = UnityEngine.Object.FindFirstObjectByType<FightingGameController>();
+                return c != null ? c.CurrentFightState.ToString() : "-";
+            }
+            catch { return "?"; }
+        }
+
         private const string KeepMark = "keep.txt";
         internal static bool IsKept(string dir) => File.Exists(Path.Combine(dir, KeepMark));
 
@@ -55,8 +77,13 @@ namespace GK2Tweaks
         internal static string Root => Path.Combine(Path.Combine(Paths.BepInExRootPath, "GK2VanillaPlus"), "Backups");
         private const string Stamp = "yyyy-MM-dd_HH-mm-ss";
 
+        // 1.7.7: von BattleSave gesetzt - der letzte Stand vor dem Kampf wird vor dem Speichern nach dem Kampf immer gesichert
+        internal static bool ForceNextBackup;
+
         internal static void BeforeSave(SaveSlotData slot)
         {
+            bool forceNext = ForceNextBackup;
+            ForceNextBackup = false;
             int keep = Plugin.BackupCount.Value;
             if (keep <= 0 || slot == null || slot.isDemoSave || string.IsNullOrEmpty(slot.slotName)) return;
             DateTime now = DateTime.Now;
@@ -68,7 +95,7 @@ namespace GK2Tweaks
             {
                 // Der letzte gute Stand vor einem Kampf wird immer gesichert, auch wenn das letzte Backup noch frisch ist:
                 // Autosaves mitten im Kampf sind oft kaputt (John?, Bug-Thread #12).
-                bool force = battleNow && !prevBattle;
+                bool force = (battleNow && !prevBattle) || forceNext;
                 bool due = !lastBackup.TryGetValue(slot.slotName, out DateTime last) || (now - last).TotalMinutes >= Plugin.BackupMinutes.Value;
                 if ((force || due) && Copy(slot.slotName, now.ToString(Stamp)))
                 {
@@ -177,7 +204,8 @@ namespace GK2Tweaks
         // Ein Fehler beim Backup darf das Speichern des Spiels nie verhindern
         private static void Prefix(SaveSlotData slotData)
         {
-            try { if (!Plugin.BenchOn && SafeMode.On("Saves")) Backups.BeforeSave(slotData); }
+            // 1.7.7: ein im Kampf uebersprungenes Speichern schreibt weder Backup noch last_save.txt = "battle"
+            try { if (!Plugin.BenchOn && SafeMode.On("Saves") && !BattleSave.ShouldBlock()) Backups.BeforeSave(slotData); }
             catch (Exception e) { SafeMode.Fail("Saves", e); }
         }
     }

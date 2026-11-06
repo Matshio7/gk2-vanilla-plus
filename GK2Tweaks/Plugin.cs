@@ -14,7 +14,7 @@ namespace GK2Tweaks
     {
         public const string Guid = "mats.gk2.tweaks";
         public const string PluginName = "GK2 Tweaks";
-        public const string PluginVersion = "1.7.6";
+        public const string PluginVersion = "1.7.7";
         // Anzeige (Hauptmenue, Was ist neu, Log). Hotfix-Buchstaben (z. B. "b") nur bei schnellen, nicht voll getesteten Hotfixes. PluginVersion bleibt
         // eine reine Zahl - BepInEx, Update-Check und Installer lesen sie als Version.
         // Vorab-Versionen (Beta): BetaNumber > 0 und BetaTag " Beta N" setzen; Stabil: 0 und "". GitHub-Tag der Beta: v<Version>-beta.<N>
@@ -145,7 +145,7 @@ namespace GK2Tweaks
             var harmony = new Harmony(Guid);
             // Die Typen stecken bewusst in Lambdas (wie in SafeMode.CheckGame): ein typeof(X), das beim JIT scheitert,
             // trifft so nur diesen einen Eintrag statt das ganze Awake.
-            var patches = new System.Collections.Generic.List<Func<Type>> { () => typeof(TierPatch), () => typeof(ScreenSettingsPatch), () => typeof(SaveBlockPatch), () => typeof(ZoomPatch), () => typeof(ModdedLabelPatch), () => typeof(BackupPatch), () => typeof(MainMenuModsButtonPatch), () => typeof(PauseModsButtonPatch), () => typeof(CraftCellPinPatch), () => typeof(SelectionPinPatch), () => typeof(QuestPinPatch), () => typeof(LongNotes), () => typeof(InstantRemovePatch), () => typeof(TeleportPatch), () => typeof(FadeInPatch), () => typeof(FadeOutPatch), () => typeof(CleanupPatch), () => typeof(MoveInputPatch), () => typeof(MoveTargetPatch), () => typeof(MoveCellsPatch), () => typeof(MoveBuildPatch), () => typeof(MoveDisablePatch), () => typeof(TradePressPatch), () => typeof(TradeCountPatch), () => typeof(ZoneRedrawPatch), () => typeof(MoveRemoveLabelPatch), () => typeof(OrderPinPatch), () => typeof(AlchemyPinPatch), () => typeof(RespecOverPatch), () => typeof(RespecOutPatch), () => typeof(RespecTechPatch), () => typeof(CraftRepairPatch), () => typeof(RainScanPatch), () => typeof(TownBuiltPatch), () => typeof(MoveSpeedPatch), () => typeof(UiScalePatch) };
+            var patches = new System.Collections.Generic.List<Func<Type>> { () => typeof(TierPatch), () => typeof(ScreenSettingsPatch), () => typeof(SaveBlockPatch), () => typeof(ZoomPatch), () => typeof(ModdedLabelPatch), () => typeof(BackupPatch), () => typeof(BattleSavePatch), () => typeof(MainMenuModsButtonPatch), () => typeof(PauseModsButtonPatch), () => typeof(CraftCellPinPatch), () => typeof(SelectionPinPatch), () => typeof(QuestPinPatch), () => typeof(LongNotes), () => typeof(InstantRemovePatch), () => typeof(TeleportPatch), () => typeof(FadeInPatch), () => typeof(FadeOutPatch), () => typeof(CleanupPatch), () => typeof(MoveInputPatch), () => typeof(MoveTargetPatch), () => typeof(MoveCellsPatch), () => typeof(MoveBuildPatch), () => typeof(MoveDisablePatch), () => typeof(TradePressPatch), () => typeof(TradeCountPatch), () => typeof(ZoneRedrawPatch), () => typeof(MoveRemoveLabelPatch), () => typeof(OrderPinPatch), () => typeof(AlchemyPinPatch), () => typeof(RespecOverPatch), () => typeof(RespecOutPatch), () => typeof(RespecTechPatch), () => typeof(CraftRepairPatch), () => typeof(RainScanPatch), () => typeof(TownBuiltPatch), () => typeof(MoveSpeedPatch), () => typeof(UiScalePatch) };
 #if DEV
             if (BenchEnabled.Value) patches.Add(() => typeof(SystemProfiler));
 #endif
@@ -414,6 +414,11 @@ namespace GK2Tweaks
                 "Write frame statistics to the BepInEx log every N seconds (0 = off).",
                 new AcceptableValueList<int>(0, 5, 10, 30, 60)));
 
+            // 1.7.7: Eintraege der neuen Funktionen stehen in ihren eigenen Klassen
+            BattleSave.BindConfig(Config);
+            QuestPins.BindConfig(Config);
+            RepeatWork.BindConfig(Config);
+
 #if DEV
             BenchEnabled = Config.Bind("Benchmark", "Enabled", false, "Nur fuer Messlaeufe: laedt den letzten Spielstand (Speichern blockiert), misst und beendet das Spiel.");
             BenchLabel = Config.Bind("Benchmark", "Label", "run", "Name des Messlaufs.");
@@ -484,6 +489,7 @@ namespace GK2Tweaks
             SafeMode.Run("EscLeave", () => GK2Tweaks.EscLeave.Tick(Gui.AnyWindowOpen));
             SafeMode.Run("Pins", PadBind.Tick);
             SafeMode.Run("MoveObjects", BuildMove.Tick);
+            SafeMode.Run("RepeatWork", RepeatWork.Tick);
 #if MINIMAP
             SafeMode.Run("Minimap", Minimap.Tick);
 #endif
@@ -514,6 +520,7 @@ namespace GK2Tweaks
             bench?.Update(dt);
 #endif
             SafeMode.Run("Saves", AutoSave.Tick);
+            SafeMode.Run("Saves", BattleSave.Tick);
             SafeMode.Run("Zoom", ZoomPatch.Tick);
             SafeMode.Run("Zoom", () => CameraZoom.Tick(dt));
             SafeMode.Run("Screenshots", HiResShot.Tick);

@@ -166,6 +166,8 @@ namespace GK2Tweaks
             try
             {
                 if (!MainGame.PlayerController.IsControlsEnabledExcept()) { nextSave = now + 10f; return; }
+                // 1.7.7: "Kein Speichern im Kampf" - der Autosave-Timer wartet bis nach dem Kampf
+                if (BattleSave.BlocksManual()) { nextSave = now + 10f; return; }
                 Plugin.Log.LogInfo("Autosave");
                 SaveSystem.Save(mg.SaveSlotData, mg.GameSave);
             }
@@ -199,6 +201,10 @@ namespace GK2Tweaks
                 MainGame mg = MainGame.Instance;
                 if (mg == null || mg.gameState != MainGame.GameState.InGame || mg.GameSave == null)
                 { Say(Labels.T("Speichern geht nur im laufenden Spiel.", "Saving only works while playing.")); return; }
+                // 1.7.7: im Kampf wuerde BattleSavePatch das Speichern ueberspringen und trotzdem "Gespeichert" melden
+                // (bei "Speichern & aktualisieren" startete dann sogar der Updater) - darum vorher ablehnen
+                if (BattleSave.BlocksManual())
+                { BattleSave.Request(); Say(Labels.T("Während eines Kampfs nicht möglich – Vanilla+ speichert direkt danach.", "Not possible during a battle – Vanilla+ saves right after it.")); return; }
                 // Das offene Mod-Menue sperrt selbst die Steuerung (ByTeleport) - das zaehlt hier nicht.
                 bool free = menuOpen ? MainGame.PlayerController.IsControlsEnabledExcept(TakenControlType.ByTeleport)
                                      : MainGame.PlayerController.IsControlsEnabledExcept();

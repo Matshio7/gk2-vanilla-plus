@@ -1,5 +1,17 @@
 # Changelog
 
+## 1.7.7 – unreleased
+
+**EN**
+- **New: No saving in battle** (off by default) – mod menu (F9) → Gameplay helpers, next to "Autosave": turn on "No saving in battle", and saves the game makes while a battle is running (these are often broken) are skipped. Vanilla+ then saves once right after the battle, as soon as you have control again ("Saved after the battle"), and keeps the last save from before the battle as a backup. Vanilla+'s own save key and extra autosave wait until the battle is over. If you quit during a battle, the save from before the battle is kept (thanks Diepie2635).
+- **New: quest pins show required items** – mod menu (F9) → Pins → "Quest pins: required items" (off by default, experimental): pinned quests also list the items and money the current step asks for, e.g. 5 wheat for the farmer, with have/need like recipe pins. They show "ready" with a short message when you have everything, and "done" when the quest is completed. If Vanilla+ can't read a quest's requirements, the pin shows only the task text as before. If rows are missing or wrong, please attach BepInEx\LogOutput.log (thanks Ydyp).
+- **New: Repeat work (not vanilla, off by default)** – mod menu (F9) → Gameplay helpers: turn on "Repeat work (not vanilla)" and set a "Repeat work key", then press it once at a workbench you work at yourself. Vanilla+ then presses F for you each time the next queued craft can start. It stops when the queue is empty, you walk away, a Vanilla+ or craft window opens or a battle starts – or when you press the key again. While another menu is open or the game is paused, it waits (thanks DokMo).
+
+**DE**
+- **Neu: Kein Speichern im Kampf** (standardmäßig aus) – Mod-Menü (F9) → Spielhilfen, neben „Autosave“: „Kein Speichern im Kampf“ einschalten, dann werden Speicherstände, die das Spiel mitten im Kampf anlegt (die sind oft kaputt), übersprungen. Vanilla+ speichert stattdessen einmal direkt nach dem Kampf, sobald du wieder steuern kannst („Nach dem Kampf gespeichert“), und behält den letzten Stand vor dem Kampf als Backup. Die Speichern-Taste und der zusätzliche Autosave von Vanilla+ warten, bis der Kampf vorbei ist. Beendest du das Spiel im Kampf, bleibt der Spielstand von vor dem Kampf erhalten (danke Diepie2635).
+- **Neu: Quest-Pins zeigen benötigte Gegenstände** – Mod-Menü (F9) → Anpinnen → „Quest-Pins: benötigte Gegenstände“ (standardmäßig aus, experimentell): Angepinnte Quests zeigen auch die Gegenstände und das Geld, die der aktuelle Schritt verlangt, z. B. 5 Weizen für den Bauern, mit Haben/Brauchen wie bei Rezepten. Ist alles da, steht „bereit“ mit kurzer Meldung, ist die Quest erledigt, steht „erledigt“. Kann Vanilla+ die Anforderungen einer Quest nicht lesen, zeigt der Pin wie bisher nur den Aufgabentext. Fehlen Zeilen oder stimmen sie nicht, bitte BepInEx\LogOutput.log anhängen (danke Ydyp).
+- **Neu: Arbeit wiederholen (nicht Vanilla, standardmäßig aus)** – Mod-Menü (F9) → Spielhilfen: „Arbeit wiederholen (nicht Vanilla)“ einschalten und eine „Taste Arbeit wiederholen“ festlegen, dann an einer Werkbank, die du selbst bedienst, einmal drücken. Vanilla+ drückt dann jedes Mal F für dich, sobald der nächste Auftrag der Warteschlange starten kann. Schluss ist, wenn die Warteschlange leer ist, du weggehst, ein Vanilla+- oder Herstellfenster aufgeht oder ein Kampf beginnt – oder wenn du die Taste noch einmal drückst. Solange ein anderes Menü offen ist oder das Spiel pausiert, wartet es (danke DokMo).
+
 ## 1.7.6 – 2026-11-01 · HUD & menu size, 2× for ultrawide
 
 **EN**

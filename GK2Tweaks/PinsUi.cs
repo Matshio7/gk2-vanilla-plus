@@ -62,7 +62,7 @@ namespace GK2Tweaks
                 got += Mathf.Min(n.Have, n.Count);
                 need += Mathf.Max(1, n.Count);
             }
-            if (p.QuestId != null) return p.Ready ? 1f : 0f;
+            if (p.QuestId != null && (p.Needs.Count == 0 || QuestPins.Done(p))) return p.Ready ? 1f : 0f;
             return need > 0f ? got / need : (p.Ready ? 1f : 0f);
         }
 
@@ -82,7 +82,7 @@ namespace GK2Tweaks
             float w = 0f, h = 0f, countW = pnCount.CalcSize(new GUIContent("999 / 999")).x;
             foreach (Pins.Pin p in Pins.List)
             {
-                string st = p.Ready ? "  " + (p.QuestId != null ? doneTxt : readyTxt) : "";
+                string st = p.Ready ? "  " + (p.QuestId != null && QuestPins.Done(p) ? doneTxt : readyTxt) : "";
                 w = Mathf.Max(w, bs + 6f + icon + 8f + pnTitle.CalcSize(new GUIContent(p.Title + st)).x + 12f + pnProg.CalcSize(new GUIContent("99/99")).x + 8f + bs + pad + bs + 30f);
                 h += head + 6f;
                 if (p.Collapsed) { h += 6f; continue; }
@@ -166,9 +166,9 @@ namespace GK2Tweaks
                     if (KitButton(mr, mt, Labels.T("Wie oft herstellen? Klick = mehr, Rechtsklick = weniger", "How many times to craft? Click = more, right click = less"), KitGrey, pnFs)) act = () => PinTree.StepMult(pp, 1);
                     rightW += mw + 4f;
                 }
-                string progTxt = p.QuestId == null && nAll > 0 ? nOk + "/" + nAll : "";
+                string progTxt = nAll > 0 ? nOk + "/" + nAll : "";
                 float pw = progTxt.Length > 0 ? pnProg.CalcSize(new GUIContent(progTxt)).x + 8f : 0f;
-                string status = p.Ready ? "  <color=#" + ColorUtility.ToHtmlStringRGB(ok) + ">" + (p.QuestId != null ? doneTxt : readyTxt) + "</color>" : "";
+                string status = p.Ready ? "  <color=#" + ColorUtility.ToHtmlStringRGB(ok) + ">" + (p.QuestId != null && QuestPins.Done(p) ? doneTxt : readyTxt) + "</color>" : "";
                 GUI.Label(new Rect(tx, hr.y, hr.xMax - tx - rightW - pw - 4f, head), p.Title + status, pnTitle);
                 if (pw > 0) GUI.Label(new Rect(hr.xMax - rightW - pw - 2f, hr.y, pw, head), progTxt, pnProg);
                 if (KitButton(new Rect(hr.xMax - bs - 5f, hr.y + (head - bs) / 2f, bs, bs), "x", Labels.T("Loslösen", "Unpin"), KitRed, pnFs)) remove = p;

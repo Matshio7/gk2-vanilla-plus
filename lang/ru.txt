@@ -620,3 +620,36 @@ Like the game => Как в игре
 Like the game ({0}×) => Как в игре ({0}×)
 {0}× – too big, {1}× => {0}× – не помещается, {1}×
 Size of the game's HUD, menus and windows (game 1.011 or newer). Like the game = as large as the pixels of the game world (often 3x on ultrawide). If a size does not fit the screen, the game adjusts it by its own rules. The game world itself stays the same - use the camera zoom for that. => Размер HUD, меню и окон игры (игра 1.011 или новее). «Как в игре» = такой же, как пиксели игрового мира (на ультрашироких экранах часто 3x). Если размер не помещается на экран, игра подстраивает его по своим правилам. Сам игровой мир не меняется – для этого используйте масштаб камеры.
+
+# 1.7.7
+Saved after the battle => Сохранено после боя
+Saving after the battle failed. => Не удалось сохранить после боя.
+No saving during a battle: saves the game makes while a battle is running (often broken) are skipped, and Vanilla+ saves once right after the battle instead. If you quit during a battle, the save from before the battle is kept. => Без сохранений во время боя: сохранения, которые игра делает во время боя (часто повреждённые), пропускаются, а Vanilla+ сохраняет один раз сразу после боя. Если выйти из игры во время боя, останется сохранение, сделанное до боя.
+Repeat work (not vanilla) => Повторять работу (не ваниль)
+Repeat work key => Клавиша «Повторять работу»
+No saving in battle => Без сохранений в бою
+Quest pins: required items => Закреплённые квесты: нужные предметы
+Not possible during a battle – Vanilla+ saves right after it. => Невозможно во время боя – Vanilla+ сохранит сразу после него.
+Not saved during the battle – Vanilla+ saves right after it. => Во время боя не сохранено – Vanilla+ сохранит сразу после него.
+Money => Деньги
+Quest pins also list the items (and money) the current quest step asks for, with have/need counts like recipe pins. Experimental: read from the game's quest data; if it can't be read, quest pins show only the task text as before. => Закреплённые квесты также показывают предметы (и деньги), которые требует текущий шаг, с «есть/нужно» как у рецептов. Экспериментально: читается из данных квестов игры; если прочитать не удаётся, закреплённый квест показывает только текст задания, как раньше.
+turned off => выключено
+error => ошибка
+Not during a battle. => Не во время боя.
+Repeat work is not possible while "Repair stuck workbench" is on. => «Повторять работу» недоступно, пока включено «Починить зависший верстак».
+Repeat work: stand at a workbench with queued crafts. => Повторять работу: встаньте у верстака с заказами в очереди.
+Repeat work on – walk away or press the key again to stop. => Повторять работу включено – отойдите или нажмите клавишу ещё раз, чтобы остановить.
+battle => бой
+Repeat work: here F opens the craft window – not supported at this workbench. => Повторять работу: здесь F открывает окно крафта – у этого верстака не поддерживается.
+a window opened => открылось окно
+workbench gone => верстак пропал
+you moved => вы отошли
+queue finished => очередь выполнена
+nothing happened => ничего не произошло
+limit reached => достигнут предел
+not reachable => вне досягаемости
+Repeat work off. => Повторять работу выключено.
+Repeat work off ({0}). => Повторять работу выключено ({0}).
+Repeat work (not vanilla): press the Repeat work key once at a workbench you work at yourself; Vanilla+ then presses F for you whenever the next queued craft is ready to start, until the queue is empty, you walk away, a Vanilla+ or craft window opens or a battle starts. It waits while another menu is open or the game is paused. Off by default. => Повторять работу (не ваниль): нажмите клавишу «Повторять работу» один раз у верстака, за которым работаете сами; Vanilla+ будет нажимать F за вас, как только следующий заказ из очереди сможет начаться, – пока очередь не опустеет, вы не отойдёте, не откроется окно Vanilla+ или окно изготовления или не начнётся бой. Пока открыто другое меню или игра на паузе, функция ждёт. По умолчанию выключено.
+Key that starts/stops Repeat work at the workbench you stand at (empty = feature unusable). => Клавиша, которая запускает/останавливает «Повторять работу» у верстака, рядом с которым вы стоите (пусто = функция недоступна).
+Repeat work => Повторять работу

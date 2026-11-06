@@ -386,7 +386,7 @@ namespace GK2Tweaks
                 float tx = cx + btn;
                 Texture2D ti = Pins.Icon(p.IconId);
                 if (ti != null) { GUI.DrawTexture(new Rect(tx, cy, icon, icon), ti, ScaleMode.ScaleToFit); tx += icon + 6f; }
-                string status = p.Ready ? "  <color=#9be27f>" + (p.QuestId != null ? done.Trim() : ready.Trim()) + "</color>" : "";
+                string status = p.Ready ? "  <color=#9be27f>" + (p.QuestId != null && QuestPins.Done(p) ? done.Trim() : ready.Trim()) + "</color>" : "";
                 GUI.Label(new Rect(tx, cy, w - (tx - x) - 36f, line), p.Title + status, pinTitleStyle);
                 if (GUI.Button(new Rect(x + w - 30f, cy, 22f, line), new GUIContent("x", Labels.T("Loslösen", "Unpin")), pinXStyle)) remove = p;
                 cy += line + 4f;
@@ -734,6 +734,7 @@ namespace GK2Tweaks
                 DrawEntry(Plugin.CraftMaxButton);
                 DrawEntry(Plugin.PauseInBackground);
                 DrawEntry(Plugin.AutoSaveMinutes);
+                DrawEntry(BattleSave.Enabled);
 
                 Header(Labels.T("Bauen", "Building"));
                 DrawEntry(Plugin.InstantRemove);
@@ -743,6 +744,8 @@ namespace GK2Tweaks
                 if (Respec.OtherMod) GUILayout.Label(Labels.T("„Talent & Tech Refund“ ist installiert – dessen Funktion wird genutzt.", "\"Talent & Tech Refund\" is installed – its function is used."), smallStyle);
                 DrawEntry(Plugin.Respec);
                 DrawEntry(Plugin.MoveSpeed);
+                DrawEntry(RepeatWork.Enabled);
+                DrawEntry(RepeatWork.Key);
 
                 Header(Labels.T("Kamera", "Camera"));
                 DrawEntry(Plugin.Zoom);
@@ -761,6 +764,7 @@ namespace GK2Tweaks
                 DrawEntry(Plugin.PinsEnabled);
                 DrawEntry(Plugin.PinsChests);
                 DrawEntry(Plugin.PinsNotify);
+                DrawEntry(QuestPins.Enabled);
                 DrawEntry(Plugin.PinsAutoUnpin);
                 DrawEntry(Plugin.PinsVariants);
                 DrawEntry(Plugin.PinsTree);

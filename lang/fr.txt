@@ -620,3 +620,36 @@ Like the game => Comme le jeu
 Like the game ({0}×) => Comme le jeu ({0}×)
 {0}× – too big, {1}× => {0}× – trop grand, {1}×
 Size of the game's HUD, menus and windows (game 1.011 or newer). Like the game = as large as the pixels of the game world (often 3x on ultrawide). If a size does not fit the screen, the game adjusts it by its own rules. The game world itself stays the same - use the camera zoom for that. => Taille du HUD, des menus et des fenêtres du jeu (jeu 1.011 ou plus récent). Comme le jeu = aussi grand que les pixels du monde du jeu (souvent 3x en ultrawide). Si une taille ne tient pas à l'écran, le jeu l'ajuste selon ses propres règles. Le monde du jeu reste identique – utilisez le zoom de la caméra pour cela.
+
+# 1.7.7
+Saved after the battle => Sauvegardé après le combat
+Saving after the battle failed. => Échec de la sauvegarde après le combat.
+No saving during a battle: saves the game makes while a battle is running (often broken) are skipped, and Vanilla+ saves once right after the battle instead. If you quit during a battle, the save from before the battle is kept. => Pas de sauvegarde pendant un combat : les sauvegardes que le jeu fait pendant un combat (souvent corrompues) sont ignorées, et Vanilla+ sauvegarde une fois juste après le combat. Si vous quittez pendant un combat, la sauvegarde d'avant le combat est conservée.
+Repeat work (not vanilla) => Répéter le travail (pas vanilla)
+Repeat work key => Touche Répéter le travail
+No saving in battle => Pas de sauvegarde en combat
+Quest pins: required items => Quêtes épinglées : objets requis
+Not possible during a battle – Vanilla+ saves right after it. => Impossible pendant un combat – Vanilla+ sauvegarde juste après.
+Not saved during the battle – Vanilla+ saves right after it. => Pas sauvegardé pendant le combat – Vanilla+ sauvegarde juste après.
+Money => Argent
+Quest pins also list the items (and money) the current quest step asks for, with have/need counts like recipe pins. Experimental: read from the game's quest data; if it can't be read, quest pins show only the task text as before. => Les quêtes épinglées affichent aussi les objets (et l'argent) demandés par l'étape actuelle, avec possédé/requis comme pour les recettes. Expérimental : lu dans les données de quête du jeu ; si elles ne peuvent pas être lues, la quête épinglée n'affiche que le texte de la tâche comme avant.
+turned off => désactivé
+error => erreur
+Not during a battle. => Pas pendant un combat.
+Repeat work is not possible while "Repair stuck workbench" is on. => Répéter le travail n'est pas possible tant que « Réparer l'établi bloqué » est activé.
+Repeat work: stand at a workbench with queued crafts. => Répéter le travail : placez-vous devant un établi avec des commandes en file d'attente.
+Repeat work on – walk away or press the key again to stop. => Répéter le travail activé – éloignez-vous ou appuyez à nouveau sur la touche pour arrêter.
+battle => combat
+Repeat work: here F opens the craft window – not supported at this workbench. => Répéter le travail : ici, F ouvre la fenêtre de fabrication – non pris en charge à cet établi.
+a window opened => une fenêtre s'est ouverte
+workbench gone => établi disparu
+you moved => vous vous êtes déplacé
+queue finished => file terminée
+nothing happened => rien ne s'est passé
+limit reached => limite atteinte
+not reachable => hors de portée
+Repeat work off. => Répéter le travail désactivé.
+Repeat work off ({0}). => Répéter le travail désactivé ({0}).
+Repeat work (not vanilla): press the Repeat work key once at a workbench you work at yourself; Vanilla+ then presses F for you whenever the next queued craft is ready to start, until the queue is empty, you walk away, a Vanilla+ or craft window opens or a battle starts. It waits while another menu is open or the game is paused. Off by default. => Répéter le travail (pas vanilla) : appuyez une fois sur la touche Répéter le travail devant un établi que vous utilisez vous-même ; Vanilla+ appuie ensuite sur F pour vous dès que la commande suivante de la file peut commencer, jusqu'à ce que la file soit vide, que vous vous éloigniez, qu'une fenêtre de Vanilla+ ou de fabrication s'ouvre ou qu'un combat commence. Attend tant qu'un autre menu est ouvert ou que le jeu est en pause. Désactivé par défaut.
+Key that starts/stops Repeat work at the workbench you stand at (empty = feature unusable). => Touche qui démarre/arrête Répéter le travail à l'établi devant lequel vous êtes (vide = fonction inutilisable).
+Repeat work => Répéter le travail

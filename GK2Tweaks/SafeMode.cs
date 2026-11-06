@@ -61,6 +61,8 @@ namespace GK2Tweaks
             { "CraftRepair", new[] { "Hängende Werkbänke lösen", "Fix stuck workbenches" } },
             { "MoveSpeed", new[] { "Laufgeschwindigkeit", "Movement speed" } },
             { "UiScale", new[] { "HUD & Menüs: Größe", "HUD & menus: size" } },
+            { "QuestItems", new[] { "Quest-Pins: benötigte Gegenstände", "Quest pins: required items" } },
+            { "RepeatWork", new[] { "Arbeit wiederholen", "Repeat work" } },
             { "Gui", new[] { "Mod-Menü & Anzeigen", "Mod menu & displays" } },
             { "Keys", new[] { "Tastenkürzel", "Hotkeys" } },
             { "News", new[] { "Hinweisfenster (Neuigkeiten, Bewertung)", "Notice windows (news, rating)" } },
@@ -80,7 +82,7 @@ namespace GK2Tweaks
                 case "MainMenuModsButtonPatch": case "PauseModsButtonPatch": return "ModsButton";
                 case "ModdedLabelPatch": return "MenuInfo";
                 case "ZoomPatch": return "Zoom";
-                case "BackupPatch": case "SaveBlockPatch": return "Saves";
+                case "BackupPatch": case "SaveBlockPatch": case "BattleSavePatch": return "Saves";
                 case "TierPatch": case "ScreenSettingsPatch": return "Graphics";
                 case "InstantRemovePatch": return "InstantRemove";
                 case "CraftRepairPatch": return "CraftRepair";
@@ -263,6 +265,13 @@ namespace GK2Tweaks
             F("CraftRepair", () => typeof(WGOInteractionHandlerBase), "assignedWgo");
             M("CraftRepair", () => typeof(CraftComponent), "RemoveFromQueue");
             M("CraftRepair", () => typeof(CraftComponent), "GetStartCraftStatus");
+            // 1.7.7: Kein Speichern im Kampf (BattleSavePatch) und Arbeit wiederholen
+            M("Saves", () => typeof(SaveSystem), "Save");
+            // Bewusst KEINE Pruefung von FightingGameController.CurrentFightState: fehlt es, liefert Backups.InBattle() false
+            // (try/catch) - dann blockiert BattleSave nur nichts, die Backups duerfen deswegen nicht mit abgeschaltet werden.
+            M("RepeatWork", () => typeof(CraftInteractionHandler), "Interact");
+            M("RepeatWork", () => typeof(CraftInteractionHandler), "HasInteraction");
+            M("RepeatWork", () => typeof(CraftComponent), "GetStartCraftStatus");
             M("TradeLikes", () => typeof(Trading), "OnPlayerItemPress1");
             F("TradeLikes", () => typeof(Trading), "cachedWindowData");
             F("TradeLikes", () => typeof(Trading), "sellInventory");

@@ -240,13 +240,28 @@ namespace GK2Tweaks
                 bool wasReady = p.Ready;
                 if (p.QuestId != null)
                 {
+                    bool qDone = false, qOk = false;
                     try
                     {
                         var q = MainGame.Instance.GameSave.questSystemData;
-                        p.Ready = q.IsQuestInStatus(p.QuestId, QuestStatus.Completed);
+                        qDone = q.IsQuestInStatus(p.QuestId, QuestStatus.Completed);
+                        qOk = true;
                     }
                     catch { }
-                    if (p.Ready && !wasReady && p.Checked) NotifyReady(p);
+                    // Status nicht lesbar: alles lassen wie es ist (wie 1.7.6), sonst kaeme der Erledigt-Hinweis spaeter doppelt
+                    if (!qOk) { p.Checked = true; continue; }
+                    // Option: benoetigte Gegenstaende des aktuellen Schritts (QuestPins), sonst Pin wie in 1.7.6
+                    bool items = false;
+                    if (!qDone && QuestPins.Active)
+                    {
+                        try { items = QuestPins.Update(p, (id, g) => HaveOf(inv, id, g)); }
+                        catch (Exception e) { QuestPins.Reset(p); SafeMode.Fail(QuestPins.Feature, e); }
+                    }
+                    else QuestPins.Reset(p);
+                    bool wasDone = QuestPins.Done(p);
+                    QuestPins.SetDone(p, qDone);
+                    p.Ready = qDone || items;
+                    if (p.Checked && ((qDone && !wasDone) || (p.Ready && !wasReady))) NotifyReady(p);
                     p.Checked = true;
                     continue;
                 }
@@ -291,7 +306,7 @@ namespace GK2Tweaks
         private static void NotifyReady(Pin p)
         {
             if (!Plugin.PinsNotify.Value) return;
-            ManualSave.Toast(string.Format(p.QuestId != null ? Labels.T("Erledigt: {0}", "Done: {0}") : Labels.T("Alles da für: {0}", "Everything ready for: {0}"), p.Title), 4f);
+            ManualSave.Toast(string.Format(p.QuestId != null && QuestPins.Done(p) ? Labels.T("Erledigt: {0}", "Done: {0}") : Labels.T("Alles da für: {0}", "Everything ready for: {0}"), p.Title), 4f);
             try { LazyAudio.PlayAndForget("unlock"); } catch { }
         }
 
@@ -927,6 +942,7 @@ namespace GK2Tweaks
                 Component host = header.transform.parent;
                 if (q == null || q.status == QuestStatus.Completed) { PinButton.Attach(host, null, null, 30f, true, 64f); return; }
                 PinButton.Attach(host, "quest:" + q.id, () => Pins.FromQuest(q), 30f, true, 64f);
+                if (QuestPins.Active) QuestPins.Probe(q);
             }
             catch (Exception e) { SafeMode.Fail("Pins", e); }
         }
