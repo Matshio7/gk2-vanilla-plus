@@ -18,8 +18,8 @@ namespace GK2Tweaks
         // Anzeige (Hauptmenue, Was ist neu, Log). Hotfix-Buchstaben (z. B. "b") nur bei schnellen, nicht voll getesteten Hotfixes. PluginVersion bleibt
         // eine reine Zahl - BepInEx, Update-Check und Installer lesen sie als Version.
         // Vorab-Versionen (Beta): BetaNumber > 0 und BetaTag " Beta N" setzen; Stabil: 0 und "". GitHub-Tag der Beta: v<Version>-beta.<N>
-        internal const int BetaNumber = 0;
-        internal const string BetaTag = "";
+        internal const int BetaNumber = 1;
+        internal const string BetaTag = " Beta 1";
         internal const string DisplayVersion = PluginVersion + BetaTag;
         internal const string Keep = "Default";
 

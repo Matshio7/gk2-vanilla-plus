@@ -1,6 +1,6 @@
 # Changelog
 
-## 1.7.7 – unreleased
+## 1.7.7 Beta 1 – 2026-11-06 · Pre-release (GitHub, beta channel)
 
 **EN**
 - **New: No saving in battle** (off by default) – mod menu (F9) → Gameplay helpers, next to "Autosave": turn on "No saving in battle", and saves the game makes while a battle is running (these are often broken) are skipped. Vanilla+ then saves once right after the battle, as soon as you have control again ("Saved after the battle"), and keeps the last save from before the battle as a backup. Vanilla+'s own save key and extra autosave wait until the battle is over. If you quit during a battle, the save from before the battle is kept (thanks Diepie2635).
